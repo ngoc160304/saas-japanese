@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT – Chi tiết khóa học</title>
+  <meta name="description" content="Xem chi tiết các khóa học tiếng Nhật từ cơ bản, cấp tốc đến khóa chuyên sâu Cô Hạnh N1." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Inter', sans-serif;
+      --color-brand: #4F46E5;
+      --color-brand-light: #818CF8;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* Mega menu */
+    .mega-trigger:hover .mega-panel,
+    .mega-trigger:focus-within .mega-panel { display: flex; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A855F7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Custom Toast styles */
+    .toast-enter {
+      animation: slideIn 0.3s ease-out forwards;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(100px) scale(0.9); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50/50 text-slate-800 antialiased overflow-x-hidden min-h-screen flex flex-col">
+
+  <!-- ====================== HEADER PLACEHOLDER ====================== -->
+  <div id="header-placeholder"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2"></div>
+
+  <!-- ====================== MAIN CONTENT AREA ====================== -->
+  <main class="pt-24 pb-16 flex-grow">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+      
+      <!-- Page Title & Subtitle -->
+      <div class="mb-10 text-center max-w-2xl mx-auto space-y-3">
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-100 px-4 py-1.5 text-xs font-semibold text-indigo-600">📚 Hệ thống khóa học</span>
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">Chi tiết lộ trình học tập</h1>
+        <p class="text-slate-500">Tìm kiếm cấp độ JLPT phù hợp và bắt đầu hành trình chinh phục tiếng Nhật ngay hôm nay.</p>
+      </div>
+
+      <!-- LEVEL SELECTOR TABS -->
+      <div class="flex justify-center mb-10">
+        <div class="bg-white border border-slate-100 p-1.5 rounded-2xl flex gap-1 shadow-sm md:shadow-md max-w-full overflow-x-auto">
+          <button onclick="setLevel('N5')" id="tab-N5" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap bg-indigo-600 text-white shadow-sm">
+            N5 Sơ cấp
+          </button>
+          <button onclick="setLevel('N4')" id="tab-N4" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-50">
+            N4 Sơ trung
+          </button>
+          <button onclick="setLevel('N3')" id="tab-N3" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-50">
+            N3 Trung cấp
+          </button>
+          <button onclick="setLevel('N2')" id="tab-N2" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-50">
+            N2 Thượng cấp
+          </button>
+          <button onclick="setLevel('N1')" id="tab-N1" class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-50">
+            N1 Cao cấp nhất
+          </button>
+        </div>
+      </div>
+
+      <!-- DYNAMIC CONTENT CONTAINER -->
+      <div id="courses-container" class="transition-all duration-300">
+        <!-- Courses will be dynamically injected here -->
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ====================== FOOTER ====================== -->
+  <footer class="border-t border-slate-100 bg-slate-900 py-12 text-slate-400">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8 text-slate-300">
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4">Khóa học</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" onclick="setLevel('N5')" class="hover:text-indigo-400 transition-colors">JLPT N5</a></li>
+            <li><a href="#" onclick="setLevel('N4')" class="hover:text-indigo-400 transition-colors">JLPT N4</a></li>
+            <li><a href="#" onclick="setLevel('N3')" class="hover:text-indigo-400 transition-colors">JLPT N3</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4">Luyện thi</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" onclick="setLevel('N3')" class="hover:text-indigo-400 transition-colors">Thi thử N3</a></li>
+            <li><a href="#" onclick="setLevel('N2')" class="hover:text-indigo-400 transition-colors">Thi thử N2</a></li>
+            <li><a href="#" onclick="setLevel('N1')" class="hover:text-indigo-400 transition-colors">Thi thử N1</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4">Tài liệu</h4>
+          <ul class="space-y-2 text-sm">
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">Ebook</a></li>
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">PDF</a></li>
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">Combo sách</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white text-sm mb-4">Công ty</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">Về chúng tôi</a></li>
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">Liên hệ</a></li>
+            <li><a href="#" class="hover:text-indigo-400 transition-colors">Điều khoản</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-slate-800 pt-8 text-center text-xs text-slate-500">
+        © 2026 Study JLPT Platform. Hỗ trợ học viên chinh phục chứng chỉ tiếng Nhật.
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================== SCRIPTS & DYNAMIC DATA ====================== -->
+  <script>
+    // Load shared header component
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        const response = await fetch('./components/header.html');
+        const headerHTML = await response.text();
+        document.getElementById('header-placeholder').innerHTML = headerHTML;
+        
+        // Remove footer elements from the header fetch to avoid duplication
+        const headerPlaceholder = document.getElementById('header-placeholder');
+        const footerElements = headerPlaceholder.querySelectorAll('footer, .border-t.border-slate-800');
+        footerElements.forEach(el => el.remove());
+
+        initializeMegaMenus();
+        updateMenuLinks();
+      } catch (error) {
+        console.error('Failed to load header:', error);
+      }
+
+      // Read level from URL query parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const levelParam = urlParams.get('level');
+      if (levelParam && ['N5', 'N4', 'N3', 'N2', 'N1'].includes(levelParam)) {
+        setLevel(levelParam);
+      } else {
+        setLevel('N5');
+      }
+    });
+
+    // Make header menu items dynamic on this page as well
+    function updateMenuLinks() {
+      const links = document.querySelectorAll('#site-header a');
+      links.forEach(link => {
+        const text = link.textContent.trim();
+        if (text === 'Khóa học') {
+          link.href = 'javascript:setLevel("N5")';
+        }
+      });
+    }
+
+    function initializeMegaMenus() {
+      const triggers = document.querySelectorAll('.mega-trigger');
+      triggers.forEach(trigger => {
+        const button = trigger.querySelector('button');
+        const panel = trigger.querySelector('.mega-panel');
+        
+        if (button && panel) {
+          button.addEventListener('mouseenter', () => panel.classList.remove('hidden'));
+          trigger.addEventListener('mouseleave', () => panel.classList.add('hidden'));
+        }
+      });
+    }
+
+    // Courses Mock Data
+    const courseData = {
+      'N5': [
+        {
+          id: 'n5_basic',
+          level: 'N5',
+          tag: 'CƠ BẢN',
+          themeClass: 'from-indigo-500 to-violet-600',
+          title: 'Khóa học Tiếng Nhật Cơ bản N5',
+          subtitle: 'Lộ trình bài bản cho người mới học từ số 0',
+          description: 'Khóa học được xây dựng nhằm cung cấp kiến thức nền tảng tiếng Nhật toàn diện cho các học viên bắt đầu từ con số 0. Học viên sẽ được học bảng chữ cái Hiragana, Katakana, cấu trúc ngữ pháp thông dụng trong Minna no Nihongo, cách phát âm tự nhiên, phương pháp luyện nói phản xạ căn bản và nhận diện 100 chữ Kanji cơ bản nhất.',
+          stats: {
+            lessons: 30,
+            duration: '45 giờ video bài giảng',
+            materials: '15 file PDF bài tập bổ trợ',
+            support: 'AI Study Coach 24/7'
+          },
+          price: 'Miễn phí',
+          syllabus: [
+            { title: 'Bài 1: Bảng chữ cái Hiragana & Katakana', desc: 'Quy tắc viết, phát âm chuẩn nguyên âm, phụ âm và âm ghép trong tiếng Nhật.' },
+            { title: 'Bài 2: Tự giới thiệu bản thân & Chào hỏi xã giao', desc: 'Mẫu câu tự giới thiệu (Jikoshoukai), các đại từ nhân xưng và quy tắc cúi chào.' },
+            { title: 'Bài 3: Danh từ chỉ đồ vật, phương hướng (Kore/Sore/Are)', desc: 'Cách đặt câu hỏi vật thể, sở hữu cách với trợ từ "no", cấu trúc "đây là/kia là".' },
+            { title: 'Bài 4: Động từ thời gian, giờ giấc & Cách thức chia thời', desc: 'Nhận biết động từ nhóm 1, 2, 3. Các thì khẳng định, phủ định trong quá khứ và tương lai.' },
+            { title: 'Bài 5: Trợ từ di chuyển (e/ni) & Động từ di động', desc: 'Cách đặt câu với động từ Iku (đi), Kuru (đến), Kaeru (về). Cách dùng các phương tiện đi lại.' }
+          ]
+        },
+        {
+          id: 'n5_crash',
+          level: 'N5',
+          tag: 'CẤP TỐC',
+          themeClass: 'from-emerald-500 to-teal-600',
+          title: 'Khóa học JLPT N5 Cấp tốc',
+          subtitle: 'Hệ thống hóa kiến thức trọng tâm & Giải đề thi thử',
+          description: 'Giải pháp học tập nhanh dành cho những ai cần thi đỗ chứng chỉ JLPT N5 gấp hoặc muốn tổng ôn kiến thức. Tập trung đúc kết mẹo tránh bẫy từ vựng, hệ thống hóa 30 ngữ pháp cốt lõi hay ra đề, luyện phản xạ nghe hiểu cấp tốc thông qua hình ảnh sinh động và hướng dẫn phương pháp làm bài đọc hiểu ngắn.',
+          stats: {
+            lessons: 20,
+            duration: '30 giờ video bài giảng',
+            materials: '5 đề thi thử JLPT N5 chuẩn cấu trúc',
+            support: 'AI Study Coach 24/7'
+          },
+          price: '199.000 đ',
+          syllabus: [
+            { title: 'Bài 1: Tổng ôn 100 từ vựng N5 thường gặp', desc: 'Mẹo nhớ nhanh từ vựng theo cặp từ trái nghĩa, các từ chỉ thời gian hay gây nhầm lẫn.' },
+            { title: 'Bài 2: Hệ thống 30 cấu trúc ngữ pháp N5 cốt lõi', desc: 'Tập trung ôn tập các mẫu câu yêu cầu, rủ rê, liệt kê hành động và trợ từ ghép.' },
+            { title: 'Bài 3: Kỹ năng đọc hiểu N5 - Tìm ý chính', desc: 'Cách đọc nhanh tìm chủ ngữ, xác định thông tin quan trọng trong mẩu tin ngắn hoặc bảng thông báo.' },
+            { title: 'Bài 4: Luyện nghe hiểu tranh vẽ cấp tốc', desc: 'Chiến thuật nghe phần thi Mondai 1 và 2: cách loại trừ đáp án nhiễu bằng sơ đồ từ khóa.' },
+            { title: 'Bài 5: Giải đề thi mẫu sát cấu trúc đề thi thật', desc: 'Thực chiến bấm giờ giải đề thi mẫu và xem video sửa lỗi phân tích chi tiết của giáo viên.' }
+          ]
+        }
+      ],
+      'N1': [
+        {
+          id: 'n1_co_hanh',
+          level: 'N1',
+          tag: 'ĐỘC QUYỀN CÔ HẠNH',
+          themeClass: 'from-violet-600 to-purple-700',
+          title: 'Khóa học Chinh phục N1 & Giao tiếp Thương mại Cô Hạnh',
+          subtitle: 'Khóa học cao cấp được thiết kế và giảng dạy trực tiếp bởi Cô Hạnh',
+          description: 'Chương trình đào tạo cao cấp đặc biệt giúp học viên không chỉ vượt qua kỳ thi JLPT N1 đạt điểm cao mà còn xây dựng phong thái làm việc chuyên nghiệp chuẩn Nhật. Khóa học tập trung giải quyết triệt để bài đọc luận văn dài, bài nghe hiểu đàm thoại tốc độ nhanh, luyện viết email công sở chuẩn Keigo (Kính ngữ/Khiêm nhường ngữ) và các kỹ năng thuyết trình, thương thảo hợp đồng.',
+          stats: {
+            lessons: 50,
+            duration: '80 giờ học video chuyên sâu',
+            materials: 'Học liệu độc quyền & Livestream sửa bài hàng tuần cùng Cô Hạnh',
+            support: 'AI Study Coach + Cô Hạnh trực tiếp chữa bài nói/viết'
+          },
+          price: '599.000 đ',
+          originalPrice: '999.000 đ',
+          syllabus: [
+            { title: 'Bài 1: Chiến thuật giải Đọc hiểu trường văn & luận văn N1', desc: 'Phân tích kết cấu bài luận thuyết phục của tác giả, tìm câu cốt lõi bộc lộ luận điểm và mẹo loại trừ bẫy từ đồng nghĩa.' },
+            { title: 'Bài 2: Luyện nghe hiểu hội thoại tốc độ cao & bắt từ khóa', desc: 'Thực hành các bài nghe thời sự NHK, tin tức kinh tế xã hội và các bài đàm thoại đa nhân vật phức tạp.' },
+            { title: 'Bài 3: Phân biệt cấu trúc ngữ pháp N1 đồng nghĩa & tinh tế', desc: 'Học cách sử dụng đúng ngữ cảnh các mẫu câu ngữ pháp N1 trang trọng, các mẫu mang sắc thái nghi vấn hay phủ định nhẹ nhàng.' },
+            { title: 'Bài 4: Kính ngữ thương mại chuyên sâu (Sonkeigo & Kenjougo)', desc: 'Thực hành viết email xin lỗi đối tác, email đàm phán tiến độ, và kỹ năng giao tiếp qua điện thoại công sở.' },
+            { title: 'Bài 5: Thực hành hội thoại thương thuyết và đàm phán hợp đồng', desc: 'Mô phỏng tình huống thương lượng giá cả, điều khoản hợp đồng và giải quyết khiếu nại trong công việc.' }
+          ]
+        }
+      ]
+    };
+
+    // Keep track of current level
+    let currentLevel = 'N5';
+
+    // Set Level Function
+    function setLevel(level) {
+      currentLevel = level;
+      
+      // Update Tab Styles
+      ['N5', 'N4', 'N3', 'N2', 'N1'].forEach(lvl => {
+        const btn = document.getElementById(`tab-${lvl}`);
+        if (lvl === level) {
+          btn.className = "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap bg-indigo-600 text-white shadow-sm";
+        } else {
+          btn.className = "px-5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer whitespace-nowrap text-slate-500 hover:text-slate-900 hover:bg-slate-50";
+        }
+      });
+
+      // Update URL Param without reloading
+      const url = new URL(window.location);
+      url.searchParams.set('level', level);
+      window.history.pushState({}, '', url);
+
+      // Render content
+      renderCourses();
+    }
+
+    // Render Courses dynamically
+    function renderCourses() {
+      const container = document.getElementById('courses-container');
+      const courses = courseData[currentLevel];
+
+      if (!courses || courses.length === 0) {
+        // Empty State
+        container.innerHTML = `
+          <div class="bg-white border border-slate-100 rounded-3xl p-12 text-center max-w-xl mx-auto space-y-5 shadow-sm">
+            <div class="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-amber-50 text-amber-500 text-3xl">📭</div>
+            <h3 class="text-xl font-bold text-slate-900">Khóa học đang được biên soạn</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">
+              Các khóa học cho trình độ <strong class="text-indigo-600">${currentLevel}</strong> hiện đang được đội ngũ chuyên môn xây dựng để đảm bảo chất lượng tốt nhất. Bạn có thể tham khảo các lộ trình hiện có tại cấp độ <strong>N5</strong> hoặc <strong>N1</strong>.
+            </p>
+            <div class="flex gap-3 justify-center pt-2">
+              <button onclick="setLevel('N5')" class="px-5 py-2.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-semibold text-sm transition-all cursor-pointer">
+                Học N5 Sơ cấp
+              </button>
+              <button onclick="setLevel('N1')" class="px-5 py-2.5 rounded-xl bg-violet-50 hover:bg-violet-100 text-violet-600 font-semibold text-sm transition-all cursor-pointer">
+                Học N1 Cô Hạnh
+              </button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Group N5 Grid or N1 Wide layout
+      let html = '';
+      if (currentLevel === 'N5') {
+        html += `<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">`;
+      } else {
+        html += `<div class="grid grid-cols-1 gap-8 max-w-5xl mx-auto">`;
+      }
+
+      courses.forEach(course => {
+        // Check dynamic enrollment status from localStorage
+        const isEnrolled = localStorage.getItem(`enrolled_course_${course.id}`) === 'true';
+
+        html += `
+          <div class="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-slate-200/40 transition-all duration-300 flex flex-col">
+            
+            <!-- Card Banner -->
+            <div class="relative bg-gradient-to-br ${course.themeClass} p-8 text-white">
+              <div class="absolute top-6 right-6 rounded-lg bg-white/20 backdrop-blur-sm px-3 py-1 text-[10px] font-bold tracking-widest uppercase">
+                ${course.tag}
+              </div>
+              <div class="space-y-2">
+                <span class="inline-flex items-center rounded-md bg-white/10 px-2 py-0.5 text-xs font-semibold">
+                  JLPT ${course.level}
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black leading-tight">${course.title}</h2>
+                <p class="text-white/80 text-sm font-medium">${course.subtitle}</p>
+              </div>
+            </div>
+
+            <!-- Card Content Body -->
+            <div class="p-8 flex-grow flex flex-col justify-between space-y-6">
+              
+              <!-- Tab Switcher for Course description & syllabus -->
+              <div>
+                <div class="border-b border-slate-100 flex gap-4 mb-4">
+                  <button id="desc-tab-btn-${course.id}" onclick="switchCourseTab('${course.id}', 'desc')" class="pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 cursor-pointer">
+                    Mô tả khóa học
+                  </button>
+                  <button id="syll-tab-btn-${course.id}" onclick="switchCourseTab('${course.id}', 'syll')" class="pb-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 cursor-pointer">
+                    Lộ trình bài học (${course.stats.lessons} bài)
+                  </button>
+                </div>
+
+                <!-- Course Description Content -->
+                <div id="desc-content-${course.id}" class="space-y-4">
+                  <p class="text-slate-600 text-sm leading-relaxed">${course.description}</p>
+                  
+                  <!-- Inclusions List -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs text-slate-500">
+                    <div class="flex items-center gap-2">
+                      <span class="text-indigo-500 font-bold">✓</span>
+                      <span>${course.stats.duration}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-indigo-500 font-bold">✓</span>
+                      <span>${course.stats.materials}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-indigo-500 font-bold">✓</span>
+                      <span>Được hỗ trợ bởi AI Coach</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <span class="text-indigo-500 font-bold">✓</span>
+                      <span>Chứng chỉ hoàn thành lộ trình</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Course Syllabus Content -->
+                <div id="syll-content-${course.id}" class="hidden space-y-4">
+                  <p class="text-slate-500 text-xs italic mb-2">Dưới đây là 5 bài học mẫu tiêu biểu trong lộ trình học tập:</p>
+                  <div class="relative pl-4 border-l-2 border-indigo-100 space-y-4">
+                    ${course.syllabus.map((item, index) => `
+                      <div class="relative">
+                        <!-- Bullet point marker -->
+                        <div class="absolute -left-[21px] top-1 h-2 w-2 rounded-full bg-indigo-500 ring-4 ring-white"></div>
+                        <h4 class="text-sm font-bold text-slate-900">${item.title}</h4>
+                        <p class="text-slate-500 text-xs mt-0.5 leading-relaxed">${item.desc}</p>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price, Action Button & Persistence Section -->
+              <div class="pt-6 border-t border-slate-100 space-y-4">
+                <div class="flex items-center justify-between">
+                  <div class="space-y-1">
+                    <p class="text-xs text-slate-400 font-medium">Học phí trọn khóa</p>
+                    <div class="flex items-baseline gap-2">
+                      <span class="text-2xl font-black text-slate-900">${course.price}</span>
+                      ${course.originalPrice ? `<span class="text-sm text-slate-400 line-through font-medium">${course.originalPrice}</span>` : ''}
+                    </div>
+                  </div>
+
+                  <!-- Ratings and Reviews -->
+                  <div class="text-right">
+                    <div class="flex items-center gap-1 text-amber-500 text-sm font-bold justify-end">★★★★★</div>
+                    <p class="text-xs text-slate-400">4.9/5 (1,240 đánh giá)</p>
+                  </div>
+                </div>
+
+                <!-- Enrollment Interactivity -->
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2">
+                    <div class="flex-grow">
+                      ${isEnrolled ? `
+                        <!-- Enrolled / Start learning state -->
+                        <div class="space-y-1.5 mb-2.5">
+                          <div class="flex justify-between items-center text-xs">
+                            <span class="text-emerald-600 font-bold flex items-center gap-1">
+                              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+                              Đã đăng ký tham gia
+                            </span>
+                            <span class="text-slate-400 font-medium">Tiến độ: 0%</span>
+                          </div>
+                          <div class="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+                            <div class="h-full bg-emerald-500 rounded-full" style="width:0%"></div>
+                          </div>
+                        </div>
+                        <a href="./lesson_view.html" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3.5 px-6 shadow-md shadow-emerald-100 hover:shadow-lg transition-all hover:-translate-y-0.5 text-center text-sm">
+                          📖 Bắt đầu vào học bài giảng
+                        </a>
+                      ` : `
+                        <!-- Unenrolled / Join now state -->
+                        <button onclick="enrollCourse('${course.id}', '${course.title}')" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 shadow-md shadow-indigo-100 hover:shadow-lg transition-all hover:-translate-y-0.5 text-center text-sm cursor-pointer">
+                          ⚡ Đăng ký tham gia khóa học
+                        </button>
+                      `}
+                    </div>
+                  </div>
+
+                  <!-- Unenroll option to test toggling back and forth -->
+                  ${isEnrolled ? `
+                    <div class="text-center">
+                      <button onclick="unenrollCourse('${course.id}')" class="text-xs text-slate-400 hover:text-rose-500 transition-colors underline cursor-pointer">
+                        Hủy tham gia để test lại
+                      </button>
+                    </div>
+                  ` : ''}
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        `;
+      });
+
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    // Switch between course description and syllabus tabs
+    function switchCourseTab(courseId, tabType) {
+      const descBtn = document.getElementById(`desc-tab-btn-${courseId}`);
+      const syllBtn = document.getElementById(`syll-tab-btn-${courseId}`);
+      const descContent = document.getElementById(`desc-content-${courseId}`);
+      const syllContent = document.getElementById(`syll-content-${courseId}`);
+
+      if (tabType === 'desc') {
+        descBtn.className = "pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 cursor-pointer";
+        syllBtn.className = "pb-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 cursor-pointer";
+        descContent.classList.remove('hidden');
+        syllContent.classList.add('hidden');
+      } else {
+        descBtn.className = "pb-2 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-800 cursor-pointer";
+        syllBtn.className = "pb-2 text-sm font-bold border-b-2 border-indigo-600 text-indigo-600 cursor-pointer";
+        descContent.classList.add('hidden');
+        syllContent.classList.remove('hidden');
+      }
+    }
+
+    // Show Custom premium Toast Notifications
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast-enter flex items-center gap-3 bg-white border border-slate-100 shadow-2xl p-4 rounded-2xl max-w-sm transition-all duration-300`;
+      
+      const icon = type === 'success' ? '🎉' : 'ℹ️';
+      const borderTheme = type === 'success' ? 'border-l-4 border-l-emerald-500' : 'border-l-4 border-l-indigo-500';
+      toast.className += ` ${borderTheme}`;
+
+      toast.innerHTML = `
+        <span class="text-xl">${icon}</span>
+        <div>
+          <p class="text-xs text-slate-500 leading-none">Thông báo hệ thống</p>
+          <p class="text-sm font-bold text-slate-900 mt-1 leading-tight">${message}</p>
+        </div>
+      `;
+
+      container.appendChild(toast);
+      
+      // Auto close after 3.5 seconds
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-20px) scale(0.95)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // Enroll in Course Function
+    function enrollCourse(courseId, courseTitle) {
+      localStorage.setItem(`enrolled_course_${courseId}`, 'true');
+      showToast(`Bạn đã đăng ký tham gia "${courseTitle}" thành công!`);
+      renderCourses();
+    }
+
+    // Unenroll from Course Function (Test assistant)
+    function unenrollCourse(courseId) {
+      localStorage.removeItem(`enrolled_course_${courseId}`);
+      showToast(`Đã hủy đăng ký khóa học để thử nghiệm.`);
+      renderCourses();
+    }
+  </script>
+
+</body>
+</html>

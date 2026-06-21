@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT – Nền tảng học tiếng Nhật & luyện thi JLPT chuẩn N1</title>
+  <meta name="description" content="Học tiếng Nhật & luyện thi JLPT từ N5 đến N1 cùng AI Study Coach thông minh. Đề thi chuẩn cấu trúc, flashcard tự động, tiến độ cá nhân hóa." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Inter', sans-serif;
+      --color-brand: #4F46E5;
+      --color-brand-light: #818CF8;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* Mega menu */
+    .mega-trigger:hover .mega-panel,
+    .mega-trigger:focus-within .mega-panel { display: flex; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A855F7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text-warm {
+      background: linear-gradient(135deg, #F59E0B 0%, #EF4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glass card */
+    .glass {
+      background: rgba(255,255,255,0.08);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .glass-light {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.9);
+    }
+
+    /* Float animation */
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes float-slow { 0%,100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
+    @keyframes pulse-ring { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(1.4); opacity: 0; } }
+    @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+    @keyframes count-up { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .float { animation: float 4s ease-in-out infinite; }
+    .float-slow { animation: float-slow 6s ease-in-out infinite; }
+    .float-delay { animation: float 4s ease-in-out 1.5s infinite; }
+
+    .shimmer-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+      animation: shimmer 2.5s ease-in-out infinite;
+    }
+
+    /* Progress bar animation */
+    @keyframes progress-fill { from { width: 0; } to { width: var(--w); } }
+    .progress-animated { animation: progress-fill 1.2s ease-out forwards; }
+
+    /* Roadmap connector */
+    .roadmap-line::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 100%;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #E0E7FF, #C7D2FE);
+      transform: translateY(-50%);
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-800 antialiased overflow-x-hidden">
+
+<header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-slate-100/80 bg-white/90 backdrop-blur-xl transition-all duration-300">
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+    <div class="flex h-16 items-center justify-center gap-6 lg:gap-10">
+
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-2.5 shrink-0 group">
+        <div class="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-black text-lg shadow-md shadow-indigo-200 transition-transform group-hover:scale-105">
+          日
+          <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span><span class="relative flex h-3 w-3 rounded-full bg-emerald-500"></span></span>
+        </div>
+        <span class="text-[17px] font-black tracking-tight text-slate-900">Study<span class="text-indigo-600">JLPT</span></span>
+      </a>
+
+      <!-- Global Search -->
+      <div class="hidden lg:flex flex-1 max-w-md mx-auto">
+        <div class="relative w-full">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803a7.5 7.5 0 0 0 10.607 0z" />
+          </svg>
+          <input type="search" placeholder="Tìm khóa học, đề thi, từ vựng…" class="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
+          <kbd class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 px-1.5 items-center rounded-md border border-slate-200 bg-white text-[10px] font-medium text-slate-400">⌘K</kbd>
+        </div>
+      </div>
+
+      <!-- Mega Nav -->
+      <nav class="hidden lg:flex items-center gap-0.5">
+
+        <a href="course_detail.html?level=N5" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Khóa học</a>
+
+        <!-- Mega: Luyện thi -->
+        <div class="mega-trigger relative">
+          <button class="inline-flex items-center gap-1 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+            Luyện thi
+            <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+          </button>
+          <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/60 flex-col gap-0.5 z-50">
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N5</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N4</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N3</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N2</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N1</span></a>
+          </div>
+        </div>
+
+        <!-- Shop Link -->
+        <a href="#" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Shop</a>
+
+        <!-- Mega: Tài liệu -->
+        <div class="mega-trigger relative">
+          <button class="inline-flex items-center gap-1 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+            Tài liệu
+            <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+          </button>
+          <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/60 flex-col gap-0.5 z-50">
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Ebook học tiếng Nhật</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">PDF & Tài liệu PDF</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Combo sách tiết kiệm</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Đề thi thử JLPT</span></a>
+          </div>
+        </div>
+
+        <!-- Mega: AI Features -->
+        <div class="mega-trigger relative">
+          <button class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors">
+            <span class="flex h-1.5 w-1.5 rounded-full bg-indigo-400"></span>
+            AI Coach
+            <svg class="h-3.5 w-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+          </button>
+          <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl shadow-indigo-100/40 flex-col gap-1 z-50">
+            <div class="mb-2 pb-2 border-b border-slate-100">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-600">✦ Powered by AI</span>
+            </div>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🧠</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Study Coach</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🗣️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Speaking Practice</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">✍️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Grammar Checker</span></a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🗺️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Personalized Roadmap</span></a>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-3 ml-auto shrink-0">
+        <!-- Notification Bell -->
+        <button class="relative hidden sm:flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+          <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+        </button>
+        <!-- Cart -->
+        <a href="#" class="relative hidden sm:flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+          <span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">2</span>
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" /></svg>
+        </a>
+        <!-- Divider -->
+        <span class="hidden sm:block h-6 w-px bg-slate-100"></span>
+        <!-- Auth buttons -->
+        <a href="#" class="hidden md:inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors">Đăng nhập</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+  <!-- Footer Bottom -->
+  <div class="border-t border-slate-800">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <p>© 2026 StudyJLPT Platform. Bản quyền thuộc về StudyJLPT Vietnam. All rights reserved.</p>
+      <div class="flex items-center gap-4">
+        <a href="#" class="hover:text-slate-300 transition-colors">Điều khoản</a>
+        <a href="#" class="hover:text-slate-300 transition-colors">Bảo mật</a>
+        <a href="#" class="hover:text-slate-300 transition-colors">Cookie</a>
+        <span class="flex items-center gap-1">🇻🇳 Tiếng Việt</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Sticky header shadow on scroll
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 10) {
+      header.classList.add('shadow-sm', 'shadow-slate-200/60');
+    } else {
+      header.classList.remove('shadow-sm', 'shadow-slate-200/60');
+    }
+  });
+</script>
+
+</body>
+</html>

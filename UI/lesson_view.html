@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT – Giao diện học bài</title>
+  <meta name="description" content="Học bài học JLPT với 4 Tab: Bài giảng, Ngữ pháp, Từ vựng, Chữ Kanji" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Inter', sans-serif;
+      --color-brand: #4F46E5;
+      --color-brand-light: #818CF8;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    /* Mega menu */
+    .mega-trigger:hover .mega-panel,
+    .mega-trigger:focus-within .mega-panel { display: flex; }
+
+    /* Gradient text */
+    .gradient-text {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #A855F7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Tab styling */
+    .tab-btn {
+      @apply px-4 py-3 text-sm font-medium text-slate-600 border-b-2 border-transparent hover:text-slate-900 hover:border-indigo-200 transition-all cursor-pointer;
+    }
+    .tab-btn.active {
+      @apply text-indigo-600 border-indigo-600 bg-indigo-50/30;
+    }
+    
+    .tab-content {
+      @apply hidden;
+    }
+    .tab-content.active {
+      @apply block;
+    }
+  </style>
+</head>
+<body class="bg-white text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- ====================== HEADER PLACEHOLDER ====================== -->
+  <div id="header-placeholder"></div>
+<!-- -->
+<!-- ====================== MAIN CONTENT AREA ====================== -->
+<main class="pt-20 pb-12">
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+    
+    <!-- Breadcrumb & Header -->
+    <div class="mb-6 flex items-center justify-between">
+      <div class="flex items-center gap-2 text-sm text-slate-500">
+        <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">← Quay lại khóa học: JLPT N3 Tổng hợp</a>
+      </div>
+      <div class="text-xs font-semibold text-slate-400">Bài 5 / 24</div>
+    </div>
+
+    <!-- Main Layout: Sidebar + Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      
+      <!-- LEFT SIDEBAR: Lesson List -->
+      <aside class="lg:col-span-1">
+        <div class="rounded-2xl border border-slate-100 bg-white p-4 sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
+          <h3 class="mb-4 text-sm font-bold text-slate-900 uppercase tracking-wide">Danh sách bài học</h3>
+          
+          <nav class="space-y-1.5">
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></path></svg>
+              <span>Bài 1: Kanji phương hướng</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></path></svg>
+              <span>Bài 2: Kanji gia đình</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></path></svg>
+              <span>Bài 3: Từ vựng văn phòng</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></path></svg>
+              <span>Bài 4: Ngữ pháp thời gian</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-700 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors border-l-2 border-indigo-600">
+              <svg class="h-4 w-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></path></svg>
+              <span class="font-semibold">Bài 5: Kanji cơ quan</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-slate-300" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="1"/></svg>
+              <span>Bài 6: Ngữ pháp phỏng đoán</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-slate-50 transition-colors">
+              <svg class="h-4 w-4 text-slate-300" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="1"/></svg>
+              <span>Bài 7: Quiz tổng hợp</span>
+            </a>
+          </nav>
+
+          <!-- Progress -->
+          <div class="mt-6 pt-4 border-t border-slate-200">
+            <div class="mb-2 flex items-center justify-between text-xs">
+              <span class="font-semibold text-slate-700">Tiến độ</span>
+              <span class="text-slate-500">5/24 (21%)</span>
+            </div>
+            <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div class="h-full w-1/5 bg-gradient-to-r from-indigo-500 to-violet-600 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT CONTENT: Main Lesson Area -->
+      <section class="lg:col-span-3">
+        <div class="rounded-2xl border border-slate-100 bg-white overflow-hidden">
+          
+          <!-- Tab Navigation -->
+          <div class="border-b border-slate-100 flex flex-wrap gap-0 bg-slate-50/50">
+            <button class="tab-btn active" data-tab="lesson" onclick="switchTab(event, 'lesson')">
+              📖 Bài giảng
+            </button>
+            <button class="tab-btn" data-tab="grammar" onclick="switchTab(event, 'grammar')">
+              ✍️ Ngữ pháp
+            </button>
+            <button class="tab-btn" data-tab="vocabulary" onclick="switchTab(event, 'vocabulary')">
+              📚 Từ vựng
+            </button>
+            <button class="tab-btn" data-tab="kanji" onclick="switchTab(event, 'kanji')">
+              漢 Chữ Kanji
+            </button>
+          </div>
+
+          <!-- Tab Contents -->
+          <div class="p-6 lg:p-8">
+
+            <!-- TAB 1: BÀI GIẢNG -->
+            <div id="lesson" class="tab-content active space-y-6">
+              <div>
+                <h2 class="mb-2 text-2xl font-bold text-slate-900">Bài 5: Chữ Kanji chỉ hành động ở cơ quan</h2>
+                <p class="text-slate-500">Học các chữ Kanji thường gặp trong môi trường công ty và văn phòng</p>
+              </div>
+
+              <!-- Video embed placeholder -->
+              <div class="relative w-full bg-slate-900 rounded-xl overflow-hidden aspect-video flex items-center justify-center">
+                <svg class="h-16 w-16 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path d="M5 3a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2V5a2 2 0 00-2-2H5zm15 7a1 1 0 11-2 0 1 1 0 012 0z"/></svg>
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/40 transition-opacity cursor-pointer">
+                  <svg class="h-12 w-12 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z"/></svg>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="prose prose-sm max-w-none">
+                <h3 class="text-lg font-semibold text-slate-900">Nội dung bài học</h3>
+                <p class="text-slate-600">Bài học này tập trung vào các chữ Kanji liên quan đến hoạt động làm việc tại cơ quan. Những chữ Kanji này xuất hiện thường xuyên trong các bài kiểm tra JLPT N3 và N2.</p>
+                
+                <h4 class="text-base font-semibold text-slate-900 mt-4">Phần 1: Kanji Cơ bản</h4>
+                <ul class="list-disc list-inside text-slate-600 space-y-1">
+                  <li><strong>働</strong> (ĐỘNG): Làm việc, lao động</li>
+                  <li><strong>議</strong> (NGHỊ): Hội nghị, thảo luận</li>
+                  <li><strong>決</strong> (QUYẾT): Quyết định, xác định</li>
+                  <li><strong>報</strong> (BÁO): Báo cáo, tin tức</li>
+                </ul>
+              </div>
+
+              <!-- Navigation -->
+              <div class="flex items-center justify-between pt-4 border-t border-slate-200">
+                <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors text-sm font-medium">
+                  ← Bài trước
+                </button>
+                <button class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors text-sm font-medium">
+                  Bài sau →
+                </button>
+              </div>
+            </div>
+
+            <!-- TAB 2: NGỮ PHÁP -->
+            <div id="grammar" class="tab-content space-y-6">
+              <h2 class="text-2xl font-bold text-slate-900">Ngữ pháp - Bài 5</h2>
+              
+              <div class="space-y-4">
+                <div class="rounded-lg border border-slate-200 p-4 bg-slate-50">
+                  <h3 class="font-semibold text-slate-900 mb-2">Cấu trúc 1: ~ている</h3>
+                  <p class="text-sm text-slate-600 mb-3">Biểu thị hành động đang diễn ra hoặc trạng thái hiện tại</p>
+                  <div class="bg-white rounded p-3 border-l-4 border-indigo-500">
+                    <p class="font-mono text-sm text-slate-700">彼は会議に出席<strong>している</strong>。</p>
+                    <p class="text-sm text-slate-500 mt-1">Anh ấy đang tham dự cuộc họp.</p>
+                  </div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 bg-slate-50">
+                  <h3 class="font-semibold text-slate-900 mb-2">Cấu trúc 2: ~たほうが</h3>
+                  <p class="text-sm text-slate-600 mb-3">Biểu thị lời khuyên, gợi ý nên làm cái gì</p>
+                  <div class="bg-white rounded p-3 border-l-4 border-indigo-500">
+                    <p class="font-mono text-sm text-slate-700">仕事の後で、ジムに行<strong>ったほうが</strong>いい。</p>
+                    <p class="text-sm text-slate-500 mt-1">Bạn nên đi phòng tập thể dục sau khi làm việc.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 3: TỪ VỰNG -->
+            <div id="vocabulary" class="tab-content space-y-6">
+              <h2 class="text-2xl font-bold text-slate-900">Từ vựng - Bài 5</h2>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">会議</div>
+                  <div class="text-sm text-slate-600">かいぎ</div>
+                  <div class="text-sm text-slate-500 mt-1">Cuộc họp, hội nghị</div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">出席</div>
+                  <div class="text-sm text-slate-600">しゅっせき</div>
+                  <div class="text-sm text-slate-500 mt-1">Tham dự, có mặt</div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">報告</div>
+                  <div class="text-sm text-slate-600">ほうこく</div>
+                  <div class="text-sm text-slate-500 mt-1">Báo cáo, thông báo</div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">決定</div>
+                  <div class="text-sm text-slate-600">けってい</div>
+                  <div class="text-sm text-slate-500 mt-1">Quyết định, xác định</div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">交渉</div>
+                  <div class="text-sm text-slate-600">こうしょう</div>
+                  <div class="text-sm text-slate-500 mt-1">Đàm phán, thương lượng</div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-4 hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer">
+                  <div class="text-2xl font-bold text-indigo-600 mb-1">契約</div>
+                  <div class="text-sm text-slate-600">けいやく</div>
+                  <div class="text-sm text-slate-500 mt-1">Hợp đồng, thỏa thuận</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 4: CHỮ KANJI -->
+            <div id="kanji" class="tab-content space-y-6">
+              <h2 class="text-2xl font-bold text-slate-900">Chữ Kanji - Bài 5</h2>
+              
+              <div class="space-y-4">
+                <div class="rounded-lg border border-slate-200 p-5 bg-gradient-to-br from-slate-50 to-slate-100">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="text-center">
+                      <div class="text-5xl font-bold text-indigo-600 mb-1">働</div>
+                      <div class="text-xs font-semibold text-slate-600 uppercase">ĐỘNG</div>
+                    </div>
+                    <div class="col-span-2 space-y-2">
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm On:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">ドウ</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm Kun:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">はたら.く</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Số nét:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">13 nét</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="border-t border-slate-200 pt-4">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">Ý nghĩa: Làm việc, lao động</p>
+                    <p class="text-sm text-slate-600 italic">「会社で働く」 - Làm việc tại công ty</p>
+                  </div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-5 bg-gradient-to-br from-slate-50 to-slate-100">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="text-center">
+                      <div class="text-5xl font-bold text-indigo-600 mb-1">議</div>
+                      <div class="text-xs font-semibold text-slate-600 uppercase">NGHỊ</div>
+                    </div>
+                    <div class="col-span-2 space-y-2">
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm On:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">ギ</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm Kun:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">(Không có)</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Số nét:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">20 nét</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="border-t border-slate-200 pt-4">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">Ý nghĩa: Hội nghị, thảo luận</p>
+                    <p class="text-sm text-slate-600 italic">「会議に出席する」 - Tham dự cuộc họp</p>
+                  </div>
+                </div>
+
+                <div class="rounded-lg border border-slate-200 p-5 bg-gradient-to-br from-slate-50 to-slate-100">
+                  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="text-center">
+                      <div class="text-5xl font-bold text-indigo-600 mb-1">決</div>
+                      <div class="text-xs font-semibold text-slate-600 uppercase">QUYẾT</div>
+                    </div>
+                    <div class="col-span-2 space-y-2">
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm On:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">ケツ</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Âm Kun:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">き.める</span>
+                      </div>
+                      <div>
+                        <span class="text-xs font-bold text-slate-500 uppercase">Số nét:</span>
+                        <span class="text-sm font-medium text-slate-800 ml-2">6 nét</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="border-t border-slate-200 pt-4">
+                    <p class="text-sm font-semibold text-slate-700 mb-2">Ý nghĩa: Quyết định, xác định</p>
+                    <p class="text-sm text-slate-600 italic">「決定を下す」 - Đưa ra quyết định</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6 p-4 rounded-lg bg-emerald-50 border border-emerald-200">
+                <p class="text-sm text-emerald-800">✓ <strong>Bạn đã hoàn thành</strong> phần Kanji của bài học này!</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="mt-6 rounded-2xl border border-slate-100 bg-white p-6 lg:p-8">
+          <h3 class="mb-4 text-lg font-bold text-slate-900">📝 Bài kiểm tra cuối bài</h3>
+          <p class="mb-6 text-slate-600">Hoàn thành bài kiểm tra để kiểm tra kiến thức của bạn</p>
+          <button class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 transition-all hover:-translate-y-0.5">
+            Bắt đầu bài kiểm tra →
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<!-- ====================== FOOTER ====================== -->
+<footer class="mt-24 border-t border-slate-100 bg-slate-50/50 py-12">
+  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+      <div>
+        <h4 class="font-semibold text-slate-900 text-sm mb-4">Khóa học</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li><a href="#" class="hover:text-indigo-600">JLPT N5</a></li>
+          <li><a href="#" class="hover:text-indigo-600">JLPT N4</a></li>
+          <li><a href="#" class="hover:text-indigo-600">JLPT N3</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold text-slate-900 text-sm mb-4">Luyện thi</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li><a href="#" class="hover:text-indigo-600">Thi thử N3</a></li>
+          <li><a href="#" class="hover:text-indigo-600">Thi thử N2</a></li>
+          <li><a href="#" class="hover:text-indigo-600">Thi thử N1</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold text-slate-900 text-sm mb-4">Tài liệu</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li><a href="#" class="hover:text-indigo-600">Ebook</a></li>
+          <li><a href="#" class="hover:text-indigo-600">PDF</a></li>
+          <li><a href="#" class="hover:text-indigo-600">Combo sách</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-semibold text-slate-900 text-sm mb-4">Công ty</h4>
+        <ul class="space-y-2 text-sm text-slate-600">
+          <li><a href="#" class="hover:text-indigo-600">Về chúng tôi</a></li>
+          <li><a href="#" class="hover:text-indigo-600">Liên hệ</a></li>
+          <li><a href="#" class="hover:text-indigo-600">Điều khoản</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-200 pt-8 text-center text-sm text-slate-500">
+      © 2026 Study JLPT Platform. Hỗ trợ học viên chinh phục chứng chỉ tiếng Nhật.
+    </div>
+  </div>
+</footer>
+
+<!-- ====================== COMPONENT LOADER & TAB SWITCHER ====================== -->
+<script>
+  // Load shared header component
+  document.addEventListener('DOMContentLoaded', async function() {
+    try {
+      const response = await fetch('./components/header.html');
+      const headerHTML = await response.text();
+      document.getElementById('header-placeholder').innerHTML = headerHTML;
+      initializeMegaMenus();
+    } catch (error) {
+      console.error('Failed to load header:', error);
+    }
+  });
+
+  // Initialize mega menu interactivity
+  function initializeMegaMenus() {
+    const triggers = document.querySelectorAll('.mega-trigger');
+    triggers.forEach(trigger => {
+      const button = trigger.querySelector('button');
+      const panel = trigger.querySelector('.mega-panel');
+      
+      if (button && panel) {
+        button.addEventListener('mouseenter', () => panel.classList.remove('hidden'));
+        trigger.addEventListener('mouseleave', () => panel.classList.add('hidden'));
+      }
+    });
+  }
+
+  // Tab switcher for lesson content
+  function switchTab(event, tabName) {
+    event.preventDefault();
+    
+    // Hide all tab contents
+    const contents = document.querySelectorAll('.tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+    
+    // Remove active class from all buttons
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    
+    // Show selected tab content
+    document.getElementById(tabName).classList.add('active');
+    
+    // Add active class to clicked button
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

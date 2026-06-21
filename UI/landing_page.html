@@ -93,7 +93,7 @@
 <!-- ====================== STICKY HEADER ====================== -->
 <header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-slate-100/80 bg-white/90 backdrop-blur-xl transition-all duration-300">
   <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-    <div class="flex h-16 items-center gap-6 lg:gap-10">
+    <div class="flex h-16 items-center justify-center gap-6 lg:gap-10">
 
       <!-- Brand Logo -->
       <a href="#" class="flex items-center gap-2.5 shrink-0 group">
@@ -119,19 +119,7 @@
       <nav class="hidden lg:flex items-center gap-0.5">
 
         <!-- Mega: Khóa học -->
-        <div class="mega-trigger relative">
-          <button class="inline-flex items-center gap-1 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
-            Khóa học
-            <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-          </button>
-          <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/60 flex-col gap-0.5 z-50">
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><span class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700">N5</span><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">JLPT N5 – Sơ cấp</span></a>
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><span class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700">N4</span><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">JLPT N4 – Tiền trung cấp</span></a>
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><span class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-xs font-black text-indigo-700">N3</span><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">JLPT N3 – Trung cấp</span></a>
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><span class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-700">N2</span><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">JLPT N2 – Thượng cấp</span></a>
-            <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><span class="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-100 text-xs font-black text-slate-600 group-hover:bg-violet-100 group-hover:text-violet-700">N1</span><span class="text-sm font-medium text-slate-700 group-hover:text-violet-700">JLPT N1 – Cao cấp nhất</span></a>
-          </div>
-        </div>
+        <a href="course_detail.html?level=N5" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Khóa học</a>
 
         <!-- Mega: Luyện thi -->
         <div class="mega-trigger relative">
@@ -147,6 +135,9 @@
             <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N1</span></a>
           </div>
         </div>
+
+        <!-- Shop Link -->
+        <a href="#" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Shop</a>
 
         <!-- Mega: Tài liệu -->
         <div class="mega-trigger relative">
@@ -197,7 +188,6 @@
         <span class="hidden sm:block h-6 w-px bg-slate-100"></span>
         <!-- Auth buttons -->
         <a href="#" class="hidden md:inline-flex items-center rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 hover:bg-slate-50 transition-colors">Đăng nhập</a>
-        <a href="#" class="inline-flex items-center rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 transition-all hover:-translate-y-0.5">Dùng thử miễn phí</a>
       </div>
     </div>
   </div>
@@ -280,12 +270,12 @@
         <span class="inline-flex items-center gap-1.5 rounded-full bg-indigo-50 border border-indigo-100 px-4 py-1.5 text-xs font-semibold text-indigo-600">📚 Khóa học nổi bật</span>
         <h2 class="text-4xl font-black tracking-tight text-slate-900">Khóa học được<br>học viên yêu thích nhất</h2>
       </div>
-      <a href="#" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 shrink-0">Xem tất cả khóa học <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></a>
+      <a href="course_detail.html?level=N5" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 shrink-0">Xem tất cả khóa học <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Course Card 1 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+      <a href="course_detail.html?level=N3" class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden block">
         <div class="relative h-40 bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
           <span class="text-6xl font-black text-white/20">N3</span>
           <div class="absolute inset-0 flex items-center justify-center"><span class="text-4xl font-black text-white">文法</span></div>
@@ -310,9 +300,9 @@
             <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.9</span></div>
           </div>
         </div>
-      </div>
+      </a>
       <!-- Course Card 2 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+      <a href="course_detail.html?level=N3" class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden block">
         <div class="relative h-40 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
           <span class="text-6xl font-black text-white/20">N3</span>
           <div class="absolute inset-0 flex items-center justify-center"><span class="text-4xl font-black text-white">語彙</span></div>
@@ -336,9 +326,9 @@
             <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.8</span></div>
           </div>
         </div>
-      </div>
+      </a>
       <!-- Course Card 3 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+      <a href="course_detail.html?level=N2" class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden block">
         <div class="relative h-40 bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
           <span class="text-6xl font-black text-white/20">N2</span>
           <div class="absolute inset-0 flex items-center justify-center"><span class="text-4xl font-black text-white">読解</span></div>
@@ -363,9 +353,9 @@
             <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.7</span></div>
           </div>
         </div>
-      </div>
+      </a>
       <!-- Course Card 4 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+      <a href="course_detail.html?level=N1" class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden block">
         <div class="relative h-40 bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
           <span class="text-6xl font-black text-white/20">N1</span>
           <div class="absolute inset-0 flex items-center justify-center"><span class="text-4xl font-black text-white">N1</span></div>
@@ -390,25 +380,12 @@
             <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">5.0</span></div>
           </div>
         </div>
-      </div>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- ====================== TRUST LOGOS ====================== -->
-<section class="py-10 border-y border-slate-100 bg-slate-50">
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-    <p class="text-center text-xs font-semibold uppercase tracking-widest text-slate-400 mb-7">Được tin dùng bởi học viên tại hơn 50 trường đại học</p>
-    <div class="flex flex-wrap items-center justify-center gap-8 lg:gap-16 opacity-40 grayscale">
-      <span class="text-xl font-black text-slate-700">Đại học Ngoại Ngữ</span>
-      <span class="text-xl font-black text-slate-700">TOKYOU</span>
-      <span class="text-xl font-black text-slate-700">Japan Foundation</span>
-      <span class="text-xl font-black text-slate-700">VJCC</span>
-      <span class="text-xl font-black text-slate-700">FPT University</span>
-      <span class="text-xl font-black text-slate-700">HUFS</span>
-    </div>
-  </div>
-</section>
+
 
 <!-- ====================== USP SECTION ====================== -->
 <section class="py-24 bg-white">
@@ -460,150 +437,7 @@
   </div>
 </section>
 
-<!-- ====================== COURSE SHOWCASE ====================== -->
-<section class="py-24 bg-slate-50">
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-    <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
-      <div class="max-w-lg space-y-3">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-1.5 text-xs font-semibold text-slate-600">📚 Khóa học nổi bật</span>
-        <h2 class="text-4xl font-black tracking-tight text-slate-900">Khóa học được<br>học viên yêu thích nhất</h2>
-      </div>
-      <a href="#" class="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-700 shrink-0">Xem tất cả khóa học <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg></a>
-    </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-      <!-- Course Card 1 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="relative h-40 bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
-          <span class="text-6xl font-black text-white/20">N3</span>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-4xl font-black text-white">文法</span>
-          </div>
-          <div class="absolute top-3 left-3 rounded-lg bg-white/20 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white">BEST SELLER</div>
-        </div>
-        <div class="p-5 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="rounded-md bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">JLPT N3</span>
-            <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">Ngữ pháp</span>
-          </div>
-          <h3 class="font-bold text-slate-900 leading-snug group-hover:text-indigo-700 transition-colors">Ngữ pháp N3 Soumatome – Toàn tập</h3>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1">
-              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>
-              45 bài học
-            </span>
-            <span class="flex items-center gap-1">
-              <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" /></svg>
-              12,450 học viên
-            </span>
-          </div>
-          <div class="pt-1">
-            <div class="flex justify-between items-center text-xs mb-1.5">
-              <span class="text-slate-400">Hoàn thành trung bình</span>
-              <span class="font-bold text-indigo-600">72%</span>
-            </div>
-            <div class="h-1.5 w-full rounded-full bg-slate-100"><div class="h-full rounded-full bg-indigo-500" style="width:72%"></div></div>
-          </div>
-          <div class="flex items-center justify-between pt-2">
-            <div>
-              <span class="text-lg font-black text-slate-900">Miễn phí</span>
-            </div>
-            <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.9</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Course Card 2 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="relative h-40 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-          <span class="text-6xl font-black text-white/20">N3</span>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-4xl font-black text-white">語彙</span>
-          </div>
-        </div>
-        <div class="p-5 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700">JLPT N3</span>
-            <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">Từ vựng</span>
-          </div>
-          <h3 class="font-bold text-slate-900 leading-snug group-hover:text-indigo-700 transition-colors">Từ vựng Mimikara Oboeru N3</h3>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>30 bài học</span>
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" /></svg>9,820 học viên</span>
-          </div>
-          <div class="pt-1">
-            <div class="flex justify-between items-center text-xs mb-1.5"><span class="text-slate-400">Hoàn thành trung bình</span><span class="font-bold text-emerald-600">68%</span></div>
-            <div class="h-1.5 w-full rounded-full bg-slate-100"><div class="h-full rounded-full bg-emerald-500" style="width:68%"></div></div>
-          </div>
-          <div class="flex items-center justify-between pt-2">
-            <span class="text-lg font-black text-slate-900">Miễn phí</span>
-            <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.8</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Course Card 3 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="relative h-40 bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center">
-          <span class="text-6xl font-black text-white/20">N2</span>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-4xl font-black text-white">読解</span>
-          </div>
-          <div class="absolute top-3 left-3 rounded-lg bg-white/20 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white">HOT</div>
-        </div>
-        <div class="p-5 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="rounded-md bg-rose-50 px-2 py-0.5 text-[10px] font-bold text-rose-700">JLPT N2</span>
-            <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">Đọc hiểu</span>
-          </div>
-          <h3 class="font-bold text-slate-900 leading-snug group-hover:text-indigo-700 transition-colors">Shinkanzen Masuta Đọc Hiểu N2</h3>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>52 bài học</span>
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" /></svg>7,300 học viên</span>
-          </div>
-          <div class="pt-1">
-            <div class="flex justify-between items-center text-xs mb-1.5"><span class="text-slate-400">Hoàn thành trung bình</span><span class="font-bold text-rose-600">58%</span></div>
-            <div class="h-1.5 w-full rounded-full bg-slate-100"><div class="h-full rounded-full bg-rose-500" style="width:58%"></div></div>
-          </div>
-          <div class="flex items-center justify-between pt-2">
-            <div><span class="text-lg font-black text-slate-900">99.000đ</span><span class="ml-1.5 text-xs text-slate-400 line-through">149.000đ</span></div>
-            <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">4.7</span></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Course Card 4 -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-        <div class="relative h-40 bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
-          <span class="text-6xl font-black text-white/20">N1</span>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <span class="text-4xl font-black text-white">N1</span>
-          </div>
-          <div class="absolute top-3 left-3 rounded-lg bg-white/20 backdrop-blur-sm px-2.5 py-1 text-[10px] font-bold text-white">PREMIUM</div>
-        </div>
-        <div class="p-5 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="rounded-md bg-violet-50 px-2 py-0.5 text-[10px] font-bold text-violet-700">JLPT N1</span>
-            <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-500">Toàn diện</span>
-          </div>
-          <h3 class="font-bold text-slate-900 leading-snug group-hover:text-indigo-700 transition-colors">Chinh phục N1 – Khóa học toàn diện</h3>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" /></svg>120 bài học</span>
-            <span class="flex items-center gap-1"><svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0z" /></svg>3,200 học viên</span>
-          </div>
-          <div class="pt-1">
-            <div class="flex justify-between items-center text-xs mb-1.5"><span class="text-slate-400">Hoàn thành trung bình</span><span class="font-bold text-violet-600">41%</span></div>
-            <div class="h-1.5 w-full rounded-full bg-slate-100"><div class="h-full rounded-full bg-violet-500" style="width:41%"></div></div>
-          </div>
-          <div class="flex items-center justify-between pt-2">
-            <div><span class="text-lg font-black text-slate-900">299.000đ</span><span class="ml-1.5 text-xs text-slate-400 line-through">499.000đ</span></div>
-            <div class="flex items-center gap-1 text-xs text-amber-500 font-semibold">★★★★★ <span class="text-slate-500 font-normal">5.0</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ====================== JLPT ROADMAP ====================== -->
 <section id="roadmap" class="py-24 bg-white overflow-hidden">
@@ -705,279 +539,9 @@
   </div>
 </section>
 
-<!-- ====================== AI SECTION (HIGHLIGHT) ====================== -->
-<section class="py-28 relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
-  <!-- BG Grid -->
-  <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <svg class="absolute inset-0 h-full w-full opacity-[0.06]" xmlns="http://www.w3.org/2000/svg">
-      <defs><pattern id="grid2" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="#818CF8" stroke-width="1"/></pattern></defs>
-      <rect width="100%" height="100%" fill="url(#grid2)"/>
-    </svg>
-    <div class="absolute -left-32 top-0 h-96 w-96 rounded-full bg-indigo-500/10 blur-3xl"></div>
-    <div class="absolute -right-32 bottom-0 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl"></div>
-  </div>
 
-  <div class="relative mx-auto max-w-[1400px] px-6 lg:px-10">
-    <div class="grid lg:grid-cols-2 gap-16 items-center">
-      <!-- Left: AI UI Mockup -->
-      <div class="order-2 lg:order-1">
-        <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-6 space-y-4 shadow-2xl">
-          <!-- AI Chat Header -->
-          <div class="flex items-center gap-3 pb-4 border-b border-white/10">
-            <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-400 to-violet-500 text-xl">🤖</div>
-            <div>
-              <p class="text-sm font-bold text-white">AI Study Coach</p>
-              <p class="text-xs text-indigo-300">Đang phân tích năng lực của bạn…</p>
-            </div>
-            <div class="ml-auto flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></div>
-          </div>
 
-          <!-- Analysis Card -->
-          <div class="glass rounded-xl p-4 space-y-3">
-            <p class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">📊 Phân tích năng lực</p>
-            <div class="space-y-2">
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-300 w-24 shrink-0">Từ vựng</span>
-                <div class="flex-1 h-2 rounded-full bg-white/10"><div class="h-full rounded-full bg-emerald-400" style="width:82%"></div></div>
-                <span class="text-xs font-bold text-emerald-400 w-8 text-right">82%</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-300 w-24 shrink-0">Ngữ pháp</span>
-                <div class="flex-1 h-2 rounded-full bg-white/10"><div class="h-full rounded-full bg-indigo-400" style="width:71%"></div></div>
-                <span class="text-xs font-bold text-indigo-400 w-8 text-right">71%</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-300 w-24 shrink-0">Đọc hiểu</span>
-                <div class="flex-1 h-2 rounded-full bg-white/10"><div class="h-full rounded-full bg-amber-400" style="width:58%"></div></div>
-                <span class="text-xs font-bold text-amber-400 w-8 text-right">58%</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-xs text-slate-300 w-24 shrink-0">Nghe hiểu</span>
-                <div class="flex-1 h-2 rounded-full bg-white/10"><div class="h-full rounded-full bg-rose-400" style="width:45%"></div></div>
-                <span class="text-xs font-bold text-rose-400 w-8 text-right">45%</span>
-              </div>
-            </div>
-          </div>
 
-          <!-- AI Message -->
-          <div class="glass rounded-xl p-4">
-            <p class="text-xs text-slate-300 leading-relaxed">💡 <span class="text-white font-semibold">Gợi ý từ AI:</span> Năng lực Nghe hiểu đang là điểm yếu nhất. Tôi đề xuất bạn nên dành <strong class="text-indigo-300">20 phút/ngày</strong> ôn luyện Listening N3 trong 2 tuần tới để tăng xác suất đỗ thêm <strong class="text-emerald-400">+12%</strong>.</p>
-          </div>
-
-          <!-- Pass Rate Prediction -->
-          <div class="flex items-center gap-4 glass rounded-xl p-4">
-            <div class="text-center">
-              <p class="text-3xl font-black text-emerald-400">87%</p>
-              <p class="text-[10px] text-slate-400">Xác suất đỗ N3</p>
-            </div>
-            <div class="flex-1 space-y-2">
-              <div class="flex justify-between text-[10px] text-slate-400"><span>Kỳ thi gần nhất:</span><span class="text-white font-semibold">T12/2025</span></div>
-              <div class="flex justify-between text-[10px] text-slate-400"><span>Bài học còn lại:</span><span class="text-white font-semibold">24 bài</span></div>
-              <div class="flex justify-between text-[10px] text-slate-400"><span>Thời gian ôn thêm:</span><span class="text-amber-400 font-semibold">3 tuần</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Right: AI Content -->
-      <div class="order-1 lg:order-2 space-y-8">
-        <div class="space-y-4">
-          <span class="inline-flex items-center gap-2 rounded-full bg-indigo-500/20 border border-indigo-500/30 px-4 py-1.5 text-xs font-semibold text-indigo-300">✦ Tính năng độc quyền</span>
-          <h2 class="text-4xl lg:text-5xl font-black tracking-tight text-white">Gặp gỡ <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400">AI Study Coach</span> của bạn</h2>
-          <p class="text-lg text-slate-400 leading-relaxed">Trí tuệ nhân tạo phân tích từng kết quả bài thi, hiểu rõ điểm mạnh và điểm yếu, rồi xây dựng lộ trình học tập cá nhân hóa 100% cho bạn.</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">🔍</div>
-            <p class="text-sm font-bold text-white">Phân tích năng lực</p>
-            <p class="text-xs text-slate-400">Đánh giá chi tiết 4 kỹ năng: Từ vựng, Ngữ pháp, Đọc, Nghe.</p>
-          </div>
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">🗺️</div>
-            <p class="text-sm font-bold text-white">Lộ trình cá nhân hóa</p>
-            <p class="text-xs text-slate-400">Tự động tạo kế hoạch học tập tối ưu theo mục tiêu và thời gian của bạn.</p>
-          </div>
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">✅</div>
-            <p class="text-sm font-bold text-white">Chấm bài tự động</p>
-            <p class="text-xs text-slate-400">Nộp bài thi thử, AI chấm điểm và giải thích đáp án chi tiết tức thì.</p>
-          </div>
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">📈</div>
-            <p class="text-sm font-bold text-white">Đánh giá xác suất đỗ</p>
-            <p class="text-xs text-slate-400">Dự đoán xác suất vượt qua kỳ thi JLPT theo năng lực thực tế của bạn.</p>
-          </div>
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">🔔</div>
-            <p class="text-sm font-bold text-white">Nhắc học thông minh</p>
-            <p class="text-xs text-slate-400">Gợi ý thời điểm học tối ưu dựa trên lịch sử và hiệu suất học tập.</p>
-          </div>
-          <div class="glass rounded-xl p-4 space-y-2 hover:bg-white/10 transition-colors">
-            <div class="text-xl">💡</div>
-            <p class="text-sm font-bold text-white">Gợi ý bài học tiếp theo</p>
-            <p class="text-xs text-slate-400">AI tự động đề xuất bài học phù hợp nhất để lấp đầy lỗ hổng kiến thức.</p>
-          </div>
-        </div>
-
-        <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-500 transition-all hover:-translate-y-0.5">
-          Thử AI Coach ngay — Miễn phí
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====================== SOCIAL PROOF ====================== -->
-<section class="py-24 bg-white">
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-    <!-- Stats Row -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
-      <div class="text-center p-8 rounded-2xl bg-indigo-50 border border-indigo-100">
-        <p class="text-4xl lg:text-5xl font-black text-indigo-600 mb-1">128K+</p>
-        <p class="text-sm text-slate-500 font-medium">Học viên đang học</p>
-      </div>
-      <div class="text-center p-8 rounded-2xl bg-emerald-50 border border-emerald-100">
-        <p class="text-4xl lg:text-5xl font-black text-emerald-600 mb-1">2,000+</p>
-        <p class="text-sm text-slate-500 font-medium">Bài học chất lượng</p>
-      </div>
-      <div class="text-center p-8 rounded-2xl bg-rose-50 border border-rose-100">
-        <p class="text-4xl lg:text-5xl font-black text-rose-600 mb-1">500+</p>
-        <p class="text-sm text-slate-500 font-medium">Đề thi thử JLPT</p>
-      </div>
-      <div class="text-center p-8 rounded-2xl bg-amber-50 border border-amber-100">
-        <p class="text-4xl lg:text-5xl font-black text-amber-600 mb-1">91%</p>
-        <p class="text-sm text-slate-500 font-medium">Tỷ lệ đỗ JLPT</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="text-center mb-12 space-y-3">
-      <h2 class="text-4xl font-black tracking-tight text-slate-900">Học viên nói gì về <span class="gradient-text">StudyJLPT?</span></h2>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Review 1 -->
-      <div class="rounded-2xl border border-slate-100 bg-slate-50 p-6 space-y-4">
-        <div class="flex text-amber-400 text-sm">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed">"Nhờ AI Coach của StudyJLPT, mình biết chính xác mình yếu ở đâu. Chỉ sau 3 tháng luyện theo lộ trình AI đề xuất, mình đã vượt qua N3 ngay lần đầu thi!"</p>
-        <div class="flex items-center gap-3 pt-2">
-          <img class="h-10 w-10 rounded-full object-cover ring-2 ring-white" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&h=80&fit=crop" alt="">
-          <div>
-            <p class="text-sm font-bold text-slate-900">Nguyễn Thị Hương</p>
-            <p class="text-xs text-slate-400">Đỗ JLPT N3 • T7/2025</p>
-          </div>
-          <span class="ml-auto rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">✓ ĐỖ N3</span>
-        </div>
-      </div>
-
-      <!-- Review 2 -->
-      <div class="rounded-2xl border border-indigo-100 bg-indigo-50 p-6 space-y-4">
-        <div class="flex text-amber-400 text-sm">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed">"Flashcard SRS cực kỳ hiệu quả. Mình thuộc 2,000 từ vựng N2 trong vòng 2 tháng. Đề thi thử cũng rất sát với đề thật, giúp mình không bị shock khi vào phòng thi."</p>
-        <div class="flex items-center gap-3 pt-2">
-          <img class="h-10 w-10 rounded-full object-cover ring-2 ring-white" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=80&h=80&fit=crop" alt="">
-          <div>
-            <p class="text-sm font-bold text-slate-900">Trần Minh Đức</p>
-            <p class="text-xs text-slate-400">Đỗ JLPT N2 • T12/2024</p>
-          </div>
-          <span class="ml-auto rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">✓ ĐỖ N2</span>
-        </div>
-      </div>
-
-      <!-- Review 3 -->
-      <div class="rounded-2xl border border-slate-100 bg-slate-50 p-6 space-y-4">
-        <div class="flex text-amber-400 text-sm">★★★★★</div>
-        <p class="text-slate-600 text-sm leading-relaxed">"Platform đẹp và dễ dùng hơn Duolingo rất nhiều. Nội dung sâu, bài giảng rõ ràng. Đặc biệt AI phân tích điểm yếu của mình rất chính xác — không ngờ bản thân lại yếu nghe đến vậy!"</p>
-        <div class="flex items-center gap-3 pt-2">
-          <img class="h-10 w-10 rounded-full object-cover ring-2 ring-white" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=80&h=80&fit=crop" alt="">
-          <div>
-            <p class="text-sm font-bold text-slate-900">Lê Phương Anh</p>
-            <p class="text-xs text-slate-400">Đang học JLPT N1 • Hà Nội</p>
-          </div>
-          <span class="ml-auto rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-bold text-violet-700">✦ N1</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ====================== DOCUMENT STORE PREVIEW ====================== -->
-<section class="py-24 bg-slate-50">
-  <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
-    <div class="flex flex-col md:flex-row items-start md:items-end justify-between mb-12 gap-4">
-      <div class="max-w-lg space-y-3">
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-white border border-slate-200 px-4 py-1.5 text-xs font-semibold text-slate-600">🛍️ Cửa hàng tài liệu</span>
-        <h2 class="text-4xl font-black tracking-tight text-slate-900">Kho tài liệu<br><span class="gradient-text">học tiếng Nhật</span></h2>
-        <p class="text-slate-500">Sách giáo khoa, Ebook, PDF đề thi. Giao tận nhà hoặc tải ngay.</p>
-      </div>
-      <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-200 hover:bg-indigo-700 transition-all shrink-0">
-        Mua tài liệu
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" /></svg>
-      </a>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Ebook -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden">
-        <div class="h-48 bg-gradient-to-br from-indigo-400 to-blue-600 flex items-center justify-center relative">
-          <div class="glass rounded-xl p-5 text-center">
-            <div class="text-4xl font-black text-white/30 leading-none">JLPT</div>
-            <div class="text-3xl font-black text-white">N3</div>
-            <div class="text-sm text-white/80 mt-1">Ebook</div>
-          </div>
-          <div class="absolute top-3 right-3 rounded-lg bg-indigo-600 px-2.5 py-1 text-[10px] font-bold text-white">📱 Ebook</div>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-slate-900 mb-1">Shinkanzen Masuta Ngữ pháp N3 – Bản Việt</h3>
-          <p class="text-xs text-slate-400 mb-4">Tác giả: 3A Network • 220 trang • PDF Full</p>
-          <div class="flex items-center justify-between">
-            <div><span class="text-xl font-black text-slate-900">89.000đ</span><span class="ml-1.5 text-xs text-slate-400 line-through">129.000đ</span></div>
-            <button class="rounded-xl bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 px-3 py-1.5 text-xs font-bold transition-colors">Mua ngay</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Combo -->
-      <div class="group bg-white rounded-2xl border border-amber-200 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden">
-        <div class="h-48 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center relative">
-          <div class="glass rounded-xl p-5 text-center">
-            <div class="text-2xl font-black text-white">COMBO N3</div>
-            <div class="text-sm text-white/80 mt-1">5 Cuốn Sách Giấy</div>
-          </div>
-          <div class="absolute top-3 right-3 rounded-lg bg-amber-600 px-2.5 py-1 text-[10px] font-bold text-white">🔥 -40%</div>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-slate-900 mb-1">Combo chinh phục JLPT N3 – 5 cuốn cốt lõi</h3>
-          <p class="text-xs text-slate-400 mb-4">Shinkanzen + Mimikara + Soumatome • Giao nhanh 24h</p>
-          <div class="flex items-center justify-between">
-            <div><span class="text-xl font-black text-slate-900">349.000đ</span><span class="ml-1.5 text-xs text-slate-400 line-through">589.000đ</span></div>
-            <button class="rounded-xl bg-amber-50 hover:bg-amber-500 hover:text-white text-amber-600 px-3 py-1.5 text-xs font-bold transition-colors">Mua combo</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Đề thi PDF -->
-      <div class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-lg transition-all hover:-translate-y-1 overflow-hidden">
-        <div class="h-48 bg-gradient-to-br from-rose-400 to-pink-600 flex items-center justify-center relative">
-          <div class="glass rounded-xl p-5 text-center">
-            <div class="text-2xl font-black text-white">100 ĐỀ</div>
-            <div class="text-sm text-white/80 mt-1">Thi thử JLPT N2</div>
-          </div>
-          <div class="absolute top-3 right-3 rounded-lg bg-rose-600 px-2.5 py-1 text-[10px] font-bold text-white">📄 PDF</div>
-        </div>
-        <div class="p-5">
-          <h3 class="font-bold text-slate-900 mb-1">100 đề thi thử JLPT N2 có đáp án và giải thích</h3>
-          <p class="text-xs text-slate-400 mb-4">Chuẩn cấu trúc JNTO 2024 • Gồm giải thích đáp án chi tiết</p>
-          <div class="flex items-center justify-between">
-            <div><span class="text-xl font-black text-slate-900">149.000đ</span><span class="ml-1.5 text-xs text-slate-400 line-through">199.000đ</span></div>
-            <button class="rounded-xl bg-rose-50 hover:bg-rose-500 hover:text-white text-rose-600 px-3 py-1.5 text-xs font-bold transition-colors">Tải ngay</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ====================== GAMIFICATION ====================== -->
 <section class="py-24 bg-white">
