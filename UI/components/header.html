@@ -90,7 +90,7 @@
 </head>
 <body class="bg-white text-slate-800 antialiased overflow-x-hidden">
 
-<header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-slate-100/80 bg-white/90 backdrop-blur-xl transition-all duration-300">
+<header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-slate-100/80 bg-white/90 backdrop-blur-xl shadow-sm shadow-slate-100/50 transition-all duration-300">
   <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
     <div class="flex h-16 items-center justify-center gap-6 lg:gap-10">
 
@@ -207,17 +207,7 @@
   </div>
 </footer>
 
-<script>
-  // Sticky header shadow on scroll
-  const header = document.getElementById('site-header');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 10) {
-      header.classList.add('shadow-sm', 'shadow-slate-200/60');
-    } else {
-      header.classList.remove('shadow-sm', 'shadow-slate-200/60');
-    }
-  });
-</script>
+
 
 </body>
 </html>
