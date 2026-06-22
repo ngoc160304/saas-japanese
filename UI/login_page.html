@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT - Đăng nhập</title>
+  <meta name="description"
+    content="Đăng nhập StudyJLPT để tiếp tục học tiếng Nhật, luyện thi JLPT, xem tiến độ học tập và sử dụng AI Study Coach." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Inter', sans-serif;
+      --color-brand: #4F46E5;
+      --color-brand-light: #818CF8;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    .auth-choice:checked + label {
+      color: #4F46E5;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+
+    .auth-stage {
+      background:
+        linear-gradient(115deg, rgba(79,70,229,0.18) 0 16%, transparent 16% 35%, rgba(20,184,166,0.14) 35% 49%, transparent 49%),
+        linear-gradient(35deg, transparent 0 22%, rgba(251,191,36,0.16) 22% 36%, transparent 36% 66%, rgba(244,63,94,0.12) 66% 81%, transparent 81%),
+        linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fff7ed 100%);
+    }
+
+    .auth-stage::before {
+      content: "";
+      position: absolute;
+      inset: -18%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(62deg, transparent 18%, rgba(79,70,229,0.16) 18% 28%, transparent 28% 56%, rgba(16,185,129,0.13) 56% 66%, transparent 66%),
+        linear-gradient(128deg, transparent 24%, rgba(244,63,94,0.12) 24% 34%, transparent 34% 63%, rgba(245,158,11,0.14) 63% 73%, transparent 73%);
+      filter: blur(26px);
+      opacity: 0.9;
+      animation: ambientFlow 16s ease-in-out infinite alternate;
+    }
+
+    .auth-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(79,70,229,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.78), rgba(0,0,0,0.25));
+      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.78), rgba(0,0,0,0.25));
+      animation: gridDrift 18s linear infinite;
+    }
+
+    .kanji-band {
+      width: 170%;
+      white-space: nowrap;
+      font-size: 5rem;
+      letter-spacing: 0;
+      color: rgba(79,70,229,0.08);
+      animation: kanjiSlide 28s linear infinite;
+    }
+
+    .kanji-band-slow {
+      color: rgba(15,118,110,0.08);
+      animation-duration: 38s;
+      animation-direction: reverse;
+    }
+
+    .study-strip {
+      background: rgba(255,255,255,0.42);
+      border: 1px solid rgba(255,255,255,0.56);
+      box-shadow: 0 24px 80px rgba(79,70,229,0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      animation: stripFloat 9s ease-in-out infinite;
+    }
+
+    @keyframes ambientFlow {
+      0% { transform: translate3d(-2%, -1%, 0) rotate(-1deg); }
+      100% { transform: translate3d(2%, 2%, 0) rotate(1deg); }
+    }
+
+    @keyframes gridDrift {
+      0% { background-position: 0 0, 0 0; }
+      100% { background-position: 48px 48px, -48px 48px; }
+    }
+
+    @keyframes kanjiSlide {
+      0% { transform: translateX(-4%); }
+      100% { transform: translateX(-28%); }
+    }
+
+    @keyframes stripFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-800 antialiased overflow-x-hidden">
+
+  <!-- ====================== LOGIN CONTENT ====================== -->
+  <main class="relative min-h-screen overflow-hidden">
+    <section class="auth-stage relative flex min-h-screen items-center justify-center px-5 py-10 sm:px-8">
+      <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div class="kanji-band absolute -left-16 top-10 font-black">日本語 JLPT 文法 漢字 語彙 聴解 読解 日本語 JLPT 文法 漢字 語彙 聴解 読解
+        </div>
+        <div class="kanji-band kanji-band-slow absolute -left-28 bottom-12 font-black">漢字 かな N5 N4 N3 N2 N1 会話 学習 試験 漢字
+          かな N5 N4 N3 N2 N1 会話 学習 試験</div>
+        <div class="study-strip absolute left-[7%] top-[19%] hidden h-16 w-64 rotate-[-8deg] rounded-2xl lg:block">
+        </div>
+        <div class="study-strip absolute right-[9%] top-[24%] hidden h-20 w-72 rotate-[7deg] rounded-2xl lg:block"
+          style="animation-delay:-3s"></div>
+        <div class="study-strip absolute bottom-[14%] left-[12%] hidden h-24 w-80 rotate-[5deg] rounded-2xl md:block"
+          style="animation-delay:-5s"></div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="relative z-10 flex w-full items-center justify-center">
+        <div class="w-full max-w-md">
+          <div class="rounded-3xl border border-slate-100 bg-white p-6 shadow-xl shadow-slate-200/60 sm:p-8">
+            <div class="mb-8 space-y-3">
+              <span
+                class="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700">
+                <span class="h-1.5 w-1.5 rounded-full bg-indigo-500"></span>
+                Tài khoản học viên
+              </span>
+              <div class="space-y-2">
+                <h2 class="text-3xl font-black tracking-tight text-slate-900">Đăng nhập</h2>
+                <p class="text-sm leading-6 text-slate-500">Tiếp tục học bài, làm đề thi thử và xem tiến độ cá nhân của
+                  bạn.</p>
+              </div>
+            </div>
+
+            <!-- Account Type -->
+            <div class="mb-6 grid grid-cols-2 rounded-2xl bg-slate-100 p-1">
+              <input class="auth-choice hidden" type="radio" id="student-login" name="login-type" checked />
+              <label for="student-login"
+                class="cursor-pointer rounded-xl px-4 py-2.5 text-center text-sm font-bold text-slate-500 transition-all">Học
+                viên</label>
+              <input class="auth-choice hidden" type="radio" id="admin-login" name="login-type" />
+              <label for="admin-login"
+                class="cursor-pointer rounded-xl px-4 py-2.5 text-center text-sm font-bold text-slate-500 transition-all">Quản
+                trị</label>
+            </div>
+
+            <form action="#" method="post" class="space-y-5">
+              <div class="space-y-2">
+                <label for="email" class="text-sm font-semibold text-slate-700">Email</label>
+                <div class="relative">
+                  <svg class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none"
+                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M21.75 6.75v10.5A2.25 2.25 0 0 1 19.5 19.5h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                  </svg>
+                  <input id="email" name="email" type="email" autocomplete="email" placeholder="ban@studyjlpt.vn"
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-3.5 pl-12 pr-4 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100" />
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-4">
+                  <label for="password" class="text-sm font-semibold text-slate-700">Mật khẩu</label>
+                  <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Quên mật khẩu?</a>
+                </div>
+                <div class="relative">
+                  <svg class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" fill="none"
+                    viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5A2.25 2.25 0 0 0 19.5 19.5v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                  </svg>
+                  <input id="password" name="password" type="password" autocomplete="current-password"
+                    placeholder="Nhập mật khẩu"
+                    class="w-full rounded-2xl border border-slate-200 bg-slate-50/80 py-3.5 pl-12 pr-12 text-sm font-medium text-slate-800 outline-none transition-all placeholder:text-slate-400 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-100" />
+                  <button id="toggle-password" type="button"
+                    class="absolute right-3 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                    aria-label="Hiển thị mật khẩu" aria-pressed="false">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"
+                      aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.964-7.178Z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between gap-4">
+                <label class="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-600">
+                  <input type="checkbox"
+                    class="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                  Ghi nhớ đăng nhập
+                </label>
+                <span
+                  class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 sm:inline-flex">SSL
+                  secure</span>
+              </div>
+
+              <button type="submit"
+                class="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-indigo-600 px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5 hover:bg-indigo-700">
+                Đăng nhập vào học
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"
+                  aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+                </svg>
+              </button>
+            </form>
+
+            <div class="my-6 flex items-center gap-3">
+              <div class="h-px flex-1 bg-slate-100"></div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-slate-400">Hoặc</span>
+              <div class="h-px flex-1 bg-slate-100"></div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button"
+                class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:border-indigo-200 hover:bg-indigo-50">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z" />
+                  <path fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23Z" />
+                  <path fill="#FBBC05"
+                    d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18A10.98 10.98 0 0 0 1 12c0 1.77.42 3.45 1.18 4.94l3.66-2.84Z" />
+                  <path fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.31 9.14 5.38 12 5.38Z" />
+                </svg>
+                Google
+              </button>
+              <button type="button"
+                class="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition-all hover:border-indigo-200 hover:bg-indigo-50">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="11" fill="#1877F2" />
+                  <path fill="#fff"
+                    d="M15.64 15.18 16.13 12h-3.05V9.94c0-.87.43-1.72 1.8-1.72h1.39V5.51s-1.26-.21-2.46-.21c-2.51 0-4.15 1.52-4.15 4.27V12H6.88v3.18h2.78v7.68a11.21 11.21 0 0 0 3.42 0v-7.68h2.56Z" />
+                </svg>
+                Facebook
+              </button>
+            </div>
+
+
+            <p class="mt-7 text-center text-sm text-slate-500">
+              Chưa có tài khoản?
+              <a href="#" class="font-bold text-indigo-600 hover:text-indigo-700">Đăng ký miễn phí</a>
+            </p>
+          </div>
+
+          <div class="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-400">
+            <a href="#" class="hover:text-slate-600">Điều khoản</a>
+            <span>•</span>
+            <a href="#" class="hover:text-slate-600">Bảo mật</a>
+            <span>•</span>
+            <span>© 2026 StudyJLPT</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const passwordInput = document.getElementById('password');
+    const togglePassword = document.getElementById('toggle-password');
+
+    togglePassword?.addEventListener('click', () => {
+      const shouldShow = passwordInput.type === 'password';
+      passwordInput.type = shouldShow ? 'text' : 'password';
+      togglePassword.setAttribute('aria-pressed', String(shouldShow));
+      togglePassword.setAttribute('aria-label', shouldShow ? 'Ẩn mật khẩu' : 'Hiển thị mật khẩu');
+    });
+  </script>
+
+</body>
+
+</html>
