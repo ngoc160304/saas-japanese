@@ -9,6 +9,16 @@
             "projectName": "backend",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SaasJapaneseApplication<saas_japanese-backend>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.mycompany.saas_japanese.SaasJapaneseApplication",
+            "projectName": "saas_japanese-backend",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
