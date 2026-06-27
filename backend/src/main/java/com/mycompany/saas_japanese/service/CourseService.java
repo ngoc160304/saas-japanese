@@ -22,7 +22,6 @@ public class CourseService {
     }
 
     public void deleteByIdCourse(long id) {
-         
         this.courseRepository.deleteById(id);
     }
 
@@ -38,7 +37,7 @@ public class CourseService {
         return this.courseRepository.findAll();
     }
 
-    public Course updateCourse(Course reqCourse)  {
+    public Course updateCourse(Course reqCourse) {
         Course currentCourse = this.fetchCourseById(reqCourse.getId());
         if (currentCourse != null) {
             currentCourse.setLevel(reqCourse.getLevel());
@@ -49,7 +48,7 @@ public class CourseService {
             currentCourse.setPublished(reqCourse.isPublished());
             currentCourse.setSortOrder(reqCourse.getSortOrder());
             currentCourse = this.courseRepository.save(currentCourse);
-        } 
+        }
         return currentCourse;
     }
 
