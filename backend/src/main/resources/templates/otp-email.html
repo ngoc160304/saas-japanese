@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Xác thực mã OTP</title>
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .email-container {
+      max-width: 550px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      border: 1px solid #eef2f5;
+    }
+
+    .email-header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      padding: 30px;
+      text-align: center;
+    }
+
+    .email-header h1 {
+      color: #ffffff;
+      font-size: 24px;
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .email-body {
+      padding: 40px 30px;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 0;
+      color: #1e293b;
+    }
+
+    .otp-box {
+      text-align: center;
+      margin: 30px 0;
+      background-color: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .otp-code {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 6px;
+      color: #4f46e5;
+    }
+
+    .note-text {
+      font-size: 14px;
+      color: #64748b;
+      background-color: #f1f5f9;
+      padding: 12px;
+      border-radius: 6px;
+      border-left: 4px solid #94a3b8;
+    }
+
+    .email-footer {
+      background-color: #f8fafc;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid #f1f5f9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="email-container">
+    <div class="email-header">
+      <h1>HỆ THỐNG XÁC THỰC</h1>
+    </div>
+
+    <div class="email-body">
+      <p class="welcome-text">Xin chào, <span th:text="${name}">Người dùng</span>!</p>
+      <p>Bạn nhận được email này vì đã yêu cầu lấy mã xác thực (OTP) cho tài khoản của mình. Vui lòng sử dụng mã bên
+        dưới để hoàn tất:</p>
+
+      <div class="otp-box">
+        <div class="otp-code" th:text="${otp}">000000</div>
+      </div>
+
+      <p class="note-text">
+        <strong>Lưu ý:</strong> Mã OTP này có hiệu lực trong vòng <b>5 phút</b> và chỉ sử dụng được một lần duy nhất. Vì
+        sự an toàn của bạn, tuyệt đối không chia sẻ mã này cho bất kỳ ai.
+      </p>
+    </div>
+
+    <div class="email-footer">
+      <p>Đây là email tự động từ hệ thống. Vui lòng không phản hồi email này.</p>
+      <p>&copy; 2026 Duy Tan University - IT Department</p>
+    </div>
+  </div>
+</body>
+
+</html>

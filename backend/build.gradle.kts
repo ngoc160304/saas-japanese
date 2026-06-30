@@ -20,7 +20,7 @@ java {
 
 checkstyle {
   toolVersion = "10.12.4"
-	configFile = file("${rootDir}/src/main/java/com/mycompany/saas_japanese/config/checkstyle/checkstyle.xml")
+	configFile = file("${rootDir}/checkstyle.xml")
 }
 
 spotbugs {
@@ -50,7 +50,10 @@ repositories {
 dependencies {
 	checkstyle("com.puppycrawl.tools:checkstyle:${checkstyle.toolVersion}")
 	compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.3")
-
+  implementation("org.springframework.boot:spring-boot-starter-mail")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("com.konghq:unirest-java:3.14.1")
+	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -70,4 +73,3 @@ dependencies {
 tasks.withType<Test> {
 	useJUnitPlatform()
 }
-

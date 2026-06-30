@@ -1,7 +1,7 @@
 package com.mycompany.saas_japanese.controller;
 
 import com.mycompany.saas_japanese.service.CourseService;
-import com.mycompany.saas_japanese.util.error.IdInvalidException;
+import com.mycompany.saas_japanese.util.error.BadRequestException;
 
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
@@ -34,9 +33,9 @@ public class CourseController {
     }
 
     @DeleteMapping("/courses/{id}")
-    public String deleteCourses(@PathVariable("id") long id) throws IdInvalidException {
+    public String deleteCourses(@PathVariable("id") long id) throws BadRequestException {
         if (id == 0) {
-            throw new IdInvalidException("Id khong ton tai");
+            throw new BadRequestException("Id khong ton tai");
         }
         this.courseService.deleteByIdCourse(id);
         return "done";
