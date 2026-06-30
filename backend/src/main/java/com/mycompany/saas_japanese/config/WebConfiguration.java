@@ -1,5 +1,6 @@
 package com.mycompany.saas_japanese.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.method.HandlerTypePredicate;
@@ -15,4 +16,6 @@ public class WebConfiguration implements WebMvcConfigurer {
         HandlerTypePredicate.forAnnotation(RestController.class));
   }
 
+  @Value("${brevo.api.key}")
+  private String apiKey;
 }
