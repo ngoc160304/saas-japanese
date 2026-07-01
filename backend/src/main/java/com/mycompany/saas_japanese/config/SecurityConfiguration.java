@@ -1,5 +1,7 @@
 package com.mycompany.saas_japanese.config;
 
+import org.springframework.security.config.Customizer;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,6 +25,8 @@ public class SecurityConfiguration {
         .authorizeHttpRequests(auth -> auth
             .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh-token")
             .permitAll().anyRequest().authenticated())
+        .oauth2ResourceServer(
+            rs -> rs.jwt(Customizer.withDefaults()))
         .formLogin(form -> form.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return http.build();
