@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT Admin Portal - Hệ thống quản trị học tiếng Nhật & luyện thi</title>
+  <meta name="description" content="Trang quản trị hệ thống StudyJLPT - Quản lý khóa học, đề thi, flashcard, thanh toán và người dùng." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Inter', sans-serif;
+      --color-brand: #4F46E5;
+      --color-brand-light: #818CF8;
+      --color-brand-dark: #3730A3;
+    }
+    body { font-family: 'Inter', sans-serif; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Mega menu for inherited Header */
+    .mega-trigger:hover .mega-panel,
+    .mega-trigger:focus-within .mega-panel { display: flex; }
+
+    /* Tab transitions */
+    .tab-content {
+      display: none;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    .tab-content.active {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Glassmorphism card details */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(241, 245, 249, 0.9);
+    }
+
+    /* Shimmer effect for buttons */
+    .btn-shimmer {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shimmer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.6s ease;
+    }
+    .btn-shimmer:hover::after {
+      transform: translateX(100%);
+    }
+
+    /* Glowing states */
+    .glow-indigo:hover {
+      box-shadow: 0 0 15px rgba(79, 70, 229, 0.35);
+    }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- ==================== HEADER (KẾ THỪA LẠI TỪ HỆ THỐNG) ==================== -->
+  <header id="site-header" class="fixed top-0 inset-x-0 z-50 border-b border-slate-100/80 bg-white/90 backdrop-blur-xl shadow-sm shadow-slate-100/50 transition-all duration-300">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10">
+      <div class="flex h-16 items-center justify-between gap-6 lg:gap-10">
+
+        <!-- Brand Logo -->
+        <a href="#" class="flex items-center gap-2.5 shrink-0 group">
+          <div class="relative flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-black text-lg shadow-md shadow-indigo-200 transition-transform group-hover:scale-105">
+            日
+            <span class="absolute -top-0.5 -right-0.5 flex h-3 w-3"><span class="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping"></span><span class="relative flex h-3 w-3 rounded-full bg-emerald-500"></span></span>
+          </div>
+          <span class="text-[17px] font-black tracking-tight text-slate-900">Study<span class="text-indigo-600">JLPT</span></span>
+        </a>
+
+        <!-- Global Search -->
+        <div class="hidden lg:flex flex-1 max-w-md mx-auto">
+          <div class="relative w-full">
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 15.803a7.5 7.5 0 0 0 10.607 0z" />
+            </svg>
+            <input type="search" placeholder="Tìm khóa học, đề thi, từ vựng…" class="w-full rounded-xl border border-slate-200 bg-slate-50/80 py-2 pl-10 pr-4 text-sm text-slate-700 placeholder:text-slate-400 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 transition-all" />
+            <kbd class="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:inline-flex h-5 px-1.5 items-center rounded-md border border-slate-200 bg-white text-[10px] font-medium text-slate-400">⌘K</kbd>
+          </div>
+        </div>
+
+        <!-- Mega Nav -->
+        <nav class="hidden lg:flex items-center gap-0.5">
+          <a href="course_detail.html?level=N5" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Khóa học</a>
+
+          <!-- Mega: Luyện thi -->
+          <div class="mega-trigger relative">
+            <button class="inline-flex items-center gap-1 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+              Luyện thi
+              <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-56 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/60 flex-col gap-0.5 z-50">
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N5</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N4</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N3</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N2</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-rose-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-rose-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-rose-700">Thi thử N1</span></a>
+            </div>
+          </div>
+
+          <a href="#" class="inline-flex items-center rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">Shop</a>
+
+          <!-- Mega: Tài liệu -->
+          <div class="mega-trigger relative">
+            <button class="inline-flex items-center gap-1 rounded-xl px-3.5 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors">
+              Tài liệu
+              <svg class="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-200/60 flex-col gap-0.5 z-50">
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Ebook học tiếng Nhật</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">PDF & Tài liệu PDF</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Combo sách tiết kiệm</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-amber-50 group transition-colors"><svg class="h-4 w-4 text-slate-400 group-hover:text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" /></svg><span class="text-sm font-medium text-slate-700 group-hover:text-amber-700">Đề thi thử JLPT</span></a>
+            </div>
+          </div>
+
+          <!-- Mega: AI Features -->
+          <div class="mega-trigger relative">
+            <button class="inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 transition-colors">
+              <span class="flex h-1.5 w-1.5 rounded-full bg-indigo-400"></span>
+              AI Coach
+              <svg class="h-3.5 w-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            <div class="mega-panel hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 rounded-2xl border border-indigo-100 bg-white p-4 shadow-xl shadow-indigo-100/40 flex-col gap-1 z-50">
+              <div class="mb-2 pb-2 border-b border-slate-100">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-600">✦ Powered by AI</span>
+              </div>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🧠</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Study Coach</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🗣️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Speaking Practice</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">✍️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Grammar Checker</span></a>
+              <a href="#" class="flex items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-indigo-50 group transition-colors"><div class="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 text-xs">🗺️</div><span class="text-sm font-medium text-slate-700 group-hover:text-indigo-700">AI Personalized Roadmap</span></a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-3 ml-auto shrink-0">
+          <!-- Notification Bell -->
+          <button class="relative hidden sm:flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+            <span class="absolute top-2 right-2 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>
+          </button>
+          <!-- Cart -->
+          <a href="#" class="relative hidden sm:flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-50 hover:text-slate-600 transition-colors">
+            <span class="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">2</span>
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z" /></svg>
+          </a>
+          <!-- Divider -->
+          <span class="hidden sm:block h-6 w-px bg-slate-100"></span>
+          <!-- Logged In Admin Profile -->
+          <div class="flex items-center gap-2">
+            <img class="h-8.5 w-8.5 rounded-full object-cover ring-2 ring-indigo-500/20" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=80" alt="Admin avatar" />
+            <div class="hidden xl:flex flex-col text-left">
+              <span class="text-xs font-bold text-slate-800 leading-none">Minh Anh</span>
+              <span class="text-[9px] font-medium text-slate-400 mt-0.5">Admin</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT CONTAINER ==================== -->
+  <div class="flex-1 pt-16">
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10 py-10">
+      
+      <div class="flex flex-col lg:flex-row gap-8 items-start">
+        
+        <!-- Left Sidebar / Navigation (for switching tabs) -->
+        <aside class="w-full lg:w-64 shrink-0 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-4 space-y-1.5 sticky top-20 z-10">
+          <div class="px-3 py-2 border-b border-slate-100 mb-3">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Hệ thống quản trị</h3>
+          </div>
+
+          <!-- Tab 1: Dashboard -->
+          <button data-tab="dashboard" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group active bg-indigo-600 text-white shadow-md shadow-indigo-900/10">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+            </svg>
+            <span>DASHBOARD</span>
+          </button>
+
+          <!-- Tab 2: Quản lý học liệu -->
+          <button data-tab="quanly-chung" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 7.5h1.5m-1.5 3h1.5m-7.5 3h7.5m-7.5 3h7.5m3-9h3.375c.621 0 1.125.504 1.125 1.125V18a2.25 2.25 0 0 1-2.25 2.25H5.625A2.25 2.25 0 0 1 3.5 18V6.125C3.5 5.504 4.004 5 4.625 5h4.036a2.25 2.25 0 0 1 1.777.816L11.75 7.5M12 7.5V5.25c0-.621.504-1.125 1.125-1.125h4.25c.621 0 1.125.504 1.125 1.125v2.25M12 7.5h7.5" />
+            </svg>
+            <span>Quản lý học liệu</span>
+          </button>
+
+          <!-- Tab 3: Quản lý khóa học -->
+          <button data-tab="quanly-khoa" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A5.906 5.906 0 0 1 1.151 6.096a60.758 60.758 0 0 1 21.698 0 5.906 5.906 0 0 1 4.54 3.125 50.47 50.47 0 0 0-2.658.813m-15.482 0A50.703 50.703 0 0 1 12 11.756a50.703 50.703 0 0 1 5.742-1.609m0-2.025v2.025m0-2.025c0-.986-.83-1.793-1.815-1.793H8.065c-.986 0-1.815.807-1.815 1.793v2.025" />
+            </svg>
+            <span>Quản lý khóa học</span>
+          </button>
+
+          <!-- Tab 4: Quản lý học tập -->
+          <button data-tab="quanly-hoc" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A5.906 5.906 0 0 1 1.151 6.096a60.758 60.758 0 0 1 21.698 0 5.906 5.906 0 0 1 4.54 3.125 50.47 50.47 0 0 0-2.658.813m-15.482 0A50.703 50.703 0 0 1 12 11.756a50.703 50.703 0 0 1 5.742-1.609m0-2.025v2.025m0-2.025c0-.986-.83-1.793-1.815-1.793H8.065c-.986 0-1.815.807-1.815 1.793v2.025" />
+            </svg>
+            <span>Quản lý học</span>
+          </button>
+
+          <!-- Tab 5: Quản lý đề thi -->
+          <button data-tab="quanly-dethi" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z" />
+            </svg>
+            <span>Quản lý đề thi</span>
+          </button>
+
+          <!-- Tab 6: Flashcards -->
+          <button data-tab="quanly-flashcard" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m-15 0a2.25 2.25 0 0 0-1.5 2.122v5.25a2.25 2.25 0 0 0 2.25 2.25h13.5A2.25 2.25 0 0 0 19.5 17.25V12a2.25 2.25 0 0 0-1.5-2.122m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128" />
+            </svg>
+            <span>Flashcard</span>
+          </button>
+
+          <!-- Tab 7: Thanh toán -->
+          <button data-tab="quanly-thanhtoan" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+            </svg>
+            <span>Thanh toán</span>
+          </button>
+
+          <!-- Tab 8: Người dùng -->
+          <button data-tab="quanly-nguoidung" class="tab-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 group text-slate-500 hover:bg-slate-50 hover:text-slate-900">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 shrink-0 group-hover:scale-105 transition-transform">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20.03c-2.115 0-4.113-.393-5.959-1.109V19.1c0-2.33 2.007-4.199 4.25-4.199h3.42c1.603 0 2.998.966 3.593 2.34m4.18-12.261a3.75 3.75 0 1 1-4.8 4.8 3.75 3.75 0 0 1 4.8-4.8ZM12 3.5a3.375 3.375 0 1 0 0 6.75 3.375 3.375 0 0 0 0-6.75Z" />
+            </svg>
+            <span>Người dùng</span>
+          </button>
+        </aside>
+
+        <!-- Right Content Area -->
+        <div class="flex-1 min-w-0 w-full bg-white rounded-2xl border border-slate-200/80 p-6 lg:p-8 shadow-sm">
+          
+          <!-- ==================== TAB 1: DASHBOARD ==================== -->
+          <div id="tab-dashboard" class="tab-content active space-y-8">
+            <!-- Title & Welcoming -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight">DASHBOARD</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Tổng quan thông số và hoạt động của toàn bộ hệ thống StudyJLPT.</p>
+              </div>
+              <div class="flex gap-2">
+                <button class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-all flex items-center gap-2">
+                  <span>Hôm nay</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                  </svg>
+                </button>
+                <button class="px-3.5 py-1.5 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-all shadow-sm flex items-center gap-2 btn-shimmer">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                  <span>Xuất báo cáo</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Metric Cards (4 Columns) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <!-- Card 1 -->
+              <div class="glass-card p-5 rounded-2xl border border-slate-100 hover:shadow-md transition-all group duration-300">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tổng doanh thu</p>
+                    <h3 class="text-2xl font-black text-slate-900 mt-2 tracking-tight">185.4M đ</h3>
+                  </div>
+                  <div class="p-2 rounded-xl bg-indigo-50 text-indigo-600 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75m0 .75v.75m0 .75v.75m0 .75v.75m0 .75v.75m0 .75V13.5m0 .75v.75m0 .75v.75m0 .75V18M1.5 5.25h1.5m-1.5 4.5h1.5m-1.5 4.5h1.5m-1.5 4.5h1.5" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 mt-4 text-emerald-600 text-xs font-semibold">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                  </svg>
+                  <span>+12.4%</span>
+                  <span class="text-slate-400 font-normal ml-1">so với tháng trước</span>
+                </div>
+              </div>
+              <!-- Card 2 -->
+              <div class="glass-card p-5 rounded-2xl border border-slate-100 hover:shadow-md transition-all group duration-300">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Học viên mới</p>
+                    <h3 class="text-2xl font-black text-slate-900 mt-2 tracking-tight">1,248</h3>
+                  </div>
+                  <div class="p-2 rounded-xl bg-violet-50 text-violet-600 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 mt-4 text-emerald-600 text-xs font-semibold">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                  </svg>
+                  <span>+8.2%</span>
+                  <span class="text-slate-400 font-normal ml-1">so với tuần trước</span>
+                </div>
+              </div>
+              <!-- Card 3 -->
+              <div class="glass-card p-5 rounded-2xl border border-slate-100 hover:shadow-md transition-all group duration-300">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Đề thi được làm</p>
+                    <h3 class="text-2xl font-black text-slate-900 mt-2 tracking-tight">4,892</h3>
+                  </div>
+                  <div class="p-2 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 mt-4 text-emerald-600 text-xs font-semibold">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+                  </svg>
+                  <span>+24.1%</span>
+                  <span class="text-slate-400 font-normal ml-1">trong 30 ngày qua</span>
+                </div>
+              </div>
+              <!-- Card 4 -->
+              <div class="glass-card p-5 rounded-2xl border border-slate-100 hover:shadow-md transition-all group duration-300">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tỷ lệ hoàn thành học</p>
+                    <h3 class="text-2xl font-black text-slate-900 mt-2 tracking-tight">72.4%</h3>
+                  </div>
+                  <div class="p-2 rounded-xl bg-teal-50 text-teal-600 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 mt-4 text-rose-500 text-xs font-semibold">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3 h-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+                  </svg>
+                  <span>-1.5%</span>
+                  <span class="text-slate-400 font-normal ml-1">so với quý trước</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activities & Popular Courses (No Redundant Charts) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Recent activities feed -->
+              <div class="lg:col-span-2 border border-slate-100 p-6 rounded-2xl bg-slate-50/50">
+                <h4 class="text-sm font-bold text-slate-900 mb-5">Nhật ký hoạt động gần đây</h4>
+                <div class="flow-root">
+                  <ul role="list" class="-mb-8">
+                    <li>
+                      <div class="relative pb-8">
+                        <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
+                        <div class="relative flex space-x-3">
+                          <div>
+                            <span class="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 ring-8 ring-white">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.546 1.16 3.765 1.16 5.312 0l.879-.659" />
+                              </svg>
+                            </span>
+                          </div>
+                          <div class="flex-1 min-w-0 flex justify-between items-start gap-4">
+                            <div>
+                              <p class="text-sm text-slate-800">Học viên <span class="font-semibold text-slate-900">Trần Văn Tú</span> vừa nâng cấp tài khoản thành <span class="px-2 py-0.5 text-xs font-semibold rounded-full bg-violet-100 text-violet-700">VIP Pro</span></p>
+                              <p class="text-xs text-slate-400 mt-1">Đơn hàng #INV-92842 • Momo Payment</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">2 phút trước</span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="relative pb-8">
+                        <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
+                        <div class="relative flex space-x-3">
+                          <div>
+                            <span class="h-8 w-8 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 ring-8 ring-white">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4" />
+                              </svg>
+                            </span>
+                          </div>
+                          <div class="flex-1 min-w-0 flex justify-between items-start gap-4">
+                            <div>
+                              <p class="text-sm text-slate-800"><span class="font-semibold text-slate-900">Phát hiện báo lỗi:</span> Học viên báo cáo sai đáp án ở đề thi thử JLPT N3 - Mondai 2 Câu 12.</p>
+                              <p class="text-xs text-rose-500 font-semibold mt-1">Trạng thái: Chưa xử lý • Người duyệt: Admin</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">15 phút trước</span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="relative pb-8">
+                        <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-slate-200" aria-hidden="true"></span>
+                        <div class="relative flex space-x-3">
+                          <div>
+                            <span class="h-8 w-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 ring-8 ring-white">
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75" />
+                              </svg>
+                            </span>
+                          </div>
+                          <div class="flex-1 min-w-0 flex justify-between items-start gap-4">
+                            <div>
+                              <p class="text-sm text-slate-800">Học viên <span class="font-semibold text-slate-900">Lê Minh Ngọc</span> vừa hoàn thành xuất sắc đề thi <span class="font-semibold text-slate-800">JLPT N1 Full-test #1</span></p>
+                              <p class="text-xs text-emerald-600 font-semibold mt-1">Kết quả: Đạt (142/180 điểm)</p>
+                            </div>
+                            <span class="text-xs font-semibold text-slate-400 whitespace-nowrap">42 phút trước</span>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Popular courses list -->
+              <div class="border border-slate-100 p-6 rounded-2xl bg-slate-50/50">
+                <h4 class="text-sm font-bold text-slate-900 mb-5">Khóa học đăng ký nhiều</h4>
+                <div class="space-y-4">
+                  <!-- Item 1 -->
+                  <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <div class="h-9 w-9 rounded-lg bg-indigo-50 flex items-center justify-center font-bold text-indigo-600 shrink-0 text-xs">N3</div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="text-xs font-bold text-slate-800 truncate">Khóa học JLPT N3 Cấp Tốc</h5>
+                      <p class="text-[10px] text-slate-400 mt-0.5">342 học viên mới</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800 shrink-0">1.2M đ</span>
+                  </div>
+                  <!-- Item 2 -->
+                  <div class="flex items-center gap-3 border-b border-slate-100 pb-3">
+                    <div class="h-9 w-9 rounded-lg bg-rose-50 flex items-center justify-center font-bold text-rose-600 shrink-0 text-xs">N2</div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="text-xs font-bold text-slate-800 truncate">Chuyên đề Ngữ pháp JLPT N2</h5>
+                      <p class="text-[10px] text-slate-400 mt-0.5">218 học viên mới</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800 shrink-0">950K đ</span>
+                  </div>
+                  <!-- Item 3 -->
+                  <div class="flex items-center gap-3">
+                    <div class="h-9 w-9 rounded-lg bg-slate-200 flex items-center justify-center font-bold text-slate-800 shrink-0 text-xs">N1</div>
+                    <div class="flex-1 min-w-0">
+                      <h5 class="text-xs font-bold text-slate-800 truncate">Combo Luyện đề Thi thử N1</h5>
+                      <p class="text-[10px] text-slate-400 mt-0.5">185 học viên mới</p>
+                    </div>
+                    <span class="text-xs font-bold text-slate-800 shrink-0">1.8M đ</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 2: QUẢN LÝ CHUNG (HỌC LIỆU) ==================== -->
+          <div id="tab-quanly-chung" class="tab-content space-y-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight">Quản lý học liệu</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Quản lý kho ngữ pháp, từ vựng, và chữ Kanji trong hệ thống.</p>
+              </div>
+              <button onclick="openModal('modal-add-resource')" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 glow-indigo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Thêm học liệu mới</span>
+              </button>
+            </div>
+
+            <!-- Filter tabs for Resource Types -->
+            <div class="flex gap-2 border-b border-slate-200 pb-3">
+              <button class="px-4 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">Ngữ pháp (Grammar)</button>
+              <button class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all">Từ vựng (Vocabulary)</button>
+              <button class="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-all">Chữ Kanji</button>
+            </div>
+
+            <!-- Table Filters & Search -->
+            <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200/80 shadow-sm">
+              <div class="flex gap-3 items-center">
+                <select class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-600">
+                  <option>Cấp độ: Tất cả</option>
+                  <option>JLPT N1</option>
+                  <option>JLPT N2</option>
+                  <option>JLPT N3</option>
+                  <option>JLPT N4</option>
+                  <option>JLPT N5</option>
+                </select>
+                <select class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-slate-600">
+                  <option>Sắp xếp: Mới nhất</option>
+                  <option>Lượt xem nhiều</option>
+                  <option>Tên A-Z</option>
+                </select>
+              </div>
+              <div class="w-72 relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                  </svg>
+                </span>
+                <input type="text" placeholder="Tìm theo tên học liệu..." class="w-full pl-9 pr-4 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white" />
+              </div>
+            </div>
+
+            <!-- Resources Datatable -->
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <th class="py-4 px-6">ID</th>
+                    <th class="py-4 px-6">Mẫu câu/Từ ngữ</th>
+                    <th class="py-4 px-6">Cấp độ</th>
+                    <th class="py-4 px-6">Giải nghĩa ngắn</th>
+                    <th class="py-4 px-6">Bài viết hướng dẫn</th>
+                    <th class="py-4 px-6">Lượt xem</th>
+                    <th class="py-4 px-6 text-right">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#GR-0842</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">〜ものなら (mono nara)</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white">N1</span></td>
+                    <td class="py-4 px-6 text-slate-500">Nếu có thể... (thể hiện ước muốn khó thực hiện)</td>
+                    <td class="py-4 px-6 text-indigo-600 hover:underline cursor-pointer">Xem chi tiết bài học</td>
+                    <td class="py-4 px-6">1,824</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa</button>
+                      <button class="text-rose-600 hover:text-rose-950 font-semibold">Xóa</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#GR-0839</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">〜つつある (tsutsu aru)</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white">N2</span></td>
+                    <td class="py-4 px-6 text-slate-500">Dần dần đang... (diễn tiến của trạng thái biến đổi)</td>
+                    <td class="py-4 px-6 text-indigo-600 hover:underline cursor-pointer">Xem chi tiết bài học</td>
+                    <td class="py-4 px-6">2,910</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa</button>
+                      <button class="text-rose-600 hover:text-rose-950 font-semibold">Xóa</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#GR-0820</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">〜わけがない (wake ga nai)</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white">N3</span></td>
+                    <td class="py-4 px-6 text-slate-500">Không có lý nào/Làm sao có chuyện...</td>
+                    <td class="py-4 px-6 text-indigo-600 hover:underline cursor-pointer">Xem chi tiết bài học</td>
+                    <td class="py-4 px-6">4,128</td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa</button>
+                      <button class="text-rose-600 hover:text-rose-950 font-semibold">Xóa</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- Pagination -->
+              <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium">Hiển thị 1-3 trong số 842 mục học liệu</span>
+                <div class="flex gap-1">
+                  <button class="px-3 py-1 text-xs border border-slate-200 rounded-md bg-white hover:bg-slate-50 text-slate-600 font-semibold">Trước</button>
+                  <button class="px-3 py-1 text-xs border border-indigo-200 rounded-md bg-indigo-50 text-indigo-600 font-bold">1</button>
+                  <button class="px-3 py-1 text-xs border border-slate-200 rounded-md bg-white hover:bg-slate-50 text-slate-600 font-semibold">2</button>
+                  <button class="px-3 py-1 text-xs border border-slate-200 rounded-md bg-white hover:bg-slate-50 text-slate-600 font-semibold font-semibold">Sau</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 3: QUẢN LÝ KHÓA HỌC ==================== -->
+          <div id="tab-quanly-khoa" class="tab-content space-y-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight">Quản lý khóa học (Courses)</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Xây dựng lộ trình đào tạo, biên soạn bài giảng cho từng cấp độ.</p>
+              </div>
+              <button onclick="openModal('modal-add-course')" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 glow-indigo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Tạo khóa học mới</span>
+              </button>
+            </div>
+
+            <!-- Course Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Course Card 1 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-shadow">
+                <div>
+                  <div class="relative h-40 bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center p-6 text-white overflow-hidden">
+                    <span class="absolute right-4 top-4 px-2 py-0.5 text-[9px] font-bold rounded bg-slate-900/40 border border-white/20">Active</span>
+                    <span class="text-3xl font-black">N3</span>
+                    <div class="absolute bottom-4 left-6">
+                      <h4 class="text-xs font-bold truncate">Khóa học JLPT N3 Cấp tốc</h4>
+                      <p class="text-[10px] text-indigo-100 mt-0.5">Lộ trình bài bản chinh phục N3 trong 3 tháng</p>
+                    </div>
+                  </div>
+                  <div class="p-5 space-y-4">
+                    <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-600">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512" />
+                        </svg>
+                        <span>42 Bài học</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372" />
+                        </svg>
+                        <span>1,340 Học viên</span>
+                      </div>
+                    </div>
+                    <!-- Mini progress bar -->
+                    <div>
+                      <div class="flex justify-between text-[10px] font-semibold text-slate-500 mb-1">
+                        <span>Đánh giá hoàn thành</span>
+                        <span>68%</span>
+                      </div>
+                      <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-indigo-600 rounded-full" style="width: 68%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">1,200,000 đ</span>
+                  <div class="flex gap-2">
+                    <button class="px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all">Sửa</button>
+                    <button class="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">Biên soạn bài</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Card 2 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-shadow">
+                <div>
+                  <div class="relative h-40 bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center p-6 text-white overflow-hidden">
+                    <span class="absolute right-4 top-4 px-2 py-0.5 text-[9px] font-bold rounded bg-slate-900/40 border border-white/20">Active</span>
+                    <span class="text-3xl font-black">N2</span>
+                    <div class="absolute bottom-4 left-6">
+                      <h4 class="text-xs font-bold truncate">Chuyên đề Ngữ pháp JLPT N2</h4>
+                      <p class="text-[10px] text-rose-100 mt-0.5">Phân tích chuyên sâu 120 cấu trúc khó</p>
+                    </div>
+                  </div>
+                  <div class="p-5 space-y-4">
+                    <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-600">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512" />
+                        </svg>
+                        <span>28 Bài học</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372" />
+                        </svg>
+                        <span>948 Học viên</span>
+                      </div>
+                    </div>
+                    <!-- Mini progress bar -->
+                    <div>
+                      <div class="flex justify-between text-[10px] font-semibold text-slate-500 mb-1">
+                        <span>Đánh giá hoàn thành</span>
+                        <span>42%</span>
+                      </div>
+                      <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-rose-500 rounded-full" style="width: 42%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">950,000 đ</span>
+                  <div class="flex gap-2">
+                    <button class="px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all">Sửa</button>
+                    <button class="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">Biên soạn bài</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Course Card 3 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-shadow">
+                <div>
+                  <div class="relative h-40 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center p-6 text-white overflow-hidden">
+                    <span class="absolute right-4 top-4 px-2 py-0.5 text-[9px] font-bold rounded bg-slate-900/40 border border-white/20">Draft</span>
+                    <span class="text-3xl font-black">N1</span>
+                    <div class="absolute bottom-4 left-6">
+                      <h4 class="text-xs font-bold truncate">Đại lộ chinh phục JLPT N1</h4>
+                      <p class="text-[10px] text-slate-300 mt-0.5">Khóa học đỉnh cao, đề thi chuẩn chỉnh</p>
+                    </div>
+                  </div>
+                  <div class="p-5 space-y-4">
+                    <div class="grid grid-cols-2 gap-4 text-xs font-medium text-slate-600">
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512" />
+                        </svg>
+                        <span>50 Bài học</span>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4 text-slate-400">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372" />
+                        </svg>
+                        <span>0 Học viên</span>
+                      </div>
+                    </div>
+                    <!-- Mini progress bar -->
+                    <div>
+                      <div class="flex justify-between text-[10px] font-semibold text-slate-500 mb-1">
+                        <span>Đánh giá hoàn thành</span>
+                        <span>0%</span>
+                      </div>
+                      <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-slate-500 rounded-full" style="width: 0%"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="px-5 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+                  <span class="text-xs font-bold text-slate-800">1,800,000 đ</span>
+                  <div class="flex gap-2">
+                    <button class="px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all">Sửa</button>
+                    <button class="px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">Biên soạn bài</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 4: QUẢN LÝ HỌC TẬP ==================== -->
+          <div id="tab-quanly-hoc" class="tab-content space-y-6">
+            <div>
+              <h2 class="text-xl font-black text-slate-900 tracking-tight">Theo dõi tiến trình & Quiz học tập</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử học tập, streak hoạt động của người dùng và thiết lập ngân hàng đề Quiz.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <!-- Student list table -->
+              <div class="glass-card p-6 rounded-2xl border border-slate-100 lg:col-span-2 space-y-4">
+                <div class="flex justify-between items-center">
+                  <h4 class="text-xs font-bold text-slate-900 uppercase">Tiến độ học viên</h4>
+                  <div class="w-48 relative">
+                    <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3 h-3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                      </svg>
+                    </span>
+                    <input type="text" placeholder="Tìm theo học viên..." class="w-full pl-8 pr-3 py-1 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                  </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full text-left border-collapse">
+                    <thead>
+                      <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-[9px] font-bold uppercase tracking-wider">
+                        <th class="py-3 px-4">Học viên</th>
+                        <th class="py-3 px-4">Khóa học</th>
+                        <th class="py-3 px-4">Tiến độ bài</th>
+                        <th class="py-3 px-4">Điểm Quiz TB</th>
+                        <th class="py-3 px-4 text-right">Chi tiết</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+                      <tr>
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">Trần Thế Thành</td>
+                        <td class="py-3.5 px-4 text-slate-500">JLPT N3 Cấp Tốc</td>
+                        <td class="py-3.5 px-4">
+                          <div class="flex items-center gap-1.5">
+                            <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div class="h-full bg-indigo-600 rounded-full" style="width: 75%"></div>
+                            </div>
+                            <span class="text-[10px] font-semibold text-slate-500">75%</span>
+                          </div>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">8.6 / 10</td>
+                        <td class="py-3.5 px-4 text-right">
+                          <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Xem</button>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td class="py-3.5 px-4 font-semibold text-slate-900">Lê Thuỳ Trang</td>
+                        <td class="py-3.5 px-4 text-slate-500">Chuyên đề Ngữ pháp JLPT N2</td>
+                        <td class="py-3.5 px-4">
+                          <div class="flex items-center gap-1.5">
+                            <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                              <div class="h-full bg-indigo-600 rounded-full" style="width: 32%"></div>
+                            </div>
+                            <span class="text-[10px] font-semibold text-slate-500">32%</span>
+                          </div>
+                        </td>
+                        <td class="py-3.5 px-4 font-bold text-emerald-600">7.2 / 10</td>
+                        <td class="py-3.5 px-4 text-right">
+                          <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Xem</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Quiz Setup widget -->
+              <div class="glass-card p-6 rounded-2xl border border-slate-100 space-y-4">
+                <h4 class="text-xs font-bold text-slate-900 uppercase">Cấu hình Quiz bài học</h4>
+                <p class="text-xs text-slate-500">Thiết lập điểm đạt (pass score) cho học viên khi hoàn thành bài quiz cuối bài giảng.</p>
+                <div class="space-y-3 pt-2">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Khóa học</label>
+                    <select class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                      <option>Khóa học JLPT N3 Cấp tốc</option>
+                      <option>Chuyên đề Ngữ pháp JLPT N2</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Bài học</label>
+                    <select class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                      <option>Bài 1: Sử dụng ngữ pháp N3 cơ bản</option>
+                      <option>Bài 2: Hướng dẫn cấu trúc 〜わけがない</option>
+                    </select>
+                  </div>
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Thời gian</label>
+                      <input type="number" value="15" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Điểm đạt (%)</label>
+                      <input type="number" value="80" class="w-full px-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+                    </div>
+                  </div>
+                  <button class="w-full py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all btn-shimmer">Cập nhật cấu hình</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 5: QUẢN LÝ ĐỀ THI ==================== -->
+          <div id="tab-quanly-dethi" class="tab-content space-y-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight">Quản lý Đề thi JLPT</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Xây dựng ngân hàng câu hỏi đề thi thử chính thức theo cấu trúc chuẩn JLPT.</p>
+              </div>
+              <button class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 glow-indigo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Tạo đề thi mới</span>
+              </button>
+            </div>
+
+            <!-- Exam Datatable -->
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <th class="py-4 px-6">Mã đề</th>
+                    <th class="py-4 px-6">Tên đề thi</th>
+                    <th class="py-4 px-6">Cấp độ</th>
+                    <th class="py-4 px-6">Thời gian</th>
+                    <th class="py-4 px-6">Lượt thi</th>
+                    <th class="py-4 px-6">Trạng thái</th>
+                    <th class="py-4 px-6 text-right">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#EX-JLPT101</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">JLPT N1 Full Test chuẩn cấu trúc 2026 - Số 01</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-white">N1</span></td>
+                    <td class="py-4 px-6">170 phút</td>
+                    <td class="py-4 px-6 font-semibold">1,240 lượt</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Đã xuất bản</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa đề</button>
+                      <button class="text-slate-600 hover:text-slate-950 font-semibold">Cấu hình Mondai</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#EX-JLPT102</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">JLPT N2 Mock Test tuyển chọn nâng cao - Số 02</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white">N2</span></td>
+                    <td class="py-4 px-6">155 phút</td>
+                    <td class="py-4 px-6 font-semibold">892 lượt</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Đã xuất bản</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa đề</button>
+                      <button class="text-slate-600 hover:text-slate-950 font-semibold">Cấu hình Mondai</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-semibold text-slate-400">#EX-JLPT103</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">Đề mẫu JLPT N3 ôn thi thần tốc - Số 03</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white">N3</span></td>
+                    <td class="py-4 px-6">140 phút</td>
+                    <td class="py-4 px-6 font-semibold">0 lượt</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">Bản nháp</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Sửa đề</button>
+                      <button class="text-slate-600 hover:text-slate-950 font-semibold">Cấu hình Mondai</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 6: FLASHCARDS ==================== -->
+          <div id="tab-quanly-flashcard" class="tab-content space-y-6">
+            <div class="flex justify-between items-center">
+              <div>
+                <h2 class="text-xl font-black text-slate-900 tracking-tight">Quản lý bộ thẻ Flashcards</h2>
+                <p class="text-xs text-slate-500 mt-0.5">Xây dựng bộ thẻ ghi nhớ hỗ trợ việc luyện phản xạ học từ vựng nhanh.</p>
+              </div>
+              <button class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 shadow-sm transition-all flex items-center gap-2 glow-indigo">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                <span>Tạo bộ thẻ mới</span>
+              </button>
+            </div>
+
+            <!-- Decks Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <!-- Flashcard Deck Card 1 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <span class="absolute top-0 left-0 w-full h-1 bg-indigo-500"></span>
+                <div class="flex justify-between items-start">
+                  <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-700">N3</span>
+                  <span class="text-[10px] text-slate-400 font-medium">92 thẻ lật</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900 mt-3 group-hover:text-indigo-600 transition-colors">Mimikara Oboeru Từ vựng N3</h4>
+                <p class="text-xs text-slate-500 mt-1 line-clamp-2">Tổng hợp từ vựng N3 giáo trình Mimikara Oboeru.</p>
+                <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4 text-[10px]">
+                  <span class="font-bold text-slate-400 uppercase">Tạo bởi: System</span>
+                  <button class="font-bold text-indigo-600 hover:text-indigo-900">Chi tiết & Sửa</button>
+                </div>
+              </div>
+
+              <!-- Flashcard Deck Card 2 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <span class="absolute top-0 left-0 w-full h-1 bg-rose-500"></span>
+                <div class="flex justify-between items-start">
+                  <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-100 text-rose-700">N2</span>
+                  <span class="text-[10px] text-slate-400 font-medium">120 thẻ lật</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900 mt-3 group-hover:text-indigo-600 transition-colors">120 Chữ Kanji N2 hay gặp</h4>
+                <p class="text-xs text-slate-500 mt-1 line-clamp-2">Luyện tập âm On, âm Kun phản xạ Hán tự.</p>
+                <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4 text-[10px]">
+                  <span class="font-bold text-slate-400 uppercase">Tạo bởi: System</span>
+                  <button class="font-bold text-indigo-600 hover:text-indigo-900">Chi tiết & Sửa</button>
+                </div>
+              </div>
+
+              <!-- Flashcard Deck Card 3 -->
+              <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 hover:shadow-md transition-shadow relative overflow-hidden group">
+                <span class="absolute top-0 left-0 w-full h-1 bg-slate-800"></span>
+                <div class="flex justify-between items-start">
+                  <span class="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-200 text-slate-800">N1</span>
+                  <span class="text-[10px] text-slate-400 font-medium">75 thẻ lật</span>
+                </div>
+                <h4 class="text-sm font-bold text-slate-900 mt-3 group-hover:text-indigo-600 transition-colors">Thành ngữ bốn chữ Hán N1</h4>
+                <p class="text-xs text-slate-500 mt-1 line-clamp-2">Các cấu trúc thành ngữ bốn chữ Hán (Yojijukugo).</p>
+                <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-4 text-[10px]">
+                  <span class="font-bold text-slate-400 uppercase">Tạo bởi: Admin</span>
+                  <button class="font-bold text-indigo-600 hover:text-indigo-900">Chi tiết & Sửa</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 7: THANH TOÁN ==================== -->
+          <div id="tab-quanly-thanhtoan" class="tab-content space-y-6">
+            <div>
+              <h2 class="text-xl font-black text-slate-900 tracking-tight">Hóa đơn & Thanh toán</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử giao dịch mua tài liệu PDF/Sách giấy và nâng cấp VIP của học viên.</p>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <th class="py-4 px-6">Mã giao dịch</th>
+                    <th class="py-4 px-6">Học viên</th>
+                    <th class="py-4 px-6">Sản phẩm / Dịch vụ</th>
+                    <th class="py-4 px-6">Ngày giao dịch</th>
+                    <th class="py-4 px-6">Phương thức</th>
+                    <th class="py-4 px-6">Tổng tiền</th>
+                    <th class="py-4 px-6">Trạng thái</th>
+                    <th class="py-4 px-6 text-right">Hóa đơn</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+                  <tr>
+                    <td class="py-4 px-6 font-bold text-slate-900">#INV-92842</td>
+                    <td class="py-4 px-6 font-semibold">Trần Văn Tú</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-violet-100 text-violet-700">Gói VIP Pro 12 tháng</span></td>
+                    <td class="py-4 px-6 text-slate-400">30/06/2026 21:30</td>
+                    <td class="py-4 px-6">Ví điện tử Momo</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">1,200,000 đ</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Thành công</span></td>
+                    <td class="py-4 px-6 text-right">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Xem</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-bold text-slate-900">#INV-92840</td>
+                    <td class="py-4 px-6 font-semibold">Nguyễn Thị Hằng</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-indigo-100 text-indigo-700">Combo Sách giấy N2</span></td>
+                    <td class="py-4 px-6 text-slate-400">29/06/2026 14:15</td>
+                    <td class="py-4 px-6">Chuyển khoản Banking</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">650,000 đ</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Thành công</span></td>
+                    <td class="py-4 px-6 text-right">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Xem</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 font-bold text-slate-900">#INV-92839</td>
+                    <td class="py-4 px-6 font-semibold">Phan Anh Đức</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-slate-100 text-slate-700">Đề thi ôn tập N1 (Ebook)</span></td>
+                    <td class="py-4 px-6 text-slate-400">28/06/2026 09:20</td>
+                    <td class="py-4 px-6">Thẻ Visa/Mastercard</td>
+                    <td class="py-4 px-6 font-bold text-slate-900">250,000 đ</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Đang xử lý</span></td>
+                    <td class="py-4 px-6 text-right">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Xem</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ==================== TAB 8: NGƯỜI DÙNG ==================== -->
+          <div id="tab-quanly-nguoidung" class="tab-content space-y-6">
+            <div>
+              <h2 class="text-xl font-black text-slate-900 tracking-tight">Quản lý người dùng hệ thống</h2>
+              <p class="text-xs text-slate-500 mt-0.5">Danh sách toàn bộ tài khoản học viên, quản trị viên. Phân quyền và khóa/mở khóa tài khoản.</p>
+            </div>
+
+            <!-- User Accounts Table -->
+            <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
+                    <th class="py-4 px-6">Họ và tên</th>
+                    <th class="py-4 px-6">Email</th>
+                    <th class="py-4 px-6">Mục tiêu</th>
+                    <th class="py-4 px-6">Vai trò</th>
+                    <th class="py-4 px-6">Ngày tham gia</th>
+                    <th class="py-4 px-6">Trạng thái</th>
+                    <th class="py-4 px-6 text-right">Hành động</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+                  <tr>
+                    <td class="py-4 px-6 flex items-center gap-3">
+                      <img class="h-7 w-7 rounded-full object-cover shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=80" alt="avatar" />
+                      <span class="font-bold text-slate-900">Nguyễn Văn Tú</span>
+                    </td>
+                    <td class="py-4 px-6">tu.tranvan@gmail.com</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500 text-white">N3</span></td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-violet-100 text-violet-700 border border-violet-200">Học viên VIP</span></td>
+                    <td class="py-4 px-6 text-slate-400">12/03/2026</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Hoạt động</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-amber-600 hover:text-amber-850 font-semibold">Nâng VIP</button>
+                      <button onclick="confirmAction('Khóa tài khoản Nguyễn Văn Tú?')" class="text-rose-600 hover:text-rose-950 font-semibold">Khóa</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 flex items-center gap-3">
+                      <img class="h-7 w-7 rounded-full object-cover shrink-0" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=80" alt="avatar" />
+                      <span class="font-bold text-slate-900">Lê Thuỳ Trang</span>
+                    </td>
+                    <td class="py-4 px-6">thuytrang.le@outlook.com</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500 text-white">N2</span></td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200">Học viên thường</span></td>
+                    <td class="py-4 px-6 text-slate-400">18/04/2026</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">Hoạt động</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-amber-600 hover:text-amber-850 font-semibold">Nâng VIP</button>
+                      <button onclick="confirmAction('Khóa tài khoản Lê Thuỳ Trang?')" class="text-rose-600 hover:text-rose-950 font-semibold">Khóa</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="py-4 px-6 flex items-center gap-3">
+                      <img class="h-7 w-7 rounded-full object-cover shrink-0" src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=80" alt="avatar" />
+                      <span class="font-bold text-slate-900">Phạm Hoàng Nam</span>
+                    </td>
+                    <td class="py-4 px-6">namph2003@yahoo.com</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-white">N1</span></td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 text-[9px] font-bold rounded-full bg-slate-100 text-slate-700 border border-slate-200">Học viên thường</span></td>
+                    <td class="py-4 px-6 text-slate-400">22/05/2026</td>
+                    <td class="py-4 px-6"><span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-800 border border-rose-200">Bị khóa</span></td>
+                    <td class="py-4 px-6 text-right space-x-2">
+                      <button class="text-indigo-600 hover:text-indigo-900 font-semibold">Mở khóa</button>
+                      <button class="text-rose-400 hover:text-rose-600 font-semibold cursor-not-allowed" disabled>Đã khóa</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==================== FOOTER (KẾ THỪA LẠI TỪ HỆ THỐNG) ==================== -->
+  <footer class="bg-slate-900 text-slate-400">
+    <!-- Newsletter Bar -->
+    <div class="border-b border-slate-800">
+      <div class="mx-auto max-w-[1400px] px-6 lg:px-10 py-8">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="text-center md:text-left">
+            <p class="text-base font-bold text-white">📩 Nhận tips học tiếng Nhật mỗi tuần</p>
+            <p class="text-sm text-slate-400 mt-0.5">Thủ thuật học nhanh, bí kíp thi JLPT từ chuyên gia</p>
+          </div>
+          <div class="flex w-full max-w-sm gap-2">
+            <input type="email" placeholder="email@studyjlpt.vn" class="flex-1 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all" />
+            <button class="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-indigo-500 transition-colors whitespace-nowrap">Đăng ký</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Footer Links -->
+    <div class="mx-auto max-w-[1400px] px-6 lg:px-10 py-16">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-10">
+        <!-- Brand Column -->
+        <div class="col-span-2 sm:col-span-3 lg:col-span-1">
+          <a href="#" class="flex items-center gap-2.5 mb-5">
+            <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-black text-lg">日</div>
+            <span class="text-lg font-black text-white">Study<span class="text-indigo-400">JLPT</span></span>
+          </a>
+          <p class="text-sm text-slate-500 leading-relaxed mb-6">Nền tảng học tiếng Nhật và luyện thi JLPT hàng đầu Việt Nam với AI Study Coach.</p>
+        </div>
+
+        <!-- Products -->
+        <div>
+          <h4 class="text-sm font-bold text-white mb-4">Sản phẩm</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Khóa học JLPT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Đề thi thử</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Flashcard</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">AI Coach</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources -->
+        <div>
+          <h4 class="text-sm font-bold text-white mb-4">Tài nguyên</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Blog tiếng Nhật</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Tài liệu học</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Ebook miễn phí</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Hướng dẫn JLPT</a></li>
+          </ul>
+        </div>
+
+        <!-- Community -->
+        <div>
+          <h4 class="text-sm font-bold text-white mb-4">Cộng đồng</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Discord StudyJLPT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Nhóm Facebook</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Bảng xếp hạng</a></li>
+          </ul>
+        </div>
+
+        <!-- Company -->
+        <div>
+          <h4 class="text-sm font-bold text-white mb-4">Công ty</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">Về chúng tôi</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Tuyển dụng</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Liên hệ hợp tác</a></li>
+          </ul>
+        </div>
+
+        <!-- Support -->
+        <div>
+          <h4 class="text-sm font-bold text-white mb-4">Hỗ trợ</h4>
+          <ul class="space-y-2.5 text-sm">
+            <li><a href="#" class="hover:text-white transition-colors">FAQ</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Chính sách hoàn tiền</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Hỗ trợ khách hàng</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="border-t border-slate-800">
+      <div class="mx-auto max-w-[1400px] px-6 lg:px-10 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <p>© 2026 StudyJLPT Platform. Bản quyền thuộc về StudyJLPT Vietnam. All rights reserved.</p>
+        <div class="flex items-center gap-4">
+          <a href="#" class="hover:text-slate-300 transition-colors">Điều khoản</a>
+          <a href="#" class="hover:text-slate-300 transition-colors">Bảo mật</a>
+          <a href="#" class="hover:text-slate-300 transition-colors">Cookie</a>
+          <span class="flex items-center gap-1">🇻🇳 Tiếng Việt</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL: ADD COURSE ==================== -->
+  <div id="modal-add-course" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white w-[500px] rounded-2xl shadow-xl overflow-hidden border border-slate-100 transform scale-95 transition-transform duration-300">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-900">Tạo khóa học mới</h3>
+        <button onclick="closeModal('modal-add-course')" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Tên khóa học *</label>
+          <input type="text" placeholder="Nhập tên khóa học..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cấp độ JLPT *</label>
+            <select class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+              <option>JLPT N5</option>
+              <option>JLPT N4</option>
+              <option>JLPT N3</option>
+              <option>JLPT N2</option>
+              <option>JLPT N1</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Giá bán (đ) *</label>
+            <input type="number" placeholder="Ví dụ: 1200000" class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mô tả ngắn</label>
+          <textarea rows="3" placeholder="Nhập mô tả khóa học ngắn gọn..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"></textarea>
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5">
+        <button onclick="closeModal('modal-add-course')" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100">Hủy bỏ</button>
+        <button onclick="saveCourse()" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm btn-shimmer">Lưu khóa học</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: ADD GENERAL RESOURCE ==================== -->
+  <div id="modal-add-resource" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-white w-[500px] rounded-2xl shadow-xl overflow-hidden border border-slate-100 transform scale-95 transition-transform duration-300">
+      <div class="px-6 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-sm font-bold text-slate-900">Thêm học liệu mới</h3>
+        <button onclick="closeModal('modal-add-resource')" class="text-slate-400 hover:text-slate-600">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Loại học liệu *</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="radio" name="res-type" checked class="text-indigo-600 focus:ring-indigo-500" />
+              <span>Ngữ pháp</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="radio" name="res-type" class="text-indigo-600 focus:ring-indigo-500" />
+              <span>Từ vựng</span>
+            </label>
+            <label class="flex items-center gap-2 text-xs font-semibold cursor-pointer">
+              <input type="radio" name="res-type" class="text-indigo-600 focus:ring-indigo-500" />
+              <span>Chữ Kanji</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mẫu cấu trúc / Từ ngữ *</label>
+          <input type="text" placeholder="Ví dụ: 〜わけがない..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1">Giải nghĩa chính *</label>
+          <input type="text" placeholder="Nhập bản dịch hoặc giải nghĩa sơ lược..." class="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500" />
+        </div>
+      </div>
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex justify-end gap-2.5">
+        <button onclick="closeModal('modal-add-resource')" class="px-4 py-2 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-100">Hủy</button>
+        <button onclick="saveResource()" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 shadow-sm btn-shimmer">Lưu học liệu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== INTERACTIVE JAVASCRIPT ==================== -->
+  <script>
+    // Tab switching mechanism
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+
+        // Deactivate current active button
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-900/10');
+          b.classList.add('text-slate-500');
+        });
+
+        // Activate clicked button
+        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md', 'shadow-indigo-900/10');
+        btn.classList.remove('text-slate-500');
+
+        // Swap tab visibility
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        const targetContent = document.getElementById(`tab-${targetTab}`);
+        if (targetContent) {
+          targetContent.classList.add('active');
+        }
+      });
+    });
+
+    // Modal helpers
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      modal.firstElementChild.classList.remove('scale-95');
+      modal.firstElementChild.classList.add('scale-100');
+    }
+
+    // Close Modal helper
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modal.firstElementChild.classList.remove('scale-100');
+      modal.firstElementChild.classList.add('scale-95');
+    }
+
+    // Actions & Events simulation
+    function confirmAction(message) {
+      if (confirm(message)) {
+        alert("Hành động đã được thực hiện thành công!");
+      }
+    }
+
+    function saveCourse() {
+      alert("Đã lưu thông tin khóa học mới thành công!");
+      closeModal('modal-add-course');
+    }
+
+    function saveResource() {
+      alert("Đã thêm học liệu mới vào cơ sở dữ liệu!");
+      closeModal('modal-add-resource');
+    }
+  </script>
+</body>
+
+</html>
