@@ -19,4 +19,9 @@ public class OtpServiceImpl implements OtpService {
     return otpRepository.save(otp); // Replace with actual implementation
   }
 
+  @Override
+  public Otp getLatestOtp(String email){
+    return otpRepository.findFirstByEmailOrderByCreatedAtDesc(email);
+  }
+
 }

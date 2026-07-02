@@ -21,14 +21,19 @@ import org.springframework.stereotype.Service;
 
 import com.mycompany.saas_japanese.domain.Otp;
 import com.mycompany.saas_japanese.domain.User;
+import com.mycompany.saas_japanese.domain.request.ReqForgotPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqLoginDTO;
 import com.mycompany.saas_japanese.domain.request.ReqOtpDTO;
+import com.mycompany.saas_japanese.domain.request.ReqResetPasswordDTO;
 import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
 import com.mycompany.saas_japanese.provider.BrevoProvider;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthService;
 import com.mycompany.saas_japanese.service.OtpService;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -83,8 +88,37 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public String verifyUser(ReqOtpDTO otp) {
-    throw new UnsupportedOperationException("Unimplemented method 'verifyUser'");
+  public String verifyUser(ReqOtpDTO req) {
+
+    Otp latestOtp = validateOtp(req.getEmail(), req.getOtp());
+    User user = userRepository.findByEmail(req.getEmail())
+        .orElseThrow(() -> new BadRequestException("User not found"));
+    user.setVerified(true);
+    user.setActive(true);
+    userRepository.save(user);
+    latestOtp.setUsed(true);
+    otpService.save(latestOtp);
+    return "Verify success";
+  }
+
+  private Otp validateOtp(String email, String otpInput) {
+
+    Otp latestOtp = otpService.getLatestOtp(email);
+
+    if (latestOtp == null) {
+      throw new BadRequestException("OTP không tồn tại");
+    }
+    if (latestOtp.isUsed()) {
+      throw new BadRequestException("OTP đã được sử dụng");
+    }
+    if (latestOtp.getExpiredAt() != null &&
+        latestOtp.getExpiredAt().isBefore(Instant.now())) {
+      throw new BadRequestException("OTP đã hết hạn");
+    }
+    if (!latestOtp.getOtp().equals(otpInput)) {
+      throw new BadRequestException("OTP không đúng");
+    }
+    return latestOtp;
   }
 
   @Override
@@ -101,6 +135,9 @@ public class AuthServiceImpl implements AuthService {
     User user = userRepository
         .findByEmail(userDetails.getUsername())
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    if (!user.isVerified()) {
+      throw new BadRequestException("Please verify your email before login");
+    }
 
     String accessToken = this.generateToken(userDetails, Duration.ofMinutes(30).getSeconds(),
         userDetails.getUsername());
@@ -112,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
 
     ResLoginDTO response = new ResLoginDTO();
     response.setAccessToken(accessToken);
-    response.setRefreshToen(refreshToken);
+    response.setRefreshToken(refreshToken);
     response.setUser(userLogin);
 
     return response;
@@ -136,5 +173,38 @@ public class AuthServiceImpl implements AuthService {
     return jwtEncoder.encode(
         JwtEncoderParameters.from(claims))
         .getTokenValue();
+  }
+
+  @Override
+  public void logout(HttpServletResponse response) {
+    Cookie cookie = new Cookie("refresh_token", null);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    cookie.setMaxAge(0);
+    response.addCookie((cookie));
+  }
+
+  @Override
+  public void forgotPassword(ReqForgotPasswordDTO req) {
+    User user = userRepository.findByEmail(req.getEmail())
+        .orElseThrow(() -> new BadRequestException("Email không tồn tại"));
+    String otp = String.format("%06d", RANDOM.nextInt(1_000_000));
+    Otp newOtp = new Otp();
+    newOtp.setEmail(user.getEmail());
+    newOtp.setOtp((otp));
+    otpService.save(newOtp);
+    brevoProvider.sendOtpEmail(user.getEmail(), user.getUsername(), otp);
+  }
+
+  @Override
+  public void resetPassword(ReqResetPasswordDTO req) {
+    validateOtp(req.getEmail(), req.getOtp());
+    User user = userRepository.findByEmail(req.getEmail())
+        .orElseThrow(() -> new BadRequestException("Email không tồn tại"));
+    user.setPassword(passwordEncoder.encode(req.getNewPassword()));
+    userRepository.save(user);
+    Otp latestOtp = otpService.getLatestOtp(req.getEmail());
+    latestOtp.setUsed(true);
+    otpService.save(latestOtp);
   }
 }
