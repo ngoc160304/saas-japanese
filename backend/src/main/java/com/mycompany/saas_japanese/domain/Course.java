@@ -34,8 +34,6 @@ public class Course {
 
     private boolean isPublished;
 
-    private Integer sortOrder;
-
     private Instant createdAt;
 
     private Instant updatedAt;
