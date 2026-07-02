@@ -7,5 +7,5 @@ import com.mycompany.saas_japanese.domain.Otp;
 
 @Repository
 public interface OtpRepository extends JpaRepository<Otp, Long> {
-
+Otp findFirstByEmailOrderByCreatedAtDesc(String email);
 }
