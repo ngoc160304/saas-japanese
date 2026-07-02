@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "jlptLevels")
+@Table(name = "jlpt_levels")
 @Setter
 @Getter
 public class JlptLevel {
