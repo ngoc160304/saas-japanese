@@ -1,7 +1,6 @@
 package com.mycompany.saas_japanese.domain.response;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
