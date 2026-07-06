@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/vocabularies")
+@RequestMapping("/vocabularies")
 public class VocabularyController {
     @Autowired
     private VocabularyService service;

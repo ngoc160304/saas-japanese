@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/kanjis")
+@RequestMapping("/kanjis")
 public class KanjiController {
     @Autowired
     private KanjiService service;

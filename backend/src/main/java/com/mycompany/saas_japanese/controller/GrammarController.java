@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/grammars")
+@RequestMapping("/grammars")
 public class GrammarController {
     @Autowired
     private GrammarService service;
