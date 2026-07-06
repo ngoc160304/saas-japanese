@@ -18,32 +18,14 @@ public class SecurityConfiguration {
     return new BCryptPasswordEncoder();
   }
 
-  // @Bean
-  // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-  // Exception {
-  // http
-  // .csrf(csrf -> csrf.disable())
-  // .authorizeHttpRequests(auth -> auth
-  // .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register",
-  // "/api/v1/auth/refresh-token")
-  // .permitAll()
-  // .requestMatchers("/api/lessons", "/api/lessons/**").permitAll()
-  // .anyRequest().authenticated())
-  // .oauth2ResourceServer(
-  // rs -> rs.jwt(Customizer.withDefaults()))
-  // .formLogin(form -> form.disable())
-  // .sessionManagement(session ->
-  // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-  // return http.build();
-  // }
-
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/api/auth/**", "/api/v1/auth/**").permitAll()
-            .requestMatchers("/api/v1/courses", "/api/v1/courses/**").permitAll()
+            .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register",
+                "/api/v1/auth/refresh-token")
+            .permitAll()
             .requestMatchers("/api/v1/lessons", "/api/v1/lessons/**").permitAll()
             .anyRequest().authenticated())
         .oauth2ResourceServer(
@@ -52,5 +34,23 @@ public class SecurityConfiguration {
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return http.build();
   }
+
+  // @Bean
+  // public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
+  // Exception {
+  // http
+  // .csrf(csrf -> csrf.disable())
+  // .authorizeHttpRequests(auth -> auth
+  // .requestMatchers("/", "/api/auth/**", "/api/v1/auth/**").permitAll()
+  // .requestMatchers("/api/v1/courses", "/api/v1/courses/**").permitAll()
+  // .requestMatchers("/api/v1/lessons", "/api/v1/lessons/**").permitAll()
+  // .anyRequest().authenticated())
+  // .oauth2ResourceServer(
+  // rs -> rs.jwt(Customizer.withDefaults()))
+  // .formLogin(form -> form.disable())
+  // .sessionManagement(session ->
+  // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+  // return http.build();
+  // }
 
 }
