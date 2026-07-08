@@ -26,6 +26,9 @@ public class UserDetailCustom implements UserDetailsService {
     if (user == null) {
       throw new BadRequestException("username/password khong hop le !");
     }
+    if (!user.isVerified()) {
+      throw new BadRequestException("Please verify your email before login");
+    }
     return new User(
         user.getEmail(),
         user.getPassword(),

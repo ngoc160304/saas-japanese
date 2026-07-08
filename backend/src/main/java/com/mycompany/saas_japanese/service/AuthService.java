@@ -22,4 +22,7 @@ public interface AuthService {
 
   void resetPassword(ReqResetPasswordDTO req);
 
+  void verifyResetOtp(ReqOtpDTO req);
+
+  ResLoginDTO refreshToken(String refreshToken);
 }

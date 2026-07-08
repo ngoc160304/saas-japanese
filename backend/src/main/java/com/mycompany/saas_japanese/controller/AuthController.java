@@ -19,10 +19,13 @@ import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
 import com.mycompany.saas_japanese.service.AuthService;
 import com.mycompany.saas_japanese.service.impl.OtpServiceImpl;
 import com.mycompany.saas_japanese.util.anotation.ApiMessage;
+import com.mycompany.saas_japanese.util.error.BadRequestException;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kong.unirest.HttpStatus;
+import jakarta.servlet.http.Cookie;
 
 @RestController
 @RequestMapping("/auth")
@@ -80,11 +83,47 @@ public class AuthController {
     return ResponseEntity.ok("Send otp success");
   }
 
+  @PostMapping("/verifyResetOtp")
+  @ApiMessage("verifyResetOtp")
+  public ResponseEntity<String> verifyResetOtp(
+      @RequestBody ReqOtpDTO req) {
+    authService.verifyResetOtp(req);
+    return ResponseEntity.ok("OTP verified");
+  }
+
   @PostMapping("/resetPassword")
   @ApiMessage("reset password")
   public ResponseEntity<String> resetPassword(
       @Valid @RequestBody ReqResetPasswordDTO req) {
     authService.resetPassword(req);
     return ResponseEntity.ok("Reset password success");
+  }
+
+  @PostMapping("/refreshToken")
+  @ApiMessage("refresh token")
+  public ResponseEntity<ResLoginDTO> refreshToken(HttpServletRequest request) {
+
+    String refreshToken = null;
+    if (request.getCookies() != null) {
+      for (Cookie cookie : request.getCookies()) {
+        if ("refresh_token".equals(cookie.getName())) {
+          refreshToken = cookie.getValue();
+          break;
+        }
+      }
+    }
+    if (refreshToken == null) {
+      throw new BadRequestException("Refresh token not found");
+    }
+    ResLoginDTO res = authService.refreshToken(refreshToken);
+    ResponseCookie cookie = ResponseCookie.from("refresh_token",
+        res.getRefreshToken())
+        .httpOnly(true)
+        .secure(true)
+        .path("/")
+        .maxAge(Duration.ofDays(7))
+        .build();
+
+    return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString()).body(res);
   }
 }

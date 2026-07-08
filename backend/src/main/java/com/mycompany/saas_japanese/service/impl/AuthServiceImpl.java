@@ -13,11 +13,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
 import com.mycompany.saas_japanese.domain.Otp;
 import com.mycompany.saas_japanese.domain.User;
@@ -31,6 +33,7 @@ import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthService;
 import com.mycompany.saas_japanese.service.OtpService;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -43,17 +46,22 @@ public class AuthServiceImpl implements AuthService {
   private final BrevoProvider brevoProvider;
   private final AuthenticationManagerBuilder authenticationManagerBuilder;
   private final JwtEncoder jwtEncoder;
+  private final JwtDecoder jwtDecoder;
+  private final UserDetailsService userDetailsService;
 
   private static final SecureRandom RANDOM = new SecureRandom();
 
   AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService,
-      BrevoProvider brevoProvider, AuthenticationManagerBuilder authenticationManagerBuilder, JwtEncoder jwtEncoder) {
+      BrevoProvider brevoProvider, AuthenticationManagerBuilder authenticationManagerBuilder, JwtEncoder jwtEncoder,
+      JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
     this.userRepository = userRepository;
     this.otpService = otpService;
     this.passwordEncoder = passwordEncoder;
     this.brevoProvider = brevoProvider;
     this.authenticationManagerBuilder = authenticationManagerBuilder;
     this.jwtEncoder = jwtEncoder;
+    this.jwtDecoder = jwtDecoder;
+    this.userDetailsService = userDetailsService;
   }
 
   @Override
@@ -135,9 +143,9 @@ public class AuthServiceImpl implements AuthService {
     User user = userRepository
         .findByEmail(userDetails.getUsername())
         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    if (!user.isVerified()) {
-      throw new BadRequestException("Please verify your email before login");
-    }
+    // if (!user.isVerified()) {
+    // throw new BadRequestException("Please verify your email before login");
+    // }
 
     String accessToken = this.generateToken(userDetails, Duration.ofMinutes(30).getSeconds(),
         userDetails.getUsername());
@@ -198,13 +206,37 @@ public class AuthServiceImpl implements AuthService {
 
   @Override
   public void resetPassword(ReqResetPasswordDTO req) {
-    validateOtp(req.getEmail(), req.getOtp());
     User user = userRepository.findByEmail(req.getEmail())
         .orElseThrow(() -> new BadRequestException("Email không tồn tại"));
     user.setPassword(passwordEncoder.encode(req.getNewPassword()));
     userRepository.save(user);
-    Otp latestOtp = otpService.getLatestOtp(req.getEmail());
+  }
+
+  @Override
+  public void verifyResetOtp(ReqOtpDTO req) {
+    Otp latestOtp = validateOtp(req.getEmail(), req.getOtp());
     latestOtp.setUsed(true);
     otpService.save(latestOtp);
+  }
+
+  @Override
+  public ResLoginDTO refreshToken(String refreshToken) {
+    // decode refresh token
+    Jwt jwt = jwtDecoder.decode(refreshToken);
+    String email = jwt.getSubject();
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new BadRequestException("User not found"));
+    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+    String newAccessToken = generateToken(userDetails, Duration.ofMinutes(30).getSeconds(), user.getEmail());
+    String newRefreshToken = generateToken(userDetails, Duration.ofDays(7).getSeconds(), user.getEmail());
+    ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
+        user.getEmail(),
+        user.getUsername(),
+        user.getId());
+    ResLoginDTO response = new ResLoginDTO();
+    response.setAccessToken(newAccessToken);
+    response.setRefreshToken(newRefreshToken);
+    response.setUser(userLogin);
+    return response;
   }
 }
