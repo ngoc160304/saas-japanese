@@ -9,6 +9,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
+import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 
 @Configuration
 public class SecurityConfiguration {
@@ -23,10 +25,15 @@ public class SecurityConfiguration {
     http
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register", "/api/v1/auth/refresh-token")
+            .requestMatchers("/", "/api/v1/auth/login", "/api/v1/auth/register",
+                "/api/v1/auth/verifyUser", "/api/v1/auth/logout", "/api/v1/auth/forgotPassword",
+                "/api/v1/auth/resetPassword", "/api/v1/auth/verifyResetOtp", "/api/v1/auth/refreshToken")
             .permitAll().anyRequest().authenticated())
         .oauth2ResourceServer(
             rs -> rs.jwt(Customizer.withDefaults()))
+        .exceptionHandling(ex -> ex
+            .authenticationEntryPoint(new BearerTokenAuthenticationEntryPoint())
+            .accessDeniedHandler(new BearerTokenAccessDeniedHandler()))
         .formLogin(form -> form.disable())
         .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
     return http.build();
