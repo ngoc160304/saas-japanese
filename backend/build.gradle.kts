@@ -66,6 +66,7 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
 	runtimeOnly("com.mysql:mysql-connector-j")
+	implementation("org.apache.poi:poi-ooxml:5.3.0")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 }
