@@ -81,15 +81,15 @@ public class VocabularyServiceImpl implements VocabularyService {
                     continue;
 
                 Vocabulary vocab = new Vocabulary();
-                // Cột 1: lesson_id
+                // lesson_id
                 vocab.setLessonId(getCellLong(row.getCell(1)));
-                // Cột 2: term
+                //  2 term
                 vocab.setTerm(term);
-                // Cột 3: kanji
+                // Cột 3 kanji
                 vocab.setKanji(getCellString(row.getCell(3)));
-                // Cột 4: meaning
+                // meaning
                 vocab.setMeaning(getCellString(row.getCell(4)));
-                // Cột 5: romaji
+                // romaji
                 vocab.setRomaji(getCellString(row.getCell(5)));
 
                 result.add(vocab);
