@@ -70,7 +70,7 @@ public class MediaService {
             log.info("[ASYNC] Bắt đầu upload video cho lesson {} | thread: {}", lessonId,
                     Thread.currentThread().getName());
 
-            // Upload lên Cloudinary kèm context lesson_id
+         
             Map uploadResult = cloudinaryService.uploadFile(tempFile, "videos", "VIDEO", lessonId);
 
             String publicId = (String) uploadResult.get("public_id");
@@ -89,10 +89,8 @@ public class MediaService {
             Media saved = mediaRepository.save(media);
             log.info("[ASYNC] Upload xong, mediaId={}, publicId={}", saved.getId(), publicId);
 
-            // Tính thứ tự video (số video đang có + 1)
             int nextOrder = lessonVideoRepository.findByLessonIdOrderBySortOrderAsc(lessonId).size();
 
-            // Tạo bản ghi LessonVideo — KHÔNG ghi đè, chỉ thêm mới
             String videoUrl = "https://res.cloudinary.com/" + cloudName + "/video/upload/" + publicId;
             LessonVideo lessonVideo = LessonVideo.builder()
                     .lessonId(lessonId)
@@ -102,8 +100,6 @@ public class MediaService {
                     .sortOrder(nextOrder)
                     .build();
             lessonVideoRepository.save(lessonVideo);
-
-            // Cập nhật trạng thái lesson = READY
             lessonRepository.findById(lessonId).ifPresent(lesson -> {
                 lesson.setStatus("READY");
                 lessonRepository.save(lesson);
@@ -116,7 +112,6 @@ public class MediaService {
             log.error("[ASYNC] Upload FAILED cho lesson {}: {}", lessonId, e.getMessage());
             return CompletableFuture.failedFuture(e);
         } finally {
-            // LUÔN XÓA FILE TẠM ĐỂ GIẢI PHÓNG Ổ CỨNG
             if (tempFile != null && tempFile.exists()) {
                 boolean deleted = tempFile.delete();
                 if (!deleted) {
