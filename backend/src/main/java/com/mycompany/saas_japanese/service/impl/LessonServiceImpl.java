@@ -45,6 +45,9 @@ public class LessonServiceImpl implements LessonService {
             lesson.setSortOrder(details.getSortOrder());
             lesson.setPublished(details.isPublished());
             lesson.setVideoMediaId(details.getVideoMediaId());
+            if (details.getStatus() != null) {
+                lesson.setStatus(details.getStatus()); // Giữ status khi update
+            }
             lesson.setUpdatedAt(LocalDateTime.now());
             return lessonRepository.save(lesson);
         }
@@ -58,5 +61,11 @@ public class LessonServiceImpl implements LessonService {
             lesson.setDeletedAt(LocalDateTime.now());
             lessonRepository.save(lesson);
         }
+    }
+
+    @Override
+    public List<Lesson> getPublishedLessonsByCourse(Long courseId) {
+        // Lấy danh sách bài học công khai VÀ đã xử lý video xong (READY)
+        return lessonRepository.findByCourseIdAndPublishedTrueAndStatus(courseId, "READY");
     }
 }

@@ -15,4 +15,7 @@ public interface LessonService {
     Lesson update(Long id, Lesson lessonDetails);
 
     void delete(Long id);
+
+    List<Lesson> getPublishedLessonsByCourse(Long courseId);
+
 }

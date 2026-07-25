@@ -8,4 +8,6 @@ public interface LessonRepository extends JpaRepository<Lesson, Long> {
     List<Lesson> findByDeletedAtIsNull();
 
     List<Lesson> findByCourseIdAndDeletedAtIsNull(Long courseId);
+
+    List<Lesson> findByCourseIdAndPublishedTrueAndStatus(Long courseId, String status);
 }

@@ -35,6 +35,15 @@ public class Lesson {
     @Column(name = "is_published", nullable = false)
     private boolean isPublished = false;
 
+    @Column(name = "video_media_id")
+    private Long videoMediaId;
+
+    @Column(name = "video_url", length = 1000)
+    private String videoUrl;
+
+    @Column(name = "status", length = 20)
+    private String status = "NO_VIDEO";
+
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
@@ -44,6 +53,4 @@ public class Lesson {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @Column(name = "video_media_id")
-    private Long videoMediaId;
 }
