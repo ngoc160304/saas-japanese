@@ -13,24 +13,30 @@ public class VocabularyMapper {
         if (request == null) return null;
         Vocabulary voc = new Vocabulary();
         voc.setLessonId(request.getLessonId());
-        voc.setWord(request.getWord());
-        voc.setReading(request.getReading());
-        voc.setMeaningVi(request.getMeaningVi());
-        voc.setExampleSentenceJp(request.getExampleSentenceJp());
-        voc.setExampleSentenceVi(request.getExampleSentenceVi());
-        voc.setPartOfSpeech(request.getPartOfSpeech());
+        voc.setMediaId(request.getMediaId());
+        voc.setTerm(request.getTerm());
+        voc.setKanji(request.getKanji());
+        voc.setMeaning(request.getMeaning());
+        voc.setRomaji(request.getRomaji());
+        voc.setExampleSentence(request.getExampleSentence());
+        voc.setExampleMeaning(request.getExampleMeaning());
+        voc.setSortOrder(request.getSortOrder() != null ? request.getSortOrder() : 0);
         return voc;
     }
 
     public void updateEntity(Vocabulary voc, ReqUpdateVocabulary request) {
         if (request == null || voc == null) return;
         voc.setLessonId(request.getLessonId());
-        voc.setWord(request.getWord());
-        voc.setReading(request.getReading());
-        voc.setMeaningVi(request.getMeaningVi());
-        voc.setExampleSentenceJp(request.getExampleSentenceJp());
-        voc.setExampleSentenceVi(request.getExampleSentenceVi());
-        voc.setPartOfSpeech(request.getPartOfSpeech());
+        voc.setMediaId(request.getMediaId());
+        voc.setTerm(request.getTerm());
+        voc.setKanji(request.getKanji());
+        voc.setMeaning(request.getMeaning());
+        voc.setRomaji(request.getRomaji());
+        voc.setExampleSentence(request.getExampleSentence());
+        voc.setExampleMeaning(request.getExampleMeaning());
+        if (request.getSortOrder() != null) {
+            voc.setSortOrder(request.getSortOrder());
+        }
     }
 
     public VocabularyResponse toResponse(Vocabulary voc) {
@@ -38,12 +44,14 @@ public class VocabularyMapper {
         VocabularyResponse response = new VocabularyResponse();
         response.setId(voc.getId());
         response.setLessonId(voc.getLessonId());
-        response.setWord(voc.getWord());
-        response.setReading(voc.getReading());
-        response.setMeaningVi(voc.getMeaningVi());
-        response.setExampleSentenceJp(voc.getExampleSentenceJp());
-        response.setExampleSentenceVi(voc.getExampleSentenceVi());
-        response.setPartOfSpeech(voc.getPartOfSpeech());
+        response.setMediaId(voc.getMediaId());
+        response.setTerm(voc.getTerm());
+        response.setKanji(voc.getKanji());
+        response.setMeaning(voc.getMeaning());
+        response.setRomaji(voc.getRomaji());
+        response.setExampleSentence(voc.getExampleSentence());
+        response.setExampleMeaning(voc.getExampleMeaning());
+        response.setSortOrder(voc.getSortOrder());
         response.setCreatedAt(voc.getCreatedAt());
         response.setUpdatedAt(voc.getUpdatedAt());
         return response;

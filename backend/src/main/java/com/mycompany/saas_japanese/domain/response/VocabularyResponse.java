@@ -9,12 +9,14 @@ import java.time.LocalDateTime;
 public class VocabularyResponse {
     private Long id;
     private Long lessonId;
-    private String word;
-    private String reading;
-    private String meaningVi;
-    private String exampleSentenceJp;
-    private String exampleSentenceVi;
-    private String partOfSpeech;
+    private Long mediaId;
+    private String term;
+    private String kanji;
+    private String meaning;
+    private String romaji;
+    private String exampleSentence;
+    private String exampleMeaning;
+    private Integer sortOrder;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

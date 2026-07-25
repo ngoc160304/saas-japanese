@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,17 +22,17 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     @Override
     public List<Vocabulary> getAll() {
-        return vocabularyRepository.findByDeletedAtIsNull();
+        return vocabularyRepository.findAll();
     }
 
     @Override
     public List<Vocabulary> getByLesson(Long lessonId) {
-        return vocabularyRepository.findByLessonIdAndDeletedAtIsNull(lessonId);
+        return vocabularyRepository.findByLessonIdOrderBySortOrderAsc(lessonId);
     }
 
     @Override
     public Vocabulary getById(Long id) {
-        return vocabularyRepository.findById(id).filter(v -> v.getDeletedAt() == null).orElse(null);
+        return vocabularyRepository.findById(id).orElse(null);
     }
 
     @Override
@@ -46,13 +45,14 @@ public class VocabularyServiceImpl implements VocabularyService {
         Vocabulary vocab = getById(id);
         if (vocab != null) {
             vocab.setLessonId(details.getLessonId());
-            vocab.setWord(details.getWord());
-            vocab.setReading(details.getReading());
-            vocab.setMeaningVi(details.getMeaningVi());
-            vocab.setExampleSentenceJp(details.getExampleSentenceJp());
-            vocab.setExampleSentenceVi(details.getExampleSentenceVi());
-            vocab.setPartOfSpeech(details.getPartOfSpeech());
-            vocab.setUpdatedAt(LocalDateTime.now());
+            vocab.setMediaId(details.getMediaId());
+            vocab.setTerm(details.getTerm());
+            vocab.setKanji(details.getKanji());
+            vocab.setMeaning(details.getMeaning());
+            vocab.setRomaji(details.getRomaji());
+            vocab.setExampleSentence(details.getExampleSentence());
+            vocab.setExampleMeaning(details.getExampleMeaning());
+            vocab.setSortOrder(details.getSortOrder());
             return vocabularyRepository.save(vocab);
         }
         return null;
@@ -60,11 +60,7 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     @Override
     public void delete(Long id) {
-        Vocabulary vocab = getById(id);
-        if (vocab != null) {
-            vocab.setDeletedAt(LocalDateTime.now());
-            vocabularyRepository.save(vocab);
-        }
+        vocabularyRepository.deleteById(id);
     }
 
     @Override
@@ -80,20 +76,21 @@ public class VocabularyServiceImpl implements VocabularyService {
                 Row row = sheet.getRow(i);
                 if (row == null)
                     continue;
-                String word = getCellString(row.getCell(2));
-                if (word == null || word.isBlank())
+                String term = getCellString(row.getCell(2));
+                if (term == null || term.isBlank())
                     continue;
 
                 Vocabulary vocab = new Vocabulary();
-
-                // cot 1 lesson id
+                // Cột 1: lesson_id
                 vocab.setLessonId(getCellLong(row.getCell(1)));
-                // Cột 2: word
-                vocab.setWord(word);
-                // Cột 3: reading
-                vocab.setReading(getCellString(row.getCell(3)));
-                // Cột 4: meaning_vi
-                vocab.setMeaningVi(getCellString(row.getCell(4)));
+                // Cột 2: term
+                vocab.setTerm(term);
+                // Cột 3: kanji
+                vocab.setKanji(getCellString(row.getCell(3)));
+                // Cột 4: meaning
+                vocab.setMeaning(getCellString(row.getCell(4)));
+                // Cột 5: romaji
+                vocab.setRomaji(getCellString(row.getCell(5)));
 
                 result.add(vocab);
             }

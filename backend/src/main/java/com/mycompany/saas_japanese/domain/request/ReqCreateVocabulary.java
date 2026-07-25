@@ -1,24 +1,28 @@
 package com.mycompany.saas_japanese.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class ReqCreateVocabulary {
+    @NotNull(message = "Lesson ID is required")
     private Long lessonId;
 
-    @NotBlank(message = "Word is required")
-    private String word;
+    private Long mediaId;
 
-    @NotBlank(message = "Reading is required")
-    private String reading;
+    @NotBlank(message = "Term is required")
+    private String term;
+
+    private String kanji;
 
     @NotBlank(message = "Meaning is required")
-    private String meaningVi;
+    private String meaning;
 
-    private String exampleSentenceJp;
-    private String exampleSentenceVi;
-    private String partOfSpeech;
+    private String romaji;
+    private String exampleSentence;
+    private String exampleMeaning;
+    private Integer sortOrder;
 }

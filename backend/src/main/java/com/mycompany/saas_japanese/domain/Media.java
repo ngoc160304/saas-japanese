@@ -18,13 +18,13 @@ public class Media {
     private Long id;
 
     @Column(name = "file_key", nullable = false, length = 500)
-    private String fileKey; // Lưu public_id của Cloudinary
+    private String fileKey;
 
     @Column(name = "file_name", length = 255)
-    private String fileName; // Tên gốc của file khi upload
+    private String fileName;
 
     @Column(name = "file_type", nullable = false, length = 50)
-    private String fileType; // VIDEO, AUDIO, IMAGE, DOCUMENT
+    private String fileType;
 
     @Column(name = "mime_type", length = 100)
     private String mimeType;
