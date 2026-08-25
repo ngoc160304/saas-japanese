@@ -26,7 +26,6 @@ public class User {
   private boolean isActive;
   private boolean isVerified;
   private Instant createdAt;
-
   private Instant updatedAt;
 
   @PrePersist

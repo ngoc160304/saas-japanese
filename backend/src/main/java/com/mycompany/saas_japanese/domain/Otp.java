@@ -41,7 +41,7 @@ public class Otp {
   private Instant updatedAt;
 
   @PrePersist
-  public void prePersist() {
+  public void onCreate() {
     createdAt = Instant.now();
     updatedAt = createdAt;
     expiredAt = createdAt.plusSeconds(300);
@@ -49,7 +49,7 @@ public class Otp {
   }
 
   @PreUpdate
-  public void preUpdate() {
+  public void onUpdate() {
     updatedAt = Instant.now();
   }
 }

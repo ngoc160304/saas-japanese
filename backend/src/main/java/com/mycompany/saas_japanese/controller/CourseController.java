@@ -4,7 +4,6 @@ import com.mycompany.saas_japanese.util.anotation.ApiMessage;
 
 import jakarta.validation.Valid;
 
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.saas_japanese.domain.Course;
@@ -14,8 +13,6 @@ import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 import com.mycompany.saas_japanese.service.impl.CourseServiceImpl;
 import com.mycompany.saas_japanese.service.mapper.CourseMapper;
-
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -28,15 +25,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
+
 public class CourseController {
 
-    private final JwtDecoder jwtDecoder;
     private final CourseServiceImpl courseServiceImpl;
     private final CourseMapper courseMapper;
 
-    CourseController(CourseServiceImpl courseServiceImpl, JwtDecoder jwtDecoder, CourseMapper courseMapper) {
+    CourseController(CourseServiceImpl courseServiceImpl, CourseMapper courseMapper) {
         this.courseServiceImpl = courseServiceImpl;
-        this.jwtDecoder = jwtDecoder;
         this.courseMapper = courseMapper;
     }
 
@@ -51,7 +47,7 @@ public class CourseController {
     @ApiMessage("Delete course")
     public ResponseEntity<String> deleteCourses(@PathVariable("id") long id) {
         this.courseServiceImpl.deleteByIdCourse(id);
-        return ResponseEntity.ok("Xoa thanh cong");
+        return ResponseEntity.ok("Delete successfully !");
     }
 
     @GetMapping("/courses/{id}")

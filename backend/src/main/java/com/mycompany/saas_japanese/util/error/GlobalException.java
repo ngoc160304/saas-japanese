@@ -31,6 +31,15 @@ public class GlobalException {
         return ResponseEntity.badRequest().body(response);
     }
 
+    @ExceptionHandler(value = NotFoundException.class)
+    public ResponseEntity<ErrorResponse> NotFoundException(NotFoundException idException) {
+        ErrorResponse response = new ErrorResponse();
+        response.setMessage(idException.getMessage());
+        response.setStatus(HttpStatus.NOT_FOUND.value());
+        response.setTrace(getStackTrace(idException));
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(Exception.class) // fallback for all exceptions
     public ResponseEntity<ErrorResponse> handleGeneral(Exception ex) {
         ErrorResponse response = new ErrorResponse();

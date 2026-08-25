@@ -2,6 +2,7 @@ import com.github.spotbugs.snom.Confidence
 import com.github.spotbugs.snom.Effort
 import com.github.spotbugs.snom.SpotBugsTask
 
+
 plugins {
 	java
 	id("org.springframework.boot") version "4.1.0"
@@ -15,7 +16,9 @@ group = "com.mycompany"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
 }
 
 checkstyle {
@@ -65,6 +68,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
+
+
+	implementation("com.cloudinary:cloudinary-http5:2.0.0")
+
+	implementation("io.github.cdimascio:dotenv-java:3.2.0")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")

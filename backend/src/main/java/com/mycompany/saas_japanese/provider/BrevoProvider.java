@@ -4,14 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+// import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 
-@Service
+@Component
 public class BrevoProvider {
 
   private final SpringTemplateEngine templateEngine;
@@ -52,14 +53,12 @@ public class BrevoProvider {
           .asString();
 
       if (response.getStatus() == 201 || response.getStatus() == 200) {
-        System.err.println("OKokokok");
         return "Gửi OTP thành công!";
       } else {
-        System.err.println("no no no no no");
         System.err.println("Response Status: " + response.getStatus());
         System.err.println("Response Body: " + response.getBody());
         System.err.println("Response API KEY: " + apiKey);
-        
+
         return "Thất bại: " + response.getBody();
       }
 

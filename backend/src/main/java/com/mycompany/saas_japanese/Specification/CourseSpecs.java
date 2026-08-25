@@ -1,4 +1,4 @@
-package com.mycompany.saas_japanese.Specification;
+package com.mycompany.saas_japanese.specification;
 
 import org.springframework.data.jpa.domain.PredicateSpecification;
 
