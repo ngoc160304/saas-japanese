@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT - Student Learning Dashboard</title>
+  <meta name="description"
+    content="Student Learning Dashboard for StudyJLPT Japanese Learning SaaS Platform. Track active courses, learning streak, daily activity, and JLPT preparation progress." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .shadow-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.07), 0 3px 8px -2px rgba(15, 23, 42, 0.03);
+    }
+
+    /* Custom semi-circle radial gauge */
+    .gauge-bg {
+      stroke: #f1f5f9;
+      stroke-width: 12;
+      fill: none;
+      stroke-linecap: round;
+    }
+    .gauge-progress {
+      stroke: url(#gaugeGradient);
+      stroke-width: 12;
+      fill: none;
+      stroke-linecap: round;
+      stroke-dasharray: 141;
+      stroke-dashoffset: 35;
+      transition: stroke-dashoffset 1s ease-in-out;
+    }
+
+    /* Calendar Day Streak Fire Indicator */
+    .cal-streak-day {
+      position: relative;
+      background-color: #f59e0b;
+      color: #ffffff !important;
+      font-weight: 700;
+      border-radius: 9999px;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+    }
+    .cal-streak-day::after {
+      content: "🔥";
+      position: absolute;
+      top: -9px;
+      right: -4px;
+      font-size: 11px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
+    }
+  </style>
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+    <!-- ========================================== -->
+    <!-- 1. LEFT SIDEBAR NAVIGATION                 -->
+    <!-- ========================================== -->
+    <aside id="sidebar"
+      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
+      
+      <!-- Top Brand & Nav Section -->
+      <div>
+        <!-- Brand Logo -->
+        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+              <!-- Sparkle icon -->
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
+                Studify <span class="text-sky-600 text-xs font-bold px-1.5 py-0.5 rounded bg-sky-50 uppercase tracking-wide">JLPT</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Menu Section Label -->
+        <div class="px-3 mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Main Menu</span>
+        </div>
+
+        <!-- Nav Links List -->
+        <nav id="navMenu" class="space-y-1.5">
+          <!-- Overview (Active) -->
+          <a href="#"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Overview</span>
+          </a>
+
+          <!-- Courses -->
+          <a href="#courses"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Courses</span>
+            <span class="ml-auto text-[11px] font-semibold bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full">5 N5-N1</span>
+          </a>
+
+          <!-- JLPT Practice / Mock Exams -->
+          <a href="#jlpt-exams"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            <span>JLPT Exams</span>
+          </a>
+
+          <!-- Analytics & Progress -->
+          <a href="#analytics"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+            <span>Analytics</span>
+          </a>
+
+          <!-- Flashcards / Decks -->
+          <a href="#flashcards"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span>Flashcards</span>
+          </a>
+
+          <!-- Settings -->
+          <a href="#settings"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Bottom Sidebar Promo Card (Faithful to Template) -->
+      <div class="mt-8 pt-4">
+        <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-3 aspect-[4/3] flex flex-col justify-end shadow-md group">
+          <!-- Background 3D Japanese Garden Cottage Image -->
+          <img src="assets/images/sidebar_cottage.jpg" alt="StudyJLPT Community"
+            class="absolute inset-0 w-full h-full object-cover object-center opacity-85 transition-transform duration-500 group-hover:scale-105" />
+          
+          <!-- Gradient Overlay -->
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+
+          <!-- Bottom Pill CTA -->
+          <div class="relative z-10 flex items-center justify-between bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-sm text-slate-900">
+            <div class="pl-1">
+              <p class="text-xs font-bold text-slate-900 leading-tight">Invite A Friend</p>
+              <p class="text-[10px] text-slate-500 font-medium">You'll Get A Special Offer...</p>
+            </div>
+            <button class="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shrink-0" title="Invite Friends">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN CENTER CONTENT DASHBOARD           -->
+    <!-- ========================================== -->
+    <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+
+      <!-- Top Header Row (Greeting & Date) -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+            Good Morning <span class="inline-block transform hover:rotate-12 transition-transform origin-bottom-right">👋</span>
+          </h1>
+          <p class="text-slate-500 font-medium text-sm mt-0.5">
+            Welcome Back, <span id="studentGreetingName" class="text-slate-800 font-semibold">Alex</span> 
+            <span class="mx-2 text-slate-300">•</span>
+            <span id="currentLiveDate" class="text-slate-400 font-normal">Tuesday, 10:03 AM</span>
+          </p>
+        </div>
+
+        <!-- Header Actions: Date Badge & Notification -->
+        <div class="flex items-center gap-3">
+          <!-- Calendar Date Pill -->
+          <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white border border-slate-100 shadow-soft text-slate-700">
+            <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center shadow-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="text-left">
+              <p id="headerBadgeDate" class="text-xs font-bold text-slate-800 leading-tight">15 July,</p>
+              <p id="headerBadgeDay" class="text-[11px] text-slate-400 font-medium leading-tight">Wednesday</p>
+            </div>
+          </div>
+
+          <!-- Notification Bell -->
+          <button class="relative w-11 h-11 rounded-2xl bg-white border border-slate-100 shadow-soft flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" title="Notifications">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+            <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-white"></span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ========================================== -->
+      <!-- TOP STATS ROW (3 Pastel Cards with 3D Books) -->
+      <!-- ========================================== -->
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-6">
+        
+        <!-- Stat Card 1: Active Courses (Sky Pastel) -->
+        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-sky-50/90 via-blue-50/70 to-sky-100/80 border border-sky-100 shadow-soft shadow-hover">
+          <div class="relative z-10 flex items-center justify-between">
+            <div>
+              <p id="statActiveCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">62</p>
+              <p class="text-xs font-semibold text-slate-500 mt-1">Active Courses</p>
+            </div>
+            <!-- 3D Book Icon Visual -->
+            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
+              <img src="assets/images/book_3d.jpg" alt="Active Courses" class="w-full h-full object-contain drop-shadow-md rounded-xl" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat Card 2: Courses In Progress (Peach / Warm Pastel) -->
+        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-amber-100/80 border border-amber-100 shadow-soft shadow-hover">
+          <div class="relative z-10 flex items-center justify-between">
+            <div>
+              <p id="statInProgressCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">18</p>
+              <p class="text-xs font-semibold text-slate-500 mt-1">Courses In Progress</p>
+            </div>
+            <!-- 3D Book Icon Visual -->
+            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
+              <img src="assets/images/book_3d.jpg" alt="In Progress" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-15" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Stat Card 3: Completed Courses (Mint / Green Pastel) -->
+        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/80 border border-emerald-100 shadow-soft shadow-hover">
+          <div class="relative z-10 flex items-center justify-between">
+            <div>
+              <p id="statCompletedCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">44</p>
+              <p class="text-xs font-semibold text-slate-500 mt-1">Completed Courses</p>
+            </div>
+            <!-- 3D Book Icon Visual -->
+            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
+              <img src="assets/images/book_3d.jpg" alt="Completed Courses" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-90" />
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- REVISED MIDDLE ROW: 3 BALANCED ANALYTIC CARDS -->
+      <!-- ========================================== -->
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-6">
+        
+        <!-- Card 1: Learning Activity (Chart) -->
+        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
+          <div>
+            <!-- Card Header -->
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="text-base font-bold text-slate-900">Learning Activity</h2>
+              <span class="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">Monthly</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mb-3">Total learning time this month</p>
+            
+            <!-- Big Metric -->
+            <div class="flex items-baseline gap-1 mb-4">
+              <span id="activityTotalMinutes" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
+              <span class="text-xs font-semibold text-slate-400">/Mins</span>
+            </div>
+
+            <!-- Activity Pill Bar Chart -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between text-[10px] text-slate-400 font-medium mb-1.5 px-0.5">
+                <span>0</span>
+                <span>2,345</span>
+              </div>
+              
+              <!-- Daily Bars Container -->
+              <div class="flex items-end justify-between gap-1 h-14 w-full bg-slate-50/70 p-2 rounded-2xl border border-slate-100">
+                <div class="w-1.5 bg-sky-400 rounded-full h-[60%]" title="Day 1"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[85%]" title="Day 2"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[40%]" title="Day 3"></div>
+                <div class="w-1.5 bg-sky-500 rounded-full h-[95%]" title="Day 4"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[70%]" title="Day 5"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[55%]" title="Day 6"></div>
+                <div class="w-1.5 bg-sky-500 rounded-full h-[100%]" title="Day 7"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[80%]" title="Day 8"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[65%]" title="Day 9"></div>
+                <div class="w-1.5 bg-sky-500 rounded-full h-[90%]" title="Day 10"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[45%]" title="Day 11"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[75%]" title="Day 12"></div>
+                <div class="w-1.5 bg-sky-500 rounded-full h-[88%]" title="Day 13"></div>
+                <div class="w-1.5 bg-sky-400 rounded-full h-[60%]" title="Day 14"></div>
+                <div class="w-1.5 bg-slate-200 rounded-full h-[30%]" title="Day 15"></div>
+                <div class="w-1.5 bg-slate-200 rounded-full h-[20%]" title="Day 16"></div>
+                <div class="w-1.5 bg-slate-200 rounded-full h-[25%]" title="Day 17"></div>
+                <div class="w-1.5 bg-slate-200 rounded-full h-[15%]" title="Day 18"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom 3 Metric Stats -->
+          <div class="grid grid-cols-3 pt-3.5 border-t border-slate-100 text-center">
+            <div>
+              <p class="text-xs font-extrabold text-slate-900">12 <span class="text-[10px] font-normal text-slate-400">Hours</span></p>
+              <p class="text-[10px] text-slate-400 font-medium">This Week</p>
+            </div>
+            <div>
+              <p class="text-xs font-extrabold text-slate-900">38 <span class="text-[10px] font-normal text-slate-400">Hours</span></p>
+              <p class="text-[10px] text-slate-400 font-medium">This Month</p>
+            </div>
+            <div>
+              <p class="text-xs font-extrabold text-emerald-600">+18% <span class="text-[10px] font-normal text-slate-400">MoM</span></p>
+              <p class="text-[10px] text-slate-400 font-medium">Growth Rate</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Focus Mode & Daily Practice -->
+        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover text-center">
+          <div>
+            <!-- Top Learner Avatar Stack & Tag -->
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center -space-x-1.5">
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="Learner" />
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="Learner" />
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="Learner" />
+              </div>
+              <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">AI Boost</span>
+            </div>
+
+            <!-- Title -->
+            <h2 class="text-base font-extrabold text-slate-900 leading-snug mb-2">
+              Experience Distraction Free Learning
+            </h2>
+
+            <!-- Action Pill Button (Focus Mode) -->
+            <button id="focusModeBtn"
+              class="w-full py-2.5 px-4 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold transition-colors shadow-sm flex items-center justify-center gap-2 mb-3">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              <span>Focus Mode</span>
+            </button>
+
+            <!-- Subtitle Description -->
+            <p class="text-[11px] text-slate-400 font-normal leading-relaxed">
+              Improve retention with short, focused JLPT lessons designed to fit your schedule.
+            </p>
+          </div>
+
+          <!-- Bottom Session Counter -->
+          <div class="pt-3.5 border-t border-slate-100 text-left">
+            <div class="flex items-center justify-between text-[11px] mb-1">
+              <span class="font-bold text-slate-700">2<span class="text-slate-400 font-normal">/5</span></span>
+              <span class="text-slate-400 text-[10px]">Sessions completed today</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-sky-500 h-full rounded-full" style="width: 40%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Learning Streak (Semi-Circle Gauge) -->
+        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
+          <div>
+            <!-- Header -->
+            <div class="flex items-center justify-between mb-1">
+              <h2 class="text-base font-bold text-slate-900">Learning Streak</h2>
+              <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span>🔥</span> Active
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium mb-1">Your longest learning streak</p>
+            
+            <!-- Longest Streak Total -->
+            <div class="flex items-baseline gap-1 mb-2">
+              <span id="streakDaysTotal" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
+              <span class="text-xs font-semibold text-slate-400">/days</span>
+            </div>
+
+            <!-- Semi-Circle Arc Radial Gauge Chart -->
+            <div class="relative flex flex-col items-center justify-center my-0.5">
+              <svg class="w-40 h-22 overflow-visible" viewBox="0 0 120 70">
+                <!-- SVG Gradient Definition -->
+                <defs>
+                  <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#38bdf8" />
+                    <stop offset="100%" stop-color="#0284c7" />
+                  </linearGradient>
+                </defs>
+
+                <!-- Gauge Background Arc -->
+                <path class="gauge-bg" d="M 15 65 A 45 45 0 0 1 105 65" />
+                <!-- Gauge Active Progress Arc -->
+                <path class="gauge-progress" d="M 15 65 A 45 45 0 0 1 105 65" stroke-dasharray="141" stroke-dashoffset="40" />
+              </svg>
+
+              <!-- Central Label in Gauge -->
+              <div class="absolute bottom-0 text-center">
+                <span id="currentStreakCenterNum" class="text-2xl font-extrabold text-slate-900 tracking-tight">124</span>
+                <p class="text-[10px] text-slate-400 font-medium -mt-0.5">your learning streak</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Badges: Current vs Best Streak -->
+          <div class="flex items-center justify-between pt-3.5 border-t border-slate-100 text-xs">
+            <div class="flex items-center gap-1.5">
+              <span class="text-amber-500 text-sm">🔥</span>
+              <div>
+                <p class="text-[10px] text-slate-400 font-medium">Current Streak</p>
+                <p id="badgeCurrentStreak" class="font-extrabold text-slate-900 text-xs">7 days</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 text-right">
+              <span class="text-sky-500 text-sm">🏆</span>
+              <div>
+                <p class="text-[10px] text-slate-400 font-medium">Best Streak</p>
+                <p id="badgeLongestStreak" class="font-extrabold text-slate-900 text-xs">24 days</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================== -->
+      <!-- BOTTOM SECTION: ENROLLED COURSES TABLE     -->
+      <!-- ========================================== -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+        
+        <!-- Table Section Header -->
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h2 class="text-base md:text-lg font-bold text-slate-900">Your Enrolled Courses</h2>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">JLPT programs & courses where you're actively learning</p>
+          </div>
+
+          <!-- Action Menu -->
+          <button class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors" title="Options">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <circle cx="5" cy="12" r="2"></circle>
+              <circle cx="12" cy="12" r="2"></circle>
+              <circle cx="19" cy="12" r="2"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="pb-3 pl-2 font-semibold">Course Name</th>
+                <th class="pb-3 px-4 font-semibold text-center sm:text-left">Learners</th>
+                <th class="pb-3 px-4 font-semibold">Enrolled Date</th>
+                <th class="pb-3 pr-2 font-semibold text-right sm:text-left">Progress</th>
+              </tr>
+            </thead>
+            <tbody id="enrolledCoursesTableBody" class="divide-y divide-slate-100/70 text-xs">
+              
+              <!-- Row 1: N3 Soumatome -->
+              <tr class="hover:bg-slate-50/70 transition-colors group">
+                <td class="py-3.5 pl-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                      N3
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
+                        Tiếng Nhật Trung Cấp N3 Soumatome
+                      </p>
+                      <p class="text-[11px] text-slate-400 font-medium">courses/n3-soumatome</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center -space-x-1.5">
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+5</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
+                  Jan 4, 2026
+                </td>
+                <td class="py-3.5 pr-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 md:w-32 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-sky-500 h-full rounded-full" style="width: 40%"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 text-xs w-9 text-right">40%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 2: N2 Luyện Đề -->
+              <tr class="hover:bg-slate-50/70 transition-colors group">
+                <td class="py-3.5 pl-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                      N2
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
+                        Luyện Đề Thi Thử Toàn Diện N2
+                      </p>
+                      <p class="text-[11px] text-slate-400 font-medium">courses/n2-exam-mastery</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center -space-x-1.5">
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+8</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
+                  Jan 4, 2026
+                </td>
+                <td class="py-3.5 pr-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 md:w-32 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-sky-500 h-full rounded-full" style="width: 60%"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 text-xs w-9 text-right">60%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 3: N4 Kanji & Từ vựng -->
+              <tr class="hover:bg-slate-50/70 transition-colors group">
+                <td class="py-3.5 pl-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                      N4
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
+                        Kanji & Từ Vựng Cấp Tốc N4
+                      </p>
+                      <p class="text-[11px] text-slate-400 font-medium">courses/n4-kanji-vocab</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center -space-x-1.5">
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+9</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
+                  Jan 2, 2026
+                </td>
+                <td class="py-3.5 pr-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 md:w-32 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-emerald-500 h-full rounded-full" style="width: 90%"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 text-xs w-9 text-right">90%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 4: N5 Minna No Nihongo -->
+              <tr class="hover:bg-slate-50/70 transition-colors group">
+                <td class="py-3.5 pl-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                      N5
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
+                        Tiếng Nhật Cơ Bản Cho Người Mới Bắt Đầu N5
+                      </p>
+                      <p class="text-[11px] text-slate-400 font-medium">courses/n5-starter</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center -space-x-1.5">
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+6</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
+                  Jan 6, 2026
+                </td>
+                <td class="py-3.5 pr-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 md:w-32 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-sky-500 h-full rounded-full" style="width: 30%"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 text-xs w-9 text-right">30%</span>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Row 5: N3 Kaiwa & Shadowing -->
+              <tr class="hover:bg-slate-50/70 transition-colors group">
+                <td class="py-3.5 pl-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                      N3
+                    </div>
+                    <div>
+                      <p class="font-bold text-slate-800 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
+                        Luyện Giao Tiếp & Shadowing N3
+                      </p>
+                      <p class="text-[11px] text-slate-400 font-medium">courses/n3-shadowing</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4">
+                  <div class="flex items-center -space-x-1.5">
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
+                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+4</span>
+                  </div>
+                </td>
+                <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
+                  Jan 8, 2026
+                </td>
+                <td class="py-3.5 pr-2">
+                  <div class="flex items-center gap-3">
+                    <div class="w-24 md:w-32 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                      <div class="bg-sky-500 h-full rounded-full" style="width: 80%"></div>
+                    </div>
+                    <span class="font-bold text-slate-700 text-xs w-9 text-right">80%</span>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ======================================================= -->
+    <!-- 3. REVISED RIGHT SIDEBAR: PROFILE & STUDY CALENDAR      -->
+    <!-- ======================================================= -->
+    <aside class="w-full xl:w-80 2xl:w-88 bg-transparent p-4 md:p-6 lg:p-7 flex flex-col gap-5 shrink-0">
+      
+      <!-- Student Profile Card (Clean & Balanced) -->
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        <div class="flex items-center gap-3.5">
+          <!-- Student Avatar with Online Badge -->
+          <div class="relative shrink-0">
+            <img id="profileAvatarImg" class="w-13 h-13 rounded-2xl ring-2 ring-sky-100 object-cover shadow-sm"
+              src="assets/images/student_hero.jpg" alt="Student Profile" />
+            <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
+          </div>
+
+          <!-- Student Information -->
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-1.5">
+              <h2 id="profileFullName" class="text-sm font-bold text-slate-900 truncate">Alex Williamson</h2>
+              <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-600 shrink-0">N3</span>
+            </div>
+            <p id="profileEmail" class="text-xs text-slate-400 font-medium truncate mt-0.5">alexwilliamson@gmail.com</p>
+          </div>
+        </div>
+
+        <!-- Quick Profile Status Badges -->
+        <div class="grid grid-cols-3 gap-2 mt-4 pt-3.5 border-t border-slate-100 text-center">
+          <div class="bg-slate-50/80 rounded-xl p-1.5">
+            <p class="text-[10px] text-slate-400 font-medium">Target</p>
+            <p class="text-xs font-bold text-slate-800">JLPT N3</p>
+          </div>
+          <div class="bg-amber-50/80 rounded-xl p-1.5">
+            <p class="text-[10px] text-amber-600 font-medium">Streak</p>
+            <p class="text-xs font-bold text-amber-700">7 Days 🔥</p>
+          </div>
+          <div class="bg-sky-50/80 rounded-xl p-1.5">
+            <p class="text-[10px] text-sky-600 font-medium">Rank</p>
+            <p class="text-xs font-bold text-sky-700">Top 5%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- STUDY ACTIVITY CALENDAR (REVISED & COMPACT)-->
+      <!-- ========================================== -->
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+        
+        <!-- Calendar Month Navigation -->
+        <div class="flex items-center justify-between mb-4">
+          <button id="calPrevMonthBtn" class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Previous Month">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          
+          <h3 id="calCurrentMonthLabel" class="text-sm font-bold text-slate-900 tracking-tight">
+            August 2024
+          </h3>
+
+          <button id="calNextMonthBtn" class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Next Month">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Day of Week Headers -->
+        <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 mb-2">
+          <span>Su</span>
+          <span>Mo</span>
+          <span>Tu</span>
+          <span>We</span>
+          <span>Th</span>
+          <span>Fr</span>
+          <span>Sa</span>
+        </div>
+
+        <!-- Calendar Days Grid (Exact Faithful Representation from Provided Image) -->
+        <div class="grid grid-cols-7 gap-y-2 gap-x-1 text-center text-xs font-semibold">
+          
+          <!-- Row 1 (Previous month tail + Month start) -->
+          <span class="text-slate-300 py-1.5">29</span>
+          <span class="text-slate-300 py-1.5">30</span>
+          <span class="text-slate-300 py-1.5">31</span>
+          <span class="text-slate-700 py-1.5">1</span>
+          <span class="text-slate-700 py-1.5">2</span>
+          <span class="text-slate-700 py-1.5">3</span>
+          <span class="text-slate-700 py-1.5">4</span>
+
+          <!-- Row 2 -->
+          <span class="text-slate-700 py-1.5">5</span>
+          <span class="text-slate-700 py-1.5">6</span>
+          <span class="text-slate-700 py-1.5">7</span>
+          <span class="text-slate-700 py-1.5">8</span>
+          <span class="text-slate-700 py-1.5">9</span>
+          <!-- Streak Day 10 (Fire Badge) -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">10</span>
+          </div>
+          <!-- Streak Day 11 (Fire Badge) -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">11</span>
+          </div>
+
+          <!-- Row 3 (Active Consecutive Streak 12, 13, 14, 15, 16) -->
+          <!-- Streak Day 12 -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">12</span>
+          </div>
+          <!-- Streak Day 13 -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">13</span>
+          </div>
+          <!-- Streak Day 14 -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">14</span>
+          </div>
+          <!-- Streak Day 15 -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">15</span>
+          </div>
+          <!-- Streak Day 16 -->
+          <div class="flex items-center justify-center">
+            <span class="cal-streak-day w-7 h-7 flex items-center justify-center text-xs">16</span>
+          </div>
+          <!-- Current Day 17 (Soft Highlight Circle) -->
+          <div class="flex items-center justify-center">
+            <span class="w-7 h-7 rounded-full bg-slate-100 text-slate-900 font-bold flex items-center justify-center text-xs ring-1 ring-slate-200">17</span>
+          </div>
+          <span class="text-slate-700 py-1.5">18</span>
+
+          <!-- Row 4 -->
+          <span class="text-slate-700 py-1.5">19</span>
+          <span class="text-slate-700 py-1.5">20</span>
+          <span class="text-slate-700 py-1.5">21</span>
+          <span class="text-slate-700 py-1.5">22</span>
+          <span class="text-slate-700 py-1.5">23</span>
+          <span class="text-slate-700 py-1.5">24</span>
+          <span class="text-slate-700 py-1.5">25</span>
+
+          <!-- Row 5 (Month end + next month lead) -->
+          <span class="text-slate-700 py-1.5">26</span>
+          <span class="text-slate-700 py-1.5">27</span>
+          <span class="text-slate-700 py-1.5">28</span>
+          <span class="text-slate-700 py-1.5">29</span>
+          <span class="text-slate-700 py-1.5">30</span>
+          <span class="text-slate-300 py-1.5">1</span>
+          <span class="text-slate-300 py-1.5">2</span>
+
+        </div>
+
+        <!-- Calendar Bottom Streak Summary Legend -->
+        <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block shadow-xs"></span>
+            <span class="text-slate-500 font-medium">Studied Days (7)</span>
+          </div>
+          <span class="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full text-[10px]">
+            🔥 7 Days Streak
+          </span>
+        </div>
+      </div>
+
+      <!-- Current Badge Milestone (Compact & Integrated) -->
+      <div class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/60 rounded-3xl p-4 border border-sky-100 shadow-soft">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 shrink-0 rounded-2xl bg-sky-500/10 p-1 flex items-center justify-center">
+            <img src="assets/images/streak_badge.jpg" alt="Badge" class="w-full h-full object-contain drop-shadow-sm rounded-xl" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-xs font-bold text-slate-900 leading-tight">Master Streak Badge</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Earned 12 times in total</p>
+            
+            <!-- Mini Progress -->
+            <div class="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden mt-2">
+              <div class="bg-sky-500 h-full rounded-full" style="width: 33%"></div>
+            </div>
+            <p class="text-[9px] text-slate-400 mt-1 font-medium">Complete tasks for 3 more days</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. REALISTIC MOCK DATA & SCRIPT LOGIC       -->
+  <!-- ========================================== -->
+  <script>
+    /**
+     * StudyJLPT Mock Data Model
+     * Aligned 100% with the analyzed database schema:
+     * - users
+     * - learning_streaks
+     * - user_course_enrollments -> courses -> jlpt_levels
+     * - user_lesson_progress
+     * - user_quiz_attempts & user_jlpt_attempts
+     */
+    const studentDashboardData = {
+      // Current Authenticated Student (from `users` table)
+      user: {
+        id: 1,
+        full_name: "Alex Williamson",
+        email: "alexwilliamson@gmail.com",
+        avatar_url: "assets/images/student_hero.jpg",
+        role: "student",
+        target_jlpt_level: "N3",
+        is_active: 1,
+        last_login_at: "2026-08-23T10:03:00Z"
+      },
+
+      // Learning Streak Record (from `learning_streaks` table)
+      learningStreak: {
+        id: 1,
+        user_id: 1,
+        current_streak: 7,
+        longest_streak: 24,
+        last_study_date: "2026-08-23",
+        gauge_display_value: 124,
+        total_historical_streak_days: 2040,
+        streak_badge_earned_times: 12,
+        current_badge_progress_days: 4,
+        target_badge_days: 12,
+        calendar_month: "August 2024",
+        studied_dates: [10, 11, 12, 13, 14, 15, 16],
+        current_day: 17
+      },
+
+      // Learning Progress Statistics (aggregated from `user_course_enrollments` & `user_lesson_progress`)
+      learningStats: {
+        active_courses_count: 62,
+        in_progress_courses_count: 18,
+        completed_courses_count: 44,
+        total_study_minutes_month: 2040,
+        weekly_study_hours: 12,
+        monthly_study_hours: 38,
+        growth_rate_mom_percent: 18,
+        daily_sessions_completed: 2,
+        daily_sessions_target: 5
+      },
+
+      // Enrolled Courses List (from `user_course_enrollments` JOIN `courses` JOIN `jlpt_levels`)
+      enrolledCourses: [
+        {
+          id: 101,
+          course_id: 1,
+          title: "Tiếng Nhật Trung Cấp N3 Soumatome",
+          slug: "n3-soumatome",
+          jlpt_level_code: "N3",
+          jlpt_level_badge_bg: "bg-sky-600",
+          enrolled_at: "Jan 4, 2026",
+          status: "active",
+          progress_percent: 40.00,
+          batch_learners_count: "+5"
+        },
+        {
+          id: 102,
+          course_id: 2,
+          title: "Luyện Đề Thi Thử Toàn Diện N2",
+          slug: "n2-exam-mastery",
+          jlpt_level_code: "N2",
+          jlpt_level_badge_bg: "bg-slate-900",
+          enrolled_at: "Jan 4, 2026",
+          status: "active",
+          progress_percent: 60.00,
+          batch_learners_count: "+8"
+        },
+        {
+          id: 103,
+          course_id: 3,
+          title: "Kanji & Từ Vựng Cấp Tốc N4",
+          slug: "n4-kanji-vocab",
+          jlpt_level_code: "N4",
+          jlpt_level_badge_bg: "bg-emerald-500",
+          enrolled_at: "Jan 2, 2026",
+          status: "active",
+          progress_percent: 90.00,
+          batch_learners_count: "+9"
+        },
+        {
+          id: 104,
+          course_id: 4,
+          title: "Tiếng Nhật Cơ Bản Cho Người Mới Bắt Đầu N5",
+          slug: "n5-starter",
+          jlpt_level_code: "N5",
+          jlpt_level_badge_bg: "bg-amber-500",
+          enrolled_at: "Jan 6, 2026",
+          status: "active",
+          progress_percent: 30.00,
+          batch_learners_count: "+6"
+        },
+        {
+          id: 105,
+          course_id: 5,
+          title: "Luyện Giao Tiếp & Shadowing N3",
+          slug: "n3-shadowing",
+          jlpt_level_code: "N3",
+          jlpt_level_badge_bg: "bg-sky-600",
+          enrolled_at: "Jan 8, 2026",
+          status: "active",
+          progress_percent: 80.00,
+          batch_learners_count: "+4"
+        }
+      ]
+    };
+
+    // Populate Dashboard Data dynamically
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1. Set Greetings & User info
+      const firstName = studentDashboardData.user.full_name.split(" ")[0];
+      document.getElementById("studentGreetingName").textContent = firstName;
+      document.getElementById("profileFullName").textContent = studentDashboardData.user.full_name;
+      document.getElementById("profileEmail").textContent = studentDashboardData.user.email;
+
+      // 2. Set Top Stats Cards
+      document.getElementById("statActiveCourses").textContent = studentDashboardData.learningStats.active_courses_count;
+      document.getElementById("statInProgressCourses").textContent = studentDashboardData.learningStats.in_progress_courses_count;
+      document.getElementById("statCompletedCourses").textContent = studentDashboardData.learningStats.completed_courses_count;
+
+      // 3. Set Middle Analytic Cards
+      document.getElementById("activityTotalMinutes").textContent = studentDashboardData.learningStats.total_study_minutes_month.toLocaleString();
+      document.getElementById("streakDaysTotal").textContent = studentDashboardData.learningStreak.total_historical_streak_days.toLocaleString();
+      document.getElementById("currentStreakCenterNum").textContent = studentDashboardData.learningStreak.gauge_display_value;
+      document.getElementById("badgeCurrentStreak").textContent = `${studentDashboardData.learningStreak.current_streak} days`;
+      document.getElementById("badgeLongestStreak").textContent = `${studentDashboardData.learningStreak.longest_streak} days`;
+
+      // 4. Focus Mode Button Interactive Feedback
+      const focusBtn = document.getElementById("focusModeBtn");
+      if (focusBtn) {
+        focusBtn.addEventListener("click", () => {
+          alert("⚡ Focus Mode Activated! 25-minute Japanese study session started.");
+        });
+      }
+
+      // 5. Mobile Menu Toggle
+      const mobileBtn = document.getElementById("mobileMenuBtn");
+      const navMenu = document.getElementById("navMenu");
+      if (mobileBtn && navMenu) {
+        mobileBtn.addEventListener("click", () => {
+          navMenu.classList.toggle("hidden");
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
