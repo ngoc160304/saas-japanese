@@ -3,7 +3,13 @@ package com.mycompany.saas_japanese.service.impl;
 import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.service.CourseService;
 import com.mycompany.saas_japanese.service.mapper.CourseMapper;
+import com.mycompany.saas_japanese.util.SlugUtil;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
+import com.mycompany.saas_japanese.util.error.NotFoundException;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.util.Optional;
 
@@ -13,38 +19,51 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 
-import com.mycompany.saas_japanese.Specification.CourseSpecs;
+import com.mycompany.saas_japanese.specification.CourseSpecs;
 import com.mycompany.saas_japanese.domain.Course;
+import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
 @Service
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
-
-    CourseServiceImpl(CourseRepository courseRepository, CourseMapper courseMapper) {
-        this.courseRepository = courseRepository;
-        this.courseMapper = courseMapper;
-    }
+    private final UploadServiceImpl uploadService;
 
     @Override
+    @Transactional
     public Course handleCreateCourse(ReqCreateCourse requestCourse) {
+        Media media = uploadService.getMediaById(requestCourse.getThumbnailId());
+        if (media.getIsDeleted()) {
+            throw new BadRequestException("Media has been deleted");
+        }
+
+        if (media.getIsUsed()) {
+            throw new BadRequestException("Media is already in use");
+        }
+
         Course course = new Course();
+
         course.setTitle(requestCourse.getTitle());
         course.setDescription(requestCourse.getDescription());
-        course.setLevel(null);
-        course.setThumbnail(null);
-        course.setSlug(requestCourse.getTitle().trim().toLowerCase().replace(" ", "-"));
-        return this.courseRepository.save(course);
+        course.setSlug(SlugUtil.toSlug(requestCourse.getTitle()));
+        course.setIsPublished(requestCourse.getIsPublished());
+        course.setPrice(requestCourse.getPrice());
+        course.setThumbnailMedia(media);
+        media.setIsUsed(true);
+
+        return courseRepository.save(course);
     }
 
     @Override
     public void deleteByIdCourse(long id) {
         if (!courseRepository.existsById(id)) {
-            throw new BadRequestException("Id khong ton tai");
+            throw new NotFoundException("Id khong ton tai");
         }
         this.courseRepository.deleteById(id);
     }
@@ -55,7 +74,7 @@ public class CourseServiceImpl implements CourseService {
         if (courseOptional.isPresent()) {
             return courseMapper.toResponse(courseOptional.get());
         } else {
-            throw new BadRequestException("Id khong ton tai");
+            throw new NotFoundException("Id khong ton tai");
         }
     }
 
@@ -83,9 +102,8 @@ public class CourseServiceImpl implements CourseService {
             Course currentCourse = courseOptional.get();
             currentCourse.setTitle(reqCourse.getTitle());
             currentCourse.setDescription(reqCourse.getDescription());
-            currentCourse.setPublished(reqCourse.getPublished());
-            currentCourse.setLevel(null);
-            currentCourse.setThumbnail(null);
+            currentCourse.setIsPublished(reqCourse.getPublished());
+            currentCourse.setThumbnailMedia(null);
             currentCourse.setSlug(reqCourse.getTitle().trim().toLowerCase().replace(" ", "-"));
 
             currentCourse = courseRepository.save(currentCourse);
@@ -93,7 +111,6 @@ public class CourseServiceImpl implements CourseService {
             return courseMapper.toResponse(currentCourse);
         }
         throw new BadRequestException("Id khong ton tai");
-
     }
 
 }

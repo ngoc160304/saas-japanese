@@ -1,7 +1,9 @@
 package com.mycompany.saas_japanese.domain.response;
 
-import lombok.Getter;
-import lombok.Setter;
+import java.math.BigDecimal;
+import java.time.Instant;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -16,7 +18,9 @@ public class CourseResponse {
 
     private boolean published;
 
-    private Long levelId;
+    private BigDecimal price;
 
-    private Long thumbnailId;
+    private String thumnailURL;
+
+    private Instant createdAt;
 }
