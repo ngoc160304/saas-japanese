@@ -1,7 +1,5 @@
 package com.mycompany.saas_japanese.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 
 import com.mycompany.saas_japanese.domain.Course;
@@ -21,4 +19,5 @@ public interface CourseService {
     Page<CourseResponse> fetchAllCourse(CourseQuerry query);
 
     CourseResponse updateCourse(Long id, ReqUpdateCourse course);
+
 }

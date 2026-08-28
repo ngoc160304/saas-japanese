@@ -18,6 +18,10 @@ public class CourseResponse {
 
     private boolean published;
 
+    private String categoryName;
+
+    private Long lessonCount;
+
     private BigDecimal price;
 
     private String thumnailURL;

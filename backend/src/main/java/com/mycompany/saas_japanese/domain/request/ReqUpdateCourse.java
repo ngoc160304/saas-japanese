@@ -12,6 +12,9 @@ public class ReqUpdateCourse {
     @NotBlank(message = "Title Không được để trống")
     private String title;
 
+    @NotNull(message = "Danh mục không được để trống")
+    private Long categoryId;
+
     @NotBlank(message = "description Không được để trống")
     private String description;
 

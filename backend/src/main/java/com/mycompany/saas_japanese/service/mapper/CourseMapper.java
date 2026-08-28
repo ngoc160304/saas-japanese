@@ -15,7 +15,9 @@ public class CourseMapper {
         response.setDescription(course.getDescription());
         response.setPublished(course.getIsPublished());
         response.setPrice(course.getPrice());
-        response.setThumnailURL(null);
+        response.setThumnailURL(course.getThumbnailMedia() != null
+                ? course.getThumbnailMedia().getSecureUrl()
+                : null);
         return response;
     }
 }

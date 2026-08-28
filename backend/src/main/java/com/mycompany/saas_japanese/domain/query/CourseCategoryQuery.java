@@ -5,6 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CourseQuerry extends BaseQuery {
-    private String title;
+public class CourseCategoryQuery {
+
+  private String name;
+
+  private int page = 0;
+
+  private int size = 10;
 }
