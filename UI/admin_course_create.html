@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT Admin - Tạo Khóa Học Mới (Create Course)</title>
+  <meta name="description" content="Dedicated Admin Create Course Page for StudyJLPT Platform." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+    <!-- Left Sidebar -->
+    <aside id="sidebar"
+      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30">
+      <div>
+        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <span class="text-xl font-extrabold tracking-tight text-slate-900">
+              Studify <span class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100">ADMIN</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="px-3 mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Admin Control</span>
+        </div>
+
+        <nav class="space-y-1.5">
+          <a href="admin_categories.html" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>Categories (JLPT)</span>
+          </a>
+
+          <a href="admin_courses.html" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Courses</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="mt-8 pt-4">
+        <a href="admin_courses.html" class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1.5 font-semibold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Courses List</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+
+      <!-- Breadcrumbs & Header -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="admin_courses.html" class="hover:text-slate-600">Courses</a>
+            <span>/</span>
+            <span class="text-slate-800" id="headerBreadcrumbTitle">Create New Course</span>
+          </nav>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight" id="pageMainHeading">
+            Create New Course
+          </h1>
+          <p class="text-slate-500 font-medium text-sm mt-0.5">
+            Step 1 of Course Flow: Khởi tạo thông tin cơ bản của khóa học trong bảng <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono">courses</code>.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <a href="admin_courses.html" class="px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs">
+            Cancel
+          </a>
+          <button type="submit" form="courseCreateForm"
+            class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm transition-all flex items-center gap-1.5">
+            <span>Save & Add Lessons</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Course Creation Form Card -->
+      <div class="max-w-4xl bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-soft">
+        
+        <form id="courseCreateForm" class="space-y-6">
+          <input type="hidden" id="editCourseId" value="" />
+
+          <!-- Row 1: Course Title & Slug -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            <!-- Title -->
+            <div>
+              <label for="courseTitle" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Course Title <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`title` VARCHAR(200))</span>
+              </label>
+              <input type="text" id="courseTitle" required maxlength="200"
+                placeholder="e.g., Tiếng Nhật Trung Cấp N3 Soumatome"
+                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-semibold" />
+            </div>
+
+            <!-- Slug -->
+            <div>
+              <label for="courseSlug" class="block text-xs font-bold text-slate-700 mb-1.5">
+                URL Slug <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`slug` VARCHAR(220) UNIQUE)</span>
+              </label>
+              <input type="text" id="courseSlug" required maxlength="220"
+                placeholder="tieng-nhat-trung-cap-n3-soumatome"
+                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white font-mono transition-all" />
+              <p class="text-[10px] text-slate-400 mt-1">Unique URL identifier for the course page.</p>
+            </div>
+          </div>
+
+          <!-- Row 2: JLPT Level, Price, Sort Order -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- JLPT Level (FK) -->
+            <div>
+              <label for="courseJlptLevel" class="block text-xs font-bold text-slate-700 mb-1.5">
+                JLPT Level <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`jlpt_level_id`)</span>
+              </label>
+              <select id="courseJlptLevel" required
+                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
+                <option value="1">N5 - Sơ cấp (Beginner)</option>
+                <option value="2">N4 - Sơ trung cấp (Elementary)</option>
+                <option value="3" selected>N3 - Trung cấp (Intermediate)</option>
+                <option value="4">N4 - Trung cao cấp (Upper-Int)</option>
+                <option value="5">N1 - Cao cấp (Advanced)</option>
+              </select>
+            </div>
+
+            <!-- Price -->
+            <div>
+              <label for="coursePrice" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Price (VND) <span class="text-[10px] text-slate-400 font-mono">(`price` DECIMAL(12,2))</span>
+              </label>
+              <div class="relative">
+                <input type="number" id="coursePrice" min="0" step="1000" value="499000"
+                  class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
+                <span class="absolute right-3.5 top-3 text-xs text-slate-400 font-bold">VND</span>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-1">Set 0 for free open courses.</p>
+            </div>
+
+            <!-- Sort Order -->
+            <div>
+              <label for="courseSortOrder" class="block text-xs font-bold text-slate-700 mb-1.5">
+                Display Order <span class="text-[10px] text-slate-400 font-mono">(`sort_order` INT)</span>
+              </label>
+              <input type="number" id="courseSortOrder" min="0" value="1"
+                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
+            </div>
+          </div>
+
+          <!-- Row 3: Description -->
+          <div>
+            <label for="courseDescription" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Course Description <span class="text-[10px] text-slate-400 font-mono">(`description` TEXT)</span>
+            </label>
+            <textarea id="courseDescription" rows="4"
+              placeholder="Nhập mô tả tổng quan về lộ trình học, số lượng bài giảng, mục tiêu đầu ra chứng chỉ..."
+              class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all leading-relaxed"></textarea>
+          </div>
+
+          <!-- Row 4: Thumbnail Selection & Publish Status -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-slate-100">
+            
+            <!-- Thumbnail Media Preview -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                Course Thumbnail <span class="text-[10px] text-slate-400 font-mono">(`thumbnail_media_id`)</span>
+              </label>
+              <div class="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                <div class="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-1">
+                  <img id="thumbnailPreview" src="assets/images/book_3d.jpg" alt="Thumbnail Preview" class="w-full h-full object-contain rounded-lg" />
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-bold text-slate-800">book_3d.jpg</p>
+                  <p class="text-[10px] text-slate-400">Default 3D Japanese Textbook Asset</p>
+                  <button type="button" class="mt-1 text-[11px] font-bold text-sky-600 hover:text-sky-700">
+                    Change Media File
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Publish Status Toggle -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1.5">
+                Publication Status <span class="text-[10px] text-slate-400 font-mono">(`is_published` TINYINT(1))</span>
+              </label>
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold text-slate-800">Publish Immediately</p>
+                  <p class="text-[11px] text-slate-400">Make this course visible to students</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="courseIsPublished" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Actions -->
+          <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+            <a href="admin_courses.html" class="px-5 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
+              Cancel & Return
+            </a>
+            <button type="submit"
+              class="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-md transition-all flex items-center gap-2">
+              <span>Save Course & Configure Lessons</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script>
+    // Auto-slugify course title
+    document.getElementById("courseTitle").addEventListener("input", function(e) {
+      const slugInput = document.getElementById("courseSlug");
+      if (!slugInput.dataset.manualEdit) {
+        slugInput.value = e.target.value
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[đĐ]/g, "d")
+          .replace(/[^a-z0-9\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-");
+      }
+    });
+
+    document.getElementById("courseSlug").addEventListener("input", function() {
+      this.dataset.manualEdit = "true";
+    });
+
+    // Check for edit query param
+    const urlParams = new URLSearchParams(window.location.search);
+    const editId = urlParams.get("edit_id");
+    if (editId) {
+      document.getElementById("headerBreadcrumbTitle").textContent = "Edit Course #" + editId;
+      document.getElementById("pageMainHeading").textContent = "Edit Course #" + editId;
+      document.getElementById("editCourseId").value = editId;
+      document.getElementById("courseTitle").value = "Tiếng Nhật Trung Cấp N3 Soumatome";
+      document.getElementById("courseSlug").value = "tieng-nhat-trung-cap-n3-soumatome";
+      document.getElementById("courseDescription").value = "Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.";
+    }
+
+    // Form Submission -> Redirect to Course Detail / Lesson Management
+    document.getElementById("courseCreateForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const courseId = editId || "1"; // Simulating saved course id
+      window.location.href = `admin_course_detail.html?course_id=${courseId}&created=true`;
+    });
+  </script>
+</body>
+
+</html>

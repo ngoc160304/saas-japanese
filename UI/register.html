@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT - Đăng ký tài khoản (Sign Up)</title>
+  <meta name="description"
+    content="Tạo tài khoản học tiếng Nhật StudyJLPT miễn phí để học ngữ pháp, từ vựng, chữ Kanji và luyện thi JLPT N5-N1." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --font-jp: 'Noto Sans JP', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-japanese {
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    .shadow-card {
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-4 md:p-6 lg:p-8 bg-[#f3f6fa]">
+
+  <!-- Auth Container (2-Column Card) -->
+  <div class="w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-card border border-slate-100 flex flex-col lg:flex-row min-h-[660px]">
+    
+    <!-- LEFT: MODERN JAPANESE AESTHETIC HERO CARD -->
+    <div class="lg:w-1/2 bg-gradient-to-br from-indigo-600 via-sky-600 to-teal-500 p-8 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden shrink-0">
+      
+      <!-- Subtle Geometry Background -->
+      <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 filter blur-2xl pointer-events-none"></div>
+      <div class="absolute -left-12 -bottom-12 w-56 h-56 rounded-full bg-sky-300/20 filter blur-xl pointer-events-none"></div>
+
+      <!-- Top Header -->
+      <div class="relative z-10">
+        <div class="flex items-center gap-2.5 mb-6">
+          <div class="w-9 h-9 rounded-xl bg-white text-slate-900 flex items-center justify-center shadow-md font-extrabold text-sm">
+            <svg class="w-5 h-5 fill-sky-600" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-white">
+            Studify <span class="text-sky-200 text-xs font-bold px-1.5 py-0.5 rounded bg-white/15 uppercase tracking-wider">JLPT</span>
+          </span>
+        </div>
+
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-medium text-sky-100 mb-3">
+          <span class="font-japanese text-white font-bold">一歩一歩前へ</span>
+          <span>•</span>
+          <span>Start Your Learning Journey</span>
+        </div>
+
+        <h2 class="text-2xl lg:text-3xl font-extrabold text-white tracking-tight leading-snug">
+          Begin Your Japanese Fluency in Minutes.
+        </h2>
+        <p class="text-xs lg:text-sm text-sky-100 mt-2 leading-relaxed font-normal">
+          Tạo tài khoản học viên để truy cập toàn bộ ngân hàng câu hỏi, bài học ngữ pháp, và lưu trữ chuỗi ngày học Streak.
+        </p>
+      </div>
+
+      <!-- Middle Feature Checklist Card -->
+      <div class="relative z-10 my-6 bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/20 text-white space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-white text-sky-600 flex items-center justify-center font-bold text-xs shrink-0">✓</div>
+          <p class="text-xs font-medium">Lộ trình bài giảng chuẩn N5 đến N1 kèm Audio</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-white text-sky-600 flex items-center justify-center font-bold text-xs shrink-0">✓</div>
+          <p class="text-xs font-medium">Thư viện Flashcard ghi nhớ từ vựng tự động</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-6 h-6 rounded-full bg-white text-sky-600 flex items-center justify-center font-bold text-xs shrink-0">✓</div>
+          <p class="text-xs font-medium">Phòng thi thử JLPT trực tuyến có đồng hồ đếm ngược</p>
+        </div>
+      </div>
+
+      <!-- Bottom Trust Metric -->
+      <div class="relative z-10 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-sky-100">
+        <span class="font-medium">100% Free Starter Plan Available</span>
+        <span class="font-japanese font-bold text-white">夢をかなえる</span>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: REGISTRATION FORM -->
+    <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-between bg-white">
+      
+      <!-- Top Navigation -->
+      <div class="flex items-center justify-between mb-6">
+        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-japanese">
+          新規登録 <span class="font-sans font-normal text-slate-300">/ Sign Up</span>
+        </span>
+        <a href="login.html" class="text-xs font-bold text-sky-600 hover:text-sky-700">
+          Sign In instead →
+        </a>
+      </div>
+
+      <!-- Form Container -->
+      <div class="max-w-md w-full mx-auto my-auto">
+        
+        <div class="mb-5">
+          <h1 class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Create Your Account 🌸
+          </h1>
+          <p class="text-slate-500 font-medium text-xs lg:text-sm mt-1">
+            Bắt đầu hành trình chinh phục chứng chỉ tiếng Nhật cùng StudyJLPT.
+          </p>
+        </div>
+
+        <!-- Error Alert -->
+        <div id="errorAlert" class="hidden mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
+          <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"></path>
+          </svg>
+          <span id="errorMessage">Vui lòng kiểm tra lại thông tin đăng ký.</span>
+        </div>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="space-y-3.5">
+          
+          <!-- Full Name (`users.full_name`) -->
+          <div>
+            <label for="fullNameInput" class="block text-xs font-bold text-slate-700 mb-1">
+              Full Name <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <input type="text" id="fullNameInput" required placeholder="Nguyễn Văn A"
+                class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-medium" />
+            </div>
+          </div>
+
+          <!-- Email Address (`users.email`) -->
+          <div>
+            <label for="emailInput" class="block text-xs font-bold text-slate-700 mb-1">
+              Email Address <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                </svg>
+              </div>
+              <input type="email" id="emailInput" required placeholder="name@example.com"
+                class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-medium" />
+            </div>
+          </div>
+
+          <!-- Password (`users.password_hash`) -->
+          <div>
+            <label for="passwordInput" class="block text-xs font-bold text-slate-700 mb-1">
+              Password <span class="text-rose-500">*</span>
+            </label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <input type="password" id="passwordInput" required placeholder="Tối thiểu 8 ký tự"
+                class="w-full pl-10 pr-10 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-medium" />
+              <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Target JLPT Level Chips -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              Your Target JLPT Level <span class="text-[10px] text-slate-400 font-normal">(Optional)</span>
+            </label>
+            <div class="grid grid-cols-5 gap-1.5" id="levelSelectionGrid">
+              <button type="button" onclick="selectLevel('N5')" class="level-chip py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-sky-500 transition-colors">N5</button>
+              <button type="button" onclick="selectLevel('N4')" class="level-chip py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-sky-500 transition-colors">N4</button>
+              <button type="button" onclick="selectLevel('N3')" class="level-chip py-1.5 rounded-xl border-2 border-sky-500 bg-sky-50 text-xs font-bold text-sky-700">N3</button>
+              <button type="button" onclick="selectLevel('N2')" class="level-chip py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-sky-500 transition-colors">N2</button>
+              <button type="button" onclick="selectLevel('N1')" class="level-chip py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:border-sky-500 transition-colors">N1</button>
+            </div>
+          </div>
+
+          <!-- Terms Checkbox -->
+          <div class="pt-1">
+            <label class="flex items-start gap-2 cursor-pointer select-none">
+              <input type="checkbox" id="agreeTerms" required
+                class="w-4 h-4 rounded-lg text-sky-600 focus:ring-sky-500 border-slate-300 mt-0.5" />
+              <span class="text-[11px] text-slate-500 leading-tight">
+                Tôi đồng ý với <a href="#" class="text-slate-900 font-bold hover:underline">Điều khoản sử dụng</a> và <a href="#" class="text-slate-900 font-bold hover:underline">Chính sách bảo mật</a> của StudyJLPT.
+              </span>
+            </label>
+          </div>
+
+          <!-- Create Account Button -->
+          <button type="submit" id="submitBtn"
+            class="w-full py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2">
+            <span>Create Free Account</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+
+        </form>
+
+      </div>
+
+      <!-- Bottom Footer -->
+      <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+        <p class="text-[11px] text-slate-400">
+          Already have an account? 
+          <a href="login.html" class="font-bold text-slate-900 hover:text-sky-600 transition-colors">Sign in here</a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 transition-all">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toastMessage">Tạo tài khoản thành công!</span>
+  </div>
+
+  <script>
+    // Toggle Password Visibility
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const passwordInput = document.getElementById("passwordInput");
+    togglePasswordBtn.addEventListener("click", () => {
+      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
+    });
+
+    // Level selector
+    function selectLevel(code) {
+      document.querySelectorAll(".level-chip").forEach(el => {
+        el.classList.remove("border-2", "border-sky-500", "bg-sky-50", "text-sky-700");
+        el.classList.add("border-slate-200", "text-slate-700");
+      });
+      event.target.classList.remove("border-slate-200", "text-slate-700");
+      event.target.classList.add("border-2", "border-sky-500", "bg-sky-50", "text-sky-700");
+    }
+
+    // Form Submission Simulation
+    const registerForm = document.getElementById("registerForm");
+    const toast = document.getElementById("toast");
+
+    function showToast(msg) {
+      document.getElementById("toastMessage").textContent = msg;
+      toast.classList.remove("hidden");
+      setTimeout(() => toast.classList.add("hidden"), 3000);
+    }
+
+    registerForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      showToast("Tài khoản đã được tạo thành công! Đang chuyển đến Dashboard...");
+      setTimeout(() => {
+        window.location.href = "student_dashboard.html";
+      }, 1000);
+    });
+  </script>
+</body>
+
+</html>
