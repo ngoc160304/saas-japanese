@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.util;
 
 import java.text.Normalizer;
+import java.time.Instant;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -35,6 +36,6 @@ public final class SlugUtil {
     // Xóa "-" ở đầu và cuối
     slug = slug.replaceAll("^-|-$", "");
 
-    return slug;
+    return slug + Instant.now().toEpochMilli();
   }
 }

@@ -14,7 +14,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "courses")
@@ -61,8 +66,13 @@ public class Course {
     @JoinColumn(name = "thumbnail_media_id")
     private Media thumbnailMedia;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private CourseCategory category;
+
     @PrePersist
     protected void onCreate() {
+
         Instant now = Instant.now();
 
         createdAt = now;
