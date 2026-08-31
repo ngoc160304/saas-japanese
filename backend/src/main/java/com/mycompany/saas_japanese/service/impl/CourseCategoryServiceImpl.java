@@ -21,6 +21,7 @@ import com.mycompany.saas_japanese.service.CourseCategoryService;
 import com.mycompany.saas_japanese.service.mapper.CourseCategoryMapper;
 import com.mycompany.saas_japanese.specification.CourseCategorySpecs;
 import com.mycompany.saas_japanese.util.SlugUtil;
+import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +53,11 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
       media = mediaRepository
           .findByIdAndIsDeletedFalse(request.getMediaId())
           .orElseThrow(() -> new NotFoundException("Media không tồn tại"));
+
+      if (media.getIsUsed()) {
+        throw new BadRequestException("Media đã được sử dụng !");
+      }
+      media.setIsUsed(true);
     }
 
     CourseCategory category = CourseCategory.builder()
@@ -134,17 +140,19 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
 
     if (request.getMediaId() != null) {
 
-      Media media = mediaRepository
-          .findByIdAndIsDeletedFalse(
-              request.getMediaId())
-          .orElseThrow(() -> new NotFoundException(
-              "Media không tồn tại"));
+      if (category.getMedia().getId() != request.getMediaId()) {
 
-      category.setMedia(media);
-
-    } else {
-
-      category.setMedia(null);
+        Media media = mediaRepository
+            .findByIdAndIsDeletedFalse(
+                request.getMediaId())
+            .orElseThrow(() -> new NotFoundException(
+                "Media không tồn tại"));
+        if (media.getIsUsed()) {
+          throw new BadRequestException("Media đã được sử dụng !");
+        }
+        media.setIsUsed(true);
+        category.setMedia(media);
+      }
     }
 
     CourseCategory saved = courseCategoryRepository.save(category);
@@ -158,7 +166,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
 
     CourseCategory category = courseCategoryRepository
         .findByIdAndIsDeletedFalse(id)
-        .orElseThrow(() -> new RuntimeException(
+        .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy danh mục khóa học"));
 
     category.setIsDeleted(true);

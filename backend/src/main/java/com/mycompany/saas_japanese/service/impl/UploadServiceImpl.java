@@ -30,6 +30,7 @@ public class UploadServiceImpl implements UploadService {
   @SuppressWarnings("unchecked")
   @Override
   public Media uploadImage(MultipartFile file) {
+    System.out.println(file.getContentType());
     validateImage(file);
     try {
 
@@ -38,6 +39,10 @@ public class UploadServiceImpl implements UploadService {
           ObjectUtils.asMap(
               "resource_type", "image",
               "folder", "images"));
+
+      System.out.println("result :" + result.get("secure_url"));
+      System.out.println("result :" + result.get("public_id"));
+
       Media media = Media.builder()
           .fileName(file.getOriginalFilename())
           .originalName(file.getOriginalFilename())
@@ -46,6 +51,7 @@ public class UploadServiceImpl implements UploadService {
           .fileType(FileTypeEnum.IMAGE)
           .mimeType(file.getContentType())
           .fileSize(file.getSize())
+          .filePath(null)
           .isDeleted(false)
           .isUsed(false)
           .build();
@@ -59,7 +65,7 @@ public class UploadServiceImpl implements UploadService {
   @SuppressWarnings("unchecked")
   @Override
   public Media uploadVideo(MultipartFile file) {
-    validateImage(file);
+    validateVideo(file);
     try {
 
       Map<String, Object> result = cloudinary.uploader().upload(
@@ -90,18 +96,17 @@ public class UploadServiceImpl implements UploadService {
   private static final long MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100 MB
 
   private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif");
+      "jpeg",
+      "png",
+      "webp",
+      "gif");
 
   private static final Set<String> ALLOWED_VIDEO_TYPES = Set.of(
-      "video/mp4",
-      "video/webm",
-      "video/quicktime");
+      "mp4",
+      "webm",
+      "quicktime");
 
   public void validateImage(MultipartFile file) {
-
     validateNotEmpty(file);
 
     if (file.getSize() > MAX_IMAGE_SIZE) {
@@ -109,14 +114,18 @@ public class UploadServiceImpl implements UploadService {
           "Image size must not exceed 10 MB !");
     }
 
-    if (!ALLOWED_IMAGE_TYPES.contains(file.getContentType())) {
+    String filename = file.getOriginalFilename();
+
+    String fileType = filename.substring(
+        filename.lastIndexOf(".") + 1);
+
+    if (fileType == null || !ALLOWED_IMAGE_TYPES.contains(fileType)) {
       throw new BadRequestException(
-          "Unsupported image type !");
+          "Unsupported image type: " + fileType);
     }
   }
 
   public void validateVideo(MultipartFile file) {
-
     validateNotEmpty(file);
 
     if (file.getSize() > MAX_VIDEO_SIZE) {
@@ -124,9 +133,14 @@ public class UploadServiceImpl implements UploadService {
           "Video size must not exceed 100 MB !");
     }
 
-    if (!ALLOWED_VIDEO_TYPES.contains(file.getContentType())) {
+    String filename = file.getOriginalFilename();
+
+    String fileType = filename.substring(
+        filename.lastIndexOf(".") + 1);
+
+    if (fileType == null || !ALLOWED_VIDEO_TYPES.contains(fileType)) {
       throw new BadRequestException(
-          "Unsupported video type !");
+          "Unsupported video type: " + fileType);
     }
   }
 
@@ -139,7 +153,7 @@ public class UploadServiceImpl implements UploadService {
 
   @Override
   public Media getMediaById(Long id) {
-    return mediaRepository.findById(id)
-        .orElseThrow(() -> new NotFoundException("Media not found"));
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'getMediaById'");
   }
 }
