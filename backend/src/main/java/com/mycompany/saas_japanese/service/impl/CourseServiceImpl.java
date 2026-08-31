@@ -47,16 +47,22 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public Course handleCreateCourse(ReqCreateCourse requestCourse) {
-        Media media = mediaRepository.findByIdAndIsDeletedFalse(requestCourse.getThumbnailId())
-                .orElseThrow(() -> new NotFoundException("File không tìm thấy !"));
-
-        if (media.getIsUsed()) {
-            throw new BadRequestException("Media is already in use");
-        }
-
         CourseCategory courseCategory = courseCategoryRepository.findById(requestCourse.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         Course course = new Course();
+        if (requestCourse.getThumbnailId() != null) {
+            Media media = mediaRepository.findByIdAndIsDeletedFalse(requestCourse.getThumbnailId())
+                    .orElseThrow(() -> new NotFoundException("File không tìm thấy !"));
+
+            if (media.getIsUsed()) {
+                throw new BadRequestException("Media is already in use");
+            }
+            course.setThumbnailMedia(media);
+            media.setIsUsed(true);
+
+        } else {
+            course.setThumbnailMedia(null);
+        }
 
         course.setTitle(requestCourse.getTitle());
         course.setCategory(courseCategory);
@@ -64,8 +70,6 @@ public class CourseServiceImpl implements CourseService {
         course.setSlug(SlugUtil.toSlug(requestCourse.getTitle()));
         course.setIsPublished(requestCourse.getIsPublished());
         course.setPrice(requestCourse.getPrice());
-        course.setThumbnailMedia(media);
-        media.setIsUsed(true);
 
         return courseRepository.save(course);
     }
@@ -94,17 +98,34 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional(readOnly = true)
     public Page<CourseResponse> fetchAllCourse(CourseQuerry query) {
+
         PredicateSpecification<Course> spec = (root, builder) -> null;
-        if (query.getTitle() != null && !query.getTitle().trim().isEmpty()) {
-            spec = spec.and(CourseSpecs.hasTitle(query.getTitle()));
-        }
-        Page<Course> coursePage = courseRepository.findBy(spec,
-                q -> q.page(PageRequest.of(query.getPage(), query.getSize(), Sort.by("id").ascending())));
+
+        spec = spec.and(
+                CourseSpecs.hasTitle(query.getTitle()));
+
+        Page<Course> coursePage = courseRepository.findBy(
+                spec,
+                q -> q.page(
+                        PageRequest.of(
+                                query.getPage(),
+                                query.getSize(),
+                                Sort.by("id").ascending())));
+
         return coursePage.map(course -> {
+
             CourseResponse response = courseMapper.toResponse(course);
-            response.setCategoryName(course.getCategory() != null ? course.getCategory().getName() : null);
-            long lessonCount = lessonRepository.countByCourseIdAndIsDeletedFalse(course.getId());
+
+            response.setCategoryName(
+                    course.getCategory() != null
+                            ? course.getCategory().getName()
+                            : null);
+
+            long lessonCount = lessonRepository.countByCourseIdAndIsDeletedFalse(
+                    course.getId());
+
             response.setLessonCount(lessonCount);
+
             return response;
         });
     }
@@ -121,15 +142,17 @@ public class CourseServiceImpl implements CourseService {
         currentCourse.setSlug(slug);
         CourseCategory category = courseCategoryRepository.findByIdAndIsDeletedFalse(reqCourse.getCategoryId())
                 .orElseThrow(() -> new BadRequestException("Category không tồn tại"));
-
-        Media media = mediaRepository.findByIdAndIsDeletedFalse(reqCourse.getThumbnailId())
-                .orElseThrow(() -> new NotFoundException("File không tìm thấy !"));
-        if (currentCourse.getThumbnailMedia().getId() != media.getId()) {
-            if (media.getIsUsed()) {
-                throw new BadRequestException("Media is already in use");
+        if (reqCourse.getThumbnailId() != null && reqCourse.getThumbnailId() != category.getMedia().getId()) {
+            Media media = mediaRepository.findByIdAndIsDeletedFalse(reqCourse.getThumbnailId())
+                    .orElseThrow(() -> new NotFoundException("File không tìm thấy !"));
+            if (currentCourse.getThumbnailMedia().getId() != media.getId()) {
+                if (media.getIsUsed()) {
+                    throw new BadRequestException("Media is already in use");
+                }
+                currentCourse.setThumbnailMedia(media);
+                media.setIsUsed(true);
             }
-            currentCourse.setThumbnailMedia(media);
-            media.setIsUsed(true);
+
         }
         currentCourse.setCategory(category);
         Course updatedCourse = courseRepository.save(currentCourse);

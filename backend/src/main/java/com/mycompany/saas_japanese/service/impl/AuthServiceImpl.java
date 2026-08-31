@@ -37,8 +37,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Service
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
   private final UserRepository userRepository;
   private final OtpService otpService;
@@ -50,19 +54,6 @@ public class AuthServiceImpl implements AuthService {
   private final UserDetailsService userDetailsService;
 
   private static final SecureRandom RANDOM = new SecureRandom();
-
-  AuthServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, OtpService otpService,
-      BrevoProvider brevoProvider, AuthenticationManagerBuilder authenticationManagerBuilder, JwtEncoder jwtEncoder,
-      JwtDecoder jwtDecoder, UserDetailsService userDetailsService) {
-    this.userRepository = userRepository;
-    this.otpService = otpService;
-    this.passwordEncoder = passwordEncoder;
-    this.brevoProvider = brevoProvider;
-    this.authenticationManagerBuilder = authenticationManagerBuilder;
-    this.jwtEncoder = jwtEncoder;
-    this.jwtDecoder = jwtDecoder;
-    this.userDetailsService = userDetailsService;
-  }
 
   @Override
   public User register(User user) {

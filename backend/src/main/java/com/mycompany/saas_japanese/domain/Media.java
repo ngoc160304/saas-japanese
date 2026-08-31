@@ -26,7 +26,7 @@ public class Media {
     @Column(length = 255)
     private String originalName;
 
-    @Column(nullable = false, length = 500)
+    @Column(nullable = true, length = 500)
     private String filePath;
 
     @Column(nullable = false, length = 255)

@@ -20,7 +20,6 @@ public class ReqCreateCourse {
     @NotBlank(message = "description Không được để trống")
     private String description;
 
-    @NotNull(message = "thumbnailId không được để trống")
     private Long thumbnailId;
 
     @NotNull(message = "isPublished không được để trống")

@@ -2,20 +2,20 @@ package com.mycompany.saas_japanese.service;
 
 import org.springframework.data.domain.Page;
 
-import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.query.LessonQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateLesson;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLesson;
+import com.mycompany.saas_japanese.domain.response.LessonResponse;
 
 public interface LessonService {
 
-  Lesson createLesson(ReqCreateLesson request);
+  LessonResponse createLesson(ReqCreateLesson request);
 
-  Lesson fetchLessonById(Long id);
+  LessonResponse fetchLessonById(Long id);
 
-  Page<Lesson> fetchAllLesson(LessonQuery query);
+  Page<LessonResponse> fetchAllLesson(LessonQuery query);
 
-  Lesson updateLesson(Long id, ReqUpdateLesson request);
+  LessonResponse updateLesson(Long id, ReqUpdateLesson request);
 
   void deleteLesson(Long id);
 
