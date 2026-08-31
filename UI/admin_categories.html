@@ -182,16 +182,14 @@
         </nav>
       </div>
 
-      <!-- Bottom Sidebar DB & System Status Badge -->
+      <!-- Bottom Help & Support Link -->
       <div class="mt-8 pt-4">
-        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-3 text-slate-700">
-          <div class="flex items-center gap-2 mb-1.5">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-xs font-bold text-slate-900">Database Active</span>
-          </div>
-          <p class="text-[11px] text-slate-500 font-mono">study_jlpt (32 tables)</p>
-          <p class="text-[10px] text-slate-400 mt-1">Schema: jlpt_levels table</p>
-        </div>
+        <a href="admin_courses.html" class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1.5 font-semibold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Back to Courses</span>
+        </a>
       </div>
     </aside>
 
@@ -207,14 +205,12 @@
             <span class="text-xs font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">
               System Classification
             </span>
-            <span class="text-slate-300">•</span>
-            <span class="text-xs font-medium text-slate-400">jlpt_levels</span>
           </div>
           <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Categories & JLPT Levels
+            Course Categories
           </h1>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Quản lý danh sách các cấp độ JLPT (N5 - N1) và phân loại khóa học trong hệ thống.
+            Quản lý danh sách các phân loại khóa học trong hệ thống.
           </p>
         </div>
 
@@ -317,23 +313,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
-            <input type="text" id="searchInput" placeholder="Search by Level Code, Name, or Description..."
+            <input type="text" id="searchInput" placeholder="Search categories..."
               class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
           </div>
 
-          <!-- Filters: Status & Quick Counts -->
-          <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Filter by Code -->
-            <select id="codeFilter"
-              class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
-              <option value="ALL">All Levels (N5-N1)</option>
-              <option value="N5">N5 - Sơ cấp 1</option>
-              <option value="N4">N4 - Sơ cấp 2</option>
-              <option value="N3">N3 - Trung cấp</option>
-              <option value="N2">N2 - Trung cao cấp</option>
-              <option value="N1">N1 - Cao cấp</option>
-            </select>
-
+          <!-- Actions -->
+          <div class="flex items-center gap-2.5">
             <!-- Reset Filter Button -->
             <button id="resetFilterBtn"
               class="px-3 py-2.5 rounded-2xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 text-xs font-semibold transition-colors flex items-center gap-1.5"
@@ -351,13 +336,11 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-2 font-semibold">ID</th>
-                <th class="pb-3 px-3 font-semibold">Code (`code`)</th>
-                <th class="pb-3 px-4 font-semibold">Display Name (`name`)</th>
-                <th class="pb-3 px-4 font-semibold">Description (`description`)</th>
-                <th class="pb-3 px-3 font-semibold text-center">Courses</th>
-                <th class="pb-3 px-3 font-semibold text-center">Exams</th>
-                <th class="pb-3 pr-2 font-semibold text-right">Actions</th>
+                <th class="pb-3 pl-3 font-semibold w-14">#</th>
+                <th class="pb-3 px-4 font-semibold">Category</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Courses</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Exams</th>
+                <th class="pb-3 pr-4 font-semibold text-right w-28">Actions</th>
               </tr>
             </thead>
             <tbody id="categoriesTableBody" class="divide-y divide-slate-100/70 text-xs">
@@ -374,12 +357,12 @@
             </svg>
           </div>
           <p class="text-sm font-bold text-slate-800">No categories found</p>
-          <p class="text-xs text-slate-400 mt-1">Try adjusting your search or filter criteria.</p>
+          <p class="text-xs text-slate-400 mt-1">Try adjusting your search criteria.</p>
         </div>
 
         <!-- Table Footer / Pagination -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
-          <p id="tableShowingCount">Showing 5 of 5 JLPT Categories</p>
+          <p id="tableShowingCount">Showing 5 of 5 Categories</p>
           <div class="flex items-center gap-1.5">
             <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">
               Previous
@@ -403,13 +386,12 @@
   <!-- 3. MODAL: ADD / EDIT CATEGORY              -->
   <!-- ========================================== -->
   <div id="categoryModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
         <div>
           <h3 id="modalTitle" class="text-lg font-bold text-slate-900">Add New Category</h3>
-          <p class="text-xs text-slate-400 font-medium mt-0.5">Database Table: `jlpt_levels`</p>
         </div>
         <button id="closeModalBtn" class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -418,43 +400,17 @@
         </button>
       </div>
 
-      <!-- Category Form -->
+      <!-- Category Form (Only Category input) -->
       <form id="categoryForm" class="space-y-4">
         <input type="hidden" id="formCategoryId" value="" />
 
-        <!-- Field 1: Level Code (`code` ENUM: N5, N4, N3, N2, N1) -->
-        <div>
-          <label for="formCode" class="block text-xs font-bold text-slate-700 mb-1">
-            Level Code <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-normal">(`code` ENUM)</span>
-          </label>
-          <select id="formCode" required
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
-            <option value="N5">N5 (Beginner)</option>
-            <option value="N4">N4 (Elementary)</option>
-            <option value="N3">N3 (Intermediate)</option>
-            <option value="N2">N2 (Upper-Intermediate)</option>
-            <option value="N1">N1 (Advanced)</option>
-          </select>
-          <p class="text-[10px] text-slate-400 mt-1">Unique identifier code matching JLPT test classification.</p>
-        </div>
-
-        <!-- Field 2: Display Name (`name` VARCHAR(50)) -->
+        <!-- Category -->
         <div>
           <label for="formName" class="block text-xs font-bold text-slate-700 mb-1">
-            Display Name <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-normal">(`name` VARCHAR(50))</span>
+            Category <span class="text-rose-500">*</span>
           </label>
-          <input type="text" id="formName" required maxlength="50" placeholder="e.g., Tiếng Nhật Trung Cấp N3"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
-        </div>
-
-        <!-- Field 3: Description (`description` VARCHAR(255)) -->
-        <div>
-          <label for="formDescription" class="block text-xs font-bold text-slate-700 mb-1">
-            Description <span class="text-[10px] text-slate-400 font-normal">(`description` VARCHAR(255))</span>
-          </label>
-          <textarea id="formDescription" rows="3" maxlength="255" placeholder="Mô tả mục tiêu kiến thức, từ vựng, ngữ pháp của cấp độ này..."
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"></textarea>
-          <p class="text-[10px] text-slate-400 mt-1 text-right"><span id="charCount">0</span>/255 characters</p>
+          <input type="text" id="formName" required maxlength="100" placeholder="e.g., Tiếng Nhật Trung Cấp N3"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-semibold" />
         </div>
 
         <!-- Modal Footer Actions -->
@@ -469,7 +425,6 @@
           </button>
         </div>
       </form>
-
     </div>
   </div>
 
@@ -488,8 +443,8 @@
 
       <h3 class="text-base font-bold text-slate-900">Delete Category?</h3>
       <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
-        Are you sure you want to delete category <strong id="deleteCategoryName" class="text-slate-800"></strong>?
-        <span class="block text-rose-500 text-[11px] font-semibold mt-1">Warning: Linked courses (`courses.jlpt_level_id`) and exams may be affected.</span>
+        Are you sure you want to delete <strong id="deleteCategoryName" class="text-slate-800"></strong>?
+        <span class="block text-rose-500 text-[11px] font-semibold mt-1">Warning: Linked courses and exams may be affected.</span>
       </p>
 
       <div class="flex items-center justify-center gap-3">
@@ -633,7 +588,7 @@
       const totalExams = categoriesData.reduce((sum, i) => sum + (i.linked_exams_count || 0), 0);
       document.getElementById("statLinkedCourses").textContent = totalCourses;
       document.getElementById("statLinkedExams").textContent = totalExams;
-      document.getElementById("tableShowingCount").textContent = `Showing ${filtered.length} of ${categoriesData.length} JLPT Categories`;
+      document.getElementById("tableShowingCount").textContent = `Showing ${filtered.length} of ${categoriesData.length} Categories`;
 
       if (filtered.length === 0) {
         tbody.innerHTML = "";
@@ -644,53 +599,37 @@
       }
 
       tbody.innerHTML = filtered.map(item => {
-        const style = getBadgeStyle(item.code);
         return `
           <tr class="hover:bg-slate-50/80 transition-colors group">
             <!-- ID -->
-            <td class="py-3.5 pl-2 font-mono text-slate-400 text-xs">
+            <td class="py-4 pl-3 font-mono text-slate-400 text-xs">
               #${item.id}
             </td>
 
-            <!-- Code Badge -->
-            <td class="py-3.5 px-3">
-              <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl font-extrabold text-xs shadow-xs ${style.bg}">
-                ${item.code}
-              </span>
-            </td>
-
-            <!-- Name -->
-            <td class="py-3.5 px-4">
+            <!-- Category -->
+            <td class="py-4 px-4">
               <p class="font-bold text-slate-900 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
                 ${item.name}
-              </p>
-              <p class="text-[11px] text-slate-400 font-mono mt-0.5">code: '${item.code}'</p>
-            </td>
-
-            <!-- Description -->
-            <td class="py-3.5 px-4 max-w-xs md:max-w-md">
-              <p class="text-slate-600 line-clamp-2 text-xs leading-relaxed">
-                ${item.description || '<span class="text-slate-300 italic">No description provided</span>'}
               </p>
             </td>
 
             <!-- Linked Courses -->
-            <td class="py-3.5 px-3 text-center">
+            <td class="py-4 px-4 text-center">
               <span class="inline-block px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 font-bold text-xs border border-sky-100">
                 ${item.linked_courses_count} Courses
               </span>
             </td>
 
             <!-- Linked Exams -->
-            <td class="py-3.5 px-3 text-center">
+            <td class="py-4 px-4 text-center">
               <span class="inline-block px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-100">
                 ${item.linked_exams_count} Exams
               </span>
             </td>
 
             <!-- Actions -->
-            <td class="py-3.5 pr-2 text-right">
-              <div class="flex items-center justify-end gap-1">
+            <td class="py-4 pr-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
                 <!-- Edit Button -->
                 <button onclick="openEditModal(${item.id})"
                   class="w-8 h-8 rounded-xl hover:bg-sky-50 text-slate-400 hover:text-sky-600 flex items-center justify-center transition-colors"
@@ -723,7 +662,6 @@
       document.getElementById("modalTitle").textContent = "Add New Category";
       document.getElementById("categoryForm").reset();
       document.getElementById("formCategoryId").value = "";
-      document.getElementById("charCount").textContent = "0";
       document.getElementById("categoryModal").classList.remove("hidden");
       document.getElementById("categoryModal").classList.add("flex");
     }
@@ -733,12 +671,9 @@
       if (!item) return;
 
       currentEditingId = id;
-      document.getElementById("modalTitle").textContent = `Edit Category: ${item.code}`;
+      document.getElementById("modalTitle").textContent = `Edit Category: ${item.name}`;
       document.getElementById("formCategoryId").value = item.id;
-      document.getElementById("formCode").value = item.code;
       document.getElementById("formName").value = item.name;
-      document.getElementById("formDescription").value = item.description || "";
-      document.getElementById("charCount").textContent = (item.description || "").length;
 
       document.getElementById("categoryModal").classList.remove("hidden");
       document.getElementById("categoryModal").classList.add("flex");
@@ -754,7 +689,7 @@
       if (!item) return;
 
       currentDeletingId = id;
-      document.getElementById("deleteCategoryName").textContent = `${item.code} - ${item.name}`;
+      document.getElementById("deleteCategoryName").textContent = item.name;
       document.getElementById("deleteModal").classList.remove("hidden");
       document.getElementById("deleteModal").classList.add("flex");
     }
@@ -771,10 +706,8 @@
 
       // Search & Filters
       document.getElementById("searchInput").addEventListener("input", renderCategories);
-      document.getElementById("codeFilter").addEventListener("change", renderCategories);
       document.getElementById("resetFilterBtn").addEventListener("click", () => {
         document.getElementById("searchInput").value = "";
-        document.getElementById("codeFilter").value = "ALL";
         renderCategories();
       });
 
@@ -783,39 +716,28 @@
       document.getElementById("closeModalBtn").addEventListener("click", closeCategoryModal);
       document.getElementById("cancelModalBtn").addEventListener("click", closeCategoryModal);
 
-      // Character count for textarea
-      document.getElementById("formDescription").addEventListener("input", (e) => {
-        document.getElementById("charCount").textContent = e.target.value.length;
-      });
-
       // Form Submit (Save Category)
       document.getElementById("categoryForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const code = document.getElementById("formCode").value;
         const name = document.getElementById("formName").value.trim();
-        const description = document.getElementById("formDescription").value.trim();
 
         if (currentEditingId) {
           // Update
           const index = categoriesData.findIndex(c => c.id === currentEditingId);
           if (index !== -1) {
-            categoriesData[index].code = code;
             categoriesData[index].name = name;
-            categoriesData[index].description = description;
-            showToast(`Category ${code} updated successfully!`);
+            showToast(`Category updated successfully!`);
           }
         } else {
           // Create
           const newId = categoriesData.length > 0 ? Math.max(...categoriesData.map(c => c.id)) + 1 : 1;
           categoriesData.push({
             id: newId,
-            code: code,
             name: name,
-            description: description,
             linked_courses_count: 0,
             linked_exams_count: 0
           });
-          showToast(`New Category ${code} created successfully!`);
+          showToast(`New Category created successfully!`);
         }
 
         closeCategoryModal();
@@ -828,7 +750,7 @@
         if (currentDeletingId) {
           const item = categoriesData.find(c => c.id === currentDeletingId);
           categoriesData = categoriesData.filter(c => c.id !== currentDeletingId);
-          showToast(`Category ${item ? item.code : ''} deleted.`);
+          showToast(`Category deleted.`);
           closeDeleteModal();
           renderCategories();
         }

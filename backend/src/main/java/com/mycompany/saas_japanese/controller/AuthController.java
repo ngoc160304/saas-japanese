@@ -1,10 +1,12 @@
 package com.mycompany.saas_japanese.controller;
 
 import com.mycompany.saas_japanese.repository.OtpRepository;
+import com.mycompany.saas_japanese.service.impl.UserServiceImpl;
 import java.time.Duration;
 
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +17,9 @@ import com.mycompany.saas_japanese.domain.request.ReqForgotPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqLoginDTO;
 import com.mycompany.saas_japanese.domain.request.ReqOtpDTO;
 import com.mycompany.saas_japanese.domain.request.ReqResetPasswordDTO;
+import com.mycompany.saas_japanese.domain.request.ReqUpdateProfileDTO;
 import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
+import com.mycompany.saas_japanese.domain.response.UserProfileResponseDTO;
 import com.mycompany.saas_japanese.service.AuthService;
 import com.mycompany.saas_japanese.service.impl.OtpServiceImpl;
 import com.mycompany.saas_japanese.util.anotation.ApiMessage;
@@ -31,12 +35,14 @@ import jakarta.servlet.http.Cookie;
 @RequestMapping("/auth")
 public class AuthController {
 
+  private final UserServiceImpl userServiceImpl;
   private final OtpRepository otpRepository;
   private final AuthService authService;
 
-  AuthController(AuthService authService, OtpRepository otpRepository) {
+  AuthController(AuthService authService, OtpRepository otpRepository, UserServiceImpl userServiceImpl) {
     this.authService = authService;
     this.otpRepository = otpRepository;
+    this.userServiceImpl = userServiceImpl;
   }
 
   @PostMapping("/register")
@@ -126,4 +132,18 @@ public class AuthController {
 
     return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString()).body(res);
   }
+
+  @GetMapping("/myProfile")
+  @ApiMessage("get my profile")
+  public ResponseEntity<UserProfileResponseDTO> getMyProfile() {
+    return ResponseEntity.ok(userServiceImpl.getMyProfile());
+  }
+
+  @PostMapping("/updateProfile")
+  @ApiMessage("update profile")
+  public ResponseEntity<UserProfileResponseDTO> updateProfile(
+      @Valid @RequestBody ReqUpdateProfileDTO request) {
+    return ResponseEntity.ok(userServiceImpl.updateMyProfile(request));
+  }
+
 }

@@ -6,6 +6,7 @@ import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.service.CourseService;
 import com.mycompany.saas_japanese.service.mapper.CourseMapper;
+import com.mycompany.saas_japanese.specification.CourseSpecs;
 import com.mycompany.saas_japanese.util.SlugUtil;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
@@ -24,7 +25,6 @@ import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mycompany.saas_japanese.specification.CourseSpecs;
 import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.CourseCategory;
 import com.mycompany.saas_japanese.domain.Media;

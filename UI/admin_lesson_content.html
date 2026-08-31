@@ -154,66 +154,62 @@
         </div>
       </header>
 
-      <!-- Lesson Completion Overview Cards -->
+      <!-- Lesson Completion Overview Cards (Statistics Only) -->
       <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         
-        <!-- Vocab Tab Card -->
-        <button onclick="switchTab('vocab')" id="tabBtn-vocab"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-sky-500 shadow-soft text-left transition-all">
+        <!-- Vocab Stat Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-sky-600 uppercase tracking-wider">1. Vocabulary</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Ready</span>
           </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewVocabCount">20 Words</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `vocabularies`</p>
-        </button>
+          <p class="text-2xl font-extrabold text-slate-900 mt-1.5" id="overviewVocabCount">20 Words</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Từ vựng bài học</p>
+        </div>
 
-        <!-- Kanji Tab Card -->
-        <button onclick="switchTab('kanji')" id="tabBtn-kanji"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
+        <!-- Kanji Stat Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">2. Kanji</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
+            <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">2. Kanji</span>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Ready</span>
           </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewKanjiCount">8 Characters</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `kanjis`</p>
-        </button>
+          <p class="text-2xl font-extrabold text-slate-900 mt-1.5" id="overviewKanjiCount">8 Characters</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Chữ Hán bài học</p>
+        </div>
 
-        <!-- Grammar + Video Tab Card -->
-        <button onclick="switchTab('grammar')" id="tabBtn-grammar"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
+        <!-- Grammar + Video Stat Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">3. Grammar + Video</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
+            <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">3. Grammar + Video</span>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Ready</span>
           </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewGrammarCount">4 Pts · 1 Video</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">`grammars` + `media`</p>
-        </button>
+          <p class="text-2xl font-extrabold text-slate-900 mt-1.5" id="overviewGrammarCount">4 Pts · 1 Video</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Ngữ pháp & Video bài giảng</p>
+        </div>
 
-        <!-- Quiz Tab Card -->
-        <button onclick="switchTab('quiz')" id="tabBtn-quiz"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
+        <!-- Quiz Stat Card -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-100 shadow-soft">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">4. Quiz</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ 60% Pass</span>
+            <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">4. Quiz</span>
+            <span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">60% Pass</span>
           </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewQuizCount">10 Questions</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `quizzes`</p>
-        </button>
+          <p class="text-2xl font-extrabold text-slate-900 mt-1.5" id="overviewQuizCount">10 Questions</p>
+          <p class="text-[11px] text-slate-400 mt-0.5">Kiểm tra trắc nghiệm</p>
+        </div>
 
       </section>
 
       <!-- ======================================================== -->
-      <!-- SECTION 1: VOCABULARY MANAGEMENT TAB                     -->
+      <!-- SECTION 1: VOCABULARY MANAGEMENT                         -->
       <!-- ======================================================== -->
-      <section id="tabContent-vocab" class="tab-pane bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+      <section id="section-vocab" class="bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Vocabulary Management</span>
-              <span class="text-xs font-semibold text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">vocabularies</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-sky-500"></span>
+              <span>1. Vocabulary Management</span>
             </h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">Danh sách từ vựng trong bài học: Từ tiếng Nhật, Cách đọc Furigana, Nghĩa tiếng Việt, Câu ví dụ.</p>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Danh sách từ vựng và ý nghĩa trong bài học.</p>
           </div>
 
           <button onclick="openAddVocabModal()"
@@ -225,17 +221,14 @@
           </button>
         </div>
 
-        <!-- Vocab Table -->
+        <!-- Vocab Table (Vocabulary & Meaning only) -->
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-2 font-semibold">Word (`word`)</th>
-                <th class="pb-3 px-3 font-semibold">Reading (`reading`)</th>
-                <th class="pb-3 px-3 font-semibold">Meaning (`meaning_vi`)</th>
-                <th class="pb-3 px-3 font-semibold">Type (`part_of_speech`)</th>
-                <th class="pb-3 px-4 font-semibold">Example Sentence (`example_sentence_jp`)</th>
-                <th class="pb-3 pr-2 font-semibold text-right">Actions</th>
+                <th class="pb-3 pl-3 font-semibold w-1/3">Vocabulary</th>
+                <th class="pb-3 px-4 font-semibold">Meaning</th>
+                <th class="pb-3 pr-3 font-semibold text-right w-24">Actions</th>
               </tr>
             </thead>
             <tbody id="vocabTableBody" class="divide-y divide-slate-100/70 text-xs">
@@ -246,14 +239,14 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- SECTION 2: KANJI MANAGEMENT TAB                          -->
+      <!-- SECTION 2: KANJI MANAGEMENT (NO DELETE ACTION)           -->
       <!-- ======================================================== -->
-      <section id="tabContent-kanji" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+      <section id="section-kanji" class="bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Kanji Management</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">kanjis</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <span>2. Kanji Management</span>
             </h2>
             <p class="text-xs text-slate-400 font-medium mt-0.5">Quản lý chữ Hán trong bài học: Chữ Kanji, Âm Onyomi, Âm Kunyomi, Nghĩa Hán Việt, Số nét.</p>
           </div>
@@ -267,24 +260,24 @@
           </button>
         </div>
 
-        <!-- Kanji Cards Grid -->
+        <!-- Kanji Cards Grid (No Delete Action) -->
         <div id="kanjiGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Rendered via JS -->
         </div>
       </section>
 
       <!-- ======================================================== -->
-      <!-- SECTION 3: GRAMMAR + LESSON VIDEO (UNIFIED SUBMISSION)   -->
+      <!-- SECTION 3: GRAMMAR + LESSON VIDEO                        -->
       <!-- ======================================================== -->
-      <section id="tabContent-grammar" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+      <section id="section-grammar" class="bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Grammar & Lesson Video</span>
-              <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">Unified Submission</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+              <span>3. Grammar & Lesson Video</span>
             </h2>
             <p class="text-xs text-slate-400 font-medium mt-0.5">
-              Cấu hình Video bài giảng (`lessons.video_media_id`) và các điểm Ngữ pháp (`grammars`) được lưu đồng thời trong 1 lần gửi.
+              Cấu hình Video bài giảng và các điểm Ngữ pháp được lưu đồng thời trong 1 lần gửi.
             </p>
           </div>
 
@@ -306,7 +299,7 @@
                 <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
-                <span>Lesson Video Media (`lessons.video_media_id` FK -> `media.id`)</span>
+                <span>Lesson Video Media</span>
               </label>
               <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                 1 Video Attached
@@ -345,7 +338,7 @@
           <div>
             <div class="flex items-center justify-between mb-3">
               <label class="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Grammar Points in this Lesson (`grammars` Table)
+                Grammar Points in this Lesson
               </label>
               <button type="button" onclick="addGrammarPointRow()"
                 class="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1">
@@ -359,7 +352,7 @@
               <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-xs font-bold text-slate-800">Grammar Point #1</span>
-                  <button type="button" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
+                  <button type="button" onclick="this.closest('.p-4').remove()" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
                 </div>
                 <input type="text" value="~わけがない / ~わけはない (Làm sao mà... được / Tuyệt đối không thể)"
                   class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 mb-2" />
@@ -376,9 +369,9 @@
               <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
                 <div class="flex items-center justify-between mb-2">
                   <span class="text-xs font-bold text-slate-800">Grammar Point #2</span>
-                  <button type="button" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
+                  <button type="button" onclick="this.closest('.p-4').remove()" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
                 </div>
-                <input type="text" value="~わけではない / ~わけでもない (Không hẳn là / Không có nghĩa là)"
+                <input type="text" value="~わけではない / ~わけではない (Không hẳn là / Không có nghĩa là)"
                   class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 mb-2" />
                 <textarea rows="3"
                   class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 leading-relaxed font-sans">**Ý nghĩa**: Phủ định một phần nhận định, không hoàn toàn đồng tình ("không hẳn là như vậy").
@@ -397,7 +390,7 @@
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
               </svg>
-              <span>Submit & Save Grammar + Video Workflow</span>
+              <span>Save Grammar & Video</span>
             </button>
           </div>
 
@@ -405,18 +398,18 @@
       </section>
 
       <!-- ======================================================== -->
-      <!-- SECTION 4: QUIZ MANAGEMENT TAB                           -->
+      <!-- SECTION 4: QUIZ MANAGEMENT                               -->
       <!-- ======================================================== -->
-      <section id="tabContent-quiz" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+      <section id="section-quiz" class="bg-white rounded-2xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Lesson Quiz Management</span>
-              <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">quizzes & questions</span>
+              <span class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              <span>4. Lesson Quiz Management</span>
             </h2>
             <p class="text-xs text-slate-400 font-medium mt-0.5">
-              Cấu hình đề kiểm tra cuối bài: Điểm đạt (`pass_score`), Giới hạn thời gian (`time_limit_seconds`), Ngân hàng câu hỏi trắc nghiệm.
+              Cấu hình đề kiểm tra cuối bài: Điểm đạt, Giới hạn thời gian, Ngân hàng câu hỏi trắc nghiệm.
             </p>
           </div>
 
@@ -432,12 +425,12 @@
         <!-- Quiz Master Config Row -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200">
           <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Quiz Title (`quizzes.title`)</label>
+            <label class="text-[11px] font-bold text-slate-600 block mb-1">Quiz Title</label>
             <input type="text" value="Bài kiểm tra tổng hợp Bài 1: Ngữ pháp & Từ vựng N3"
               class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
           </div>
           <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Passing Score % (`pass_score`)</label>
+            <label class="text-[11px] font-bold text-slate-600 block mb-1">Passing Score %</label>
             <div class="relative">
               <input type="number" value="60.00" step="5" min="0" max="100"
                 class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
@@ -445,7 +438,7 @@
             </div>
           </div>
           <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Time Limit (`time_limit_seconds`)</label>
+            <label class="text-[11px] font-bold text-slate-600 block mb-1">Time Limit</label>
             <div class="relative">
               <input type="number" value="900" step="60" min="60"
                 class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
@@ -465,56 +458,34 @@
 
   </div>
 
-  <!-- MODAL: ADD / EDIT VOCABULARY -->
+  <!-- MODAL: ADD / EDIT VOCABULARY (ONLY VOCABULARY AND MEANING) -->
   <div id="vocabModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
-        <h3 class="text-base font-bold text-slate-900">Add Vocabulary to Lesson</h3>
+        <h3 class="text-base font-bold text-slate-900">Add Vocabulary</h3>
         <button onclick="closeVocabModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
       </div>
 
-      <form id="vocabForm" class="space-y-3.5">
+      <form id="vocabForm" class="space-y-4">
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Word (`word` Japanese Kanji/Kana) *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Vocabulary *</label>
           <input type="text" id="vocabWord" required placeholder="e.g., 会社員"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Reading (`reading` Hiragana) *</label>
-            <input type="text" id="vocabReading" required placeholder="かいしゃいん"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
-          </div>
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Part of Speech (`part_of_speech`)</label>
-            <input type="text" id="vocabPos" placeholder="Danh từ / Động từ..."
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
-          </div>
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Meaning (Vietnamese) *</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Meaning *</label>
           <input type="text" id="vocabMeaning" required placeholder="Nhân viên công ty"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Japanese (`example_sentence_jp`)</label>
-          <input type="text" id="vocabExJp" placeholder="彼は日本の会社員です。"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Vietnamese (`example_sentence_vi`)</label>
-          <input type="text" id="vocabExVi" placeholder="Anh ấy là nhân viên công ty Nhật Bản."
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
         </div>
         <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeVocabModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold">Save Vocabulary</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold">Save</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: ADD / EDIT KANJI -->
+  <!-- MODAL: ADD / EDIT KANJI (NO DELETE ACTION) -->
   <div id="kanjiModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
@@ -525,12 +496,12 @@
       <form id="kanjiForm" class="space-y-3.5">
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kanji Character (`kanji`) *</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kanji Character *</label>
             <input type="text" id="kanjiChar" required maxlength="10" placeholder="e.g. 働"
               class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-base font-bold text-center" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Stroke Count (`stroke_count`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stroke Count</label>
             <input type="number" id="kanjiStrokes" min="1" max="50" placeholder="13"
               class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold" />
           </div>
@@ -542,24 +513,82 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Onyomi (`onyomi`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Onyomi</label>
             <input type="text" id="kanjiOn" placeholder="ドウ"
               class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kunyomi (`kunyomi`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kunyomi</label>
             <input type="text" id="kanjiKun" placeholder="はたら.く"
               class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Compound Words (`example_words`)</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Example Compound Words</label>
           <input type="text" id="kanjiExamples" placeholder="労働 (ろうどう), 働き者 (はたらきもの)"
             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
         </div>
         <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
           <button type="button" onclick="closeKanjiModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
           <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold">Save Kanji</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD QUIZ QUESTION -->
+  <div id="questionModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 class="text-base font-bold text-slate-900">Add Quiz Question</h3>
+        <button onclick="closeQuestionModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="questionForm" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Question Text *</label>
+          <textarea id="qText" required rows="2" placeholder="Nhập nội dung câu hỏi..."
+            class="w-full px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Points</label>
+            <input type="number" id="qPoints" value="1.0" step="0.5" min="0.5"
+              class="w-full px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Type</label>
+            <select id="qType" class="w-full px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold">
+              <option value="single_choice">Single Choice</option>
+              <option value="multiple_choice">Multiple Choice</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-700">Options (Select correct answer)</label>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="0" checked class="text-sky-600" />
+            <input type="text" id="opt0" required placeholder="Option A" class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="1" class="text-sky-600" />
+            <input type="text" id="opt1" required placeholder="Option B" class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="2" class="text-sky-600" />
+            <input type="text" id="opt2" placeholder="Option C (Optional)" class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="3" class="text-sky-600" />
+            <input type="text" id="opt3" placeholder="Option D (Optional)" class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeQuestionModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold">Save Question</button>
         </div>
       </form>
     </div>
@@ -572,11 +601,11 @@
   </div>
 
   <script>
-    // State Mock Data
+    // State Mock Data (Vocabulary: Word & Meaning)
     let vocabs = [
-      { id: 1, word: "会社員", reading: "かいしゃいん", meaning_vi: "Nhân viên công ty", part_of_speech: "Danh từ", example_sentence_jp: "田中さんは大手IT企業の会社員です。", example_sentence_vi: "Anh Tanaka là nhân viên một công ty IT lớn." },
-      { id: 2, word: "残業", reading: "ざんぎょう", meaning_vi: "Làm thêm giờ, tăng ca", part_of_speech: "Danh từ, する", example_sentence_jp: "今週は毎日残業しなければならない。", example_sentence_vi: "Tuần này ngày nào tôi cũng phải làm thêm giờ." },
-      { id: 3, word: "締め切り", reading: "しめきり", meaning_vi: "Hạn chót, deadline", part_of_speech: "Danh từ", example_sentence_jp: "レポートの締め切りは明日です。", example_sentence_vi: "Hạn chót nộp báo cáo là ngày mai." }
+      { id: 1, word: "会社員", meaning_vi: "Nhân viên công ty" },
+      { id: 2, word: "残業", meaning_vi: "Làm thêm giờ, tăng ca" },
+      { id: 3, word: "締め切り", meaning_vi: "Hạn chót, deadline" }
     ];
 
     let kanjis = [
@@ -619,49 +648,22 @@
       setTimeout(() => toast.classList.add("hidden"), 3000);
     }
 
-    // Tabs Switcher
-    function switchTab(tabId) {
-      document.querySelectorAll(".tab-pane").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".content-tab-btn").forEach(el => {
-        el.classList.remove("border-sky-500", "border-emerald-500", "border-amber-500", "border-indigo-500");
-        el.classList.add("border-transparent");
-      });
-
-      const pane = document.getElementById(`tabContent-${tabId}`);
-      if (pane) pane.classList.remove("hidden");
-
-      const btn = document.getElementById(`tabBtn-${tabId}`);
-      if (btn) {
-        btn.classList.remove("border-transparent");
-        if (tabId === 'vocab') btn.classList.add("border-sky-500");
-        if (tabId === 'kanji') btn.classList.add("border-emerald-500");
-        if (tabId === 'grammar') btn.classList.add("border-amber-500");
-        if (tabId === 'quiz') btn.classList.add("border-indigo-500");
-      }
-    }
-
-    // Render Vocab
+    // Render Vocab (Vocabulary & Meaning only)
     function renderVocabTable() {
       const tbody = document.getElementById("vocabTableBody");
       document.getElementById("overviewVocabCount").textContent = `${vocabs.length} Words`;
       tbody.innerHTML = vocabs.map((v, i) => `
         <tr class="hover:bg-slate-50/80 transition-colors">
-          <td class="py-3 pl-2 font-bold text-slate-900 text-sm">${v.word}</td>
-          <td class="py-3 px-3 font-medium text-sky-600">${v.reading}</td>
-          <td class="py-3 px-3 font-semibold text-slate-800">${v.meaning_vi}</td>
-          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-600">${v.part_of_speech || 'Từ vựng'}</span></td>
-          <td class="py-3 px-4 text-[11px] text-slate-600">
-            <p class="font-medium text-slate-800">${v.example_sentence_jp || ''}</p>
-            <p class="text-slate-400 mt-0.5">${v.example_sentence_vi || ''}</p>
-          </td>
-          <td class="py-3 pr-2 text-right">
+          <td class="py-3.5 pl-3 font-bold text-slate-900 text-sm">${v.word}</td>
+          <td class="py-3.5 px-4 font-semibold text-slate-800 text-xs md:text-sm">${v.meaning_vi}</td>
+          <td class="py-3.5 pr-3 text-right">
             <button onclick="deleteVocab(${v.id})" class="text-slate-400 hover:text-rose-600 text-xs font-semibold">Delete</button>
           </td>
         </tr>
       `).join("");
     }
 
-    // Render Kanji
+    // Render Kanji (No Delete Action)
     function renderKanjiGrid() {
       const grid = document.getElementById("kanjiGrid");
       document.getElementById("overviewKanjiCount").textContent = `${kanjis.length} Characters`;
@@ -710,11 +712,33 @@
       `).join("");
     }
 
+    // Grammar Point Builder helper
+    function addGrammarPointRow() {
+      const list = document.getElementById("grammarPointsList");
+      const count = list.children.length + 1;
+      const row = document.createElement("div");
+      row.className = "p-4 rounded-2xl bg-slate-50 border border-slate-200";
+      row.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-bold text-slate-800">Grammar Point #${count}</span>
+          <button type="button" onclick="this.closest('.p-4').remove()" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
+        </div>
+        <input type="text" placeholder="Tên cấu trúc ngữ pháp (e.g. ~について)"
+          class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 mb-2" />
+        <textarea rows="3" placeholder="Ý nghĩa, cách chia, và câu ví dụ..."
+          class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 leading-relaxed font-sans"></textarea>
+      `;
+      list.appendChild(row);
+      showToast("Added new grammar point slot.");
+    }
+
     // Modal helpers
     function openAddVocabModal() { document.getElementById("vocabModal").classList.remove("hidden"); document.getElementById("vocabModal").classList.add("flex"); }
     function closeVocabModal() { document.getElementById("vocabModal").classList.add("hidden"); document.getElementById("vocabModal").classList.remove("flex"); }
     function openAddKanjiModal() { document.getElementById("kanjiModal").classList.remove("hidden"); document.getElementById("kanjiModal").classList.add("flex"); }
     function closeKanjiModal() { document.getElementById("kanjiModal").classList.add("hidden"); document.getElementById("kanjiModal").classList.remove("flex"); }
+    function openAddQuestionModal() { document.getElementById("questionModal").classList.remove("hidden"); document.getElementById("questionModal").classList.add("flex"); }
+    function closeQuestionModal() { document.getElementById("questionModal").classList.add("hidden"); document.getElementById("questionModal").classList.remove("flex"); }
 
     function deleteVocab(id) {
       vocabs = vocabs.filter(v => v.id !== id);
@@ -727,24 +751,20 @@
       renderKanjiGrid();
       renderQuizQuestions();
 
-      // Vocab form submit
+      // Vocab form submit (only word and meaning)
       document.getElementById("vocabForm").addEventListener("submit", (e) => {
         e.preventDefault();
         vocabs.push({
           id: Date.now(),
           word: document.getElementById("vocabWord").value,
-          reading: document.getElementById("vocabReading").value,
-          meaning_vi: document.getElementById("vocabMeaning").value,
-          part_of_speech: document.getElementById("vocabPos").value,
-          example_sentence_jp: document.getElementById("vocabExJp").value,
-          example_sentence_vi: document.getElementById("vocabExVi").value
+          meaning_vi: document.getElementById("vocabMeaning").value
         });
         closeVocabModal();
         renderVocabTable();
         showToast("Vocabulary added to Lesson!");
       });
 
-      // Kanji form submit
+      // Kanji form submit (No Delete Action)
       document.getElementById("kanjiForm").addEventListener("submit", (e) => {
         e.preventDefault();
         kanjis.push({
@@ -759,6 +779,34 @@
         closeKanjiModal();
         renderKanjiGrid();
         showToast("Kanji added to Lesson!");
+      });
+
+      // Question form submit
+      document.getElementById("questionForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const correctIdx = parseInt(document.querySelector('input[name="correctOpt"]:checked').value);
+        const options = [];
+        const opt0 = document.getElementById("opt0").value;
+        const opt1 = document.getElementById("opt1").value;
+        const opt2 = document.getElementById("opt2").value;
+        const opt3 = document.getElementById("opt3").value;
+
+        if (opt0) options.push({ text: opt0, is_correct: correctIdx === 0 ? 1 : 0 });
+        if (opt1) options.push({ text: opt1, is_correct: correctIdx === 1 ? 1 : 0 });
+        if (opt2) options.push({ text: opt2, is_correct: correctIdx === 2 ? 1 : 0 });
+        if (opt3) options.push({ text: opt3, is_correct: correctIdx === 3 ? 1 : 0 });
+
+        questions.push({
+          id: Date.now(),
+          question_text: document.getElementById("qText").value,
+          points: parseFloat(document.getElementById("qPoints").value) || 1.0,
+          question_type: document.getElementById("qType").value,
+          options: options
+        });
+
+        closeQuestionModal();
+        renderQuizQuestions();
+        showToast("Quiz Question added successfully!");
       });
 
       // Grammar + Video Form Submit

@@ -101,7 +101,7 @@
             Create New Course
           </h1>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Step 1 of Course Flow: Khởi tạo thông tin cơ bản của khóa học trong bảng <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono">courses</code>.
+            Step 1 of Course Flow: Khởi tạo thông tin cơ bản của khóa học.
           </p>
         </div>
 
@@ -125,53 +125,38 @@
         <form id="courseCreateForm" class="space-y-6">
           <input type="hidden" id="editCourseId" value="" />
 
-          <!-- Row 1: Course Title & Slug -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            
-            <!-- Title -->
-            <div>
-              <label for="courseTitle" class="block text-xs font-bold text-slate-700 mb-1.5">
-                Course Title <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`title` VARCHAR(200))</span>
-              </label>
-              <input type="text" id="courseTitle" required maxlength="200"
-                placeholder="e.g., Tiếng Nhật Trung Cấp N3 Soumatome"
-                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-semibold" />
-            </div>
-
-            <!-- Slug -->
-            <div>
-              <label for="courseSlug" class="block text-xs font-bold text-slate-700 mb-1.5">
-                URL Slug <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`slug` VARCHAR(220) UNIQUE)</span>
-              </label>
-              <input type="text" id="courseSlug" required maxlength="220"
-                placeholder="tieng-nhat-trung-cap-n3-soumatome"
-                class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white font-mono transition-all" />
-              <p class="text-[10px] text-slate-400 mt-1">Unique URL identifier for the course page.</p>
-            </div>
+          <!-- Row 1: Course Title (Full Width) -->
+          <div>
+            <label for="courseTitle" class="block text-xs font-bold text-slate-700 mb-1.5">
+              Course Title <span class="text-rose-500">*</span>
+            </label>
+            <input type="text" id="courseTitle" required maxlength="200"
+              placeholder="e.g., Tiếng Nhật Trung Cấp N3 Soumatome"
+              class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-semibold" />
           </div>
 
-          <!-- Row 2: JLPT Level, Price, Sort Order -->
+          <!-- Row 2: Course Category, Price, Display Order -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
             
-            <!-- JLPT Level (FK) -->
+            <!-- Course Category -->
             <div>
               <label for="courseJlptLevel" class="block text-xs font-bold text-slate-700 mb-1.5">
-                JLPT Level <span class="text-rose-500">*</span> <span class="text-[10px] text-slate-400 font-mono">(`jlpt_level_id`)</span>
+                Course Category <span class="text-rose-500">*</span>
               </label>
               <select id="courseJlptLevel" required
                 class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all">
-                <option value="1">N5 - Sơ cấp (Beginner)</option>
-                <option value="2">N4 - Sơ trung cấp (Elementary)</option>
-                <option value="3" selected>N3 - Trung cấp (Intermediate)</option>
-                <option value="4">N4 - Trung cao cấp (Upper-Int)</option>
-                <option value="5">N1 - Cao cấp (Advanced)</option>
+                <option value="1">JLPT N5 (Sơ cấp)</option>
+                <option value="2">JLPT N4 (Sơ trung cấp)</option>
+                <option value="3" selected>JLPT N3 (Trung cấp)</option>
+                <option value="4">JLPT N2 (Trung cao cấp)</option>
+                <option value="5">JLPT N1 (Cao cấp)</option>
               </select>
             </div>
 
             <!-- Price -->
             <div>
               <label for="coursePrice" class="block text-xs font-bold text-slate-700 mb-1.5">
-                Price (VND) <span class="text-[10px] text-slate-400 font-mono">(`price` DECIMAL(12,2))</span>
+                Price (VND)
               </label>
               <div class="relative">
                 <input type="number" id="coursePrice" min="0" step="1000" value="499000"
@@ -184,7 +169,7 @@
             <!-- Sort Order -->
             <div>
               <label for="courseSortOrder" class="block text-xs font-bold text-slate-700 mb-1.5">
-                Display Order <span class="text-[10px] text-slate-400 font-mono">(`sort_order` INT)</span>
+                Display Order
               </label>
               <input type="number" id="courseSortOrder" min="0" value="1"
                 class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
@@ -194,7 +179,7 @@
           <!-- Row 3: Description -->
           <div>
             <label for="courseDescription" class="block text-xs font-bold text-slate-700 mb-1.5">
-              Course Description <span class="text-[10px] text-slate-400 font-mono">(`description` TEXT)</span>
+              Course Description
             </label>
             <textarea id="courseDescription" rows="4"
               placeholder="Nhập mô tả tổng quan về lộ trình học, số lượng bài giảng, mục tiêu đầu ra chứng chỉ..."
@@ -207,7 +192,7 @@
             <!-- Thumbnail Media Preview -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                Course Thumbnail <span class="text-[10px] text-slate-400 font-mono">(`thumbnail_media_id`)</span>
+                Course Thumbnail
               </label>
               <div class="flex items-center gap-3.5 p-3 rounded-2xl bg-slate-50 border border-slate-200">
                 <div class="w-14 h-14 rounded-xl bg-white border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center p-1">
@@ -226,7 +211,7 @@
             <!-- Publish Status Toggle -->
             <div>
               <label class="block text-xs font-bold text-slate-700 mb-1.5">
-                Publication Status <span class="text-[10px] text-slate-400 font-mono">(`is_published` TINYINT(1))</span>
+                Publication Status
               </label>
               <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
                 <div>
@@ -265,25 +250,6 @@
   </div>
 
   <script>
-    // Auto-slugify course title
-    document.getElementById("courseTitle").addEventListener("input", function(e) {
-      const slugInput = document.getElementById("courseSlug");
-      if (!slugInput.dataset.manualEdit) {
-        slugInput.value = e.target.value
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .replace(/[đĐ]/g, "d")
-          .replace(/[^a-z0-9\s-]/g, "")
-          .trim()
-          .replace(/\s+/g, "-");
-      }
-    });
-
-    document.getElementById("courseSlug").addEventListener("input", function() {
-      this.dataset.manualEdit = "true";
-    });
-
     // Check for edit query param
     const urlParams = new URLSearchParams(window.location.search);
     const editId = urlParams.get("edit_id");
@@ -292,7 +258,6 @@
       document.getElementById("pageMainHeading").textContent = "Edit Course #" + editId;
       document.getElementById("editCourseId").value = editId;
       document.getElementById("courseTitle").value = "Tiếng Nhật Trung Cấp N3 Soumatome";
-      document.getElementById("courseSlug").value = "tieng-nhat-trung-cap-n3-soumatome";
       document.getElementById("courseDescription").value = "Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.";
     }
 
