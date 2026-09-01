@@ -68,7 +68,7 @@ public class AuthController {
     return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.SET_COOKIE, resCookies.toString()).body(res);
   }
 
-  @PostMapping("/verifyUser")
+  @PostMapping("/verify-user")
   @ApiMessage("verify user")
   public ResponseEntity<String> verifyUser(@RequestBody ReqOtpDTO req) {
     return ResponseEntity.ok(authService.verifyUser(req));
@@ -82,14 +82,14 @@ public class AuthController {
     return ResponseEntity.ok("Logout success");
   }
 
-  @PostMapping("/forgotPassword")
+  @PostMapping("/forgot-password")
   @ApiMessage("forgot Password")
   public ResponseEntity<String> forgotPassword(@Valid @RequestBody ReqForgotPasswordDTO req) {
     authService.forgotPassword(req);
     return ResponseEntity.ok("Send otp success");
   }
 
-  @PostMapping("/verifyResetOtp")
+  @PostMapping("/verify-reset-otp")
   @ApiMessage("verifyResetOtp")
   public ResponseEntity<String> verifyResetOtp(
       @RequestBody ReqOtpDTO req) {
@@ -97,7 +97,7 @@ public class AuthController {
     return ResponseEntity.ok("OTP verified");
   }
 
-  @PostMapping("/resetPassword")
+  @PostMapping("/reset-password")
   @ApiMessage("reset password")
   public ResponseEntity<String> resetPassword(
       @Valid @RequestBody ReqResetPasswordDTO req) {
@@ -105,7 +105,7 @@ public class AuthController {
     return ResponseEntity.ok("Reset password success");
   }
 
-  @PostMapping("/refreshToken")
+  @PostMapping("/refresh-token")
   @ApiMessage("refresh token")
   public ResponseEntity<ResLoginDTO> refreshToken(HttpServletRequest request) {
 

@@ -11,7 +11,9 @@
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    rel="stylesheet" />
 
   <!-- Tailwind CSS v4 CDN -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -49,32 +51,39 @@
 <body class="min-h-screen flex items-center justify-center p-4 md:p-6 lg:p-8 bg-[#f3f6fa]">
 
   <!-- Auth Container (2-Column Card) -->
-  <div class="w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-card border border-slate-100 flex flex-col lg:flex-row min-h-[620px]">
-    
+  <div
+    class="w-full max-w-5xl bg-white rounded-3xl overflow-hidden shadow-card border border-slate-100 flex flex-col lg:flex-row min-h-[620px]">
+
     <!-- ========================================== -->
     <!-- LEFT: MODERN JAPANESE AESTHETIC HERO CARD  -->
     <!-- ========================================== -->
-    <div class="lg:w-1/2 bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-600 p-8 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden shrink-0">
-      
+    <div
+      class="lg:w-1/2 bg-gradient-to-br from-sky-400 via-sky-500 to-indigo-600 p-8 lg:p-12 text-white flex flex-col justify-between relative overflow-hidden shrink-0">
+
       <!-- Subtle Japanese Ambient Background Geometry -->
-      <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 filter blur-2xl pointer-events-none"></div>
-      <div class="absolute -left-12 -bottom-12 w-56 h-56 rounded-full bg-sky-300/20 filter blur-xl pointer-events-none"></div>
+      <div class="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-white/10 filter blur-2xl pointer-events-none">
+      </div>
+      <div class="absolute -left-12 -bottom-12 w-56 h-56 rounded-full bg-sky-300/20 filter blur-xl pointer-events-none">
+      </div>
 
       <!-- Top Header Brand & Japanese Tagline -->
       <div class="relative z-10">
         <div class="flex items-center gap-2.5 mb-6">
-          <div class="w-9 h-9 rounded-xl bg-white text-slate-900 flex items-center justify-center shadow-md font-extrabold text-sm">
+          <div
+            class="w-9 h-9 rounded-xl bg-white text-slate-900 flex items-center justify-center shadow-md font-extrabold text-sm">
             <!-- Sparkle icon -->
             <svg class="w-5 h-5 fill-sky-600" viewBox="0 0 24 24">
               <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
             </svg>
           </div>
           <span class="text-xl font-extrabold tracking-tight text-white">
-            Studify <span class="text-sky-200 text-xs font-bold px-1.5 py-0.5 rounded bg-white/15 uppercase tracking-wider">JLPT</span>
+            Studify <span
+              class="text-sky-200 text-xs font-bold px-1.5 py-0.5 rounded bg-white/15 uppercase tracking-wider">JLPT</span>
           </span>
         </div>
 
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-medium text-sky-100 mb-3">
+        <div
+          class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-medium text-sky-100 mb-3">
           <span class="font-japanese text-white font-bold">日本語を学ぼう</span>
           <span>•</span>
           <span>SaaS Learning Platform</span>
@@ -91,8 +100,10 @@
       <!-- Center Mascot & Daily Kanji Highlight -->
       <div class="relative z-10 my-6 flex items-center justify-center">
         <!-- Floating Glassmorphism Daily Kanji Card -->
-        <div class="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/40 text-slate-800 flex items-center gap-4 max-w-xs w-full transform hover:-translate-y-1 transition-transform">
-          <div class="w-13 h-13 rounded-xl bg-slate-900 text-white font-japanese text-2xl font-black flex items-center justify-center shadow-md shrink-0">
+        <div
+          class="bg-white/90 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/40 text-slate-800 flex items-center gap-4 max-w-xs w-full transform hover:-translate-y-1 transition-transform">
+          <div
+            class="w-13 h-13 rounded-xl bg-slate-900 text-white font-japanese text-2xl font-black flex items-center justify-center shadow-md shrink-0">
             学
           </div>
           <div class="min-w-0 flex-1">
@@ -109,10 +120,17 @@
       <!-- Bottom Trust & Community Metric -->
       <div class="relative z-10 pt-4 border-t border-white/20 flex items-center justify-between text-xs text-sky-100">
         <div class="flex items-center -space-x-1.5">
-          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="Learner" />
-          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="Learner" />
-          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="Learner" />
-          <span class="w-6 h-6 rounded-full bg-white text-slate-800 text-[9px] font-extrabold flex items-center justify-center">+10k</span>
+          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+            alt="Learner" />
+          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
+            alt="Learner" />
+          <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80"
+            alt="Learner" />
+          <span
+            class="w-6 h-6 rounded-full bg-white text-slate-800 text-[9px] font-extrabold flex items-center justify-center">+10k</span>
         </div>
         <span class="font-medium text-[11px]">Join 10,000+ active JLPT learners</span>
       </div>
@@ -123,7 +141,7 @@
     <!-- RIGHT: CLEAN LOGIN FORM                    -->
     <!-- ========================================== -->
     <div class="lg:w-1/2 p-8 lg:p-12 flex flex-col justify-between bg-white">
-      
+
       <!-- Top Navigation & Language Switch -->
       <div class="flex items-center justify-between mb-6">
         <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-japanese">
@@ -136,7 +154,7 @@
 
       <!-- Form Content -->
       <div class="max-w-md w-full mx-auto my-auto">
-        
+
         <div class="mb-6">
           <h1 class="text-2xl lg:text-3xl font-extrabold text-slate-900 tracking-tight">
             Welcome Back 👋
@@ -147,8 +165,10 @@
         </div>
 
         <!-- Error Alert Container (Simulated) -->
-        <div id="errorAlert" class="hidden mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
-          <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <div id="errorAlert"
+          class="hidden mb-4 p-3 rounded-2xl bg-rose-50 border border-rose-100 text-rose-700 text-xs font-medium flex items-center gap-2">
+          <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="10"></circle>
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"></path>
           </svg>
@@ -157,7 +177,7 @@
 
         <!-- Login Form -->
         <form id="loginForm" class="space-y-4">
-          
+
           <!-- Email Field (`users.email`) -->
           <div>
             <label for="emailInput" class="block text-xs font-bold text-slate-700 mb-1.5">
@@ -166,7 +186,8 @@
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.206" />
                 </svg>
               </div>
               <input type="email" id="emailInput" required value="alexwilliamson@gmail.com"
@@ -188,16 +209,19 @@
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <input type="password" id="passwordInput" required value="Password123!"
-                placeholder="••••••••"
+              <input type="password" id="passwordInput" required value="Password123!" placeholder="••••••••"
                 class="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-medium" />
-              <button type="button" id="togglePasswordBtn" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
-                <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <button type="button" id="togglePasswordBtn"
+                class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                <svg id="eyeIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </button>
             </div>
@@ -216,7 +240,8 @@
           <button type="submit" id="submitBtn"
             class="w-full py-3.5 px-4 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-md transition-all flex items-center justify-center gap-2 mt-2 group">
             <span id="btnText">Sign In to Studify</span>
-            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor"
+              stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </button>
@@ -226,7 +251,8 @@
         <!-- Divider -->
         <div class="relative flex py-5 items-center">
           <div class="flex-grow border-t border-slate-100"></div>
-          <span class="flex-shrink mx-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Or continue with</span>
+          <span class="flex-shrink mx-4 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Or continue
+            with</span>
           <div class="flex-grow border-t border-slate-100"></div>
         </div>
 
@@ -235,10 +261,14 @@
           <button type="button" onclick="quickLogin('Student Demo')"
             class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors">
             <svg class="w-4 h-4" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
-              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.27 21.36 7.37 24 12 24z"/>
-              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z"/>
-              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.27 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+              <path fill="#4285F4"
+                d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z" />
+              <path fill="#34A853"
+                d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.27 21.36 7.37 24 12 24z" />
+              <path fill="#FBBC05"
+                d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.98 0 12s.46 3.84 1.26 5.42l4.02-3.15z" />
+              <path fill="#EA4335"
+                d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.27 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z" />
             </svg>
             <span>Google</span>
           </button>
@@ -246,7 +276,8 @@
           <button type="button" onclick="quickLogin('Guest Learner')"
             class="flex items-center justify-center gap-2 py-2.5 px-4 rounded-2xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 transition-colors">
             <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.87c.62-.75 1.04-1.8 0.92-2.87-.9.04-2 0.6-2.65 1.35-.56.65-1.06 1.71-.93 2.74 1.01.08 2.04-.47 2.66-1.22z"/>
+              <path
+                d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.87c.62-.75 1.04-1.8 0.92-2.87-.9.04-2 0.6-2.65 1.35-.56.65-1.06 1.71-.93 2.74 1.01.08 2.04-.47 2.66-1.22z" />
             </svg>
             <span>Apple</span>
           </button>
@@ -257,8 +288,9 @@
       <!-- Bottom Terms Footer -->
       <div class="mt-6 pt-4 border-t border-slate-100 text-center">
         <p class="text-[11px] text-slate-400">
-          Don't have an account? 
-          <a href="register.html" class="font-bold text-slate-900 hover:text-sky-600 transition-colors">Sign up for free</a>
+          Don't have an account?
+          <a href="register.html" class="font-bold text-slate-900 hover:text-sky-600 transition-colors">Sign up for
+            free</a>
         </p>
       </div>
 
@@ -267,7 +299,8 @@
   </div>
 
   <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 transition-all">
+  <div id="toast"
+    class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 transition-all">
     <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
     <span id="toastMessage">Đăng nhập thành công! Đang chuyển hướng...</span>
   </div>
@@ -276,7 +309,7 @@
     // Password visibility toggle
     const togglePasswordBtn = document.getElementById("togglePasswordBtn");
     const passwordInput = document.getElementById("passwordInput");
-    
+
     togglePasswordBtn.addEventListener("click", () => {
       const isPassword = passwordInput.type === "password";
       passwordInput.type = isPassword ? "text" : "password";
@@ -306,7 +339,7 @@
 
       errorAlert.classList.add("hidden");
       document.getElementById("btnText").textContent = "Signing In...";
-      
+
       showToast("Đăng nhập thành công! Đang chuyển đến Dashboard...");
       setTimeout(() => {
         window.location.href = "student_dashboard.html";

@@ -36,6 +36,6 @@ public final class SlugUtil {
     // Xóa "-" ở đầu và cuối
     slug = slug.replaceAll("^-|-$", "");
 
-    return slug + Instant.now().toEpochMilli();
+    return slug + " " + Instant.now().toEpochMilli();
   }
 }

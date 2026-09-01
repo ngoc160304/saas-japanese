@@ -1,8 +1,6 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,185 +13,208 @@ import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.LessonQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateLesson;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLesson;
+import com.mycompany.saas_japanese.domain.response.LessonResponse;
 import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.service.LessonService;
+import com.mycompany.saas_japanese.service.mapper.LessonMapper;
 import com.mycompany.saas_japanese.specification.LessonSpecs;
 import com.mycompany.saas_japanese.util.SlugUtil;
+import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Service
 @Transactional
 public class LessonServiceImpl implements LessonService {
-        private final LessonRepository lessonRepository;
-        private final CourseRepository courseRepository;
-        private final MediaRepository mediaRepository;
 
-        @Override
-        public Lesson createLesson(
-                        ReqCreateLesson request) {
+  LessonRepository lessonRepository;
 
-                Course course = courseRepository
-                                .findByIdAndIsDeletedFalse(request.getCourseId())
-                                .orElseThrow(() -> new NotFoundException("Course không tồn tại"));
+  CourseRepository courseRepository;
 
-                Lesson lesson = new Lesson();
+  MediaRepository mediaRepository;
 
-                lesson.setCourse(course);
-                lesson.setTitle(request.getTitle().trim());
+  LessonMapper lessonMapper;
 
-                lesson.setSlug(SlugUtil.toSlug(lesson.getTitle()));
+  @Override
+  public LessonResponse createLesson(
+      ReqCreateLesson request) {
 
-                lesson.setGrammar(request.getGrammar());
+    Course course = courseRepository
+        .findByIdAndIsDeletedFalse(
+            request.getCourseId())
+        .orElseThrow(
+            () -> new NotFoundException(
+                "Course không tồn tại"));
 
-                lesson.setDurationMinutes(
-                                request.getDurationMinutes());
+    Lesson lesson = new Lesson();
 
-                lesson.setIsPublished(
-                                request.getIsPublished() != null
-                                                ? request.getIsPublished()
-                                                : false);
+    lesson.setCourse(course);
 
-                lesson.setIsDeleted(false);
+    lesson.setTitle(
+        request.getTitle().trim());
 
-                if (request.getVideoMediaId() != null) {
+    lesson.setSlug(
+        SlugUtil.toSlug(
+            lesson.getTitle()));
 
-                        Media media = mediaRepository
-                                        .findByIdAndIsDeletedFalse(
-                                                        request.getVideoMediaId())
-                                        .orElseThrow(() -> new NotFoundException(
-                                                        "Video Media không tồn tại"));
+    lesson.setGrammar(
+        request.getGrammar());
 
-                        lesson.setVideoMedia(media);
-                }
+    lesson.setDurationMinutes(
+        request.getDurationMinutes());
 
-                return lessonRepository.save(lesson);
-        }
+    lesson.setIsPublished(
+        request.getIsPublished() != null
+            ? request.getIsPublished()
+            : false);
 
-        @Override
-        public Lesson fetchLessonById(Long id) {
+    lesson.setIsDeleted(false);
 
-                Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Lesson không tồn tại"));
+    if (request.getVideoMediaId() != null) {
 
-                return lesson;
-        }
+      Media media = mediaRepository
+          .findByIdAndIsDeletedFalse(
+              request.getVideoMediaId())
+          .orElseThrow(
+              () -> new NotFoundException(
+                  "Video Media không tồn tại"));
 
-        @Override
-        public Page<Lesson> fetchAllLesson(
-                        LessonQuery query) {
+      lesson.setVideoMedia(media);
+    }
 
-                PredicateSpecification<Lesson> spec = LessonSpecs.isNotDeleted();
+    Lesson savedLesson = lessonRepository.save(lesson);
 
-                if (query.getTitle() != null &&
-                                !query.getTitle().trim().isEmpty()) {
+    return lessonMapper.toResponse(
+        savedLesson);
+  }
 
-                        spec = spec.and(
-                                        LessonSpecs.hasTitle(
-                                                        query.getTitle()));
-                }
+  @Override
+  @Transactional(Transactional.TxType.SUPPORTS)
+  public LessonResponse fetchLessonById(
+      Long id) {
 
-                if (query.getCourseId() != null) {
+    Lesson lesson = lessonRepository
+        .findByIdAndIsDeletedFalse(id)
+        .orElseThrow(
+            () -> new NotFoundException(
+                "Lesson không tồn tại"));
 
-                        spec = spec.and(
-                                        LessonSpecs.hasCourseId(
-                                                        query.getCourseId()));
-                }
+    return lessonMapper.toResponse(
+        lesson);
+  }
 
-                Page<Lesson> lessonPage = lessonRepository.findBy(
-                                spec,
-                                q -> q.page(
-                                                PageRequest.of(
-                                                                query.getPage(),
-                                                                query.getSize())));
+  @Override
+  @Transactional(Transactional.TxType.SUPPORTS)
+  public Page<LessonResponse> fetchAllLesson(
+      LessonQuery query) {
 
-                return lessonPage;
+    PredicateSpecification<Lesson> spec = LessonSpecs.isNotDeleted();
 
-        }
+    if (query.getTitle() != null
+        && !query.getTitle().trim().isEmpty()) {
 
-        @Override
-        public Lesson updateLesson(Long id, ReqUpdateLesson request) {
+      spec = spec.and(
+          LessonSpecs.hasTitle(
+              query.getTitle().trim()));
+    }
 
-                Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Lesson không tồn tại"));
+    if (query.getCourseId() != null) {
 
-                lesson.setTitle(
-                                request.getTitle().trim());
+      spec = spec.and(
+          LessonSpecs.hasCourseId(
+              query.getCourseId()));
+    }
 
-                lesson.setSlug(
-                                request.getSlug().trim());
+    Page<Lesson> lessonPage = lessonRepository.findBy(
+        spec,
+        q -> q.page(
+            PageRequest.of(
+                query.getPage(),
+                query.getSize())));
 
-                lesson.setGrammar(request.getGrammar());
+    return lessonPage.map(
+        lessonMapper::toResponse);
+  }
 
-                lesson.setDurationMinutes(
-                                request.getDurationMinutes());
+  @Override
+  public LessonResponse updateLesson(
+      Long id,
+      ReqUpdateLesson request) {
 
-                lesson.setIsPublished(
-                                request.getIsPublished());
+    Lesson lesson = lessonRepository
+        .findByIdAndIsDeletedFalse(id)
+        .orElseThrow(
+            () -> new NotFoundException(
+                "Lesson không tồn tại"));
 
-                Media media = mediaRepository
-                                .findByIdAndIsDeletedFalse(
-                                                request.getVideoMediaId())
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Video Media không tồn tại"));
+    lesson.setTitle(
+        request.getTitle().trim());
 
-                lesson.setVideoMedia(media);
+    lesson.setSlug(
+        SlugUtil.toSlug(
+            lesson.getTitle()));
 
-                Lesson updatedLesson = lessonRepository.save(lesson);
+    lesson.setGrammar(
+        request.getGrammar());
 
-                return updatedLesson;
-        }
+    lesson.setDurationMinutes(
+        request.getDurationMinutes());
 
-        @Override
-        public void deleteLesson(Long id) {
+    lesson.setIsPublished(
+        request.getIsPublished());
 
-                Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
-                                .orElseThrow(() -> new NotFoundException(
-                                                "Lesson không tồn tại"));
-                lesson.setIsDeleted(true);
-                lesson.setDeletedAt(
-                                java.time.Instant.now());
+    if (request.getVideoMediaId() != null && request.getVideoMediaId() != lesson.getVideoMedia().getId()) {
 
-                lessonRepository.save(lesson);
-        }
+      Media media = mediaRepository
+          .findByIdAndIsDeletedFalse(
+              request.getVideoMediaId())
+          .orElseThrow(
+              () -> new NotFoundException(
+                  "Video Media không tồn tại"));
+      if (media.getIsUsed()) {
+        throw new BadRequestException("Tài nguyên đã được sử dụng !");
+      }
+      lesson.setVideoMedia(media);
+    }
 
-        @Override
-        public void deleteByCourseId(long courseId) {
-                // List<Lesson> lessons =
-                // lessonRepository.findAllByCourseIdAndIsDeletedFalse(courseId);
+    Lesson updatedLesson = lessonRepository.save(lesson);
 
-                // for (Lesson lesson : lessons) {
-                // lessonService.deleteLesson(lesson);
-                // }
+    return lessonMapper.toResponse(
+        updatedLesson);
+  }
 
-        }
+  @Override
+  public void deleteLesson(
+      Long id) {
 
-        @Transactional
-        public void deleteLesson(Lesson lesson) {
+    Lesson lesson = lessonRepository
+        .findByIdAndIsDeletedFalse(id)
+        .orElseThrow(
+            () -> new NotFoundException(
+                "Lesson không tồn tại"));
 
-                // // Xóa/soft delete các content của lesson
-                // grammarService.deleteByLessonId(lesson.getId());
-                // vocabularyService.deleteByLessonId(lesson.getId());
-                // kanjiService.deleteByLessonId(lesson.getId());
-                // quizService.deleteByLessonId(lesson.getId());
+    lesson.setIsDeleted(true);
 
-                // // Xử lý video Media nếu cần
-                // mediaService.deleteMedia(lesson.getVideoMedia());
+    lesson.setDeletedAt(
+        Instant.now());
 
-                // lesson.setIsDeleted(true);
-                // lesson.setDeletedAt(Instant.now());
-        }
+    lessonRepository.save(lesson);
+  }
 
+  @Override
+  public void deleteByCourseId(
+      long courseId) {
+
+    // TODO:
+    // Xử lý soft delete toàn bộ lesson
+    // và các content liên quan của lesson.
+  }
 }

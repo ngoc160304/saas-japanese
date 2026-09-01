@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/course-categories")
+@RequestMapping("/course-categories")
 @RequiredArgsConstructor
 public class CourseCategoryController {
 
@@ -43,14 +43,14 @@ public class CourseCategoryController {
 
   @GetMapping("/{id}")
   public ResponseEntity<CourseCategoryResponse> findById(
-      @PathVariable Long id) {
+      @PathVariable("id") Long id) {
 
     return ResponseEntity.ok(courseCategoryService.findById(id));
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<CourseCategoryResponse> update(
-      @PathVariable Long id,
+      @PathVariable("id") Long id,
       @Valid @RequestBody ReqCreateCourseCategory request) {
 
     return ResponseEntity.ok(
@@ -59,8 +59,7 @@ public class CourseCategoryController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> delete(
-      @PathVariable Long id) {
-
+      @PathVariable("id") Long id) {
     courseCategoryService.delete(id);
     return ResponseEntity.ok("Xóa thành công !");
   }
