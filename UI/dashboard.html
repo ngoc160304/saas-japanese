@@ -11,7 +11,9 @@
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 
   <!-- Tailwind CSS v4 CDN -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -93,6 +95,7 @@
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -103,13 +106,14 @@
     <!-- ========================================== -->
     <aside id="sidebar"
       class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
-      
+
       <!-- Top Brand & Nav Section -->
       <div>
         <!-- Brand Logo -->
         <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
           <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+            <div
+              class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
               <!-- Sparkle icon -->
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
@@ -117,13 +121,15 @@
             </div>
             <div class="flex flex-col">
               <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
-                Studify <span class="text-sky-600 text-xs font-bold px-1.5 py-0.5 rounded bg-sky-50 uppercase tracking-wide">JLPT</span>
+                Studify <span
+                  class="text-sky-600 text-xs font-bold px-1.5 py-0.5 rounded bg-sky-50 uppercase tracking-wide">JLPT</span>
               </span>
             </div>
           </div>
 
           <!-- Mobile Hamburger Toggle -->
-          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Toggle menu">
+          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100"
+            aria-label="Toggle menu">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -148,20 +154,32 @@
           </a>
 
           <!-- Courses -->
-          <a href="#courses"
+          <a href="admin_courses.html"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
             <span>Courses</span>
-            <span class="ml-auto text-[11px] font-semibold bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full">5 N5-N1</span>
+          </a>
+
+          <!-- Category -->
+          <a href="admin_categories.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>Category</span>
           </a>
 
           <!-- JLPT Practice / Mock Exams -->
           <a href="#jlpt-exams"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
@@ -172,7 +190,8 @@
           <!-- Analytics & Progress -->
           <a href="#analytics"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
             <span>Analytics</span>
@@ -181,7 +200,8 @@
           <!-- Flashcards / Decks -->
           <a href="#flashcards"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -191,7 +211,8 @@
           <!-- Settings -->
           <a href="#settings"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -203,21 +224,25 @@
 
       <!-- Bottom Sidebar Promo Card (Faithful to Template) -->
       <div class="mt-8 pt-4">
-        <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-3 aspect-[4/3] flex flex-col justify-end shadow-md group">
+        <div
+          class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-3 aspect-[4/3] flex flex-col justify-end shadow-md group">
           <!-- Background 3D Japanese Garden Cottage Image -->
           <img src="assets/images/sidebar_cottage.jpg" alt="StudyJLPT Community"
             class="absolute inset-0 w-full h-full object-cover object-center opacity-85 transition-transform duration-500 group-hover:scale-105" />
-          
+
           <!-- Gradient Overlay -->
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
 
           <!-- Bottom Pill CTA -->
-          <div class="relative z-10 flex items-center justify-between bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-sm text-slate-900">
+          <div
+            class="relative z-10 flex items-center justify-between bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-sm text-slate-900">
             <div class="pl-1">
               <p class="text-xs font-bold text-slate-900 leading-tight">Invite A Friend</p>
               <p class="text-[10px] text-slate-500 font-medium">You'll Get A Special Offer...</p>
             </div>
-            <button class="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shrink-0" title="Invite Friends">
+            <button
+              class="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shrink-0"
+              title="Invite Friends">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
               </svg>
@@ -236,10 +261,11 @@
       <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-            Good Morning <span class="inline-block transform hover:rotate-12 transition-transform origin-bottom-right">👋</span>
+            Good Morning <span
+              class="inline-block transform hover:rotate-12 transition-transform origin-bottom-right">👋</span>
           </h1>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Welcome Back, <span id="studentGreetingName" class="text-slate-800 font-semibold">Alex</span> 
+            Welcome Back, <span id="studentGreetingName" class="text-slate-800 font-semibold">Alex</span>
             <span class="mx-2 text-slate-300">•</span>
             <span id="currentLiveDate" class="text-slate-400 font-normal">Tuesday, 10:03 AM</span>
           </p>
@@ -248,7 +274,8 @@
         <!-- Header Actions: Date Badge & Notification -->
         <div class="flex items-center gap-3">
           <!-- Calendar Date Pill -->
-          <div class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white border border-slate-100 shadow-soft text-slate-700">
+          <div
+            class="flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-white border border-slate-100 shadow-soft text-slate-700">
             <div class="w-7 h-7 rounded-lg bg-sky-500 text-white flex items-center justify-center shadow-sm">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -262,7 +289,9 @@
           </div>
 
           <!-- Notification Bell -->
-          <button class="relative w-11 h-11 rounded-2xl bg-white border border-slate-100 shadow-soft flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" title="Notifications">
+          <button
+            class="relative w-11 h-11 rounded-2xl bg-white border border-slate-100 shadow-soft flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors"
+            title="Notifications">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -276,9 +305,10 @@
       <!-- TOP STATS ROW (3 Pastel Cards with 3D Books) -->
       <!-- ========================================== -->
       <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-6">
-        
+
         <!-- Stat Card 1: Active Courses (Sky Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-sky-50/90 via-blue-50/70 to-sky-100/80 border border-sky-100 shadow-soft shadow-hover">
+        <div
+          class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-sky-50/90 via-blue-50/70 to-sky-100/80 border border-sky-100 shadow-soft shadow-hover">
           <div class="relative z-10 flex items-center justify-between">
             <div>
               <p id="statActiveCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">62</p>
@@ -286,35 +316,42 @@
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Active Courses" class="w-full h-full object-contain drop-shadow-md rounded-xl" />
+              <img src="assets/images/book_3d.jpg" alt="Active Courses"
+                class="w-full h-full object-contain drop-shadow-md rounded-xl" />
             </div>
           </div>
         </div>
 
         <!-- Stat Card 2: Courses In Progress (Peach / Warm Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-amber-100/80 border border-amber-100 shadow-soft shadow-hover">
+        <div
+          class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-amber-100/80 border border-amber-100 shadow-soft shadow-hover">
           <div class="relative z-10 flex items-center justify-between">
             <div>
-              <p id="statInProgressCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">18</p>
+              <p id="statInProgressCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">18
+              </p>
               <p class="text-xs font-semibold text-slate-500 mt-1">Courses In Progress</p>
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="In Progress" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-15" />
+              <img src="assets/images/book_3d.jpg" alt="In Progress"
+                class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-15" />
             </div>
           </div>
         </div>
 
         <!-- Stat Card 3: Completed Courses (Mint / Green Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/80 border border-emerald-100 shadow-soft shadow-hover">
+        <div
+          class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/80 border border-emerald-100 shadow-soft shadow-hover">
           <div class="relative z-10 flex items-center justify-between">
             <div>
-              <p id="statCompletedCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">44</p>
+              <p id="statCompletedCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">44
+              </p>
               <p class="text-xs font-semibold text-slate-500 mt-1">Completed Courses</p>
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Completed Courses" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-90" />
+              <img src="assets/images/book_3d.jpg" alt="Completed Courses"
+                class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-90" />
             </div>
           </div>
         </div>
@@ -325,9 +362,10 @@
       <!-- REVISED MIDDLE ROW: 3 BALANCED ANALYTIC CARDS -->
       <!-- ========================================== -->
       <section class="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-6">
-        
+
         <!-- Card 1: Learning Activity (Chart) -->
-        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
+        <div
+          class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
           <div>
             <!-- Card Header -->
             <div class="flex items-center justify-between mb-1">
@@ -335,7 +373,7 @@
               <span class="text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full">Monthly</span>
             </div>
             <p class="text-xs text-slate-400 font-medium mb-3">Total learning time this month</p>
-            
+
             <!-- Big Metric -->
             <div class="flex items-baseline gap-1 mb-4">
               <span id="activityTotalMinutes" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
@@ -348,9 +386,10 @@
                 <span>0</span>
                 <span>2,345</span>
               </div>
-              
+
               <!-- Daily Bars Container -->
-              <div class="flex items-end justify-between gap-1 h-14 w-full bg-slate-50/70 p-2 rounded-2xl border border-slate-100">
+              <div
+                class="flex items-end justify-between gap-1 h-14 w-full bg-slate-50/70 p-2 rounded-2xl border border-slate-100">
                 <div class="w-1.5 bg-sky-400 rounded-full h-[60%]" title="Day 1"></div>
                 <div class="w-1.5 bg-sky-400 rounded-full h-[85%]" title="Day 2"></div>
                 <div class="w-1.5 bg-sky-400 rounded-full h-[40%]" title="Day 3"></div>
@@ -376,29 +415,39 @@
           <!-- Bottom 3 Metric Stats -->
           <div class="grid grid-cols-3 pt-3.5 border-t border-slate-100 text-center">
             <div>
-              <p class="text-xs font-extrabold text-slate-900">12 <span class="text-[10px] font-normal text-slate-400">Hours</span></p>
+              <p class="text-xs font-extrabold text-slate-900">12 <span
+                  class="text-[10px] font-normal text-slate-400">Hours</span></p>
               <p class="text-[10px] text-slate-400 font-medium">This Week</p>
             </div>
             <div>
-              <p class="text-xs font-extrabold text-slate-900">38 <span class="text-[10px] font-normal text-slate-400">Hours</span></p>
+              <p class="text-xs font-extrabold text-slate-900">38 <span
+                  class="text-[10px] font-normal text-slate-400">Hours</span></p>
               <p class="text-[10px] text-slate-400 font-medium">This Month</p>
             </div>
             <div>
-              <p class="text-xs font-extrabold text-emerald-600">+18% <span class="text-[10px] font-normal text-slate-400">MoM</span></p>
+              <p class="text-xs font-extrabold text-emerald-600">+18% <span
+                  class="text-[10px] font-normal text-slate-400">MoM</span></p>
               <p class="text-[10px] text-slate-400 font-medium">Growth Rate</p>
             </div>
           </div>
         </div>
 
         <!-- Card 2: Focus Mode & Daily Practice -->
-        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover text-center">
+        <div
+          class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover text-center">
           <div>
             <!-- Top Learner Avatar Stack & Tag -->
             <div class="flex items-center justify-between mb-3">
               <div class="flex items-center -space-x-1.5">
-                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="Learner" />
-                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="Learner" />
-                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="Learner" />
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+                  alt="Learner" />
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
+                  alt="Learner" />
+                <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80"
+                  alt="Learner" />
               </div>
               <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">AI Boost</span>
             </div>
@@ -436,17 +485,19 @@
         </div>
 
         <!-- Card 3: Learning Streak (Semi-Circle Gauge) -->
-        <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
+        <div
+          class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft flex flex-col justify-between h-full shadow-hover">
           <div>
             <!-- Header -->
             <div class="flex items-center justify-between mb-1">
               <h2 class="text-base font-bold text-slate-900">Learning Streak</h2>
-              <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span
+                class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <span>🔥</span> Active
               </span>
             </div>
             <p class="text-xs text-slate-400 font-medium mb-1">Your longest learning streak</p>
-            
+
             <!-- Longest Streak Total -->
             <div class="flex items-baseline gap-1 mb-2">
               <span id="streakDaysTotal" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
@@ -467,12 +518,14 @@
                 <!-- Gauge Background Arc -->
                 <path class="gauge-bg" d="M 15 65 A 45 45 0 0 1 105 65" />
                 <!-- Gauge Active Progress Arc -->
-                <path class="gauge-progress" d="M 15 65 A 45 45 0 0 1 105 65" stroke-dasharray="141" stroke-dashoffset="40" />
+                <path class="gauge-progress" d="M 15 65 A 45 45 0 0 1 105 65" stroke-dasharray="141"
+                  stroke-dashoffset="40" />
               </svg>
 
               <!-- Central Label in Gauge -->
               <div class="absolute bottom-0 text-center">
-                <span id="currentStreakCenterNum" class="text-2xl font-extrabold text-slate-900 tracking-tight">124</span>
+                <span id="currentStreakCenterNum"
+                  class="text-2xl font-extrabold text-slate-900 tracking-tight">124</span>
                 <p class="text-[10px] text-slate-400 font-medium -mt-0.5">your learning streak</p>
               </div>
             </div>
@@ -503,16 +556,19 @@
       <!-- BOTTOM SECTION: ENROLLED COURSES TABLE     -->
       <!-- ========================================== -->
       <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-        
+
         <!-- Table Section Header -->
         <div class="flex items-center justify-between mb-5">
           <div>
             <h2 class="text-base md:text-lg font-bold text-slate-900">Your Enrolled Courses</h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">JLPT programs & courses where you're actively learning</p>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">JLPT programs & courses where you're actively learning
+            </p>
           </div>
 
           <!-- Action Menu -->
-          <button class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors" title="Options">
+          <button
+            class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors"
+            title="Options">
             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <circle cx="5" cy="12" r="2"></circle>
               <circle cx="12" cy="12" r="2"></circle>
@@ -533,12 +589,13 @@
               </tr>
             </thead>
             <tbody id="enrolledCoursesTableBody" class="divide-y divide-slate-100/70 text-xs">
-              
+
               <!-- Row 1: N3 Soumatome -->
               <tr class="hover:bg-slate-50/70 transition-colors group">
                 <td class="py-3.5 pl-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                    <div
+                      class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
                       N3
                     </div>
                     <div>
@@ -551,10 +608,17 @@
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex items-center -space-x-1.5">
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+5</span>
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <span
+                      class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+5</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
@@ -574,7 +638,8 @@
               <tr class="hover:bg-slate-50/70 transition-colors group">
                 <td class="py-3.5 pl-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                    <div
+                      class="w-9 h-9 rounded-xl bg-slate-900 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
                       N2
                     </div>
                     <div>
@@ -587,10 +652,17 @@
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex items-center -space-x-1.5">
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+8</span>
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <span
+                      class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+8</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
@@ -610,7 +682,8 @@
               <tr class="hover:bg-slate-50/70 transition-colors group">
                 <td class="py-3.5 pl-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                    <div
+                      class="w-9 h-9 rounded-xl bg-emerald-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
                       N4
                     </div>
                     <div>
@@ -623,10 +696,17 @@
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex items-center -space-x-1.5">
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+9</span>
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <span
+                      class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+9</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
@@ -646,7 +726,8 @@
               <tr class="hover:bg-slate-50/70 transition-colors group">
                 <td class="py-3.5 pl-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                    <div
+                      class="w-9 h-9 rounded-xl bg-amber-500 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
                       N5
                     </div>
                     <div>
@@ -659,9 +740,14 @@
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex items-center -space-x-1.5">
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+6</span>
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <span
+                      class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+6</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
@@ -681,7 +767,8 @@
               <tr class="hover:bg-slate-50/70 transition-colors group">
                 <td class="py-3.5 pl-2">
                   <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
+                    <div
+                      class="w-9 h-9 rounded-xl bg-sky-600 text-white font-bold flex items-center justify-center text-xs shadow-sm shrink-0">
                       N3
                     </div>
                     <div>
@@ -694,9 +781,14 @@
                 </td>
                 <td class="py-3.5 px-4">
                   <div class="flex items-center -space-x-1.5">
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80" alt="avatar" />
-                    <span class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+4</span>
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <img class="w-6 h-6 rounded-full ring-2 ring-white object-cover"
+                      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=60&auto=format&fit=crop&q=80"
+                      alt="avatar" />
+                    <span
+                      class="w-6 h-6 rounded-full bg-slate-100 ring-2 ring-white text-[10px] font-bold text-slate-600 flex items-center justify-center">+4</span>
                   </div>
                 </td>
                 <td class="py-3.5 px-4 font-medium text-slate-500 whitespace-nowrap">
@@ -724,7 +816,7 @@
     <!-- 3. REVISED RIGHT SIDEBAR: PROFILE & STUDY CALENDAR      -->
     <!-- ======================================================= -->
     <aside class="w-full xl:w-80 2xl:w-88 bg-transparent p-4 md:p-6 lg:p-7 flex flex-col gap-5 shrink-0">
-      
+
       <!-- Student Profile Card (Clean & Balanced) -->
       <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
         <div class="flex items-center gap-3.5">
@@ -766,20 +858,24 @@
       <!-- STUDY ACTIVITY CALENDAR (REVISED & COMPACT)-->
       <!-- ========================================== -->
       <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
-        
+
         <!-- Calendar Month Navigation -->
         <div class="flex items-center justify-between mb-4">
-          <button id="calPrevMonthBtn" class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Previous Month">
+          <button id="calPrevMonthBtn"
+            class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors"
+            title="Previous Month">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          
+
           <h3 id="calCurrentMonthLabel" class="text-sm font-bold text-slate-900 tracking-tight">
             August 2024
           </h3>
 
-          <button id="calNextMonthBtn" class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Next Month">
+          <button id="calNextMonthBtn"
+            class="w-7 h-7 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors"
+            title="Next Month">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
             </svg>
@@ -799,7 +895,7 @@
 
         <!-- Calendar Days Grid (Exact Faithful Representation from Provided Image) -->
         <div class="grid grid-cols-7 gap-y-2 gap-x-1 text-center text-xs font-semibold">
-          
+
           <!-- Row 1 (Previous month tail + Month start) -->
           <span class="text-slate-300 py-1.5">29</span>
           <span class="text-slate-300 py-1.5">30</span>
@@ -847,7 +943,8 @@
           </div>
           <!-- Current Day 17 (Soft Highlight Circle) -->
           <div class="flex items-center justify-center">
-            <span class="w-7 h-7 rounded-full bg-slate-100 text-slate-900 font-bold flex items-center justify-center text-xs ring-1 ring-slate-200">17</span>
+            <span
+              class="w-7 h-7 rounded-full bg-slate-100 text-slate-900 font-bold flex items-center justify-center text-xs ring-1 ring-slate-200">17</span>
           </div>
           <span class="text-slate-700 py-1.5">18</span>
 
@@ -884,15 +981,17 @@
       </div>
 
       <!-- Current Badge Milestone (Compact & Integrated) -->
-      <div class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/60 rounded-3xl p-4 border border-sky-100 shadow-soft">
+      <div
+        class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/60 rounded-3xl p-4 border border-sky-100 shadow-soft">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 shrink-0 rounded-2xl bg-sky-500/10 p-1 flex items-center justify-center">
-            <img src="assets/images/streak_badge.jpg" alt="Badge" class="w-full h-full object-contain drop-shadow-sm rounded-xl" />
+            <img src="assets/images/streak_badge.jpg" alt="Badge"
+              class="w-full h-full object-contain drop-shadow-sm rounded-xl" />
           </div>
           <div class="min-w-0 flex-1">
             <p class="text-xs font-bold text-slate-900 leading-tight">Master Streak Badge</p>
             <p class="text-[10px] text-slate-500 mt-0.5">Earned 12 times in total</p>
-            
+
             <!-- Mini Progress -->
             <div class="w-full bg-slate-200/80 rounded-full h-1.5 overflow-hidden mt-2">
               <div class="bg-sky-500 h-full rounded-full" style="width: 33%"></div>

@@ -1,0 +1,60 @@
+:root {
+  --color-primary-navy: #2B4263;
+  --color-primary-blue: #1E88E5;
+  --color-accent-sky: #EBF3FA;
+  --color-bg-main: #F5F7FA;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #1E293B;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-divider: #EDF2F7;
+  --color-success-bg: #E6F4EA;
+  --color-success: #16A34A;
+  --color-warning-bg: #FEF3C7;
+  --color-warning: #D97706;
+  --color-danger-bg: #FEE2E2;
+  --color-danger: #DC2626;
+  --color-category-bg: #E0F2FE;
+  --color-category: #0284C7;
+}
+
+/* Shared color mapping for the existing Tailwind-based UI. */
+html, body, .bg-\[\#f3f6fa\], .bg-\[\#f4f6f9\] { background-color: var(--color-bg-main) !important; }
+.bg-white { background-color: var(--color-surface) !important; }
+.bg-slate-900, .bg-slate-800, .bg-\[\#0f172a\] { background-color: var(--color-primary-navy) !important; }
+.hover\:bg-slate-900:hover, .hover\:bg-sky-600:hover, .hover\:bg-sky-700:hover, .hover\:bg-indigo-600:hover { background-color: var(--color-primary-blue) !important; }
+.bg-sky-500, .bg-sky-600, .bg-indigo-600, .bg-blue-600 { background-color: var(--color-primary-blue) !important; }
+.bg-sky-50, .bg-indigo-50, .bg-blue-50 { background-color: var(--color-accent-sky) !important; }
+.text-slate-900, .text-slate-800, .text-slate-700, .text-\[\#1e293b\], .text-\[\#0f172a\] { color: var(--color-text-primary) !important; }
+.text-slate-600, .text-slate-500, .text-slate-400, .text-slate-300 { color: var(--color-text-secondary) !important; }
+.text-sky-500, .text-sky-600, .text-sky-700, .text-indigo-600, .text-indigo-700, .text-blue-600, .text-blue-700 { color: var(--color-category) !important; }
+.hover\:text-sky-600:hover, .hover\:text-sky-700:hover, .hover\:text-indigo-600:hover, .hover\:text-slate-900:hover, .hover\:text-slate-700:hover { color: var(--color-primary-blue) !important; }
+.border-slate-100, .border-slate-200, .border-slate-300, .border-slate-800 { border-color: var(--color-border) !important; }
+.divide-slate-100 > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-divider) !important; }
+.bg-slate-50, .bg-slate-100, .hover\:bg-slate-50:hover, .hover\:bg-slate-100:hover { background-color: #F8FAFC !important; }
+.focus\:ring-sky-500:focus, .focus\:ring-sky-600:focus { --tw-ring-color: var(--color-primary-blue) !important; }
+.border-sky-500, .border-sky-600 { border-color: var(--color-primary-blue) !important; }
+.bg-emerald-50 { background-color: var(--color-success-bg) !important; }
+.text-emerald-500, .text-emerald-600, .text-emerald-700, .text-emerald-800 { color: var(--color-success) !important; }
+.bg-emerald-400, .bg-emerald-500, .hover\:bg-emerald-600:hover { background-color: var(--color-success) !important; }
+.border-emerald-100, .border-emerald-200 { border-color: var(--color-success-bg) !important; }
+.bg-amber-50, .bg-orange-50 { background-color: var(--color-warning-bg) !important; }
+.text-amber-500, .text-amber-600, .text-amber-700, .text-orange-600 { color: var(--color-warning) !important; }
+.bg-amber-500, .hover\:bg-amber-600:hover { background-color: var(--color-warning) !important; }
+.border-amber-100, .border-amber-200 { border-color: var(--color-warning-bg) !important; }
+.bg-rose-50, .bg-red-50 { background-color: var(--color-danger-bg) !important; }
+.text-rose-500, .text-rose-600, .text-rose-700, .text-red-500, .text-red-600, .text-red-700 { color: var(--color-danger) !important; }
+.bg-rose-500, .bg-red-500, .hover\:bg-rose-600:hover, .hover\:bg-red-600:hover { background-color: var(--color-danger) !important; }
+.border-rose-100, .border-rose-200, .border-red-100, .border-red-200 { border-color: var(--color-danger-bg) !important; }
+.from-sky-500 { --tw-gradient-from: var(--color-primary-blue) var(--tw-gradient-from-position) !important; }
+.to-indigo-600 { --tw-gradient-to: var(--color-primary-navy) var(--tw-gradient-to-position) !important; }
+
+/* Keep the add form ahead of the record display on lesson management pages. */
+main:has(> #add) {
+  display: flex;
+  flex-direction: column;
+}
+
+main:has(> #add) > header { order: 1; }
+main:has(> #add) > #add { order: 2; }
+main:has(> #add) > section:not(#add) { order: 3; }

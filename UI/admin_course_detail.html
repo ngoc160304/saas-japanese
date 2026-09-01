@@ -50,6 +50,7 @@
       backdrop-filter: blur(4px);
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -143,7 +144,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
             </svg>
-            <span>+ Add Lesson</span>
+            <span>Add Lesson</span>
           </a>
         </div>
       </header>
@@ -317,9 +318,9 @@
               <div class="flex items-center justify-end gap-1.5">
                 <!-- Manage Lesson Content Hub (Primary Flow) -->
                 <a href="admin_lesson_content.html?lesson_id=${item.id}&course_id=${courseId}"
-                  class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                  class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs"
                   title="Configure Lesson Content">
-                  <span>Manage Content</span>
+                  <span>Manage Lesson Content</span>
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                   </svg>

@@ -62,6 +62,7 @@
       backdrop-filter: blur(4px);
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -215,7 +216,7 @@
         <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
           <p class="text-xs font-semibold text-slate-400">Total Courses</p>
           <p id="statTotalCourses" class="text-2xl lg:text-3xl font-extrabold text-slate-900 mt-1">62</p>
-          <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">All JLPT Levels</span>
+          <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">Course catalogue</span>
         </div>
 
         <!-- Published Courses -->
@@ -241,7 +242,7 @@
 
       </section>
 
-      <!-- Course Table & Filtering Section -->
+      <!-- Course Card Gallery -->
       <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
         
         <!-- Controls Bar -->
@@ -254,23 +255,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
-            <input type="text" id="courseSearchInput" placeholder="Search courses by title, slug, description..."
+            <input type="text" id="courseSearchInput" placeholder="Search courses by title or overview..."
               class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
           </div>
 
           <!-- Filters -->
           <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Filter by JLPT Level -->
-            <select id="levelFilter"
-              class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
-              <option value="ALL">All JLPT Levels</option>
-              <option value="N5">N5 (Beginner)</option>
-              <option value="N4">N4 (Elementary)</option>
-              <option value="N3">N3 (Intermediate)</option>
-              <option value="N2">N2 (Upper-Int)</option>
-              <option value="N1">N1 (Advanced)</option>
-            </select>
-
             <!-- Filter by Publish Status -->
             <select id="statusFilter"
               class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
@@ -291,24 +281,8 @@
           </div>
         </div>
 
-        <!-- Table Container -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-2 font-semibold">Course</th>
-                <th class="pb-3 px-3 font-semibold text-center">Level</th>
-                <th class="pb-3 px-3 font-semibold text-center">Lessons</th>
-                <th class="pb-3 px-3 font-semibold">Price</th>
-                <th class="pb-3 px-3 font-semibold text-center">Status</th>
-                <th class="pb-3 px-2 font-semibold text-center">Order</th>
-                <th class="pb-3 pr-2 font-semibold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="coursesTableBody" class="divide-y divide-slate-100/70 text-xs">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
+        <div id="coursesCardGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <!-- Rendered via JavaScript -->
         </div>
 
         <!-- Empty State -->
@@ -322,9 +296,9 @@
           <p class="text-xs text-slate-400 mt-1">Try changing search keywords or level filter.</p>
         </div>
 
-        <!-- Table Footer -->
+        <!-- Gallery Footer -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
-          <p id="tableShowingCoursesCount">Showing 6 of 62 Courses</p>
+          <p id="tableShowingCoursesCount">Showing 6 courses</p>
           <div class="flex items-center gap-1.5">
             <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">Previous</button>
             <button class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs">1</button>
@@ -377,7 +351,6 @@
         jlpt_level_id: 3,
         jlpt_code: "N3",
         title: "Tiếng Nhật Trung Cấp N3 Soumatome",
-        slug: "tieng-nhat-trung-cap-n3-soumatome",
         description: "Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.",
         price: 499000,
         is_published: 1,
@@ -390,7 +363,6 @@
         jlpt_level_id: 4,
         jlpt_code: "N2",
         title: "Luyện Đề Thi Thử Toàn Diện N2 Master",
-        slug: "luyen-de-thi-thu-toan-dien-n2",
         description: "Ngân hàng 20 bộ đề thi thử sát cấu trúc đề thi chính thức kèm giải thích.",
         price: 699000,
         is_published: 1,
@@ -403,7 +375,6 @@
         jlpt_level_id: 2,
         jlpt_code: "N4",
         title: "Kanji & Từ Vựng Cấp Tốc N4",
-        slug: "kanji-tu-vung-cap-toc-n4",
         description: "Chinh phục 300 chữ Hán và 1500 từ vựng cốt lõi N4 bằng phương pháp ghi nhớ hình ảnh.",
         price: 350000,
         is_published: 1,
@@ -416,7 +387,6 @@
         jlpt_level_id: 1,
         jlpt_code: "N5",
         title: "Tiếng Nhật Sơ Cấp Minna No Nihongo N5",
-        slug: "tieng-nhat-so-cap-minna-n5",
         description: "Khóa học nhập môn từ bảng chữ cái Hiragana/Katakana đến 25 bài Minna No Nihongo.",
         price: 0,
         is_published: 1,
@@ -429,7 +399,6 @@
         jlpt_level_id: 3,
         jlpt_code: "N3",
         title: "Luyện Giao Tiếp & Shadowing N3",
-        slug: "luyen-giao-tiep-shadowing-n3",
         description: "Phương pháp Shadowing cải thiện phản xạ và phát âm chuẩn giọng Tokyo.",
         price: 420000,
         is_published: 1,
@@ -442,7 +411,6 @@
         jlpt_level_id: 5,
         jlpt_code: "N1",
         title: "Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp",
-        slug: "chuyen-de-doc-hieu-ngu-phap-n1",
         description: "Phân tích cấu trúc bài đọc dài, bình luận xã hội và ngữ pháp hiếm gặp N1.",
         price: 850000,
         is_published: 0,
@@ -473,21 +441,18 @@
     }
 
     function renderCourses() {
-      const tbody = document.getElementById("coursesTableBody");
+      const cardGrid = document.getElementById("coursesCardGrid");
       const searchVal = document.getElementById("courseSearchInput").value.trim().toLowerCase();
-      const levelVal = document.getElementById("levelFilter").value;
       const statusVal = document.getElementById("statusFilter").value;
       const emptyState = document.getElementById("courseEmptyState");
 
       const filtered = coursesData.filter(item => {
-        const matchLevel = (levelVal === "ALL") || (item.jlpt_code === levelVal);
         const matchStatus = (statusVal === "ALL") || 
                             (statusVal === "published" && item.is_published === 1) || 
                             (statusVal === "draft" && item.is_published === 0);
         const matchSearch = item.title.toLowerCase().includes(searchVal) ||
-                            item.slug.toLowerCase().includes(searchVal) ||
                             (item.description && item.description.toLowerCase().includes(searchVal));
-        return matchLevel && matchStatus && matchSearch;
+        return matchStatus && matchSearch;
       });
 
       // Update Counts
@@ -496,17 +461,16 @@
       document.getElementById("statDraftCourses").textContent = coursesData.filter(c => c.is_published === 0).length;
       const totalLessons = coursesData.reduce((sum, c) => sum + (c.lessons_count || 0), 0);
       document.getElementById("statTotalLessons").textContent = totalLessons;
-      document.getElementById("tableShowingCoursesCount").textContent = `Showing ${filtered.length} of ${coursesData.length} Courses`;
+      document.getElementById("tableShowingCoursesCount").textContent = `Showing ${filtered.length} of ${coursesData.length} courses`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = "";
+        cardGrid.innerHTML = "";
         emptyState.classList.remove("hidden");
         return;
       }
       emptyState.classList.add("hidden");
 
-      tbody.innerHTML = filtered.map(item => {
-        const badgeStyle = getLevelBadgeStyle(item.jlpt_code);
+      cardGrid.innerHTML = filtered.map(item => {
         const priceText = item.price > 0 ? `${item.price.toLocaleString('vi-VN')} đ` : `<span class="text-emerald-600 font-bold">Free</span>`;
         const statusBadge = item.is_published === 1
           ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
@@ -516,87 +480,22 @@
                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft
              </span>`;
 
+        const attempts = item.lessons_count * 18 + item.id * 7;
+        const duration = item.lessons_count * 45;
         return `
-          <tr class="hover:bg-slate-50/80 transition-colors group">
-            <!-- Course Title & Slug -->
-            <td class="py-3.5 pl-2">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden shrink-0 flex items-center justify-center p-1">
-                  <img src="${item.thumbnail_img}" alt="${item.title}" class="w-full h-full object-contain rounded-lg" />
-                </div>
-                <div>
-                  <a href="admin_course_detail.html?course_id=${item.id}"
-                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
-                    ${item.title}
-                  </a>
-                </div>
+          <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col">
+            <div class="flex items-start justify-between gap-4">
+              <div class="flex items-center gap-3 min-w-0">
+                <img src="${item.thumbnail_img}" alt="" class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1" />
+                <div class="min-w-0"><a href="admin_course_detail.html?course_id=${item.id}" class="block text-sm font-extrabold text-slate-900 hover:text-sky-600 line-clamp-2">${item.title}</a></div>
               </div>
-            </td>
-
-            <!-- Level Code -->
-            <td class="py-3.5 px-3 text-center">
-              <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl font-extrabold text-xs shadow-xs ${badgeStyle}">
-                ${item.jlpt_code}
-              </span>
-            </td>
-
-            <!-- Lessons Count -->
-            <td class="py-3.5 px-3 text-center">
-              <a href="admin_course_detail.html?course_id=${item.id}"
-                class="inline-block px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 font-bold text-xs border border-sky-100 hover:bg-sky-100 transition-colors">
-                ${item.lessons_count} Lessons
-              </a>
-            </td>
-
-            <!-- Price -->
-            <td class="py-3.5 px-3 font-semibold text-slate-800">
-              ${priceText}
-            </td>
-
-            <!-- Publish Status -->
-            <td class="py-3.5 px-3 text-center">
-              ${statusBadge}
-            </td>
-
-            <!-- Sort Order -->
-            <td class="py-3.5 px-2 text-center font-mono text-slate-400 font-bold">
-              ${item.sort_order}
-            </td>
-
-            <!-- Actions -->
-            <td class="py-3.5 pr-2 text-right">
-              <div class="flex items-center justify-end gap-1">
-                <!-- Manage Lessons Button (Primary Flow) -->
-                <a href="admin_course_detail.html?course_id=${item.id}"
-                  class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1 transition-all shadow-xs"
-                  title="Manage Lessons">
-                  <span>Lessons</span>
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </a>
-
-                <!-- Edit Course -->
-                <a href="admin_course_create.html?edit_id=${item.id}"
-                  class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors"
-                  title="Edit Course Settings">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </a>
-
-                <!-- Delete Course -->
-                <button onclick="openDeleteCourseModal(${item.id})"
-                  class="w-8 h-8 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-colors"
-                  title="Delete Course">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-        `;
+              <span class="shrink-0 inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">🔥 ${attempts}</span>
+            </div>
+            <p class="mt-4 text-xs leading-relaxed text-slate-500 line-clamp-2">${item.description}</p>
+            <div class="mt-4 flex items-center gap-4 text-xs font-semibold text-slate-500"><span>${item.lessons_count} lessons</span><span>${duration} min</span><span>${priceText}</span></div>
+            <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between"><span>${statusBadge}</span><span class="text-xs font-bold text-sky-600">${item.lessons_count * 4} activities</span></div>
+            <div class="mt-5"><a href="admin_course_detail.html?course_id=${item.id}" class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">Xem</a></div>
+          </article>`;
       }).join("");
     }
 
@@ -619,11 +518,9 @@
       renderCourses();
 
       document.getElementById("courseSearchInput").addEventListener("input", renderCourses);
-      document.getElementById("levelFilter").addEventListener("change", renderCourses);
       document.getElementById("statusFilter").addEventListener("change", renderCourses);
       document.getElementById("resetCoursesFilterBtn").addEventListener("click", () => {
         document.getElementById("courseSearchInput").value = "";
-        document.getElementById("levelFilter").value = "ALL";
         document.getElementById("statusFilter").value = "ALL";
         renderCourses();
       });

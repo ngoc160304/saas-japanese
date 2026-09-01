@@ -4,9 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StudyJLPT Admin - Quản lý Cấp độ & Danh mục (Categories)</title>
+  <title>StudyJLPT Admin - Quản lý Danh mục & Phân loại (Categories)</title>
   <meta name="description"
-    content="Admin Categories & JLPT Levels Management Interface for StudyJLPT Platform. Manage JLPT levels, descriptions, and course categorizations." />
+    content="Admin Categories Management Interface for StudyJLPT Japanese Learning Platform. Manage learning categories: Từ vựng, Kanji, Ngữ pháp, Luyện đọc, Luyện nghe, Phát âm, Giao tiếp, JLPT." />
 
   <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,12 +57,12 @@
       box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.07), 0 3px 8px -2px rgba(15, 23, 42, 0.03);
     }
 
-    /* Modal Backdrop */
     .modal-backdrop {
       background-color: rgba(15, 23, 42, 0.5);
       backdrop-filter: blur(4px);
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -80,7 +80,6 @@
         <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
           <div class="flex items-center gap-2.5">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
-              <!-- Admin Sparkle / Grid Icon -->
               <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
                 <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
               </svg>
@@ -117,7 +116,7 @@
             <span>Student Portal</span>
           </a>
 
-          <!-- Categories / JLPT Levels (Active) -->
+          <!-- Categories (Active) -->
           <a href="admin_categories.html"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -125,31 +124,22 @@
                 d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
             <span>Categories</span>
-            <span class="ml-auto text-[11px] font-bold bg-sky-500 text-white px-2 py-0.5 rounded-full">5 Levels</span>
+            <span class="ml-auto text-[11px] font-bold bg-sky-500 text-white px-2 py-0.5 rounded-full" id="sidebarCategoryCount">8</span>
           </a>
 
           <!-- Courses -->
-          <a href="#courses"
+          <a href="admin_courses.html"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
             </svg>
             <span>Courses</span>
-          </a>
-
-          <!-- Lessons & Content -->
-          <a href="#lessons"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>Lessons</span>
+            <span class="ml-auto text-[11px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">62</span>
           </a>
 
           <!-- JLPT Mock Exams -->
-          <a href="#jlpt-exams"
+          <a href="admin_categories.html"
             class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -168,27 +158,16 @@
             </svg>
             <span>Users</span>
           </a>
-
-          <!-- Settings -->
-          <a href="#settings"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span>Settings</span>
-          </a>
         </nav>
       </div>
 
-      <!-- Bottom Help & Support Link -->
+      <!-- Bottom Back to Courses Link -->
       <div class="mt-8 pt-4">
         <a href="admin_courses.html" class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1.5 font-semibold">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>
-          <span>Back to Courses</span>
+          <span>Go to Courses</span>
         </a>
       </div>
     </aside>
@@ -198,19 +177,19 @@
     <!-- ========================================== -->
     <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
 
-      <!-- Top Header Row (Page Title & Global Actions) -->
+      <!-- Breadcrumbs & Header -->
       <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold uppercase tracking-wider text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">
-              System Classification
-            </span>
-          </div>
-          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-            Course Categories
+          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="admin_courses.html" class="hover:text-slate-600">Admin</a>
+            <span>/</span>
+            <span class="text-slate-800">Categories</span>
+          </nav>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Categories Management
           </h1>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Quản lý danh sách các phân loại khóa học trong hệ thống.
+            Quản lý các danh mục phân loại học tiếng Nhật: Từ vựng, Kanji, Ngữ pháp, Luyện đọc, Luyện nghe, Phát âm, Giao tiếp và JLPT.
           </p>
         </div>
 
@@ -218,26 +197,17 @@
         <div class="flex items-center gap-3">
           <!-- Primary Add Category Button -->
           <button id="openAddCategoryBtn"
-            class="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm hover:shadow-md transition-all">
+            class="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm hover:shadow-md transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
             </svg>
             <span>Add Category</span>
           </button>
 
-          <!-- Admin Notification Bell -->
-          <button class="relative w-11 h-11 rounded-2xl bg-white border border-slate-100 shadow-soft flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors" title="Notifications">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-            </svg>
-            <span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-sky-500 ring-2 ring-white"></span>
-          </button>
-
           <!-- Admin Avatar Pill -->
           <div class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 bg-white border border-slate-100 rounded-2xl shadow-soft">
             <img class="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-100"
-              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80" alt="Admin" />
+              src="assets/images/student_hero.jpg" alt="Admin" />
             <div class="text-left hidden sm:block">
               <p class="text-xs font-bold text-slate-900 leading-tight">Admin Sarah</p>
               <p class="text-[10px] text-slate-400 font-medium">Administrator</p>
@@ -246,64 +216,43 @@
         </div>
       </header>
 
-      <!-- ========================================== -->
-      <!-- TOP STATS ROW: CATEGORY METRICS (3 CARDS)  -->
-      <!-- ========================================== -->
-      <section class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-5 mb-6">
+      <!-- KPI Stats Row (4 Cards - Following Course UI Layout) -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         
-        <!-- Stat Card 1: Total Levels (Sky Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-sky-50/90 via-blue-50/70 to-sky-100/80 border border-sky-100 shadow-soft shadow-hover">
-          <div class="relative z-10 flex items-center justify-between">
-            <div>
-              <p id="statTotalCategories" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">5</p>
-              <p class="text-xs font-semibold text-slate-500 mt-1">JLPT Level Categories</p>
-              <p class="text-[10px] text-sky-700 font-medium mt-0.5">N5, N4, N3, N2, N1</p>
-            </div>
-            <!-- 3D Book Icon Visual -->
-            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Categories" class="w-full h-full object-contain drop-shadow-md rounded-xl" />
-            </div>
-          </div>
+        <!-- Total Categories -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Total Categories</p>
+          <p id="statTotalCategories" class="text-2xl lg:text-3xl font-extrabold text-slate-900 mt-1">8</p>
+          <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">Japanese Skills</span>
         </div>
 
-        <!-- Stat Card 2: Linked Courses (Peach / Warm Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-amber-50/90 via-orange-50/70 to-amber-100/80 border border-amber-100 shadow-soft shadow-hover">
-          <div class="relative z-10 flex items-center justify-between">
-            <div>
-              <p id="statLinkedCourses" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">62</p>
-              <p class="text-xs font-semibold text-slate-500 mt-1">Categorized Courses</p>
-              <p class="text-[10px] text-amber-700 font-medium mt-0.5">courses.jlpt_level_id</p>
-            </div>
-            <!-- 3D Book Icon Visual -->
-            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Courses" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-15" />
-            </div>
-          </div>
+        <!-- Published Categories -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Published</p>
+          <p id="statPublishedCategories" class="text-2xl lg:text-3xl font-extrabold text-emerald-600 mt-1">8</p>
+          <span class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-2">Live for Students</span>
         </div>
 
-        <!-- Stat Card 3: Linked Mock Exams (Mint / Green Pastel) -->
-        <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-emerald-50/90 via-teal-50/70 to-emerald-100/80 border border-emerald-100 shadow-soft shadow-hover">
-          <div class="relative z-10 flex items-center justify-between">
-            <div>
-              <p id="statLinkedExams" class="text-3xl lg:text-4xl font-extrabold text-slate-900 tracking-tight">28</p>
-              <p class="text-xs font-semibold text-slate-500 mt-1">Categorized Mock Exams</p>
-              <p class="text-[10px] text-emerald-700 font-medium mt-0.5">jlpt_exams.jlpt_level_id</p>
-            </div>
-            <!-- 3D Book Icon Visual -->
-            <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Exams" class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-90" />
-            </div>
-          </div>
+        <!-- Linked Courses -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Linked Courses</p>
+          <p id="statLinkedCourses" class="text-2xl lg:text-3xl font-extrabold text-indigo-600 mt-1">113</p>
+          <span class="inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full mt-2">N5 → N1 Curriculums</span>
+        </div>
+
+        <!-- Linked Mock Exams -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Linked Exams</p>
+          <p id="statLinkedExams" class="text-2xl lg:text-3xl font-extrabold text-amber-600 mt-1">42</p>
+          <span class="inline-block text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-2">JLPT Test Suites</span>
         </div>
 
       </section>
 
-      <!-- ========================================== -->
-      <!-- DATA MANAGEMENT TABLE & CONTROLS           -->
-      <!-- ========================================== -->
+      <!-- Category Card Gallery (Following Course UI Layout & Card Format) -->
       <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
         
-        <!-- Filter & Search Action Bar -->
+        <!-- Controls Bar (Search + Filter + Reset) -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           
           <!-- Search Input -->
@@ -311,21 +260,24 @@
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                   <!-- Search Input -->
-          <div class="relative flex-1 max-w-md">
-            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </div>
-            <input type="text" id="searchInput" placeholder="Search categories..."
+            <input type="text" id="categorySearchInput" placeholder="Tìm kiếm danh mục (Từ vựng, Kanji, Ngữ pháp, JLPT...)"
               class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
           </div>
 
-          <!-- Actions -->
-          <div class="flex items-center gap-2.5">
-            <!-- Reset Filter Button -->
-            <button id="resetFilterBtn"
+          <!-- Filters -->
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <!-- Filter by Publish Status -->
+            <select id="statusFilter"
+              class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+              <option value="ALL">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+
+            <!-- Reset Filter -->
+            <button id="resetCategoriesFilterBtn"
               class="px-3 py-2.5 rounded-2xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 text-xs font-semibold transition-colors flex items-center gap-1.5"
               title="Reset Filters">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -336,48 +288,29 @@
           </div>
         </div>
 
-        <!-- Categories Table Container -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-3 font-semibold w-14">#</th>
-                <th class="pb-3 px-4 font-semibold">Category</th>
-                <th class="pb-3 px-4 font-semibold text-center w-32">Courses</th>
-                <th class="pb-3 px-4 font-semibold text-center w-32">Exams</th>
-                <th class="pb-3 pr-4 font-semibold text-right w-28">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="categoriesTableBody" class="divide-y divide-slate-100/70 text-xs">
-              <!-- Rendered dynamically via JavaScript -->
-            </tbody>
-          </table>
+        <!-- Cards Grid Gallery (Exact match with Course cards format) -->
+        <div id="categoriesCardGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          <!-- Rendered via JavaScript -->
         </div>
 
-        <!-- Empty State (Hidden by default) -->
-        <div id="emptyState" class="hidden py-12 text-center">
+        <!-- Empty State -->
+        <div id="categoryEmptyState" class="hidden py-12 text-center">
           <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
             </svg>
           </div>
-          <p class="text-sm font-bold text-slate-800">No categories found</p>
-          <p class="text-xs text-slate-400 mt-1">Try adjusting your search criteria.</p>
+          <p class="text-sm font-bold text-slate-800">Không tìm thấy danh mục phù hợp</p>
+          <p class="text-xs text-slate-400 mt-1">Vui lòng thử từ khóa tìm kiếm khác hoặc đổi bộ lọc trạng thái.</p>
         </div>
 
-        <!-- Table Footer / Pagination -->
+        <!-- Gallery Footer / Pagination (Exact match with Course UI) -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
-          <p id="tableShowingCount">Showing 5 of 5 Categories</p>
+          <p id="tableShowingCategoriesCount">Showing 8 of 8 Categories</p>
           <div class="flex items-center gap-1.5">
-            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">
-              Previous
-            </button>
-            <button class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs">
-              1
-            </button>
-            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">
-              Next
-            </button>
+            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">Previous</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs">1</button>
+            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">Next</button>
           </div>
         </div>
 
@@ -396,37 +329,77 @@
       <!-- Modal Header -->
       <div class="flex items-center justify-between pb-4 mb-4 border-b border-slate-100">
         <div>
-          <h3 id="modalTitle" class="text-lg font-bold text-slate-900">Add New Category</h3>
+          <h3 id="categoryModalTitle" class="text-lg font-bold text-slate-900">Thêm Danh Mục Tiếng Nhật</h3>
         </div>
-        <button id="closeModalBtn" class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors">
+        <button onclick="closeCategoryModal()" class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
           </svg>
         </button>
       </div>
 
-      <!-- Category Form (Only Category input) -->
+      <!-- Category Form -->
       <form id="categoryForm" class="space-y-4">
         <input type="hidden" id="formCategoryId" value="" />
 
-        <!-- Category -->
+        <!-- Category Name -->
         <div>
           <label for="formName" class="block text-xs font-bold text-slate-700 mb-1">
-            Category <span class="text-rose-500">*</span>
+            Tên Danh mục <span class="text-rose-500">*</span>
           </label>
-          <input type="text" id="formName" required maxlength="100" placeholder="e.g., Tiếng Nhật Trung Cấp N3"
+          <input type="text" id="formName" required maxlength="100" placeholder="e.g., Từ vựng, Kanji, Ngữ pháp..."
             class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all font-semibold" />
+        </div>
+
+        <!-- Level Code & Status Row -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="formCode" class="block text-xs font-bold text-slate-700 mb-1">
+              Phân loại / Cấp độ <span class="text-rose-500">*</span>
+            </label>
+            <select id="formCode" required
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white">
+              <option value="N5 - N1" selected>N5 - N1 (Toàn diện)</option>
+              <option value="N5">N5 (Sơ cấp)</option>
+              <option value="N4">N4 (Sơ trung cấp)</option>
+              <option value="N3">N3 (Trung cấp)</option>
+              <option value="N2">N2 (Trung cao cấp)</option>
+              <option value="N1">N1 (Cao cấp)</option>
+              <option value="Nhập môn">Nhập môn (Kana)</option>
+              <option value="Giao tiếp">Giao tiếp tổng hợp</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="formStatus" class="block text-xs font-bold text-slate-700 mb-1">
+              Trạng thái <span class="text-rose-500">*</span>
+            </label>
+            <select id="formStatus" required
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white">
+              <option value="1">Published</option>
+              <option value="0">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <label for="formDescription" class="block text-xs font-bold text-slate-700 mb-1">
+            Mô tả Danh mục
+          </label>
+          <textarea id="formDescription" rows="3" placeholder="Nhập mô tả nội dung học tập, mục tiêu và kỹ năng trọng tâm..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"></textarea>
         </div>
 
         <!-- Modal Footer Actions -->
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-          <button type="button" id="cancelModalBtn"
+          <button type="button" onclick="closeCategoryModal()"
             class="px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
-            Cancel
+            Hủy
           </button>
           <button type="submit"
             class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all">
-            Save Category
+            Lưu Danh Mục
           </button>
         </div>
       </form>
@@ -434,29 +407,32 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 4. MODAL: DELETE CONFIRMATION              -->
+  <!-- 4. MODAL: DELETE CATEGORY CONFIRMATION     -->
   <!-- ========================================== -->
-  <div id="deleteModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-4">
+  <div id="deleteCategoryModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center">
+      
+      <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-3">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round"
             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
         </svg>
       </div>
-      <h3 class="text-base font-bold text-slate-900">Delete Category?</h3>
+
+      <h3 class="text-base font-bold text-slate-900">Xóa Danh Mục?</h3>
       <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
-        Are you sure you want to delete <strong id="deleteCategoryName" class="text-slate-800"></strong>?
-        <span class="block text-rose-500 text-[11px] font-semibold mt-1">Warning: Linked courses and exams may be affected.</span>
+        Bạn có chắc chắn muốn xóa danh mục <strong id="deleteCategoryName" class="text-slate-800"></strong>?
+        <span class="block text-rose-500 text-[11px] font-semibold mt-1">Lưu ý: Các khóa học và đề thi thuộc danh mục này sẽ bị ảnh hưởng phân loại.</span>
       </p>
 
       <div class="flex items-center justify-center gap-3">
-        <button id="cancelDeleteBtn" class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
-          Cancel
+        <button onclick="closeDeleteCategoryModal()"
+          class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
+          Hủy
         </button>
-        <button id="confirmDeleteBtn"
+        <button id="confirmDeleteCategoryBtn"
           class="w-full px-4 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-sm transition-all">
-          Delete Category
+          Xóa Danh Mục
         </button>
       </div>
 
@@ -472,159 +448,235 @@
   </div>
 
   <!-- ========================================== -->
-  <!-- 6. REALISTIC MOCK DATA & CRUD SCRIPT       -->
+  <!-- 6. REALISTIC JAPANESE LEARNING CONTENT     -->
   <!-- ========================================== -->
   <script>
     let categoriesData = [
       {
         id: 1,
-        name: "Sơ cấp N5 (Beginner Foundation)",
-        linked_courses_count: 15,
-        linked_exams_count: 6
+        code: "N5 - N1",
+        name: "Từ vựng",
+        description: "Học và ôn tập từ vựng tiếng Nhật theo cấp độ JLPT từ N5 đến N1, từ vựng theo chủ đề đời sống và công sở.",
+        linked_courses_count: 18,
+        linked_exams_count: 8,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
       },
       {
         id: 2,
-        name: "Sơ trung cấp N4 (Elementary)",
-        linked_courses_count: 14,
-        linked_exams_count: 6
+        code: "N5 - N1",
+        name: "Kanji",
+        description: "Luyện 2.136 chữ Hán thường dùng từ N5 đến N1 với quy tắc viết nét, âm On/Kun, ý nghĩa và từ ghép minh họa.",
+        linked_courses_count: 15,
+        linked_exams_count: 6,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
       },
       {
         id: 3,
-        name: "Trung cấp N3 (Intermediate Bridge)",
-        linked_courses_count: 18,
-        linked_exams_count: 8
+        code: "N5 - N1",
+        name: "Ngữ pháp",
+        description: "Hệ thống đầy đủ các cấu trúc ngữ pháp tiếng Nhật từ N5 đến N1 kèm giải thích ngữ cảnh và bài tập thực hành.",
+        linked_courses_count: 22,
+        linked_exams_count: 10,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
       },
       {
         id: 4,
-        name: "Trung cao cấp N2 (Upper-Intermediate)",
-        linked_courses_count: 10,
-        linked_exams_count: 5
+        code: "N5 - N1",
+        name: "Luyện đọc",
+        description: "Luyện đọc hiểu đoản văn, trung văn, trường văn và các dạng bài tìm kiếm thông tin sát đề thi JLPT.",
+        linked_courses_count: 12,
+        linked_exams_count: 5,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
       },
       {
         id: 5,
-        name: "Cao cấp N1 (Advanced Mastery)",
-        linked_courses_count: 5,
-        linked_exams_count: 3
+        code: "N5 - N1",
+        name: "Luyện nghe",
+        description: "Luyện nghe hiểu phản xạ, hội thoại tình huống thực tế và bài tập nghe hiểu JLPT chuẩn giọng Tokyo.",
+        linked_courses_count: 14,
+        linked_exams_count: 6,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
+      },
+      {
+        id: 6,
+        code: "Nhập môn",
+        name: "Phát âm & Bảng chữ cái",
+        description: "Nhập môn bảng chữ cái Hiragana, Katakana, biến âm, trường âm, âm ngắt và ngữ điệu trọng âm tiếng Nhật.",
+        linked_courses_count: 6,
+        linked_exams_count: 2,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
+      },
+      {
+        id: 7,
+        code: "Giao tiếp",
+        name: "Giao tiếp & Shadowing",
+        description: "Hội thoại đời sống thường nhật, tiếng Nhật công sở (Keigo), giao tiếp thương mại và luyện Shadowing phản xạ.",
+        linked_courses_count: 10,
+        linked_exams_count: 0,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
+      },
+      {
+        id: 8,
+        code: "N5 - N1",
+        name: "Luyện thi JLPT",
+        description: "Tổng hợp ngân hàng đề thi thử bám sát cấu trúc thi thật từ cấp độ N5 đến N1 kèm giải thích chi tiết.",
+        linked_courses_count: 16,
+        linked_exams_count: 5,
+        is_published: 1,
+        thumbnail_img: "assets/images/book_3d.jpg"
       }
     ];
 
-    let currentEditingId = null;
-    let currentDeletingId = null;
+    let deletingCategoryId = null;
 
-    // Toast helper
     function showToast(msg) {
       const toast = document.getElementById("toast");
-      const toastMessage = document.getElementById("toastMessage");
-      toastMessage.textContent = msg;
+      document.getElementById("toastMessage").textContent = msg;
       toast.classList.remove("hidden");
-      setTimeout(() => {
-        toast.classList.add("hidden");
-      }, 3000);
+      setTimeout(() => toast.classList.add("hidden"), 3000);
     }
 
-    // Render Table
     function renderCategories() {
-      const tbody = document.getElementById("categoriesTableBody");
-      const searchVal = document.getElementById("searchInput").value.trim().toLowerCase();
-      const emptyState = document.getElementById("emptyState");
+      const cardGrid = document.getElementById("categoriesCardGrid");
+      const searchVal = document.getElementById("categorySearchInput").value.trim().toLowerCase();
+      const statusVal = document.getElementById("statusFilter").value;
+      const emptyState = document.getElementById("categoryEmptyState");
 
-      // Filter
       const filtered = categoriesData.filter(item => {
-        return item.name.toLowerCase().includes(searchVal);
+        const matchStatus = (statusVal === "ALL") ||
+                            (statusVal === "published" && item.is_published === 1) ||
+                            (statusVal === "draft" && item.is_published === 0);
+        const matchSearch = item.name.toLowerCase().includes(searchVal) ||
+                            item.code.toLowerCase().includes(searchVal) ||
+                            (item.description && item.description.toLowerCase().includes(searchVal));
+        return matchStatus && matchSearch;
       });
 
-      // Update Summary Stats
+      // Update KPI Statistics
       document.getElementById("statTotalCategories").textContent = categoriesData.length;
-      const totalCourses = categoriesData.reduce((sum, i) => sum + (i.linked_courses_count || 0), 0);
-      const totalExams = categoriesData.reduce((sum, i) => sum + (i.linked_exams_count || 0), 0);
+      document.getElementById("statPublishedCategories").textContent = categoriesData.filter(c => c.is_published === 1).length;
+      const totalCourses = categoriesData.reduce((sum, c) => sum + (c.linked_courses_count || 0), 0);
+      const totalExams = categoriesData.reduce((sum, c) => sum + (c.linked_exams_count || 0), 0);
       document.getElementById("statLinkedCourses").textContent = totalCourses;
       document.getElementById("statLinkedExams").textContent = totalExams;
-      document.getElementById("tableShowingCount").textContent = `Showing ${filtered.length} of ${categoriesData.length} Categories`;
+      document.getElementById("sidebarCategoryCount").textContent = categoriesData.length;
+      document.getElementById("tableShowingCategoriesCount").textContent = `Showing ${filtered.length} of ${categoriesData.length} Categories`;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = "";
+        cardGrid.innerHTML = "";
         emptyState.classList.remove("hidden");
         return;
-      } else {
-        emptyState.classList.add("hidden");
       }
+      emptyState.classList.add("hidden");
 
-      tbody.innerHTML = filtered.map(item => {
+      // Render Cards matching Course UI card structure & format
+      cardGrid.innerHTML = filtered.map(item => {
+        const statusBadge = item.is_published === 1
+          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+               <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+             </span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+               <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft
+             </span>`;
+
+        const popularityScore = item.linked_courses_count * 15 + item.id * 12 + 180;
+        const activitiesCount = item.linked_courses_count * 4;
+
         return `
-          <tr class="hover:bg-slate-50/80 transition-colors group">
-            <!-- ID -->
-            <td class="py-4 pl-3 font-mono text-slate-400 text-xs">
-              #${item.id}
-            </td>
-
-            <!-- Category -->
-            <td class="py-4 px-4">
-              <p class="font-bold text-slate-900 text-xs md:text-sm group-hover:text-sky-600 transition-colors">
-                ${item.name}
-              </p>
-            </td>
-
-            <!-- Linked Courses -->
-            <td class="py-4 px-4 text-center">
-              <span class="inline-block px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 font-bold text-xs border border-sky-100">
-                ${item.linked_courses_count} Courses
-              </span>
-            </td>
-
-            <!-- Linked Exams -->
-            <td class="py-4 px-4 text-center">
-              <span class="inline-block px-2.5 py-1 rounded-xl bg-emerald-50 text-emerald-700 font-bold text-xs border border-emerald-100">
-                ${item.linked_exams_count} Exams
-              </span>
-            </td>
-
-            <!-- Actions -->
-            <td class="py-4 pr-4 text-right">
-              <div class="flex items-center justify-end gap-1.5">
-                <!-- Edit Button -->
-                <button onclick="openEditModal(${item.id})"
-                  class="w-8 h-8 rounded-xl hover:bg-sky-50 text-slate-400 hover:text-sky-600 flex items-center justify-center transition-colors"
-                  title="Edit Category">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                  </svg>
-                </button>
-
-                <!-- Delete Button -->
-                <button onclick="openDeleteModal(${item.id})"
-                  class="w-8 h-8 rounded-xl hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-colors"
-                  title="Delete Category">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                  </svg>
-                </button>
+          <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col justify-between">
+            <div>
+              <!-- Top Row: Icon + Title + Flame Metric -->
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <img src="${item.thumbnail_img}" alt="${item.name}" class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                  <div class="min-w-0">
+                    <a href="admin_courses.html?category_id=${item.id}" class="block text-sm font-extrabold text-slate-900 hover:text-sky-600 line-clamp-2 transition-colors">
+                      ${item.name}
+                    </a>
+                  </div>
+                </div>
+                <span class="shrink-0 inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                  🔥 ${popularityScore}
+                </span>
               </div>
-            </td>
-          </tr>
+
+              <!-- Description -->
+              <p class="mt-4 text-xs leading-relaxed text-slate-500 line-clamp-2">
+                ${item.description || 'Chưa có mô tả chi tiết cho danh mục này.'}
+              </p>
+
+              <!-- Middle Meta Row -->
+              <div class="mt-4 flex items-center gap-4 text-xs font-semibold text-slate-500">
+                <span>${item.linked_courses_count} lessons</span>
+                <span>${item.linked_courses_count * 45} min</span>
+                <span class="text-slate-700 font-bold">${item.code}</span>
+              </div>
+            </div>
+
+            <div>
+              <!-- Status & Action Icons Row -->
+              <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between">
+                <span>${statusBadge}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-sky-600 mr-1">${activitiesCount} activities</span>
+                  <!-- Action Icons (Icon-Only matching Course style) -->
+                  <button type="button" onclick="openEditCategoryModal(${item.id})" title="Sửa danh mục" aria-label="Sửa danh mục"
+                    class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200/80 hover:border-sky-200 text-slate-500 hover:text-sky-600 flex items-center justify-center transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button type="button" onclick="openDeleteCategoryModal(${item.id})" title="Xóa danh mục" aria-label="Xóa danh mục"
+                    class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200/80 hover:border-rose-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Main Card Bottom Action Button (Full-width Dark 'Xem' Button) -->
+              <div class="mt-5">
+                <a href="admin_courses.html?category_id=${item.id}"
+                  class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">
+                  Xem
+                </a>
+              </div>
+            </div>
+          </article>
         `;
       }).join("");
     }
 
-    // Modal Handlers
-    function openAddModal() {
-      currentEditingId = null;
-      document.getElementById("modalTitle").textContent = "Add New Category";
-      document.getElementById("categoryForm").reset();
+    // Modal Operations
+    function openAddCategoryModal() {
+      document.getElementById("categoryModalTitle").textContent = "Thêm Danh Mục Tiếng Nhật";
       document.getElementById("formCategoryId").value = "";
+      document.getElementById("formName").value = "";
+      document.getElementById("formCode").value = "N5 - N1";
+      document.getElementById("formStatus").value = "1";
+      document.getElementById("formDescription").value = "";
       document.getElementById("categoryModal").classList.remove("hidden");
       document.getElementById("categoryModal").classList.add("flex");
     }
 
-    function openEditModal(id) {
+    function openEditCategoryModal(id) {
       const item = categoriesData.find(c => c.id === id);
       if (!item) return;
 
-      currentEditingId = id;
-      document.getElementById("modalTitle").textContent = `Edit Category: ${item.name}`;
+      document.getElementById("categoryModalTitle").textContent = `Chỉnh sửa: ${item.name}`;
       document.getElementById("formCategoryId").value = item.id;
       document.getElementById("formName").value = item.name;
+      document.getElementById("formCode").value = item.code || "N5 - N1";
+      document.getElementById("formStatus").value = item.is_published ? "1" : "0";
+      document.getElementById("formDescription").value = item.description || "";
 
       document.getElementById("categoryModal").classList.remove("hidden");
       document.getElementById("categoryModal").classList.add("flex");
@@ -635,20 +687,19 @@
       document.getElementById("categoryModal").classList.remove("flex");
     }
 
-    function openDeleteModal(id) {
+    function openDeleteCategoryModal(id) {
+      deletingCategoryId = id;
       const item = categoriesData.find(c => c.id === id);
       if (!item) return;
-
-      currentDeletingId = id;
       document.getElementById("deleteCategoryName").textContent = item.name;
-      document.getElementById("deleteModal").classList.remove("hidden");
-      document.getElementById("deleteModal").classList.add("flex");
+      document.getElementById("deleteCategoryModal").classList.remove("hidden");
+      document.getElementById("deleteCategoryModal").classList.add("flex");
     }
 
-    function closeDeleteModal() {
-      document.getElementById("deleteModal").classList.add("hidden");
-      document.getElementById("deleteModal").classList.remove("flex");
-      currentDeletingId = null;
+    function closeDeleteCategoryModal() {
+      document.getElementById("deleteCategoryModal").classList.add("hidden");
+      document.getElementById("deleteCategoryModal").classList.remove("flex");
+      deletingCategoryId = null;
     }
 
     // DOM Ready Event Listeners
@@ -656,39 +707,48 @@
       renderCategories();
 
       // Search & Filters
-      document.getElementById("searchInput").addEventListener("input", renderCategories);
-      document.getElementById("resetFilterBtn").addEventListener("click", () => {
-        document.getElementById("searchInput").value = "";
+      document.getElementById("categorySearchInput").addEventListener("input", renderCategories);
+      document.getElementById("statusFilter").addEventListener("change", renderCategories);
+      document.getElementById("resetCategoriesFilterBtn").addEventListener("click", () => {
+        document.getElementById("categorySearchInput").value = "";
+        document.getElementById("statusFilter").value = "ALL";
         renderCategories();
       });
 
-      // Modal Open/Close
-      document.getElementById("openAddCategoryBtn").addEventListener("click", openAddModal);
-      document.getElementById("closeModalBtn").addEventListener("click", closeCategoryModal);
-      document.getElementById("cancelModalBtn").addEventListener("click", closeCategoryModal);
+      // Modal Triggers
+      document.getElementById("openAddCategoryBtn").addEventListener("click", openAddCategoryModal);
 
-      // Form Submit (Save Category)
+      // Form Submit (Add / Edit)
       document.getElementById("categoryForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        const name = document.getElementById("formName").value.trim();
+        const editId = document.getElementById("formCategoryId").value;
+        const nameVal = document.getElementById("formName").value.trim();
+        const codeVal = document.getElementById("formCode").value;
+        const statusVal = parseInt(document.getElementById("formStatus").value);
+        const descVal = document.getElementById("formDescription").value.trim();
 
-        if (currentEditingId) {
-          // Update
-          const index = categoriesData.findIndex(c => c.id === currentEditingId);
-          if (index !== -1) {
-            categoriesData[index].name = name;
-            showToast(`Category updated successfully!`);
+        if (editId) {
+          const idx = categoriesData.findIndex(c => c.id == editId);
+          if (idx !== -1) {
+            categoriesData[idx].name = nameVal;
+            categoriesData[idx].code = codeVal;
+            categoriesData[idx].is_published = statusVal;
+            categoriesData[idx].description = descVal;
+            showToast(`Danh mục "${nameVal}" đã được cập nhật thành công!`);
           }
         } else {
-          // Create
           const newId = categoriesData.length > 0 ? Math.max(...categoriesData.map(c => c.id)) + 1 : 1;
           categoriesData.push({
             id: newId,
-            name: name,
+            name: nameVal,
+            code: codeVal,
+            is_published: statusVal,
+            description: descVal,
             linked_courses_count: 0,
-            linked_exams_count: 0
+            linked_exams_count: 0,
+            thumbnail_img: "assets/images/book_3d.jpg"
           });
-          showToast(`New Category created successfully!`);
+          showToast(`Đã tạo mới danh mục "${nameVal}"!`);
         }
 
         closeCategoryModal();
@@ -696,13 +756,12 @@
       });
 
       // Delete Confirm
-      document.getElementById("cancelDeleteBtn").addEventListener("click", closeDeleteModal);
-      document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
-        if (currentDeletingId) {
-          const item = categoriesData.find(c => c.id === currentDeletingId);
-          categoriesData = categoriesData.filter(c => c.id !== currentDeletingId);
-          showToast(`Category deleted.`);
-          closeDeleteModal();
+      document.getElementById("confirmDeleteCategoryBtn").addEventListener("click", () => {
+        if (deletingCategoryId) {
+          const item = categoriesData.find(c => c.id === deletingCategoryId);
+          categoriesData = categoriesData.filter(c => c.id !== deletingCategoryId);
+          showToast(`Đã xóa danh mục "${item ? item.name : ''}".`);
+          closeDeleteCategoryModal();
           renderCategories();
         }
       });

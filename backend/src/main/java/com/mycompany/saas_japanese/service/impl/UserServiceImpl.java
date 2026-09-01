@@ -60,12 +60,10 @@ public class UserServiceImpl implements UserService {
     if (authentication == null || !authentication.isAuthenticated()) {
       throw new BadRequestException("Unauthenticated");
     }
-    // Kiểm tra xem Principal có phải là Jwt không
     if (authentication.getPrincipal() instanceof Jwt jwt) {
-      // Lấy chính xác claim "sub" từ Payload JWT
-      String email = jwt.getSubject(); // Trả về "test@gmail.com"
+      String email = jwt.getSubject();
       if (email != null) {
-        return email.trim(); // .trim() để xóa khoảng trắng thừa nếu có
+        return email.trim();
       }
     }
     return authentication.getName();

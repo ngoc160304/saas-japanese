@@ -33,6 +33,7 @@
       box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -120,7 +121,7 @@
       </header>
 
       <!-- Course Creation Form Card -->
-      <div class="max-w-4xl bg-white rounded-3xl p-6 md:p-8 border border-slate-100 shadow-soft">
+      <div class="w-full max-w-5xl mx-auto bg-white rounded-3xl p-6 md:p-8 lg:p-10 border border-slate-100 shadow-soft">
         
         <form id="courseCreateForm" class="space-y-6">
           <input type="hidden" id="editCourseId" value="" />
@@ -136,10 +137,10 @@
           </div>
 
           <!-- Row 2: Course Category, Price, Display Order -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="grid grid-cols-1 md:grid-cols-6 gap-5">
             
             <!-- Course Category -->
-            <div>
+            <div class="md:col-span-3">
               <label for="courseJlptLevel" class="block text-xs font-bold text-slate-700 mb-1.5">
                 Course Category <span class="text-rose-500">*</span>
               </label>
@@ -154,7 +155,7 @@
             </div>
 
             <!-- Price -->
-            <div>
+            <div class="md:col-span-2">
               <label for="coursePrice" class="block text-xs font-bold text-slate-700 mb-1.5">
                 Price (VND)
               </label>
@@ -167,7 +168,7 @@
             </div>
 
             <!-- Sort Order -->
-            <div>
+            <div class="md:col-span-1">
               <label for="courseSortOrder" class="block text-xs font-bold text-slate-700 mb-1.5">
                 Display Order
               </label>
@@ -187,7 +188,7 @@
           </div>
 
           <!-- Row 4: Thumbnail Selection & Publish Status -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2 border-t border-slate-100">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100">
             
             <!-- Thumbnail Media Preview -->
             <div>
@@ -228,7 +229,7 @@
           </div>
 
           <!-- Bottom Actions -->
-          <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+          <div class="flex flex-col-reverse sm:flex-row sm:items-center sm:justify-between gap-3 pt-6 border-t border-slate-100">
             <a href="admin_courses.html" class="px-5 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
               Cancel & Return
             </a>
