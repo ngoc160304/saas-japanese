@@ -4,14 +4,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>StudyJLPT Admin - Quản lý Nội dung Bài học (Lesson Content Hub)</title>
+  <title>StudyJLPT Admin — Lesson Content & Curriculum Tree</title>
   <meta name="description"
-    content="Admin Lesson Content Management Hub for StudyJLPT Platform. Manage Vocabularies, Kanjis, Grammar + Video, and Quizzes." />
+    content="StudyJLPT Admin Lesson Content Management Workspace. Manage Course Sections, Lessons, Grammar, Vocabulary, Kanji, Quizzes, and Supporting Resources." />
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 
   <!-- Tailwind CSS v4 CDN -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
@@ -21,6 +23,7 @@
       --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
       --color-brand: #0284c7;
       --color-brand-dark: #0f172a;
+      --color-navy: #2B4C7E;
     }
 
     body {
@@ -30,485 +33,778 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Custom Slim Scrollbars */
     ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+      width: 5px;
+      height: 5px;
     }
     ::-webkit-scrollbar-track {
-      background: #f1f5f9;
+      background: transparent;
     }
     ::-webkit-scrollbar-thumb {
       background: #cbd5e1;
       border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
     }
 
     .shadow-soft {
       box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
     }
 
-    .shadow-hover {
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .shadow-hover:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.07), 0 3px 8px -2px rgba(15, 23, 42, 0.03);
+    .shadow-card {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
     }
 
     .modal-backdrop {
-      background-color: rgba(15, 23, 42, 0.5);
-      backdrop-filter: blur(4px);
+      background-color: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(5px);
+    }
+
+    /* Active Lesson in Tree */
+    .tree-lesson-active {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+    .tree-lesson-active .lesson-title {
+      color: #ffffff !important;
+    }
+    .tree-lesson-active .lesson-meta {
+      color: #94a3b8 !important;
+    }
+
+    .tree-content-active {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      border-color: #bae6fd;
+    }
+
+    /* Main Tab Indicator */
+    .tab-active {
+      background-color: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+
+    .tab-inactive {
+      background-color: #ffffff;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+    .tab-inactive:hover {
+      background-color: #f8fafc;
+      color: #1e293b;
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
-<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
-  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa] flex flex-col overflow-x-hidden">
 
-    <!-- Left Sidebar -->
-    <aside id="sidebar"
-      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30">
-      <div>
-        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
-              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
-              </svg>
-            </div>
-            <span class="text-xl font-extrabold tracking-tight text-slate-900">
-              Studify <span class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100">ADMIN</span>
-            </span>
+  <!-- ========================================================================= -->
+  <!-- 1. TOP GLOBAL NAVBAR (Course Switcher, Breadcrumbs, Actions)               -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 px-4 lg:px-6 py-2.5 shadow-xs shrink-0">
+    <div class="flex items-center justify-between gap-4">
+
+      <!-- Left: Brand & Course Info -->
+      <div class="flex items-center gap-3 md:gap-5">
+        <!-- Logo -->
+        <a href="admin_courses.html" class="flex items-center gap-2.5 shrink-0 group">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
           </div>
-        </div>
+          <span class="hidden sm:inline text-lg font-extrabold tracking-tight text-slate-900">
+            StudyJLPT <span
+              class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 uppercase tracking-wider">ADMIN</span>
+          </span>
+        </a>
 
-        <div class="px-3 mb-2.5">
-          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Navigation</span>
-        </div>
+        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
 
-        <nav class="space-y-1.5">
-          <a href="admin_courses.html" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            <span>Courses</span>
-          </a>
-
-          <a href="admin_categories.html" class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm">
-            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <span>Categories</span>
-          </a>
+        <!-- Breadcrumb & Course Title -->
+        <nav class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap" aria-label="Breadcrumb">
+          <a href="admin_courses.html" class="hover:text-slate-900 font-semibold text-slate-400">Courses</a>
+          <span class="text-slate-300">/</span>
+          <div class="relative group">
+            <button id="courseSelectDropdownBtn"
+              class="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="topCourseTitle">Tiếng Nhật Trung Cấp N3 Soumatome</span>
+              <span class="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-sky-100 text-sky-700">N3</span>
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+          </div>
+          <span class="text-slate-300">/</span>
+          <span id="topBreadcrumbSection" class="text-slate-500 font-medium hidden md:inline">Chương 1</span>
+          <span class="text-slate-300 hidden md:inline">/</span>
+          <span id="topBreadcrumbLesson" class="text-slate-900 font-bold">Bài 1</span>
         </nav>
       </div>
 
-      <div class="mt-8 pt-4">
-        <a id="backToLessonsOutlineLink" href="admin_course_detail.html?course_id=1"
-          class="text-xs text-slate-500 hover:text-slate-900 flex items-center gap-1.5 font-semibold">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      <!-- Right: Action Controls -->
+      <div class="flex items-center gap-2 md:gap-3">
+
+        <!-- Toggle Sidebar (Mobile / Tablet) -->
+        <button id="mobileTreeToggleBtn"
+          class="lg:hidden p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100"
+          title="Toggle Content Tree">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
           </svg>
-          <span>Back to Lessons</span>
+        </button>
+
+        <!-- Course Detail Link -->
+        <a href="admin_course_detail.html?course_id=1"
+          class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Outline</span>
         </a>
+
+        <!-- Student Portal Preview -->
+        <a id="studentPreviewLink" href="dashboard.html" target="_blank"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold transition-all shadow-2xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>Student View</span>
+        </a>
+
+        <!-- Admin Avatar -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+            AD
+          </div>
+        </div>
       </div>
-    </aside>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+    </div>
+  </header>
 
-      <!-- Breadcrumbs & Header -->
-      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <div>
-          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1 flex-wrap">
-            <a href="admin_courses.html" class="hover:text-slate-600">Courses</a>
-            <span>/</span>
-            <a id="breadcrumbCourseName" href="admin_course_detail.html?course_id=1" class="hover:text-slate-600 font-bold">N3 Soumatome</a>
-            <span>/</span>
-            <span class="text-slate-600 font-bold" id="breadcrumbLessonNum">Lesson 1</span>
-            <span>/</span>
-            <span class="text-slate-900">Content Hub</span>
-          </nav>
-          
-          <div class="flex items-center gap-3">
-            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight" id="lessonHeaderTitle">
-              Bài 1: Cấu trúc ~わけがない & ~わけではない
-            </h1>
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-              Published
+  <!-- ========================================================================= -->
+  <!-- 2. TWO-COLUMN MAIN WORKSPACE CONTAINER                                    -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- ======================================================================= -->
+    <!-- COLUMN 1: LEFT CONTENT TREE NAVIGATION (Clean 2-Level Section -> Lesson)-->
+    <!-- ======================================================================= -->
+    <aside id="contentTreeSidebar"
+      class="w-80 lg:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-30 transition-all duration-300 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0 h-[calc(100vh-53px)]">
+
+      <!-- Tree Header: Search & Expand Toggle -->
+      <div class="p-4 border-b border-slate-100 shrink-0 bg-slate-50/50">
+
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              <span>Curriculum Tree</span>
             </span>
           </div>
-          <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Quản lý 4 phân hệ nội dung bài học: Từ vựng, Kanji, Ngữ pháp + Video bài giảng, và Bài kiểm tra Quiz.
-          </p>
-        </div>
 
-        <div class="flex items-center gap-2.5">
-          <a id="previewLessonBtn" href="student_dashboard.html"
-            class="px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs shadow-soft transition-colors flex items-center gap-1.5">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span>Student View</span>
-          </a>
-        </div>
-      </header>
-
-      <!-- Lesson Completion Overview Cards -->
-      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        
-        <!-- Vocab Tab Card -->
-        <button onclick="switchTab('vocab')" id="tabBtn-vocab"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-sky-500 shadow-soft text-left transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-sky-600 uppercase tracking-wider">1. Vocabulary</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
+          <div class="flex items-center gap-1">
+            <button type="button" onclick="toggleExpandAllTree()" id="expandCollapseAllBtn"
+              class="px-2 py-1 rounded-lg text-[11px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+              title="Expand / Collapse all sections">
+              Collapse All
+            </button>
+            <!-- Close button for mobile drawer -->
+            <button onclick="toggleMobileTree(false)"
+              class="lg:hidden p-1 text-slate-400 hover:text-slate-700">✕</button>
           </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewVocabCount">20 Words</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `vocabularies`</p>
+        </div>
+
+        <!-- Realtime Search Bar -->
+        <div class="relative">
+          <input type="text" id="treeSearchInput" oninput="filterContentTree()"
+            placeholder="Search lesson or chapter..."
+            class="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-2xs" />
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clearTreeSearchBtn" onclick="clearTreeSearch()"
+            class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+        </div>
+
+        <!-- Curriculum Statistics Bar -->
+        <div class="flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-2.5 px-0.5">
+          <span id="treeStatsOverview">3 Chapters · 5 Lessons</span>
+          <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100 font-bold"
+            id="treeCourseBadge">JLPT N3</span>
+        </div>
+      </div>
+
+      <!-- Tree Nodes Scroll Area (2-Level: Section -> Lesson) -->
+      <div id="treeContainer" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+        <!-- Rendered dynamically via renderContentTree() -->
+      </div>
+
+      <!-- Tree Bottom Action Buttons -->
+      <div class="p-3 border-t border-slate-100 bg-slate-50/70 shrink-0 grid grid-cols-2 gap-2">
+        <button type="button" onclick="openAddSectionModal()"
+          class="px-3 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs shadow-2xs flex items-center justify-center gap-1.5 transition-all">
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2.5"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span> Section</span>
         </button>
 
-        <!-- Kanji Tab Card -->
-        <button onclick="switchTab('kanji')" id="tabBtn-kanji"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">2. Kanji</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
-          </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewKanjiCount">8 Characters</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `kanjis`</p>
+        <button type="button" onclick="openAddLessonModal()"
+          class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-2xs flex items-center justify-center gap-1.5 transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span> Lesson</span>
         </button>
+      </div>
 
-        <!-- Grammar + Video Tab Card -->
-        <button onclick="switchTab('grammar')" id="tabBtn-grammar"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">3. Grammar + Video</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ Ready</span>
-          </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewGrammarCount">4 Pts · 1 Video</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">`grammars` + `media`</p>
-        </button>
+    </aside>
 
-        <!-- Quiz Tab Card -->
-        <button onclick="switchTab('quiz')" id="tabBtn-quiz"
-          class="content-tab-btn bg-white rounded-3xl p-5 border-2 border-transparent hover:border-slate-200 shadow-soft text-left transition-all">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">4. Quiz</span>
-            <span class="text-xs text-emerald-600 font-bold">✓ 60% Pass</span>
-          </div>
-          <p class="text-2xl font-extrabold text-slate-900 mt-1" id="overviewQuizCount">10 Questions</p>
-          <p class="text-[11px] text-slate-400 mt-0.5 font-mono">table `quizzes`</p>
-        </button>
+    <!-- Mobile Overlay Backdrop -->
+    <div id="mobileTreeBackdrop" onclick="toggleMobileTree(false)"
+      class="fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-xs hidden lg:hidden"></div>
 
-      </section>
+    <!-- ======================================================================= -->
+    <!-- COLUMN 2: MAIN CONTENT WORKSPACE                                        -->
+    <!-- ======================================================================= -->
+    <main class="flex-1 flex flex-col h-[calc(100vh-53px)] overflow-y-auto bg-[#f3f6fa] p-4 md:p-6 lg:p-7">
 
-      <!-- ======================================================== -->
-      <!-- SECTION 1: VOCABULARY MANAGEMENT TAB                     -->
-      <!-- ======================================================== -->
-      <section id="tabContent-vocab" class="tab-pane bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Vocabulary Management</span>
-              <span class="text-xs font-semibold text-sky-600 bg-sky-50 px-2.5 py-0.5 rounded-full">vocabularies</span>
-            </h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">Danh sách từ vựng trong bài học: Từ tiếng Nhật, Cách đọc Furigana, Nghĩa tiếng Việt, Câu ví dụ.</p>
-          </div>
+      <!-- ===================================================================== -->
+      <!-- A. LESSON HEADER BANNER (With Secondary Resources Button)              -->
+      <!-- ===================================================================== -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft mb-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
 
-          <button onclick="openAddVocabModal()"
-            class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>+ Add Vocabulary</span>
-          </button>
-        </div>
-
-        <!-- Vocab Table -->
-        <div class="overflow-x-auto">
-          <table class="w-full text-left border-collapse">
-            <thead>
-              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-2 font-semibold">Word (`word`)</th>
-                <th class="pb-3 px-3 font-semibold">Reading (`reading`)</th>
-                <th class="pb-3 px-3 font-semibold">Meaning (`meaning_vi`)</th>
-                <th class="pb-3 px-3 font-semibold">Type (`part_of_speech`)</th>
-                <th class="pb-3 px-4 font-semibold">Example Sentence (`example_sentence_jp`)</th>
-                <th class="pb-3 pr-2 font-semibold text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="vocabTableBody" class="divide-y divide-slate-100/70 text-xs">
-              <!-- Rendered via JS -->
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- ======================================================== -->
-      <!-- SECTION 2: KANJI MANAGEMENT TAB                          -->
-      <!-- ======================================================== -->
-      <section id="tabContent-kanji" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Kanji Management</span>
-              <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">kanjis</span>
-            </h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">Quản lý chữ Hán trong bài học: Chữ Kanji, Âm Onyomi, Âm Kunyomi, Nghĩa Hán Việt, Số nét.</p>
-          </div>
-
-          <button onclick="openAddKanjiModal()"
-            class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>+ Add Kanji</span>
-          </button>
-        </div>
-
-        <!-- Kanji Cards Grid -->
-        <div id="kanjiGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <!-- Rendered via JS -->
-        </div>
-      </section>
-
-      <!-- ======================================================== -->
-      <!-- SECTION 3: GRAMMAR + LESSON VIDEO (UNIFIED SUBMISSION)   -->
-      <!-- ======================================================== -->
-      <section id="tabContent-grammar" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Grammar & Lesson Video</span>
-              <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">Unified Submission</span>
-            </h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">
-              Cấu hình Video bài giảng (`lessons.video_media_id`) và các điểm Ngữ pháp (`grammars`) được lưu đồng thời trong 1 lần gửi.
-            </p>
-          </div>
-
-          <button type="submit" form="grammarVideoForm"
-            class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-            </svg>
-            <span>Save Grammar & Video</span>
-          </button>
-        </div>
-
-        <form id="grammarVideoForm" class="space-y-6">
-          
-          <!-- Lesson Video Upload / Selector Card -->
-          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200">
-            <div class="flex items-center justify-between mb-3">
-              <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
-                <span>Lesson Video Media (`lessons.video_media_id` FK -> `media.id`)</span>
-              </label>
-              <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-                1 Video Attached
+          <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs in Card -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5 flex-wrap">
+              <span id="wsSectionBadge" class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 font-bold">Chương 1:
+                Khởi động & Căn bản</span>
+              <span>•</span>
+              <span id="wsLessonOrderBadge" class="text-slate-600 font-bold">Lesson #1.1</span>
+              <span>•</span>
+              <span
+                class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold inline-flex items-center gap-1"
+                id="wsLessonStatusBadge">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
               </span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <!-- Video Preview Thumbnail -->
-              <div class="aspect-video bg-slate-900 rounded-xl flex flex-col items-center justify-center text-white relative overflow-hidden group">
-                <svg class="w-10 h-10 text-white/80 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-                <span class="text-[10px] text-slate-300 font-mono mt-1">video_n3_lesson_1.mp4 (45:12)</span>
-              </div>
+            <!-- Dynamic Lesson Title -->
+            <h1 id="wsLessonTitle"
+              class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">
+              Bài 1: Cấu trúc ~わけがない & ~わけではない
+            </h1>
 
-              <!-- Media details -->
-              <div class="md:col-span-2 flex flex-col justify-between">
-                <div>
-                  <input type="text" value="https://cdn.studyjlpt.com/videos/n3/lesson_1_wakeganai.mp4"
-                    class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-800" />
-                  <p class="text-[10px] text-slate-400 mt-1">File format: MP4 1080p • Size: 245 MB • MIME: video/mp4</p>
-                </div>
-                <div class="flex items-center gap-2 mt-2">
-                  <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50">
-                    Replace Video
-                  </button>
-                  <button type="button" class="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50">
-                    Remove Video
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Grammar Points Builder List -->
-          <div>
-            <div class="flex items-center justify-between mb-3">
-              <label class="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Grammar Points in this Lesson (`grammars` Table)
-              </label>
-              <button type="button" onclick="addGrammarPointRow()"
-                class="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1">
-                <span>+ Add Grammar Point</span>
-              </button>
-            </div>
-
-            <!-- List of Grammar Items -->
-            <div id="grammarPointsList" class="space-y-4">
-              <!-- Item 1 -->
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-bold text-slate-800">Grammar Point #1</span>
-                  <button type="button" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
-                </div>
-                <input type="text" value="~わけがない / ~わけはない (Làm sao mà... được / Tuyệt đối không thể)"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 mb-2" />
-                <textarea rows="3"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 leading-relaxed font-sans">**Ý nghĩa**: Biểu thị sự khẳng định chắc chắn của người nói rằng "tuyệt đối không thể có chuyện đó xảy ra" dựa trên căn cứ logic hoặc tình hình thực tế.
-
-**Cấu trúc**: V/A/N (thể thông thường) + わけがない (Tính từ đuôi な giữ nguyên な, Danh từ + である/な + わけがない).
-
-**Ví dụ**:
-1. こんな難しい問題、小学生にできるわけがない。(Bài toán khó thế này, học sinh tiểu học làm sao mà giải được!)</textarea>
-              </div>
-
-              <!-- Item 2 -->
-              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-                <div class="flex items-center justify-between mb-2">
-                  <span class="text-xs font-bold text-slate-800">Grammar Point #2</span>
-                  <button type="button" class="text-xs text-rose-500 font-semibold hover:underline">Delete</button>
-                </div>
-                <input type="text" value="~わけではない / ~わけでもない (Không hẳn là / Không có nghĩa là)"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 mb-2" />
-                <textarea rows="3"
-                  class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 leading-relaxed font-sans">**Ý nghĩa**: Phủ định một phần nhận định, không hoàn toàn đồng tình ("không hẳn là như vậy").
-
-**Ví dụ**:
-1. 嫌いなわけではないが、辛い物はあまり食べない。(Không hẳn là ghét, nhưng đồ cay thì tôi không ăn mấy).</textarea>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Bottom Unified Submit Button -->
-          <div class="pt-4 border-t border-slate-100 flex items-center justify-end">
-            <button type="submit"
-              class="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm transition-all flex items-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-              </svg>
-              <span>Submit & Save Grammar + Video Workflow</span>
-            </button>
-          </div>
-
-        </form>
-      </section>
-
-      <!-- ======================================================== -->
-      <!-- SECTION 4: QUIZ MANAGEMENT TAB                           -->
-      <!-- ======================================================== -->
-      <section id="tabContent-quiz" class="tab-pane hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <span>Lesson Quiz Management</span>
-              <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full">quizzes & questions</span>
-            </h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">
-              Cấu hình đề kiểm tra cuối bài: Điểm đạt (`pass_score`), Giới hạn thời gian (`time_limit_seconds`), Ngân hàng câu hỏi trắc nghiệm.
+            <p id="wsLessonSubtitle" class="text-xs md:text-sm text-slate-500 font-medium mt-1">
+              Quản lý ngữ pháp, từ vựng, chữ Hán, bài tập kiểm tra và tài liệu đính kèm của bài học.
             </p>
           </div>
 
-          <button onclick="openAddQuestionModal()"
-            class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>+ Add Quiz Question</span>
-          </button>
-        </div>
+          <!-- Lesson Header Controls (Resources Drawer + Actions) -->
+          <div class="flex items-center gap-2 shrink-0 flex-wrap md:flex-nowrap">
 
-        <!-- Quiz Master Config Row -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Quiz Title (`quizzes.title`)</label>
-            <input type="text" value="Bài kiểm tra tổng hợp Bài 1: Ngữ pháp & Từ vựng N3"
-              class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Passing Score % (`pass_score`)</label>
-            <div class="relative">
-              <input type="number" value="60.00" step="5" min="0" max="100"
-                class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
-              <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">%</span>
-            </div>
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Time Limit (`time_limit_seconds`)</label>
-            <div class="relative">
-              <input type="number" value="900" step="60" min="60"
-                class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
-              <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">seconds (15m)</span>
-            </div>
-          </div>
-        </div>
+            <!-- Secondary Resources / Attachments Trigger Button -->
+            <button type="button" onclick="openResourcesDrawer()" id="wsResourcesBtn"
+              class="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 border border-sky-200/80 text-sky-800 font-bold text-xs shadow-2xs flex items-center gap-2 transition-all group">
+              <svg class="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" fill="none"
+                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              <span>Resources</span>
+              <span id="wsResourcesBadgeCount"
+                class="px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-sky-600 text-white">3</span>
+            </button>
 
-        <!-- Questions List -->
-        <div class="space-y-4" id="quizQuestionsList">
-          <!-- Rendered via JS -->
-        </div>
+            <!-- Edit Lesson Details -->
+            <button type="button" onclick="openEditCurrentLessonModal()"
+              class="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-all">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>Edit Lesson</span>
+            </button>
 
+            <!-- Toggle Publish Status -->
+            <button type="button" onclick="toggleLessonPublished()" id="wsToggleStatusBtn"
+              class="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all">
+              Toggle Status
+            </button>
+
+            <!-- Save Feedback -->
+            <button type="button" onclick="quickSaveLesson()"
+              class="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Save</span>
+            </button>
+          </div>
+
+        </div>
       </section>
+
+      <!-- ===================================================================== -->
+      <!-- B. 4 PRIMARY LEARNING CONTENT TABS ([Grammar] [Vocab] [Kanji] [Quiz]) -->
+      <!-- ===================================================================== -->
+      <nav class="flex items-center gap-2 overflow-x-auto pb-2 mb-5 shrink-0 scrollbar-none" aria-label="Content Tabs">
+
+        <!-- Tab 1: Grammar -->
+        <button type="button" onclick="switchContentTab('grammar')" id="tabBtn-grammar"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-active">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>Grammar + Video</span>
+          <span id="tabCount-grammar"
+            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600">2</span>
+        </button>
+
+        <!-- Tab 2: Vocabulary -->
+        <button type="button" onclick="switchContentTab('vocab')" id="tabBtn-vocab"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Vocabulary</span>
+          <span id="tabCount-vocab"
+            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600">5</span>
+        </button>
+
+        <!-- Tab 3: Kanji -->
+        <button type="button" onclick="switchContentTab('kanji')" id="tabBtn-kanji"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <span
+            class="w-4 h-4 rounded bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">漢</span>
+          <span>Kanji</span>
+          <span id="tabCount-kanji"
+            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600">3</span>
+        </button>
+
+        <!-- Tab 4: Quiz -->
+        <button type="button" onclick="switchContentTab('quiz')" id="tabBtn-quiz"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Quiz</span>
+          <span id="tabCount-quiz"
+            class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-600">2</span>
+        </button>
+
+      </nav>
+
+      <!-- ===================================================================== -->
+      <!-- C. ACTIVE CONTENT PANELS CONTAINER                                    -->
+      <!-- ===================================================================== -->
+      <div class="flex-1">
+
+        <!-- =================================================================== -->
+        <!-- PANEL 1: GRAMMAR + VIDEO MANAGEMENT                                 -->
+        <!-- =================================================================== -->
+        <section id="panel-grammar" class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Grammar & Lecture Video</span>
+                <span class="text-xs font-normal text-slate-400">| Ngữ pháp & Video bài giảng</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Video bài giảng lý thuyết và các mẫu ngữ pháp trọng
+                điểm của bài học.</p>
+            </div>
+
+            <button type="button" onclick="openAddGrammarModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Grammar Point</span>
+            </button>
+          </div>
+
+          <div id="grammarContainer">
+            <!-- Populated via renderGrammarUI() -->
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 2: VOCABULARY MANAGEMENT                                      -->
+        <!-- =================================================================== -->
+        <section id="panel-vocab" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Vocabulary List</span>
+                <span class="text-xs font-normal text-slate-400">| Từ vựng bài học</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Danh sách các từ vựng tiếng Nhật, cách đọc Kana,
+                nghĩa tiếng Việt và câu ví dụ tương ứng.</p>
+            </div>
+
+            <div class="flex items-center gap-2.5 self-start sm:self-auto">
+              <div class="relative w-48 md:w-60">
+                <input type="text" id="vocabSearchInput" oninput="filterVocabTable()" placeholder="Search vocab..."
+                  class="w-full pl-8 pr-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor"
+                  stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                  </path>
+                </svg>
+              </div>
+
+              <button type="button" onclick="openAddVocabModal()"
+                class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span> Add Vocabulary</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="vocabContainer">
+            <!-- Populated via renderVocabUI() -->
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 3: KANJI MANAGEMENT                                           -->
+        <!-- =================================================================== -->
+        <section id="panel-kanji" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Kanji Characters</span>
+                <span class="text-xs font-normal text-slate-400">| Chữ Hán bài học</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Chữ Hán, âm On/Kun, số nét, Hán Việt và các từ ghép
+                minh họa.</p>
+            </div>
+
+            <button type="button" onclick="openAddKanjiModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Kanji</span>
+            </button>
+          </div>
+
+          <div id="kanjiContainer">
+            <!-- Populated via renderKanjiUI() -->
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 4: QUIZ MANAGEMENT                                            -->
+        <!-- =================================================================== -->
+        <section id="panel-quiz" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Quiz Assessment & Question Bank</span>
+                <span class="text-xs font-normal text-slate-400">| Bài kiểm tra</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Cấu hình đề kiểm tra cuối bài và ngân hàng câu hỏi
+                trắc nghiệm.</p>
+            </div>
+
+            <button type="button" onclick="openAddQuestionModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Question</span>
+            </button>
+          </div>
+
+          <div id="quizContainer">
+            <!-- Populated via renderQuizUI() -->
+          </div>
+        </section>
+
+      </div>
 
     </main>
 
   </div>
 
-  <!-- MODAL: ADD / EDIT VOCABULARY -->
-  <div id="vocabModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
-      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
-        <h3 class="text-base font-bold text-slate-900">Add Vocabulary to Lesson</h3>
-        <button onclick="closeVocabModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+  <!-- ========================================================================= -->
+  <!-- 3. SECONDARY RESOURCES / ATTACHMENTS SLIDE-OVER DRAWER                    -->
+  <!-- ========================================================================= -->
+  <div id="resourcesDrawerBackdrop" onclick="closeResourcesDrawer()"
+    class="fixed inset-0 z-50 modal-backdrop hidden transition-opacity duration-300"></div>
+
+  <div id="resourcesDrawer"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white shadow-2xl border-l border-slate-200 flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+          <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Lesson Resources & Files</span>
+            <span id="drawerResourceCountBadge"
+              class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">3 items</span>
+          </h3>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Tài liệu đính kèm, giáo trình PDF, audio luyện nghe và
+            flashcard bổ trợ.</p>
+        </div>
       </div>
 
-      <form id="vocabForm" class="space-y-3.5">
+      <button onclick="closeResourcesDrawer()"
+        class="w-8 h-8 rounded-xl bg-white hover:bg-slate-200/60 border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors">
+        ✕
+      </button>
+    </div>
+
+    <!-- Drawer Action Bar -->
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+      <span class="text-xs font-bold text-slate-700">Attached Materials</span>
+      <button type="button" onclick="openAddSourceModal()"
+        class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-all">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <span> Add Resource</span>
+      </button>
+    </div>
+
+    <!-- Drawer Body / Resources List -->
+    <div id="drawerResourcesContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- Populated via renderDrawerResourcesUI() -->
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50 shrink-0 text-center">
+      <p class="text-[11px] text-slate-400">Students can download these attachments from the Student Lesson Portal.</p>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS SECTION                                                            -->
+  <!-- ========================================================================= -->
+
+  <!-- MODAL: ADD / EDIT SECTION -->
+  <div id="sectionModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="sectionModalTitle" class="text-base font-bold text-slate-900">Add New Section / Chapter</h3>
+        <button onclick="closeSectionModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="sectionForm" class="space-y-4">
+        <input type="hidden" id="sectionEditId" value="" />
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Word (`word` Japanese Kanji/Kana) *</label>
-          <input type="text" id="vocabWord" required placeholder="e.g., 会社員"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold" />
+          <label class="block text-xs font-bold text-slate-700 mb-1">Section / Chapter Title *</label>
+          <input type="text" id="sectionTitleInput" required placeholder="e.g. Chương 4: Đọc hiểu văn bản trung cấp"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
         </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Description / Goal</label>
+          <textarea id="sectionDescInput" rows="2" placeholder="Mục tiêu hoặc thời lượng của chương..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSectionModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Section</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT LESSON -->
+  <div id="lessonModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="lessonModalTitle" class="text-base font-bold text-slate-900">Add New Lesson</h3>
+        <button onclick="closeLessonModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="lessonForm" class="space-y-4">
+        <input type="hidden" id="lessonEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Parent Section *</label>
+          <select id="lessonParentSectionSelect" required
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+            <!-- Dynamic Sections options -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Lesson Title *</label>
+          <input type="text" id="lessonTitleInput" required placeholder="e.g. Bài 6: Phân biệt cấu trúc ~ように & ~ために"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Reading (`reading` Hiragana) *</label>
-            <input type="text" id="vocabReading" required placeholder="かいしゃいん"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+            <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Duration (minutes)</label>
+            <input type="number" id="lessonDurationInput" min="5" max="300" value="45"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Part of Speech (`part_of_speech`)</label>
-            <input type="text" id="vocabPos" placeholder="Danh từ / Động từ..."
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+            <label class="block text-xs font-bold text-slate-700 mb-1">Publish Status</label>
+            <select id="lessonStatusInput"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="1">Published (Live)</option>
+              <option value="0">Draft</option>
+            </select>
           </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeLessonModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Lesson</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SOURCE / RESOURCE -->
+  <div id="sourceModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="sourceModalTitle" class="text-base font-bold text-slate-900">Add Lesson Resource</h3>
+        <button onclick="closeSourceModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="sourceForm" class="space-y-4">
+        <input type="hidden" id="sourceEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Resource Title *</label>
+          <input type="text" id="sourceTitle" required placeholder="e.g. Giáo trình Soumatome N3 Ngữ pháp - Bài 1.pdf"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Resource Type *</label>
+            <select id="sourceType"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="pdf">PDF Document</option>
+              <option value="audio">Audio MP3</option>
+              <option value="video">Video Supplementary</option>
+              <option value="link">External Reference Link</option>
+              <option value="flashcard">Flashcard Set</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">File Size / Duration</label>
+            <input type="text" id="sourceSize" placeholder="e.g. 4.2 MB or 12:45 mins"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">URL / File Path *</label>
+          <input type="text" id="sourceUrl" required
+            placeholder="https://cdn.studyjlpt.com/resources/n3/lesson_1_grammar.pdf"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 placeholder-slate-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Description / Notes</label>
+          <textarea id="sourceDesc" rows="2" placeholder="Ghi chú sử dụng tài liệu..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSourceModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT VOCABULARY -->
+  <div id="vocabModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="vocabModalTitle" class="text-base font-bold text-slate-900">Add Vocabulary</h3>
+        <button onclick="closeVocabModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="vocabForm" class="space-y-4">
+        <input type="hidden" id="vocabEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Vocabulary (Kanji / Kana) *</label>
+          <input type="text" id="vocabWord" required placeholder="e.g. 会社員"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Reading (Hiragana / Katakana)</label>
+          <input type="text" id="vocabReading" placeholder="かいしゃいん"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Meaning (Vietnamese) *</label>
           <input type="text" id="vocabMeaning" required placeholder="Nhân viên công ty"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold" />
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Japanese (`example_sentence_jp`)</label>
-          <input type="text" id="vocabExJp" placeholder="彼は日本の会社員です。"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
-        </div>
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Vietnamese (`example_sentence_vi`)</label>
-          <input type="text" id="vocabExVi" placeholder="Anh ấy là nhân viên công ty Nhật Bản."
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+          <label class="block text-xs font-bold text-slate-700 mb-1">Example Sentence</label>
+          <input type="text" id="vocabExample" placeholder="彼は有名な会社員です。"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400" />
         </div>
         <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
-          <button type="button" onclick="closeVocabModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold">Save Vocabulary</button>
+          <button type="button" onclick="closeVocabModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Word</button>
         </div>
       </form>
     </div>
@@ -518,253 +814,1831 @@
   <div id="kanjiModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
       <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
-        <h3 class="text-base font-bold text-slate-900">Add Kanji to Lesson</h3>
-        <button onclick="closeKanjiModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+        <h3 id="kanjiModalTitle" class="text-base font-bold text-slate-900">Add Kanji to Lesson</h3>
+        <button onclick="closeKanjiModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
       </div>
 
       <form id="kanjiForm" class="space-y-3.5">
+        <input type="hidden" id="kanjiEditId" value="" />
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kanji Character (`kanji`) *</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kanji Character *</label>
             <input type="text" id="kanjiChar" required maxlength="10" placeholder="e.g. 働"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-base font-bold text-center" />
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-base font-bold text-center text-slate-900" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Stroke Count (`stroke_count`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stroke Count</label>
             <input type="number" id="kanjiStrokes" min="1" max="50" placeholder="13"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold" />
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
           </div>
         </div>
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Meaning (Hán Việt & Nghĩa) *</label>
           <input type="text" id="kanjiMeaning" required placeholder="ĐỘNG (Lao động, làm việc)"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold" />
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800" />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Onyomi (`onyomi`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Onyomi</label>
             <input type="text" id="kanjiOn" placeholder="ドウ"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Kunyomi (`kunyomi`)</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kunyomi</label>
             <input type="text" id="kanjiKun" placeholder="はたら.く"
-              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
           </div>
         </div>
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Example Compound Words (`example_words`)</label>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Example Compound Words</label>
           <input type="text" id="kanjiExamples" placeholder="労働 (ろうどう), 働き者 (はたらきもの)"
-            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs" />
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
         </div>
         <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
-          <button type="button" onclick="closeKanjiModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold">Save Kanji</button>
+          <button type="button" onclick="closeKanjiModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold shadow-xs">Save
+            Kanji</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- Toast -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 transition-all">
-    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-    <span id="toastMessage">Saved successfully</span>
+  <!-- MODAL: ADD / EDIT GRAMMAR POINT -->
+  <div id="grammarModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="grammarModalTitle" class="text-base font-bold text-slate-900">Add Grammar Point</h3>
+        <button onclick="closeGrammarModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="grammarForm" class="space-y-3.5">
+        <input type="hidden" id="grammarEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Grammar Pattern Structure *</label>
+          <input type="text" id="grammarTitle" required placeholder="e.g. ~わけがない / ~わけはない"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Explanation & Examples *</label>
+          <textarea id="grammarExplanation" required rows="5"
+            placeholder="Nhập ý nghĩa, cấu trúc kết hợp, và các câu ví dụ mẫu..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeGrammarModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-amber-600 text-white text-xs font-bold shadow-xs">Save
+            Grammar Point</button>
+        </div>
+      </form>
+    </div>
   </div>
 
+  <!-- MODAL: ADD / EDIT QUIZ QUESTION -->
+  <div id="questionModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="questionModalTitle" class="text-base font-bold text-slate-900">Add Quiz Question</h3>
+        <button onclick="closeQuestionModal()"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="questionForm" class="space-y-3.5">
+        <input type="hidden" id="questionEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Question Text *</label>
+          <textarea id="qText" required rows="2" placeholder="Nhập nội dung câu hỏi tiếng Nhật..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Points</label>
+            <input type="number" id="qPoints" value="1.0" step="0.5" min="0.5"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Type</label>
+            <select id="qType"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="single_choice">Single Choice</option>
+              <option value="multiple_choice">Multiple Choice</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-700">Options (Select correct answer radio)</label>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="0" checked class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt0" required placeholder="Option A"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="1" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt1" required placeholder="Option B"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="2" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt2" placeholder="Option C (Optional)"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="3" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt3" placeholder="Option D (Optional)"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeQuestionModal()"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold shadow-xs">Save
+            Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: UNIFIED DELETE CONFIRMATION -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center">
+      <div
+        class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 mb-1" id="deleteConfirmTitle">Confirm Deletion</h3>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed" id="deleteConfirmMessage">
+        Are you sure you want to delete this item? This action cannot be undone.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" onclick="closeDeleteConfirmModal()"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+          Cancel
+        </button>
+        <button type="button" id="confirmDeleteBtn"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"
+    class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2.5 transition-all">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="toastMessage">Action completed successfully</span>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: CONTENT TREE & TWO-COLUMN WORKSPACE ENGINE                    -->
+  <!-- ========================================================================= -->
   <script>
-    // State Mock Data
-    let vocabs = [
-      { id: 1, word: "会社員", reading: "かいしゃいん", meaning_vi: "Nhân viên công ty", part_of_speech: "Danh từ", example_sentence_jp: "田中さんは大手IT企業の会社員です。", example_sentence_vi: "Anh Tanaka là nhân viên một công ty IT lớn." },
-      { id: 2, word: "残業", reading: "ざんぎょう", meaning_vi: "Làm thêm giờ, tăng ca", part_of_speech: "Danh từ, する", example_sentence_jp: "今週は毎日残業しなければならない。", example_sentence_vi: "Tuần này ngày nào tôi cũng phải làm thêm giờ." },
-      { id: 3, word: "締め切り", reading: "しめきり", meaning_vi: "Hạn chót, deadline", part_of_speech: "Danh từ", example_sentence_jp: "レポートの締め切りは明日です。", example_sentence_vi: "Hạn chót nộp báo cáo là ngày mai." }
-    ];
+    // =========================================================================
+    // 1. DATA STORE: MULTI-SECTION & MULTI-LESSON JAPANESE CURRICULUM DATA
+    // =========================================================================
+    const curriculumData = {
+      courseId: 1,
+      courseTitle: "Tiếng Nhật Trung Cấp N3 Soumatome",
+      jlptLevel: "N3",
+      sections: [
+        {
+          id: "sec-1",
+          title: "Chương 1: Ngữ pháp căn bản & Khởi động N3",
+          description: "Lộ trình tuần 1-2: Cấu trúc phán đoán & từ vựng công sở",
+          isExpanded: true,
+          lessons: [
+            {
+              id: 101,
+              orderStr: "1.1",
+              title: "Bài 1: Cấu trúc ~わけがない & ~わけではない",
+              duration: 45,
+              is_published: 1,
+              sources: [
+                { id: 1011, title: "Soumatome N3 Grammar - Lesson 1 Notes.pdf", type: "pdf", size: "3.4 MB", url: "https://cdn.studyjlpt.com/n3/grammar_l1.pdf", desc: "Tài liệu giải thích ngữ pháp và bài tập bổ trợ" },
+                { id: 1012, title: "Luyện nghe ngữ cảnh ~わけがない (Track 01).mp3", type: "audio", size: "14.2 MB", url: "https://cdn.studyjlpt.com/n3/audio_l1.mp3", desc: "Audio phát âm và hội thoại mẫu của người bản xứ" },
+                { id: 1013, title: "Bộ Flashcard Anki Bài 1 (25 thẻ)", type: "flashcard", size: "1.1 MB", url: "https://cdn.studyjlpt.com/n3/deck_l1.apkg", desc: "Tải thẻ flashcard từ vựng & chữ Hán về ôn tập" }
+              ],
+              vocabularies: [
+                { id: 1, word: "会社員", reading: "かいしゃいん", meaning_vi: "Nhân viên công ty", example: "彼は大手IT企業の会社員です。" },
+                { id: 2, word: "残業", reading: "ざんぎょう", meaning_vi: "Làm thêm giờ, tăng ca", example: "今週は毎日残業しなければなりません。" },
+                { id: 3, word: "締め切り", reading: "しめきり", meaning_vi: "Hạn chót, deadline", example: "レポートの締め切りは金曜日です。" },
+                { id: 4, word: "同僚", reading: "どうりょう", meaning_vi: "Đồng nghiệp", example: "会社の同僚と一緒に昼ご飯を食べました。" },
+                { id: 5, word: "出張", reading: "しゅっちょう", meaning_vi: "Đi công tác", example: "来週から大阪へ出張します。" }
+              ],
+              kanjis: [
+                { id: 1, kanji: "働", stroke_count: 13, meaning_vi: "ĐỘNG - Làm việc, lao động", onyomi: "ドウ", kunyomi: "はたら.く", example_words: "労働 (lao động), 働き者 (người chăm chỉ)" },
+                { id: 2, kanji: "議", stroke_count: 20, meaning_vi: "NGHỊ - Bàn bạc, hội nghị", onyomi: "ギ", kunyomi: "ー", example_words: "会議 (cuộc họp), 議員 (nghị viên)" },
+                { id: 3, kanji: "約", stroke_count: 9, meaning_vi: "ƯỚC - Lời hứa, ước lượng", onyomi: "ヤク", kunyomi: "ー", example_words: "約束 (lời hứa), 予約 (đặt chỗ trước)" }
+              ],
+              videoMedia: {
+                title: "video_n3_lesson_1_wakeganai.mp4 (45:12)",
+                url: "https://cdn.studyjlpt.com/videos/n3/lesson_1_wakeganai.mp4"
+              },
+              grammars: [
+                {
+                  id: 1,
+                  title: "~わけがない / ~わけはない (Làm sao mà... được / Tuyệt đối không thể)",
+                  explanation: "**Ý nghĩa**: Biểu thị sự khẳng định chắc chắn của người nói rằng \"tuyệt đối không thể có chuyện đó xảy ra\" dựa trên căn cứ logic hoặc tình hình thực tế.\n\n**Cấu trúc**: V/A/N (thể thông thường) + わけがない (Tính từ đuôi な giữ nguyên な, Danh từ + である/な + わけがない).\n\n**Ví dụ**:\n1. こんな難しい問題、小学生にできるわけがない。(Bài toán khó thế này, học sinh tiểu học làm sao mà giải được!)"
+                },
+                {
+                  id: 2,
+                  title: "~わけではない / ~わけじゃない (Không hẳn là / Không có nghĩa là)",
+                  explanation: "**Ý nghĩa**: Phủ định một phần nhận định, không hoàn toàn đồng tình (\"không hẳn là như vậy\").\n\n**Ví dụ**:\n1. 嫌いなわけではないが、辛い物はあまり食べない。(Không hẳn là ghét, nhưng đồ cay thì tôi không ăn mấy)."
+                }
+              ],
+              quizSettings: {
+                title: "Bài kiểm tra tổng hợp Bài 1: Ngữ pháp & Từ vựng N3",
+                passScore: 60.0,
+                timeLimit: 900
+              },
+              quizQuestions: [
+                {
+                  id: 1,
+                  question_text: "Chọn câu sử dụng đúng cấu trúc ngữ pháp '~わけがない':",
+                  question_type: "single_choice",
+                  points: 2.0,
+                  options: [
+                    { text: "A. こんなに勉強したのに、試験に合格するわけがない。", is_correct: 0 },
+                    { text: "B. 毎日10時間勉強している彼が、試験に落ちるわけがない。", is_correct: 1 },
+                    { text: "C. 彼は明日日本へ行くわけがないかもしれない。", is_correct: 0 },
+                    { text: "D. わけがないから、早く帰ろう。", is_correct: 0 }
+                  ]
+                },
+                {
+                  id: 2,
+                  question_text: "Chữ Hán '働' có âm Kunyomi là gì?",
+                  question_type: "single_choice",
+                  points: 1.0,
+                  options: [
+                    { text: "A. はたら.く", is_correct: 1 },
+                    { text: "B. うご.く", is_correct: 0 },
+                    { text: "C. つく.る", is_correct: 0 },
+                    { text: "D. おも.う", is_correct: 0 }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 102,
+              orderStr: "1.2",
+              title: "Bài 2: Từ vựng & Kanji chủ đề Công việc & Văn phòng",
+              duration: 50,
+              is_published: 1,
+              sources: [
+                { id: 1021, title: "Từ vựng chuyên ngành Văn phòng N3.pdf", type: "pdf", size: "2.1 MB", url: "https://cdn.studyjlpt.com/n3/vocab_office.pdf", desc: "Bảng tra cứu 100 từ vựng môi trường công ty Nhật Bản" }
+              ],
+              vocabularies: [
+                { id: 10, word: "面接", reading: "めんせつ", meaning_vi: "Phỏng vấn", example: "明日の午後、面接試験があります。" },
+                { id: 11, word: "履歴書", reading: "りれきしょ", meaning_vi: "Sơ yếu lý lịch (CV)", example: "写真付きの履歴書を郵送してください。" },
+                { id: 12, word: "給料", reading: "きゅうりょう", meaning_vi: "Tiền lương", example: "今月の給料は25日に振り込まれます。" }
+              ],
+              kanjis: [
+                { id: 10, kanji: "面", stroke_count: 9, meaning_vi: "DIỆN - Mặt, bề mặt", onyomi: "メン", kunyomi: "おもて / つら", example_words: "面接 (phỏng vấn), 画面 (màn hình)" },
+                { id: 11, kanji: "接", stroke_count: 11, meaning_vi: "TIẾP - Tiếp xúc, tiếp cận", onyomi: "セツ", kunyomi: "つ.ぐ", example_words: "面接 (phỏng vấn), 直接 (trực tiếp)" }
+              ],
+              videoMedia: {
+                title: "video_n3_lesson_2_office_kanji.mp4 (38:40)",
+                url: "https://cdn.studyjlpt.com/videos/n3/lesson_2_office.mp4"
+              },
+              grammars: [
+                {
+                  id: 10,
+                  title: "~おかげで / ~せいで (Nhờ có... / Tại vì...)",
+                  explanation: "**Ý nghĩa**: Biểu thị nguyên nhân dẫn đến kết quả. ~おかげで dùng cho kết quả tích cực, ~せいで dùng cho kết quả tiêu cực.\n\n**Ví dụ**:\n1. 先生のおかげで、合格できました。(Nhờ có thầy mà em đã thi đỗ)."
+                }
+              ],
+              quizSettings: {
+                title: "Kiểm tra Từ vựng & Kanji Bài 2",
+                passScore: 70.0,
+                timeLimit: 600
+              },
+              quizQuestions: [
+                {
+                  id: 10,
+                  question_text: "Chọn Hán tự đúng của từ 'めんせつ':",
+                  question_type: "single_choice",
+                  points: 1.0,
+                  options: [
+                    { text: "A. 面接", is_correct: 1 },
+                    { text: "B. 免接", is_correct: 0 },
+                    { text: "C. 面切", is_correct: 0 },
+                    { text: "D. 毎接", is_correct: 0 }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: "sec-2",
+          title: "Chương 2: Ngữ pháp biểu thị Phán đoán & Đánh giá",
+          description: "Lộ trình tuần 3-4: Cấu trúc ~に違いない, ~はずだ, ~にすぎない",
+          isExpanded: true,
+          lessons: [
+            {
+              id: 103,
+              orderStr: "2.1",
+              title: "Bài 3: Cấu trúc biểu thị phán đoán ~に違いない & ~はずだ",
+              duration: 40,
+              is_published: 1,
+              sources: [
+                { id: 1031, title: "Tài liệu so sánh cấu trúc phán đoán N3.pdf", type: "pdf", size: "1.8 MB", url: "https://cdn.studyjlpt.com/n3/grammar_phandoan.pdf", desc: "Phân biệt sắc thái giữa に違いない, はずだ và かもしれない" }
+              ],
+              vocabularies: [
+                { id: 20, word: "確信", reading: "かくしん", meaning_vi: "Sự tin tưởng chắc chắn", example: "成功することを確信しています。" },
+                { id: 21, word: "証拠", reading: "しょうこ", meaning_vi: "Bằng chứng", example: "決定的な証拠が見つかりました。" }
+              ],
+              kanjis: [
+                { id: 20, kanji: "違", stroke_count: 13, meaning_vi: "VI - Khác biệt, sai sót", onyomi: "イ", kunyomi: "ちが.う", example_words: "間違い (sai lầm), 違反 (vi phạm)" }
+              ],
+              videoMedia: {
+                title: "video_n3_lesson_3_phandoan.mp4 (42:15)",
+                url: "https://cdn.studyjlpt.com/videos/n3/lesson_3_phandoan.mp4"
+              },
+              grammars: [
+                {
+                  id: 20,
+                  title: "~に違いない (Chắc chắn là... / Nhất định là...)",
+                  explanation: "**Ý nghĩa**: Biểu thị sự suy đoán có căn cứ vững chắc của người nói rằng chuyện đó chắc chắn đúng."
+                }
+              ],
+              quizSettings: {
+                title: "Quiz Bài 3: Phán đoán",
+                passScore: 60.0,
+                timeLimit: 600
+              },
+              quizQuestions: [
+                {
+                  id: 20,
+                  question_text: "Điền vào chỗ trống: 部屋の電気がついているから、彼は家にいる________。",
+                  question_type: "single_choice",
+                  points: 1.0,
+                  options: [
+                    { text: "A. に違いない", is_correct: 1 },
+                    { text: "B. わけではない", is_correct: 0 },
+                    { text: "C. にすぎない", is_correct: 0 },
+                    { text: "D. おかげで", is_correct: 0 }
+                  ]
+                }
+              ]
+            },
+            {
+              id: 104,
+              orderStr: "2.2",
+              title: "Bài 4: Kanji các chữ chỉ phương hướng & vị trí đô thị",
+              duration: 35,
+              is_published: 1,
+              sources: [],
+              vocabularies: [
+                { id: 30, word: "交差点", reading: "こうさてん", meaning_vi: "Ngã tư đường", example: "次の交差点を右に曲がってください。" }
+              ],
+              kanjis: [
+                { id: 30, kanji: "交", stroke_count: 6, meaning_vi: "GIAO - Giao nhau, qua lại", onyomi: "コウ", kunyomi: "まじ.わる", example_words: "交差点 (ngã tư), 交通 (giao thông)" }
+              ],
+              videoMedia: null,
+              grammars: [],
+              quizSettings: { title: "Quiz Bài 4", passScore: 60.0, timeLimit: 300 },
+              quizQuestions: []
+            }
+          ]
+        },
+        {
+          id: "sec-3",
+          title: "Chương 3: Luyện tập tổng hợp & Đọc hiểu đoạn văn N3",
+          description: "Lộ trình tuần 5-6: Ôn tập tổng hợp và rèn phản xạ đọc hiểu",
+          isExpanded: false,
+          lessons: [
+            {
+              id: 105,
+              orderStr: "3.1",
+              title: "Bài 5: Luyện tập tổng hợp & Đọc hiểu đoạn văn ngắn N3",
+              duration: 60,
+              is_published: 0,
+              sources: [],
+              vocabularies: [],
+              kanjis: [],
+              videoMedia: null,
+              grammars: [],
+              quizSettings: { title: "Quiz Tổng hợp Bài 5", passScore: 60.0, timeLimit: 1200 },
+              quizQuestions: []
+            }
+          ]
+        }
+      ]
+    };
 
-    let kanjis = [
-      { id: 1, kanji: "働", onyomi: "ドウ", kunyomi: "はたら.く", meaning_vi: "ĐỘNG - Làm việc, lao động", stroke_count: 13, example_words: "労働 (lao động), 働き者 (người chăm chỉ)" },
-      { id: 2, kanji: "議", onyomi: "ギ", kunyomi: "ー", meaning_vi: "NGHỊ - Bàn bạc, hội nghị", stroke_count: 20, example_words: "会議 (cuộc họp), 議員 (nghị viên)" },
-      { id: 3, kanji: "約", onyomi: "ヤク", kunyomi: "ー", meaning_vi: "ƯỚC - Lời hứa, ước lượng", stroke_count: 9, example_words: "約束 (lời hứa), 予約 (đặt trước)" }
-    ];
+    // =========================================================================
+    // 2. ACTIVE SELECTION STATE (LESSON & 4 MAIN CONTENT TABS)
+    // =========================================================================
+    let currentLessonId = 101;
+    let currentTab = "grammar"; // 'grammar' | 'vocab' | 'kanji' | 'quiz'
+    let pendingDeleteCallback = null;
+    let allTreeExpanded = true;
 
-    let questions = [
-      {
-        id: 1,
-        question_text: "Chọn câu sử dụng đúng cấu trúc ngữ pháp '~わけがない':",
-        question_type: "single_choice",
-        points: 2.0,
-        options: [
-          { text: "A. こんなに勉強したのに、試験に合格するわけがない。", is_correct: 0 },
-          { text: "B. 毎日10時間勉強している彼が、試験に落ちるわけがない。", is_correct: 1 },
-          { text: "C. 彼は明日日本へ行くわけがないかもしれない。", is_correct: 0 },
-          { text: "D. わけがないから、早く帰ろう。", is_correct: 0 }
-        ]
-      },
-      {
-        id: 2,
-        question_text: "Chữ Hán '働' có âm Kunyomi là gì?",
-        question_type: "single_choice",
-        points: 1.0,
-        options: [
-          { text: "A. はたら.く", is_correct: 1 },
-          { text: "B. うご.く", is_correct: 0 },
-          { text: "C. つく.る", is_correct: 0 },
-          { text: "D. おも.う", is_correct: 0 }
-        ]
+    // Helper: Find current active lesson object & section
+    function getCurrentLessonContext() {
+      for (const sec of curriculumData.sections) {
+        const found = sec.lessons.find(l => l.id === currentLessonId);
+        if (found) {
+          return { section: sec, lesson: found };
+        }
       }
-    ];
+      return { section: curriculumData.sections[0], lesson: curriculumData.sections[0].lessons[0] };
+    }
 
+    function syncLessonOrderStrings() {
+      curriculumData.sections.forEach((section, sectionIndex) => {
+        section.lessons.forEach((lesson, lessonIndex) => {
+          lesson.orderStr = `${sectionIndex + 1}.${lessonIndex + 1}`;
+        });
+      });
+    }
+
+    // Toast helper
     function showToast(msg) {
       const toast = document.getElementById("toast");
       document.getElementById("toastMessage").textContent = msg;
       toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
+      setTimeout(() => toast.classList.add("hidden"), 3200);
     }
 
-    // Tabs Switcher
-    function switchTab(tabId) {
-      document.querySelectorAll(".tab-pane").forEach(el => el.classList.add("hidden"));
-      document.querySelectorAll(".content-tab-btn").forEach(el => {
-        el.classList.remove("border-sky-500", "border-emerald-500", "border-amber-500", "border-indigo-500");
-        el.classList.add("border-transparent");
+    function quickSaveLesson() {
+      showToast("Lesson changes saved successfully!");
+    }
+
+    // =========================================================================
+    // 3. TREE NAVIGATION RENDERER (Section -> Lesson -> Content Tab)
+    // =========================================================================
+    function renderContentTree() {
+      const container = document.getElementById("treeContainer");
+      const searchVal = (document.getElementById("treeSearchInput")?.value || "").toLowerCase().trim();
+
+      let totalSecCount = curriculumData.sections.length;
+      let totalLessonCount = 0;
+      curriculumData.sections.forEach(s => totalLessonCount += s.lessons.length);
+      document.getElementById("treeStatsOverview").textContent = `${totalSecCount} Chapters · ${totalLessonCount} Lessons`;
+
+      let html = "";
+
+      curriculumData.sections.forEach((sec) => {
+        // Filter logic for section & its lessons
+        const matchingLessons = sec.lessons.filter(l => {
+          if (!searchVal) return true;
+          return l.title.toLowerCase().includes(searchVal) ||
+            sec.title.toLowerCase().includes(searchVal) ||
+            l.vocabularies.some(v => v.word.toLowerCase().includes(searchVal) || v.meaning_vi.toLowerCase().includes(searchVal)) ||
+            l.kanjis.some(k => k.kanji.toLowerCase().includes(searchVal) || k.meaning_vi.toLowerCase().includes(searchVal)) ||
+            l.grammars.some(g => g.title.toLowerCase().includes(searchVal));
+        });
+
+        if (searchVal && matchingLessons.length === 0 && !sec.title.toLowerCase().includes(searchVal)) {
+          return; // Skip section if no match
+        }
+
+        const isSecExpanded = searchVal ? true : sec.isExpanded !== false;
+
+        html += `
+          <div class="rounded-2xl border border-slate-200/80 bg-white overflow-hidden shadow-2xs group/sec transition-all">
+            
+            <!-- Section / Chapter Header Item -->
+            <div class="flex items-center justify-between p-2.5 bg-slate-50/90 hover:bg-slate-100/80 cursor-pointer select-none transition-colors"
+              onclick="toggleSectionExpand('${sec.id}')">
+              
+              <div class="flex items-center gap-2 min-w-0 flex-1">
+                <span class="w-5 h-5 rounded-md bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0 transition-transform ${isSecExpanded ? 'rotate-90' : ''}">
+                  ▶
+                </span>
+                <div class="truncate">
+                  <p class="text-xs font-bold text-slate-800 truncate">${sec.title}</p>
+                  <p class="text-[10px] text-slate-400 font-medium">${sec.lessons.length} lessons</p>
+                </div>
+              </div>
+
+              <!-- Section Hover Admin Actions -->
+              <div class="flex items-center gap-1 opacity-80 group-hover/sec:opacity-100 transition-opacity" onclick="event.stopPropagation()">
+                <button type="button" onclick="openAddLessonToSectionModal('${sec.id}')" title="Add Lesson to this Section"
+                  class="w-6 h-6 rounded-md hover:bg-white text-slate-500 hover:text-sky-600 flex items-center justify-center text-xs font-bold transition-all">
+                  +
+                </button>
+                <button type="button" onclick="openEditSectionModal('${sec.id}')" title="Edit Section"
+                  class="w-6 h-6 rounded-md hover:bg-white text-slate-400 hover:text-slate-700 flex items-center justify-center text-xs transition-all">
+                  ✎
+                </button>
+                <button type="button" onclick="deleteSectionItem('${sec.id}')" title="Delete Section"
+                  class="w-6 h-6 rounded-md hover:bg-rose-50 text-slate-300 hover:text-rose-600 flex items-center justify-center text-xs transition-all">
+                  ✕
+                </button>
+              </div>
+
+            </div>
+
+            <!-- Level 2 lessons; each can reveal four Level 3 content tabs. -->
+            ${isSecExpanded ? `
+              <div class="p-1.5 space-y-1 bg-white border-t border-slate-100">
+                ${matchingLessons.map(l => {
+          const isLessonActive = (l.id === currentLessonId);
+          const isLessonExpanded = searchVal ? true : l.isTreeExpanded === true;
+          const contentNodes = [
+            { id: 'grammar', label: 'Grammar & Video', count: l.grammars.length },
+            { id: 'vocab', label: 'Vocabulary', count: l.vocabularies.length },
+            { id: 'kanji', label: 'Kanji', count: l.kanjis.length },
+            { id: 'quiz', label: 'Quiz', count: l.quizQuestions.length }
+          ];
+
+          return `
+                    <div class="rounded-xl ${isLessonActive ? 'bg-slate-50/60' : ''}">
+                    <div onclick="selectLesson(${l.id})"
+                      class="flex items-center justify-between p-2.5 rounded-xl cursor-pointer select-none transition-all ${isLessonActive ? 'tree-lesson-active' : 'hover:bg-slate-50 text-slate-700'}">
+                      
+                      <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <span class="w-2 h-2 rounded-full ${l.is_published ? 'bg-emerald-500' : 'bg-amber-400'} shrink-0" title="${l.is_published ? 'Published' : 'Draft'}"></span>
+                        
+                        <div class="truncate">
+                          <p class="text-xs font-bold truncate lesson-title ${isLessonActive ? 'text-white' : 'text-slate-800'}">
+                            Lesson ${l.orderStr || ''}: ${l.title}
+                          </p>
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium lesson-meta ${isLessonActive ? 'text-slate-300' : 'text-slate-400'}">
+                            <span>${l.duration}m</span>
+                            <span>•</span>
+                            <span>${l.grammars.length} Grammars</span>
+                            <span>•</span>
+                            <span>${l.vocabularies.length} Vocab</span>
+                            ${l.sources.length > 0 ? `<span>•</span><span class="inline-flex items-center gap-0.5">📎 ${l.sources.length}</span>` : ''}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button type="button" onclick="event.stopPropagation(); toggleLessonTreeExpand(${l.id})" title="${isLessonExpanded ? 'Collapse content nodes' : 'Expand content nodes'}"
+                        class="w-6 h-6 rounded-md text-xs font-bold opacity-70 shrink-0 ml-2 hover:bg-white/15 transition-transform ${isLessonExpanded ? 'rotate-90' : ''} ${isLessonActive ? 'text-white' : 'text-slate-400 hover:bg-slate-100'}">
+                        →
+                      </button>
+
+                    </div>
+
+                    ${isLessonExpanded ? `
+                      <div class="ml-5 mt-1 mb-1 pl-3 border-l border-slate-200 space-y-0.5">
+                        ${contentNodes.map(node => {
+            const isNodeActive = isLessonActive && currentTab === node.id;
+            return `
+                            <button type="button" onclick="selectLessonContent(${l.id}, '${node.id}')"
+                              class="w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-lg text-left text-[11px] transition-colors border ${isNodeActive ? 'tree-content-active' : 'border-transparent text-slate-500 hover:bg-slate-50 hover:text-slate-800'}">
+                              <span class="flex items-center gap-2 min-w-0">
+                                <span class="text-[9px] text-slate-300">├</span>
+                                <span class="truncate">${node.label}</span>
+                              </span>
+                              <span class="text-[10px] font-bold text-slate-400 shrink-0">${node.count}</span>
+                            </button>
+                          `;
+          }).join('')}
+                      </div>
+                    ` : ''}
+                    </div>
+                  `;
+        }).join("")}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
       });
 
-      const pane = document.getElementById(`tabContent-${tabId}`);
-      if (pane) pane.classList.remove("hidden");
+      if (html === "") {
+        html = `
+          <div class="p-6 text-center text-slate-400 text-xs">
+            <p class="font-bold text-slate-600">No lessons match search.</p>
+            <button onclick="clearTreeSearch()" class="mt-2 text-sky-600 underline font-bold">Clear Search</button>
+          </div>
+        `;
+      }
 
-      const btn = document.getElementById(`tabBtn-${tabId}`);
-      if (btn) {
-        btn.classList.remove("border-transparent");
-        if (tabId === 'vocab') btn.classList.add("border-sky-500");
-        if (tabId === 'kanji') btn.classList.add("border-emerald-500");
-        if (tabId === 'grammar') btn.classList.add("border-amber-500");
-        if (tabId === 'quiz') btn.classList.add("border-indigo-500");
+      container.innerHTML = html;
+    }
+
+    // Toggle tree section expand
+    function toggleSectionExpand(secId) {
+      const sec = curriculumData.sections.find(s => s.id === secId);
+      if (sec) {
+        sec.isExpanded = !(sec.isExpanded !== false);
+        renderContentTree();
       }
     }
 
-    // Render Vocab
-    function renderVocabTable() {
-      const tbody = document.getElementById("vocabTableBody");
-      document.getElementById("overviewVocabCount").textContent = `${vocabs.length} Words`;
-      tbody.innerHTML = vocabs.map((v, i) => `
-        <tr class="hover:bg-slate-50/80 transition-colors">
-          <td class="py-3 pl-2 font-bold text-slate-900 text-sm">${v.word}</td>
-          <td class="py-3 px-3 font-medium text-sky-600">${v.reading}</td>
-          <td class="py-3 px-3 font-semibold text-slate-800">${v.meaning_vi}</td>
-          <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-md bg-slate-100 text-[10px] font-bold text-slate-600">${v.part_of_speech || 'Từ vựng'}</span></td>
-          <td class="py-3 px-4 text-[11px] text-slate-600">
-            <p class="font-medium text-slate-800">${v.example_sentence_jp || ''}</p>
-            <p class="text-slate-400 mt-0.5">${v.example_sentence_vi || ''}</p>
-          </td>
-          <td class="py-3 pr-2 text-right">
-            <button onclick="deleteVocab(${v.id})" class="text-slate-400 hover:text-rose-600 text-xs font-semibold">Delete</button>
-          </td>
-        </tr>
-      `).join("");
+    // Toggle Expand all
+    function toggleExpandAllTree() {
+      allTreeExpanded = !allTreeExpanded;
+      curriculumData.sections.forEach(s => {
+        s.isExpanded = allTreeExpanded;
+        s.lessons.forEach(lesson => lesson.isTreeExpanded = allTreeExpanded);
+      });
+      document.getElementById("expandCollapseAllBtn").textContent = allTreeExpanded ? "Collapse All" : "Expand All";
+      renderContentTree();
     }
 
-    // Render Kanji
-    function renderKanjiGrid() {
-      const grid = document.getElementById("kanjiGrid");
-      document.getElementById("overviewKanjiCount").textContent = `${kanjis.length} Characters`;
-      grid.innerHTML = kanjis.map(k => `
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-soft">
-          <div class="flex items-start justify-between mb-2">
-            <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl font-black text-slate-900 shadow-xs">
-              ${k.kanji}
+    // Tree Search filter
+    function filterContentTree() {
+      const q = document.getElementById("treeSearchInput").value.trim();
+      const clearBtn = document.getElementById("clearTreeSearchBtn");
+      if (q) clearBtn.classList.remove("hidden");
+      else clearBtn.classList.add("hidden");
+      renderContentTree();
+    }
+
+    function clearTreeSearch() {
+      document.getElementById("treeSearchInput").value = "";
+      document.getElementById("clearTreeSearchBtn").classList.add("hidden");
+      renderContentTree();
+    }
+
+    // Mobile Drawer Toggle
+    function toggleMobileTree(open) {
+      const sidebar = document.getElementById("contentTreeSidebar");
+      const backdrop = document.getElementById("mobileTreeBackdrop");
+      if (open) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    document.getElementById("mobileTreeToggleBtn")?.addEventListener("click", () => toggleMobileTree(true));
+
+    // =========================================================================
+    // 4. CONTENT SELECTION & TAB SWITCHING LOGIC
+    // =========================================================================
+    function selectLesson(lessonId) {
+      currentLessonId = lessonId;
+      currentTab = "grammar";
+      // Auto expand parent section
+      for (const s of curriculumData.sections) {
+        const l = s.lessons.find(item => item.id === lessonId);
+        if (l) {
+          s.isExpanded = true;
+          l.isTreeExpanded = true;
+          break;
+        }
+      }
+      updateWorkspaceUI();
+      renderContentTree();
+      // Close mobile tree drawer on selection
+      if (window.innerWidth < 1024) toggleMobileTree(false);
+    }
+
+    function switchContentTab(tabName) {
+      currentTab = tabName;
+      const { section, lesson } = getCurrentLessonContext();
+      section.isExpanded = true;
+      lesson.isTreeExpanded = true;
+      updateWorkspaceUI();
+      renderContentTree();
+    }
+
+    function toggleLessonTreeExpand(lessonId) {
+      for (const section of curriculumData.sections) {
+        const lesson = section.lessons.find(item => item.id === lessonId);
+        if (lesson) {
+          lesson.isTreeExpanded = !lesson.isTreeExpanded;
+          renderContentTree();
+          return;
+        }
+      }
+    }
+
+    function selectLessonContent(lessonId, tabName) {
+      currentLessonId = lessonId;
+      currentTab = tabName;
+      for (const section of curriculumData.sections) {
+        const lesson = section.lessons.find(item => item.id === lessonId);
+        if (lesson) {
+          section.isExpanded = true;
+          lesson.isTreeExpanded = true;
+          break;
+        }
+      }
+      updateWorkspaceUI();
+      renderContentTree();
+      if (window.innerWidth < 1024) toggleMobileTree(false);
+    }
+
+    // Update the entire workspace UI based on active lesson & active tab
+    function updateWorkspaceUI() {
+      const hasSelectedLesson = curriculumData.sections.some(section =>
+        section.lessons.some(lesson => lesson.id === currentLessonId)
+      );
+      if (!hasSelectedLesson) {
+        const fallbackLesson = curriculumData.sections.flatMap(section => section.lessons)[0];
+        if (!fallbackLesson) return;
+        currentLessonId = fallbackLesson.id;
+      }
+      const { section, lesson } = getCurrentLessonContext();
+
+      // Top Breadcrumbs
+      document.getElementById("topBreadcrumbSection").textContent = section.title.split(":")[0];
+      document.getElementById("topBreadcrumbLesson").textContent = lesson.title.split(":")[0];
+
+      // Header Banner Info
+      document.getElementById("wsSectionBadge").textContent = section.title;
+      document.getElementById("wsLessonOrderBadge").textContent = `Lesson #${lesson.orderStr || '1.1'}`;
+      document.getElementById("wsLessonTitle").textContent = lesson.title;
+
+      // Resources Button Badge in Lesson Header
+      const resCount = (lesson.sources || []).length;
+      document.getElementById("wsResourcesBadgeCount").textContent = resCount;
+
+      const statusBadge = document.getElementById("wsLessonStatusBadge");
+      if (lesson.is_published) {
+        statusBadge.className = "text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100 font-bold inline-flex items-center gap-1";
+        statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published`;
+      } else {
+        statusBadge.className = "text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-100 font-bold inline-flex items-center gap-1";
+        statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft`;
+      }
+
+      // Update 4 Primary Tab Counts
+      document.getElementById("tabCount-grammar").textContent = lesson.grammars.length;
+      document.getElementById("tabCount-vocab").textContent = lesson.vocabularies.length;
+      document.getElementById("tabCount-kanji").textContent = lesson.kanjis.length;
+      document.getElementById("tabCount-quiz").textContent = lesson.quizQuestions.length;
+
+      // Update Tab Buttons Active Styling
+      const tabs = ['grammar', 'vocab', 'kanji', 'quiz'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabBtn-${t}`);
+        const panel = document.getElementById(`panel-${t}`);
+        if (t === currentTab) {
+          btn.className = "px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-active";
+          panel.classList.remove("hidden");
+        } else {
+          btn.className = "px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive";
+          panel.classList.add("hidden");
+        }
+      });
+
+      // Render Active Panel's content
+      if (currentTab === "grammar") renderGrammarUI();
+      else if (currentTab === "vocab") renderVocabUI();
+      else if (currentTab === "kanji") renderKanjiUI();
+      else if (currentTab === "quiz") renderQuizUI();
+
+      // If drawer is currently open, re-render drawer resources too
+      renderDrawerResourcesUI();
+    }
+
+    function toggleLessonPublished() {
+      const { lesson } = getCurrentLessonContext();
+      lesson.is_published = lesson.is_published ? 0 : 1;
+      updateWorkspaceUI();
+      renderContentTree();
+      showToast(`Lesson status set to ${lesson.is_published ? 'Published' : 'Draft'}`);
+    }
+
+    // =========================================================================
+    // 5. SECONDARY RESOURCES / ATTACHMENTS DRAWER
+    // =========================================================================
+    function openResourcesDrawer() {
+      renderDrawerResourcesUI();
+      document.getElementById("resourcesDrawerBackdrop").classList.remove("hidden");
+      document.getElementById("resourcesDrawer").classList.remove("translate-x-full");
+    }
+
+    function closeResourcesDrawer() {
+      document.getElementById("resourcesDrawerBackdrop").classList.add("hidden");
+      document.getElementById("resourcesDrawer").classList.add("translate-x-full");
+    }
+
+    function renderDrawerResourcesUI() {
+      const container = document.getElementById("drawerResourcesContainer");
+      const { lesson } = getCurrentLessonContext();
+      const list = lesson.sources || [];
+      document.getElementById("drawerResourceCountBadge").textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 p-6">
+            <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 font-bold text-lg">
+              📎
             </div>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono">
-              ${k.stroke_count} Nét
-            </span>
+            <p class="text-sm font-bold text-slate-800">No resources attached to this lesson.</p>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Add PDF textbooks, audio MP3 tracks, or flashcard decks.</p>
+            <button onclick="openAddSourceModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all">
+              + Add First Resource
+            </button>
           </div>
-          <p class="font-bold text-xs text-slate-900">${k.meaning_vi}</p>
-          <div class="text-[11px] text-slate-600 mt-2 space-y-1 bg-white p-2.5 rounded-xl border border-slate-100">
-            <p><strong class="text-slate-400">On:</strong> ${k.onyomi || '-'}</p>
-            <p><strong class="text-slate-400">Kun:</strong> ${k.kunyomi || '-'}</p>
-            <p class="text-[10px] text-slate-500 pt-1 border-t border-slate-100"><strong class="text-slate-400">Ví dụ:</strong> ${k.example_words || '-'}</p>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(s => {
+        let iconBg = "bg-sky-50 text-sky-700 border-sky-100";
+        let typeLabel = "PDF Doc";
+        let iconSvg = "📄";
+        if (s.type === "audio") {
+          iconBg = "bg-emerald-50 text-emerald-700 border-emerald-100";
+          typeLabel = "Audio MP3";
+          iconSvg = "🎧";
+        } else if (s.type === "flashcard") {
+          iconBg = "bg-amber-50 text-amber-700 border-amber-100";
+          typeLabel = "Flashcard";
+          iconSvg = "📇";
+        } else if (s.type === "link") {
+          iconBg = "bg-indigo-50 text-indigo-700 border-indigo-100";
+          typeLabel = "Web Link";
+          iconSvg = "🔗";
+        } else if (s.type === "video") {
+          iconBg = "bg-rose-50 text-rose-700 border-rose-100";
+          typeLabel = "Video";
+          iconSvg = "🎬";
+        }
+
+        return `
+          <div class="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-sky-300 transition-all flex items-start justify-between gap-3">
+            
+            <div class="flex items-start gap-3 min-w-0 flex-1">
+              <div class="w-10 h-10 rounded-xl ${iconBg} border flex items-center justify-center text-base shrink-0 font-bold">
+                ${iconSvg}
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-[10px] font-bold px-2 py-0.2 rounded-md ${iconBg} uppercase tracking-wider">${typeLabel}</span>
+                  <span class="text-[11px] font-mono text-slate-400">${s.size || 'External Link'}</span>
+                </div>
+
+                <a href="${s.url}" target="_blank" class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline mt-1 block truncate">
+                  ${s.title}
+                </a>
+
+                ${s.desc ? `<p class="text-[11px] text-slate-500 font-normal mt-0.5 line-clamp-2">${s.desc}</p>` : ''}
+              </div>
+            </div>
+
+            <!-- Resource Actions -->
+            <div class="flex items-center gap-1 shrink-0 pt-1">
+              <button type="button" onclick="openEditSourceModal(${s.id})" title="Edit Resource"
+                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-500 hover:text-sky-600 flex items-center justify-center transition-all">
+                ✎
+              </button>
+              <button type="button" onclick="deleteSourceItem(${s.id})" title="Delete Resource"
+                class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                ✕
+              </button>
+            </div>
+
           </div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
     }
 
-    // Render Quiz
-    function renderQuizQuestions() {
-      const container = document.getElementById("quizQuestionsList");
-      document.getElementById("overviewQuizCount").textContent = `${questions.length} Questions`;
-      container.innerHTML = questions.map((q, idx) => `
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
-          <div class="flex items-center justify-between mb-2">
-            <span class="font-bold text-xs text-slate-900">Question #${idx + 1} (${q.points} pts)</span>
-            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono">${q.question_type}</span>
+    function openAddSourceModal() {
+      document.getElementById("sourceModalTitle").textContent = "Add Lesson Resource";
+      document.getElementById("sourceEditId").value = "";
+      document.getElementById("sourceTitle").value = "";
+      document.getElementById("sourceType").value = "pdf";
+      document.getElementById("sourceSize").value = "";
+      document.getElementById("sourceUrl").value = "";
+      document.getElementById("sourceDesc").value = "";
+      document.getElementById("sourceModal").classList.remove("hidden");
+      document.getElementById("sourceModal").classList.add("flex");
+    }
+
+    function openEditSourceModal(id) {
+      const { lesson } = getCurrentLessonContext();
+      const s = lesson.sources.find(item => item.id === id);
+      if (!s) return;
+      document.getElementById("sourceModalTitle").textContent = "Edit Lesson Resource";
+      document.getElementById("sourceEditId").value = s.id;
+      document.getElementById("sourceTitle").value = s.title;
+      document.getElementById("sourceType").value = s.type;
+      document.getElementById("sourceSize").value = s.size || "";
+      document.getElementById("sourceUrl").value = s.url;
+      document.getElementById("sourceDesc").value = s.desc || "";
+      document.getElementById("sourceModal").classList.remove("hidden");
+      document.getElementById("sourceModal").classList.add("flex");
+    }
+
+    function closeSourceModal() {
+      document.getElementById("sourceModal").classList.add("hidden");
+      document.getElementById("sourceModal").classList.remove("flex");
+    }
+
+    function deleteSourceItem(id) {
+      const { lesson } = getCurrentLessonContext();
+      const s = lesson.sources.find(item => item.id === id);
+      promptDelete("Delete Resource", `Are you sure you want to delete "${s?.title || 'this resource'}"?`, () => {
+        lesson.sources = lesson.sources.filter(item => item.id !== id);
+        updateWorkspaceUI();
+        renderContentTree();
+        renderDrawerResourcesUI();
+        showToast("Resource removed successfully.");
+      });
+    }
+
+    // =========================================================================
+    // 6. PANEL 1: GRAMMAR + VIDEO CRUD
+    // =========================================================================
+    function renderGrammarUI() {
+      const container = document.getElementById("grammarContainer");
+      const { lesson } = getCurrentLessonContext();
+      const list = lesson.grammars || [];
+      const video = lesson.videoMedia;
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          
+          <!-- Lesson Video Media Attachment Card -->
+          <div class="p-4 md:p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <span>Lesson Video Lecture</span>
+              </label>
+              <span class="text-[10px] font-bold ${video ? 'text-emerald-700 bg-emerald-50 border-emerald-100' : 'text-slate-400 bg-slate-100 border-slate-200'} px-2 py-0.5 rounded-full border">
+                ${video ? 'Attached' : 'No Video'}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="aspect-video bg-slate-900 rounded-xl flex flex-col items-center justify-center text-white relative overflow-hidden group">
+                <svg class="w-10 h-10 text-white/80 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+                <span class="text-[10px] text-slate-300 font-mono mt-1">${video?.title || 'no_video.mp4'}</span>
+              </div>
+
+              <div class="md:col-span-2 flex flex-col justify-between">
+                <div>
+                  <input type="text" id="videoLectureUrlInput" value="${video?.url || ''}" placeholder="Nhập URL video bài giảng..."
+                    class="w-full px-3.5 py-2 rounded-xl bg-white border border-slate-200 text-xs font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500" />
+                  <p class="text-[10px] text-slate-400 mt-1">Format: H.264 MP4 1080p • Hỗ trợ phát đa nền tảng web & mobile</p>
+                </div>
+                <div class="flex items-center gap-2 mt-2">
+                  <button type="button" onclick="saveLessonVideo()" class="px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-sky-600 transition-colors">
+                    Save Video
+                  </button>
+                  ${video ? `
+                    <button type="button" onclick="detachLessonVideo()" class="px-3 py-1.5 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50">
+                      Detach Video
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="text-xs font-semibold text-slate-800 mb-3">${q.question_text}</p>
-          <div class="space-y-1.5 pl-2">
-            ${q.options.map(opt => `
-              <div class="flex items-center gap-2 text-xs ${opt.is_correct ? 'font-bold text-emerald-700' : 'text-slate-600'}">
-                <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${opt.is_correct ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}">
-                  ${opt.is_correct ? '✓' : '•'}
-                </span>
-                <span>${opt.text}</span>
+
+          <!-- Grammar Points Builder List -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <label class="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                Grammar Points in this Lesson (${list.length})
+              </label>
+              <button type="button" onclick="openAddGrammarModal()"
+                class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-amber-600 text-white font-bold text-xs transition-all">
+                + Add Point
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              ${list.length === 0 ? `
+                <div class="py-8 text-center bg-slate-50 rounded-2xl border border-slate-200/60 p-4">
+                  <p class="text-xs font-bold text-slate-600">No grammar points added yet.</p>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Click "+ Add Point" to write explanations.</p>
+                </div>
+              ` : list.map((gp, i) => `
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-slate-800">Mẫu Ngữ Pháp #${i + 1}</span>
+                    <div class="flex items-center gap-1.5">
+                      <button type="button" onclick="openEditGrammarModal(${gp.id})" title="Edit Grammar"
+                        class="w-7 h-7 rounded-lg bg-white hover:bg-amber-50 border border-slate-200 text-slate-500 hover:text-amber-600 flex items-center justify-center transition-all">
+                        ✎
+                      </button>
+                      <button type="button" onclick="deleteGrammarItem(${gp.id})" title="Delete Grammar"
+                        class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                  <h4 class="text-xs font-bold text-slate-900 mb-1.5">${gp.title}</h4>
+                  <div class="text-xs text-slate-700 bg-white p-3.5 rounded-xl border border-slate-100 whitespace-pre-line leading-relaxed font-sans">${gp.explanation}</div>
+                </div>
+              `).join("")}
+            </div>
+
+          </div>
+
+        </div>
+      `;
+    }
+
+    function saveLessonVideo() {
+      const { lesson } = getCurrentLessonContext();
+      const val = document.getElementById("videoLectureUrlInput")?.value.trim();
+      if (val) {
+        lesson.videoMedia = {
+          title: `video_${lesson.title.toLowerCase().replace(/[^a-z0-9]/g, '_')}.mp4`,
+          url: val
+        };
+        showToast("Video lecture updated!");
+      } else {
+        lesson.videoMedia = null;
+        showToast("Video lecture removed.");
+      }
+      renderGrammarUI();
+    }
+
+    function detachLessonVideo() {
+      const { lesson } = getCurrentLessonContext();
+      lesson.videoMedia = null;
+      renderGrammarUI();
+      showToast("Lesson video detached.");
+    }
+
+    function openAddGrammarModal() {
+      document.getElementById("grammarModalTitle").textContent = "Add Grammar Point";
+      document.getElementById("grammarEditId").value = "";
+      document.getElementById("grammarTitle").value = "";
+      document.getElementById("grammarExplanation").value = "";
+      document.getElementById("grammarModal").classList.remove("hidden");
+      document.getElementById("grammarModal").classList.add("flex");
+    }
+
+    function openEditGrammarModal(id) {
+      const { lesson } = getCurrentLessonContext();
+      const gp = lesson.grammars.find(item => item.id === id);
+      if (!gp) return;
+      document.getElementById("grammarModalTitle").textContent = "Edit Grammar Point";
+      document.getElementById("grammarEditId").value = gp.id;
+      document.getElementById("grammarTitle").value = gp.title;
+      document.getElementById("grammarExplanation").value = gp.explanation;
+      document.getElementById("grammarModal").classList.remove("hidden");
+      document.getElementById("grammarModal").classList.add("flex");
+    }
+
+    function closeGrammarModal() {
+      document.getElementById("grammarModal").classList.add("hidden");
+      document.getElementById("grammarModal").classList.remove("flex");
+    }
+
+    function deleteGrammarItem(id) {
+      const { lesson } = getCurrentLessonContext();
+      const gp = lesson.grammars.find(item => item.id === id);
+      promptDelete("Delete Grammar Point", `Are you sure you want to delete "${gp?.title || 'this grammar point'}"?`, () => {
+        lesson.grammars = lesson.grammars.filter(item => item.id !== id);
+        updateWorkspaceUI();
+        renderContentTree();
+        showToast("Grammar point removed.");
+      });
+    }
+
+    // =========================================================================
+    // 7. PANEL 2: VOCABULARY CRUD
+    // =========================================================================
+    function renderVocabUI() {
+      const container = document.getElementById("vocabContainer");
+      const { lesson } = getCurrentLessonContext();
+      const q = (document.getElementById("vocabSearchInput")?.value || "").toLowerCase().trim();
+
+      const list = (lesson.vocabularies || []).filter(v =>
+        v.word.toLowerCase().includes(q) ||
+        v.meaning_vi.toLowerCase().includes(q) ||
+        (v.reading && v.reading.toLowerCase().includes(q))
+      );
+
+      if (lesson.vocabularies.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-6">
+            <p class="text-sm font-bold text-slate-800">No vocabulary found in this lesson.</p>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Add your first Japanese vocabulary item.</p>
+            <button onclick="openAddVocabModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all">
+              + Add Vocabulary
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="pb-3 pl-3 font-semibold w-1/4">Vocabulary</th>
+                <th class="pb-3 px-4 font-semibold w-1/4">Reading (Kana)</th>
+                <th class="pb-3 px-4 font-semibold">Meaning (Vietnamese)</th>
+                <th class="pb-3 pr-3 font-semibold text-right w-24">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="vocabTableBody" class="divide-y divide-slate-100/80 text-xs">
+              ${list.map(v => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                  <td class="py-3.5 pl-3 font-bold text-slate-900 text-sm">${v.word}</td>
+                  <td class="py-3.5 px-4 font-medium text-slate-600 font-sans">${v.reading || '-'}</td>
+                  <td class="py-3.5 px-4 font-semibold text-slate-800 text-xs md:text-sm">
+                    <div>
+                      <span>${v.meaning_vi}</span>
+                      ${v.example ? `<p class="text-[11px] text-slate-400 font-normal mt-0.5">${v.example}</p>` : ''}
+                    </div>
+                  </td>
+                  <td class="py-3.5 pr-3 text-right">
+                    <div class="flex items-center justify-end gap-1.5">
+                      <button type="button" onclick="openEditVocabModal(${v.id})" title="Edit Vocabulary"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-500 hover:text-sky-600 flex items-center justify-center transition-all">
+                        ✎
+                      </button>
+                      <button type="button" onclick="deleteVocabItem(${v.id})" title="Delete Vocabulary"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                        ✕
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function filterVocabTable() {
+      renderVocabUI();
+    }
+
+    function openAddVocabModal() {
+      document.getElementById("vocabModalTitle").textContent = "Add Vocabulary";
+      document.getElementById("vocabEditId").value = "";
+      document.getElementById("vocabWord").value = "";
+      document.getElementById("vocabReading").value = "";
+      document.getElementById("vocabMeaning").value = "";
+      document.getElementById("vocabExample").value = "";
+      document.getElementById("vocabModal").classList.remove("hidden");
+      document.getElementById("vocabModal").classList.add("flex");
+    }
+
+    function openEditVocabModal(id) {
+      const { lesson } = getCurrentLessonContext();
+      const v = lesson.vocabularies.find(item => item.id === id);
+      if (!v) return;
+      document.getElementById("vocabModalTitle").textContent = "Edit Vocabulary";
+      document.getElementById("vocabEditId").value = v.id;
+      document.getElementById("vocabWord").value = v.word;
+      document.getElementById("vocabReading").value = v.reading || "";
+      document.getElementById("vocabMeaning").value = v.meaning_vi;
+      document.getElementById("vocabExample").value = v.example || "";
+      document.getElementById("vocabModal").classList.remove("hidden");
+      document.getElementById("vocabModal").classList.add("flex");
+    }
+
+    function closeVocabModal() {
+      document.getElementById("vocabModal").classList.add("hidden");
+      document.getElementById("vocabModal").classList.remove("flex");
+    }
+
+    function deleteVocabItem(id) {
+      const { lesson } = getCurrentLessonContext();
+      const v = lesson.vocabularies.find(item => item.id === id);
+      promptDelete("Delete Vocabulary", `Are you sure you want to delete "${v?.word || 'this word'}"?`, () => {
+        lesson.vocabularies = lesson.vocabularies.filter(item => item.id !== id);
+        updateWorkspaceUI();
+        renderContentTree();
+        showToast("Vocabulary removed successfully.");
+      });
+    }
+
+    // =========================================================================
+    // 8. PANEL 3: KANJI CRUD
+    // =========================================================================
+    function renderKanjiUI() {
+      const container = document.getElementById("kanjiContainer");
+      const { lesson } = getCurrentLessonContext();
+      const list = lesson.kanjis || [];
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="py-12 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-200 p-6">
+            <p class="text-sm font-bold text-slate-800">No Kanji characters added yet.</p>
+            <p class="text-xs text-slate-400 mt-1 mb-4">Add the central Kanji characters for this lesson.</p>
+            <button onclick="openAddKanjiModal()"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all">
+              + Add Kanji
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${list.map(k => `
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-2xs relative group">
+              <div class="flex items-start justify-between mb-2">
+                <div class="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-2xl font-black text-slate-900 shadow-xs">
+                  ${k.kanji}
+                </div>
+                
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-mono">
+                    ${k.stroke_count || 10} Nét
+                  </span>
+                  <button type="button" onclick="openEditKanjiModal(${k.id})" title="Edit Kanji"
+                    class="w-7 h-7 rounded-lg bg-white hover:bg-sky-50 border border-slate-200 text-slate-500 hover:text-sky-600 flex items-center justify-center transition-all">
+                    ✎
+                  </button>
+                  <button type="button" onclick="deleteKanjiItem(${k.id})" title="Delete Kanji"
+                    class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              <p class="font-bold text-xs text-slate-900">${k.meaning_vi}</p>
+              
+              <div class="text-[11px] text-slate-600 mt-2 space-y-1 bg-white p-2.5 rounded-xl border border-slate-100">
+                <p><strong class="text-slate-400">On:</strong> ${k.onyomi || '-'}</p>
+                <p><strong class="text-slate-400">Kun:</strong> ${k.kunyomi || '-'}</p>
+                <p class="text-[10px] text-slate-500 pt-1 border-t border-slate-100"><strong class="text-slate-400">Ví dụ:</strong> ${k.example_words || '-'}</p>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function openAddKanjiModal() {
+      document.getElementById("kanjiModalTitle").textContent = "Add Kanji to Lesson";
+      document.getElementById("kanjiEditId").value = "";
+      document.getElementById("kanjiChar").value = "";
+      document.getElementById("kanjiStrokes").value = "";
+      document.getElementById("kanjiMeaning").value = "";
+      document.getElementById("kanjiOn").value = "";
+      document.getElementById("kanjiKun").value = "";
+      document.getElementById("kanjiExamples").value = "";
+      document.getElementById("kanjiModal").classList.remove("hidden");
+      document.getElementById("kanjiModal").classList.add("flex");
+    }
+
+    function openEditKanjiModal(id) {
+      const { lesson } = getCurrentLessonContext();
+      const k = lesson.kanjis.find(item => item.id === id);
+      if (!k) return;
+      document.getElementById("kanjiModalTitle").textContent = "Edit Kanji Character";
+      document.getElementById("kanjiEditId").value = k.id;
+      document.getElementById("kanjiChar").value = k.kanji;
+      document.getElementById("kanjiStrokes").value = k.stroke_count || "";
+      document.getElementById("kanjiMeaning").value = k.meaning_vi;
+      document.getElementById("kanjiOn").value = k.onyomi || "";
+      document.getElementById("kanjiKun").value = k.kunyomi || "";
+      document.getElementById("kanjiExamples").value = k.example_words || "";
+      document.getElementById("kanjiModal").classList.remove("hidden");
+      document.getElementById("kanjiModal").classList.add("flex");
+    }
+
+    function closeKanjiModal() {
+      document.getElementById("kanjiModal").classList.add("hidden");
+      document.getElementById("kanjiModal").classList.remove("flex");
+    }
+
+    function deleteKanjiItem(id) {
+      const { lesson } = getCurrentLessonContext();
+      const k = lesson.kanjis.find(item => item.id === id);
+      promptDelete("Delete Kanji", `Are you sure you want to delete Kanji "${k?.kanji || 'this character'}"?`, () => {
+        lesson.kanjis = lesson.kanjis.filter(item => item.id !== id);
+        updateWorkspaceUI();
+        renderContentTree();
+        showToast("Kanji removed successfully.");
+      });
+    }
+
+    // =========================================================================
+    // 9. PANEL 4: QUIZ CRUD
+    // =========================================================================
+    function renderQuizUI() {
+      const container = document.getElementById("quizContainer");
+      const { lesson } = getCurrentLessonContext();
+      const list = lesson.quizQuestions || [];
+      const cfg = lesson.quizSettings || { title: "Quiz Bài học", passScore: 60.0, timeLimit: 900 };
+
+      container.innerHTML = `
+        <div class="space-y-5">
+          
+          <!-- Master Quiz Configuration Card -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <div>
+              <label class="text-[11px] font-bold text-slate-600 block mb-1">Quiz Title</label>
+              <input type="text" value="${cfg.title}" onchange="updateQuizSetting('title', this.value)"
+                class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600 block mb-1">Passing Score %</label>
+              <div class="relative">
+                <input type="number" value="${cfg.passScore}" onchange="updateQuizSetting('passScore', this.value)" step="5" min="0" max="100"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+                <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">%</span>
+              </div>
+            </div>
+            <div>
+              <label class="text-[11px] font-bold text-slate-600 block mb-1">Time Limit (Seconds)</label>
+              <div class="relative">
+                <input type="number" value="${cfg.timeLimit}" onchange="updateQuizSetting('timeLimit', this.value)" step="60" min="60"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+                <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">${Math.round(cfg.timeLimit / 60)}m</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions List -->
+          <div class="space-y-4">
+            ${list.length === 0 ? `
+              <div class="py-10 text-center bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                <p class="text-sm font-bold text-slate-800">No questions in this quiz.</p>
+                <p class="text-xs text-slate-400 mt-1 mb-4">Create questions to test students after this lesson.</p>
+                <button onclick="openAddQuestionModal()"
+                  class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-sm transition-all">
+                  + Add First Question
+                </button>
+              </div>
+            ` : list.map((q, idx) => `
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-bold text-slate-900">Question #${idx + 1} (${q.points} pts)</span>
+                  
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono">${q.question_type}</span>
+                    <button type="button" onclick="openEditQuestionModal(${q.id})" title="Edit Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+                    <button type="button" onclick="deleteQuestionItem(${q.id})" title="Delete Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-xs font-semibold text-slate-800 mb-3">${q.question_text}</p>
+                
+                <div class="space-y-1.5 pl-2">
+                  ${q.options.map(opt => `
+                    <div class="flex items-center gap-2 text-xs ${opt.is_correct ? 'font-bold text-emerald-700' : 'text-slate-600'}">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] ${opt.is_correct ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}">
+                        ${opt.is_correct ? '✓' : '•'}
+                      </span>
+                      <span>${opt.text}</span>
+                    </div>
+                  `).join("")}
+                </div>
               </div>
             `).join("")}
           </div>
+
         </div>
+      `;
+    }
+
+    // Quiz configuration fields are rendered dynamically, so their handlers
+    // resolve the selected lesson at interaction time.
+    function updateQuizSetting(key, value) {
+      const { lesson } = getCurrentLessonContext();
+      if (!lesson.quizSettings) lesson.quizSettings = { title: "Quiz Bài học", passScore: 60, timeLimit: 900 };
+
+      if (key === "passScore") {
+        lesson.quizSettings.passScore = Math.max(0, Math.min(100, parseFloat(value) || 0));
+      } else if (key === "timeLimit") {
+        lesson.quizSettings.timeLimit = Math.max(60, parseInt(value, 10) || 60);
+      } else if (key === "title") {
+        lesson.quizSettings.title = value.trim();
+      }
+      renderQuizUI();
+    }
+
+    function openAddQuestionModal() {
+      document.getElementById("questionModalTitle").textContent = "Add Quiz Question";
+      document.getElementById("questionEditId").value = "";
+      document.getElementById("qText").value = "";
+      document.getElementById("qPoints").value = "1.0";
+      document.getElementById("qType").value = "single_choice";
+      document.getElementById("opt0").value = "";
+      document.getElementById("opt1").value = "";
+      document.getElementById("opt2").value = "";
+      document.getElementById("opt3").value = "";
+      const radios = document.querySelectorAll('input[name="correctOpt"]');
+      if (radios.length > 0) radios[0].checked = true;
+      document.getElementById("questionModal").classList.remove("hidden");
+      document.getElementById("questionModal").classList.add("flex");
+    }
+
+    function openEditQuestionModal(id) {
+      const { lesson } = getCurrentLessonContext();
+      const q = lesson.quizQuestions.find(item => item.id === id);
+      if (!q) return;
+      document.getElementById("questionModalTitle").textContent = "Edit Quiz Question";
+      document.getElementById("questionEditId").value = q.id;
+      document.getElementById("qText").value = q.question_text;
+      document.getElementById("qPoints").value = q.points;
+      document.getElementById("qType").value = q.question_type;
+
+      document.getElementById("opt0").value = q.options[0]?.text || "";
+      document.getElementById("opt1").value = q.options[1]?.text || "";
+      document.getElementById("opt2").value = q.options[2]?.text || "";
+      document.getElementById("opt3").value = q.options[3]?.text || "";
+
+      const correctIdx = q.options.findIndex(opt => opt.is_correct === 1);
+      const radios = document.querySelectorAll('input[name="correctOpt"]');
+      radios.forEach((r, idx) => {
+        r.checked = (idx === (correctIdx >= 0 ? correctIdx : 0));
+      });
+
+      document.getElementById("questionModal").classList.remove("hidden");
+      document.getElementById("questionModal").classList.add("flex");
+    }
+
+    function closeQuestionModal() {
+      document.getElementById("questionModal").classList.add("hidden");
+      document.getElementById("questionModal").classList.remove("flex");
+    }
+
+    function deleteQuestionItem(id) {
+      const { lesson } = getCurrentLessonContext();
+      promptDelete("Delete Quiz Question", `Are you sure you want to delete this question?`, () => {
+        lesson.quizQuestions = lesson.quizQuestions.filter(item => item.id !== id);
+        updateWorkspaceUI();
+        renderContentTree();
+        showToast("Question removed successfully.");
+      });
+    }
+
+    // =========================================================================
+    // 10. SECTION & LESSON MODAL HANDLERS
+    // =========================================================================
+    function openAddSectionModal() {
+      document.getElementById("sectionModalTitle").textContent = "Add New Section / Chapter";
+      document.getElementById("sectionEditId").value = "";
+      document.getElementById("sectionTitleInput").value = "";
+      document.getElementById("sectionDescInput").value = "";
+      document.getElementById("sectionModal").classList.remove("hidden");
+      document.getElementById("sectionModal").classList.add("flex");
+    }
+
+    function openEditSectionModal(secId) {
+      const sec = curriculumData.sections.find(s => s.id === secId);
+      if (!sec) return;
+      document.getElementById("sectionModalTitle").textContent = "Edit Section / Chapter";
+      document.getElementById("sectionEditId").value = sec.id;
+      document.getElementById("sectionTitleInput").value = sec.title;
+      document.getElementById("sectionDescInput").value = sec.description || "";
+      document.getElementById("sectionModal").classList.remove("hidden");
+      document.getElementById("sectionModal").classList.add("flex");
+    }
+
+    function closeSectionModal() {
+      document.getElementById("sectionModal").classList.add("hidden");
+      document.getElementById("sectionModal").classList.remove("flex");
+    }
+
+    function deleteSectionItem(secId) {
+      const sec = curriculumData.sections.find(s => s.id === secId);
+      const remainingLessonCount = curriculumData.sections
+        .filter(s => s.id !== secId)
+        .reduce((count, s) => count + s.lessons.length, 0);
+      if (remainingLessonCount === 0) {
+        showToast("Add another lesson before removing the final lesson section.");
+        return;
+      }
+      promptDelete("Delete Section", `Are you sure you want to delete "${sec?.title}" and all its lessons?`, () => {
+        curriculumData.sections = curriculumData.sections.filter(s => s.id !== secId);
+        const activeStillExists = curriculumData.sections.some(s => s.lessons.some(l => l.id === currentLessonId));
+        if (!activeStillExists) {
+          currentLessonId = curriculumData.sections.flatMap(s => s.lessons)[0].id;
+        }
+        syncLessonOrderStrings();
+        updateWorkspaceUI();
+        renderContentTree();
+        showToast("Section removed.");
+      });
+    }
+
+    function openAddLessonModal() {
+      populateSectionSelect();
+      document.getElementById("lessonModalTitle").textContent = "Add New Lesson";
+      document.getElementById("lessonEditId").value = "";
+      document.getElementById("lessonTitleInput").value = "";
+      document.getElementById("lessonDurationInput").value = "45";
+      document.getElementById("lessonStatusInput").value = "1";
+      document.getElementById("lessonModal").classList.remove("hidden");
+      document.getElementById("lessonModal").classList.add("flex");
+    }
+
+    function openAddLessonToSectionModal(secId) {
+      populateSectionSelect(secId);
+      document.getElementById("lessonModalTitle").textContent = "Add Lesson to Section";
+      document.getElementById("lessonEditId").value = "";
+      document.getElementById("lessonTitleInput").value = "";
+      document.getElementById("lessonDurationInput").value = "45";
+      document.getElementById("lessonStatusInput").value = "1";
+      document.getElementById("lessonModal").classList.remove("hidden");
+      document.getElementById("lessonModal").classList.add("flex");
+    }
+
+    function openEditCurrentLessonModal() {
+      const { section, lesson } = getCurrentLessonContext();
+      populateSectionSelect(section.id);
+      document.getElementById("lessonModalTitle").textContent = "Edit Lesson Details";
+      document.getElementById("lessonEditId").value = lesson.id;
+      document.getElementById("lessonTitleInput").value = lesson.title;
+      document.getElementById("lessonDurationInput").value = lesson.duration;
+      document.getElementById("lessonStatusInput").value = lesson.is_published;
+      document.getElementById("lessonModal").classList.remove("hidden");
+      document.getElementById("lessonModal").classList.add("flex");
+    }
+
+    function populateSectionSelect(selectedSecId) {
+      const select = document.getElementById("lessonParentSectionSelect");
+      select.innerHTML = curriculumData.sections.map(s => `
+        <option value="${s.id}" ${s.id === selectedSecId ? 'selected' : ''}>${s.title}</option>
       `).join("");
     }
 
-    // Modal helpers
-    function openAddVocabModal() { document.getElementById("vocabModal").classList.remove("hidden"); document.getElementById("vocabModal").classList.add("flex"); }
-    function closeVocabModal() { document.getElementById("vocabModal").classList.add("hidden"); document.getElementById("vocabModal").classList.remove("flex"); }
-    function openAddKanjiModal() { document.getElementById("kanjiModal").classList.remove("hidden"); document.getElementById("kanjiModal").classList.add("flex"); }
-    function closeKanjiModal() { document.getElementById("kanjiModal").classList.add("hidden"); document.getElementById("kanjiModal").classList.remove("flex"); }
-
-    function deleteVocab(id) {
-      vocabs = vocabs.filter(v => v.id !== id);
-      renderVocabTable();
-      showToast("Vocabulary removed.");
+    function closeLessonModal() {
+      document.getElementById("lessonModal").classList.add("hidden");
+      document.getElementById("lessonModal").classList.remove("flex");
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      renderVocabTable();
-      renderKanjiGrid();
-      renderQuizQuestions();
+    // =========================================================================
+    // 11. UNIFIED DELETE MODAL
+    // =========================================================================
+    function promptDelete(title, message, callback) {
+      document.getElementById("deleteConfirmTitle").textContent = title;
+      document.getElementById("deleteConfirmMessage").textContent = message;
+      pendingDeleteCallback = callback;
+      document.getElementById("deleteConfirmModal").classList.remove("hidden");
+      document.getElementById("deleteConfirmModal").classList.add("flex");
+    }
 
-      // Vocab form submit
+    function closeDeleteConfirmModal() {
+      document.getElementById("deleteConfirmModal").classList.add("hidden");
+      document.getElementById("deleteConfirmModal").classList.remove("flex");
+      pendingDeleteCallback = null;
+    }
+
+    document.getElementById("confirmDeleteBtn").addEventListener("click", () => {
+      if (pendingDeleteCallback) pendingDeleteCallback();
+      closeDeleteConfirmModal();
+    });
+
+    // =========================================================================
+    // 12. FORM SUBMIT HANDLERS
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      // Check query params if any
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramLesson = urlParams.get("lesson_id");
+      const paramTab = urlParams.get("tab");
+      if (paramLesson) currentLessonId = parseInt(paramLesson) || 101;
+      if (paramTab && ['grammar', 'vocab', 'kanji', 'quiz'].includes(paramTab)) currentTab = paramTab;
+
+      const initialContext = getCurrentLessonContext();
+      if (initialContext.lesson) {
+        initialContext.section.isExpanded = true;
+        initialContext.lesson.isTreeExpanded = true;
+      }
+
+      // Initial Tree & Workspace render
+      renderContentTree();
+      updateWorkspaceUI();
+
+      // Section Form Submit
+      document.getElementById("sectionForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const editId = document.getElementById("sectionEditId").value;
+        const titleVal = document.getElementById("sectionTitleInput").value.trim();
+        const descVal = document.getElementById("sectionDescInput").value.trim();
+
+        if (editId) {
+          const sec = curriculumData.sections.find(s => s.id === editId);
+          if (sec) {
+            sec.title = titleVal;
+            sec.description = descVal;
+          }
+          showToast("Section updated successfully!");
+        } else {
+          curriculumData.sections.push({
+            id: `sec-${Date.now()}`,
+            title: titleVal,
+            description: descVal,
+            isExpanded: true,
+            lessons: []
+          });
+          showToast("New Section created!");
+        }
+        closeSectionModal();
+        renderContentTree();
+      });
+
+      // Lesson Form Submit
+      document.getElementById("lessonForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const editId = document.getElementById("lessonEditId").value;
+        const secId = document.getElementById("lessonParentSectionSelect").value;
+        const titleVal = document.getElementById("lessonTitleInput").value.trim();
+        const durationVal = parseInt(document.getElementById("lessonDurationInput").value) || 45;
+        const statusVal = parseInt(document.getElementById("lessonStatusInput").value) || 0;
+
+        if (editId) {
+          const sourceSec = curriculumData.sections.find(s => s.lessons.some(l => l.id == editId));
+          const lesson = sourceSec?.lessons.find(l => l.id == editId);
+          const targetSec = curriculumData.sections.find(s => s.id === secId);
+          if (lesson) {
+            lesson.title = titleVal;
+            lesson.duration = durationVal;
+            lesson.is_published = statusVal;
+            if (targetSec && targetSec !== sourceSec) {
+              sourceSec.lessons = sourceSec.lessons.filter(l => l.id != editId);
+              targetSec.lessons.push(lesson);
+            }
+          }
+          syncLessonOrderStrings();
+          showToast("Lesson details updated!");
+        } else {
+          const targetSec = curriculumData.sections.find(s => s.id === secId) || curriculumData.sections[0];
+          const newId = Date.now();
+          const newLesson = {
+            id: newId,
+            orderStr: "",
+            title: titleVal,
+            duration: durationVal,
+            is_published: statusVal,
+            sources: [],
+            vocabularies: [],
+            kanjis: [],
+            videoMedia: null,
+            grammars: [],
+            quizSettings: { title: `Quiz ${titleVal}`, passScore: 60.0, timeLimit: 900 },
+            quizQuestions: []
+          };
+          targetSec.lessons.push(newLesson);
+          currentLessonId = newId;
+          syncLessonOrderStrings();
+          showToast("New Lesson added to Section!");
+        }
+        closeLessonModal();
+        updateWorkspaceUI();
+        renderContentTree();
+      });
+
+      // Source Form Submit
+      document.getElementById("sourceForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const { lesson } = getCurrentLessonContext();
+        const editId = document.getElementById("sourceEditId").value;
+        const sData = {
+          title: document.getElementById("sourceTitle").value.trim(),
+          type: document.getElementById("sourceType").value,
+          size: document.getElementById("sourceSize").value.trim(),
+          url: document.getElementById("sourceUrl").value.trim(),
+          desc: document.getElementById("sourceDesc").value.trim()
+        };
+
+        if (editId) {
+          const idx = lesson.sources.findIndex(s => s.id == editId);
+          if (idx !== -1) lesson.sources[idx] = { ...lesson.sources[idx], ...sData };
+          showToast("Resource updated!");
+        } else {
+          lesson.sources.push({ id: Date.now(), ...sData });
+          showToast("Resource attached to lesson!");
+        }
+        closeSourceModal();
+        updateWorkspaceUI();
+        renderContentTree();
+        renderDrawerResourcesUI();
+      });
+
+      // Vocab Form Submit
       document.getElementById("vocabForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        vocabs.push({
-          id: Date.now(),
-          word: document.getElementById("vocabWord").value,
-          reading: document.getElementById("vocabReading").value,
-          meaning_vi: document.getElementById("vocabMeaning").value,
-          part_of_speech: document.getElementById("vocabPos").value,
-          example_sentence_jp: document.getElementById("vocabExJp").value,
-          example_sentence_vi: document.getElementById("vocabExVi").value
-        });
+        const { lesson } = getCurrentLessonContext();
+        const editId = document.getElementById("vocabEditId").value;
+        const vData = {
+          word: document.getElementById("vocabWord").value.trim(),
+          reading: document.getElementById("vocabReading").value.trim(),
+          meaning_vi: document.getElementById("vocabMeaning").value.trim(),
+          example: document.getElementById("vocabExample").value.trim()
+        };
+
+        if (editId) {
+          const idx = lesson.vocabularies.findIndex(v => v.id == editId);
+          if (idx !== -1) lesson.vocabularies[idx] = { ...lesson.vocabularies[idx], ...vData };
+          showToast("Vocabulary updated!");
+        } else {
+          lesson.vocabularies.push({ id: Date.now(), ...vData });
+          showToast("Vocabulary added!");
+        }
         closeVocabModal();
-        renderVocabTable();
-        showToast("Vocabulary added to Lesson!");
+        updateWorkspaceUI();
+        renderContentTree();
       });
 
-      // Kanji form submit
+      // Kanji Form Submit
       document.getElementById("kanjiForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        kanjis.push({
-          id: Date.now(),
-          kanji: document.getElementById("kanjiChar").value,
-          stroke_count: document.getElementById("kanjiStrokes").value,
-          meaning_vi: document.getElementById("kanjiMeaning").value,
-          onyomi: document.getElementById("kanjiOn").value,
-          kunyomi: document.getElementById("kanjiKun").value,
-          example_words: document.getElementById("kanjiExamples").value
-        });
+        const { lesson } = getCurrentLessonContext();
+        const editId = document.getElementById("kanjiEditId").value;
+        const kData = {
+          kanji: document.getElementById("kanjiChar").value.trim(),
+          stroke_count: parseInt(document.getElementById("kanjiStrokes").value) || 0,
+          meaning_vi: document.getElementById("kanjiMeaning").value.trim(),
+          onyomi: document.getElementById("kanjiOn").value.trim(),
+          kunyomi: document.getElementById("kanjiKun").value.trim(),
+          example_words: document.getElementById("kanjiExamples").value.trim()
+        };
+
+        if (editId) {
+          const idx = lesson.kanjis.findIndex(k => k.id == editId);
+          if (idx !== -1) lesson.kanjis[idx] = { ...lesson.kanjis[idx], ...kData };
+          showToast("Kanji updated!");
+        } else {
+          lesson.kanjis.push({ id: Date.now(), ...kData });
+          showToast("Kanji added to lesson!");
+        }
         closeKanjiModal();
-        renderKanjiGrid();
-        showToast("Kanji added to Lesson!");
+        updateWorkspaceUI();
+        renderContentTree();
       });
 
-      // Grammar + Video Form Submit
-      document.getElementById("grammarVideoForm").addEventListener("submit", (e) => {
+      // Grammar Form Submit
+      document.getElementById("grammarForm").addEventListener("submit", (e) => {
         e.preventDefault();
-        showToast("Grammar Points & Lesson Video saved successfully!");
+        const { lesson } = getCurrentLessonContext();
+        const editId = document.getElementById("grammarEditId").value;
+        const gData = {
+          title: document.getElementById("grammarTitle").value.trim(),
+          explanation: document.getElementById("grammarExplanation").value.trim()
+        };
+
+        if (editId) {
+          const idx = lesson.grammars.findIndex(g => g.id == editId);
+          if (idx !== -1) lesson.grammars[idx] = { ...lesson.grammars[idx], ...gData };
+          showToast("Grammar point updated!");
+        } else {
+          lesson.grammars.push({ id: Date.now(), ...gData });
+          showToast("Grammar point added!");
+        }
+        closeGrammarModal();
+        updateWorkspaceUI();
+        renderContentTree();
+      });
+
+      // Question Form Submit
+      document.getElementById("questionForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const { lesson } = getCurrentLessonContext();
+        const editId = document.getElementById("questionEditId").value;
+        const correctIdx = parseInt(document.querySelector('input[name="correctOpt"]:checked').value);
+
+        const options = [];
+        const opt0 = document.getElementById("opt0").value.trim();
+        const opt1 = document.getElementById("opt1").value.trim();
+        const opt2 = document.getElementById("opt2").value.trim();
+        const opt3 = document.getElementById("opt3").value.trim();
+
+        if (opt0) options.push({ text: opt0, is_correct: correctIdx === 0 ? 1 : 0 });
+        if (opt1) options.push({ text: opt1, is_correct: correctIdx === 1 ? 1 : 0 });
+        if (opt2) options.push({ text: opt2, is_correct: correctIdx === 2 ? 1 : 0 });
+        if (opt3) options.push({ text: opt3, is_correct: correctIdx === 3 ? 1 : 0 });
+
+        const qData = {
+          question_text: document.getElementById("qText").value.trim(),
+          points: parseFloat(document.getElementById("qPoints").value) || 1.0,
+          question_type: document.getElementById("qType").value,
+          options: options
+        };
+
+        if (editId) {
+          const idx = lesson.quizQuestions.findIndex(q => q.id == editId);
+          if (idx !== -1) lesson.quizQuestions[idx] = { ...lesson.quizQuestions[idx], ...qData };
+          showToast("Quiz Question updated!");
+        } else {
+          lesson.quizQuestions.push({ id: Date.now(), ...qData });
+          showToast("Quiz Question added!");
+        }
+        closeQuestionModal();
+        updateWorkspaceUI();
+        renderContentTree();
       });
     });
   </script>

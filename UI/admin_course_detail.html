@@ -50,6 +50,7 @@
       backdrop-filter: blur(4px);
     }
   </style>
+  <link rel="stylesheet" href="assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -123,7 +124,7 @@
             <span class="px-2.5 py-1 rounded-xl bg-sky-600 text-white font-extrabold text-xs shadow-xs">N3</span>
           </div>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Lộ trình bài học thuộc bảng <code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono">lessons</code>. Quản lý danh sách bài học và nội dung chi tiết.
+            Lộ trình bài học. Quản lý danh sách bài học và nội dung chi tiết.
           </p>
         </div>
 
@@ -143,7 +144,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
             </svg>
-            <span>+ Add Lesson</span>
+            <span>Add Lesson</span>
           </a>
         </div>
       </header>
@@ -156,8 +157,6 @@
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="text-xs font-mono text-slate-400">slug: courses/n3-soumatome</span>
-              <span class="text-slate-300">•</span>
               <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
               </span>
@@ -187,7 +186,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
             <h2 class="text-base font-bold text-slate-900">Course Lessons Outline</h2>
-            <p class="text-xs text-slate-400 font-medium mt-0.5">Sắp xếp thứ tự bài học (`sort_order`) và truy cập quản lý chi tiết từng phần nội dung.</p>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Danh sách bài học và truy cập quản lý chi tiết từng phần nội dung.</p>
           </div>
 
           <div class="relative max-w-xs w-full">
@@ -204,12 +203,11 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-                <th class="pb-3 pl-2 font-semibold text-center w-12">#</th>
-                <th class="pb-3 px-3 font-semibold">Lesson Title (`title` & `slug`)</th>
-                <th class="pb-3 px-3 font-semibold text-center">Duration</th>
-                <th class="pb-3 px-4 font-semibold">Content Checklist (Vocab, Kanji, Grammar, Quiz)</th>
-                <th class="pb-3 px-3 font-semibold text-center">Status</th>
-                <th class="pb-3 pr-2 font-semibold text-right">Actions</th>
+                <th class="pb-3 pl-3 font-semibold text-center w-14">#</th>
+                <th class="pb-3 px-4 font-semibold">Lesson Title</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Duration</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Status</th>
+                <th class="pb-3 pr-4 font-semibold text-right w-48">Actions</th>
               </tr>
             </thead>
             <tbody id="lessonsTableBody" class="divide-y divide-slate-100/70 text-xs">
@@ -241,71 +239,41 @@
         id: 101,
         course_id: 1,
         title: "Bài 1: Làm quen với cấu trúc ngữ pháp ~わけがない và Phân biệt ~わけではない",
-        slug: "bai-1-ngu-phap-wakeganai",
         duration_minutes: 45,
         sort_order: 1,
-        is_published: 1,
-        vocab_count: 20,
-        kanji_count: 8,
-        grammar_count: 4,
-        video_set: true,
-        quiz_count: 10
+        is_published: 1
       },
       {
         id: 102,
         course_id: 1,
         title: "Bài 2: Từ vựng & Kanji chủ đề Công việc & Văn phòng",
-        slug: "bai-2-tu-vung-kanji-van-phong",
         duration_minutes: 50,
         sort_order: 2,
-        is_published: 1,
-        vocab_count: 25,
-        kanji_count: 10,
-        grammar_count: 3,
-        video_set: true,
-        quiz_count: 10
+        is_published: 1
       },
       {
         id: 103,
         course_id: 1,
         title: "Bài 3: Cấu trúc biểu thị phán đoán ~に違いない và ~はずだ",
-        slug: "bai-3-cau-truc-phan-doan",
         duration_minutes: 40,
         sort_order: 3,
-        is_published: 1,
-        vocab_count: 18,
-        kanji_count: 6,
-        grammar_count: 5,
-        video_set: true,
-        quiz_count: 8
+        is_published: 1
       },
       {
         id: 104,
         course_id: 1,
         title: "Bài 4: Kanji các chữ chỉ phương hướng & vị trí trong đô thị",
-        slug: "bai-4-kanji-phuong-huong",
         duration_minutes: 35,
         sort_order: 4,
-        is_published: 1,
-        vocab_count: 15,
-        kanji_count: 12,
-        grammar_count: 2,
-        video_set: false,
-        quiz_count: 10
+        is_published: 1
       },
       {
         id: 105,
         course_id: 1,
         title: "Bài 5: Luyện tập tổng hợp & Đọc hiểu đoạn văn ngắn N3",
-        slug: "bai-5-luyen-tap-tong-hop-doc-hieu",
         duration_minutes: 60,
         sort_order: 5,
-        is_published: 0,
-        vocab_count: 12,
-        kanji_count: 5,
-        grammar_count: 4,
-        video_set: false,
-        quiz_count: 0
+        is_published: 0
       }
     ];
 
@@ -313,7 +281,7 @@
       const tbody = document.getElementById("lessonsTableBody");
       const searchVal = document.getElementById("lessonSearchInput").value.trim().toLowerCase();
 
-      const filtered = lessonsData.filter(l => l.title.toLowerCase().includes(searchVal) || l.slug.toLowerCase().includes(searchVal));
+      const filtered = lessonsData.filter(l => l.title.toLowerCase().includes(searchVal));
       document.getElementById("tableShowingLessonsCount").textContent = `Showing ${filtered.length} of ${lessonsData.length} Lessons`;
 
       tbody.innerHTML = filtered.map(item => {
@@ -325,54 +293,34 @@
                <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft
              </span>`;
 
-        const quizBadge = item.quiz_count > 0 
-          ? `<span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-bold text-[10px] border border-indigo-100">Quiz: ${item.quiz_count} Qs</span>`
-          : `<span class="bg-slate-100 text-slate-400 px-2 py-0.5 rounded-md text-[10px]">No Quiz</span>`;
-
         return `
           <tr class="hover:bg-slate-50/80 transition-colors group">
-            <td class="py-3.5 pl-2 font-mono text-center font-bold text-slate-400 text-xs">
+            <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">
               ${item.sort_order}
             </td>
 
-            <td class="py-3.5 px-3">
+            <td class="py-4 px-4">
               <a href="admin_lesson_content.html?lesson_id=${item.id}&course_id=${courseId}"
                 class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
                 ${item.title}
               </a>
-              <p class="text-[11px] text-slate-400 font-mono mt-0.5">${item.slug}</p>
             </td>
 
-            <td class="py-3.5 px-3 text-center font-medium text-slate-600 whitespace-nowrap">
+            <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">
               ${item.duration_minutes} mins
             </td>
 
-            <td class="py-3.5 px-4">
-              <div class="flex items-center gap-1.5 flex-wrap">
-                <span class="bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md font-bold text-[10px] border border-sky-100">
-                  ${item.vocab_count} Vocab
-                </span>
-                <span class="bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md font-bold text-[10px] border border-emerald-100">
-                  ${item.kanji_count} Kanji
-                </span>
-                <span class="bg-amber-50 text-amber-700 px-2 py-0.5 rounded-md font-bold text-[10px] border border-amber-100">
-                  ${item.grammar_count} Grammar ${item.video_set ? '· 🎥' : ''}
-                </span>
-                ${quizBadge}
-              </div>
-            </td>
-
-            <td class="py-3.5 px-3 text-center">
+            <td class="py-4 px-4 text-center">
               ${statusBadge}
             </td>
 
-            <td class="py-3.5 pr-2 text-right">
-              <div class="flex items-center justify-end gap-1">
+            <td class="py-4 pr-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
                 <!-- Manage Lesson Content Hub (Primary Flow) -->
                 <a href="admin_lesson_content.html?lesson_id=${item.id}&course_id=${courseId}"
-                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                  class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs"
                   title="Configure Lesson Content">
-                  <span>Manage Content</span>
+                  <span>Manage Lesson Content</span>
                   <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                   </svg>

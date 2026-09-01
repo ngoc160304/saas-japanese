@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/verifyUser", "/api/v1/auth/logout",
                                 "/api/v1/auth/forgotPassword",
                                 "/api/v1/auth/resetPassword", "/api/v1/auth/verifyResetOtp",
-                                "/api/v1/auth/refreshToken")
+                                "/api/v1/auth/refreshToken", "/api/v1/auth/myProfile")
                         .permitAll().anyRequest().authenticated());
         return http.build();
     }
