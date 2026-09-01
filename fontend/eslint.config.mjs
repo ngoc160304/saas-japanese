@@ -52,12 +52,12 @@ const eslintConfig = defineConfig([
   prettierConfig,
 
   globalIgnores([
-    '.next/**',
-    'out/**',
-    'build/**',
-    'coverage/**',
-    'node_modules/**',
-    'next-env.d.ts',
+    // '.next/**',
+    // 'out/**',
+    // 'build/**',
+    // 'coverage/**',
+    // 'node_modules/**',
+    // 'next-env.d.ts',
   ]),
 ]);
 
