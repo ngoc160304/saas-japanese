@@ -1,0 +1,10 @@
+FROM onsei:latest
+WORKDIR work
+
+RUN pip3 install --no-cache-dir fastapi==0.66.0 uvicorn==0.14.0 python-multipart
+
+# Copy code của bạn (nằm ngoài submodule) vào đúng vị trí package onsei bên trong container
+COPY service/score_api.py ./onsei/score_api.py
+
+EXPOSE 8000
+ENTRYPOINT ["uvicorn", "onsei.score_api:app", "--host", "0.0.0.0", "--port", "8000"]

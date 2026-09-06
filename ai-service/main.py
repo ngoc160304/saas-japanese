@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from config.enviroments import eviroment
 from provider.livekit_client import create_room, start_livekit
 from util.generate_token_livekit import generate_token
-from provider.livekit_client import create_room, launch_bot_for_room
+from provider.livekit_client import create_room, launch_bot_for_room, _room_tasks
 
 app = FastAPI()
 
@@ -39,18 +39,34 @@ async def handle_create_room():
 
 
 # tao them endpoint trả token ve cho user ()
-
+class Topic(BaseModel):
+    id: str
+    title: str
+    description: str
 
 class JoinRoomRequest(BaseModel):
     room_name: str
     user_id: str
     user_name: str
-
+    topic: Topic
 
 @app.post("/join-room")
 async def join_room(data: JoinRoomRequest):
     token = generate_token(data.room_name, data.user_id, data.user_name)
-    launch_bot_for_room(data.room_name)  # <-- giữ strong reference, không bị GC giữa chừng
+    launch_bot_for_room(data.room_name,data.topic.model_dump())  # <-- giữ strong reference, không bị GC giữa chừng
     return {"serverUrl": eviroment.LIVEKIT_URL, "participantToken": token}
 
+class EndRoomRequest(BaseModel):
+    room_name: str
 
+@app.post("/end-room")
+async def end_room(data: EndRoomRequest):
+    task = _room_tasks.get(data.room_name)
+    if not task:
+        return {"success": False, "message": "No active bot"}
+    task.cancel()
+    result = await task
+    return {
+        "success": True,
+        "session_result": result,
+    }

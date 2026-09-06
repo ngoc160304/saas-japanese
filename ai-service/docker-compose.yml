@@ -1,0 +1,17 @@
+services:
+  onsei-base:
+    build:
+      context: ./onsei          # build từ chính Dockerfile gốc của submodule, không sửa gì
+      dockerfile: Dockerfile
+    image: onsei:latest
+
+  onsei-api:
+    build:
+      context: .                 # context = ai-service, để COPY được score_api.py
+      dockerfile: Dockerfile.onsei-api
+    image: onsei-api:latest
+    depends_on:
+      - onsei-base
+    ports:
+      - "8010:8000"
+    restart: unless-stopped

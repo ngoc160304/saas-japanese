@@ -1,36 +1,41 @@
-"use client";
-
-import { Button } from "@/components/ui/button";
-import { LiveKitService } from "@/services/livekit.service";
+'use client';
+import SpeakingResult from '@/components/speaking/result/SpeakingResult';
+import SpeakingLayout from '@/components/speaking/layout/SpeakingLayout';
+import Conversation from '@/components/speaking/conversation/Conversation';
+import TopicSelection, { Topic } from '@/components/speaking/topic/TopicSelection';
+import { LiveKitService } from '@/services/livekit.service';
 import {
   RoomAudioRenderer,
   SessionProvider,
   useSession,
-  BarVisualizer,
-  TrackToggle,
   StartAudio,
   useLocalParticipant,
-  DisconnectButton,
-} from "@livekit/components-react";
-import "@livekit/components-styles";
-import {
-  DataPacket_Kind,
-  RemoteParticipant,
-  RoomEvent,
-  TokenSource,
-  Track,
-} from "livekit-client";
-import { useEffect, useMemo, useState } from "react";
+} from '@livekit/components-react';
+import '@livekit/components-styles';
+import { DataPacket_Kind, RemoteParticipant, RoomEvent, TokenSource, Track } from 'livekit-client';
+import { useEffect, useMemo, useState } from 'react';
 
-const LIVEKIT_URL = "wss://jlpt-learning-itys0a6n.livekit.cloud";
-const USERID = "ngoc_123";
-const USERNAME = "Ngoc Nguyen";
+type Message = {
+  id: string;
+  role: 'user' | 'ai';
+  message: string;
+};
 
-function MicSection() {
+const LIVEKIT_URL = 'wss://jlpt-learning-itys0a6n.livekit.cloud';
+const USERID = 'ngoc_123';
+const USERNAME = 'Ngoc Nguyen';
+
+function MicSection({ onEnd, messages }: { onEnd: () => void; messages: Message[] }) {
   const { localParticipant, microphoneTrack } = useLocalParticipant();
 
+  // Khi chưa có mic, hiển thị trạng thái chờ ngay trong khung chính luôn
   if (!microphoneTrack) {
-    return null;
+    return (
+      <div className="flex h-full w-full items-center justify-center gap-2 text-sm text-slate-500">
+        <div className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
+        Đang kết nối micro...
+      </div>
+    );
   }
 
   const trackRef = {
@@ -39,31 +44,18 @@ function MicSection() {
     source: Track.Source.Microphone,
   };
 
-  return (
-    <div className="flex flex-col items-center gap-4">
-      <div className="w-[400px] h-[120px] bg-black rounded-xl p-4">
-        <BarVisualizer trackRef={trackRef} className="h-full w-full" />
-      </div>
-      <div className="flex gap-4">
-        <TrackToggle
-          source={Track.Source.Microphone}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-        >
-          Toggle Mic
-        </TrackToggle>
-        <DisconnectButton className="px-4 py-2 bg-red-500 text-white rounded-lg">
-          End Call
-        </DisconnectButton>
-      </div>
-    </div>
-  );
+  return <Conversation trackRef={trackRef} messages={messages} onEnd={onEnd} />;
 }
 
 const Speaking = () => {
   const [room, setRoom] = useState<any>(null);
   const [joinRoom, setJoinRoom] = useState<any>(null);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const handleJoinRoom = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleJoinRoom = async (topic: Topic) => {
     const roomData = (await LiveKitService.prototype.createRoom()).data;
     setRoom(roomData);
 
@@ -72,27 +64,68 @@ const Speaking = () => {
         room_name: roomData.name,
         user_id: USERID,
         user_name: USERNAME,
+        topic,
       });
       setJoinRoom(responseJoin.data);
+      setIsSpeaking(true);
+      setResult(null);
     }
   };
+  
+  const handleStartSpeaking = async (topic: Topic) => {
+    setSelectedTopic(topic);
+    setMessages([]);
+    await handleJoinRoom(topic);
+  };
   return (
-    <>
-      <div>
-        <Button variant="default" size="lg" onClick={handleJoinRoom}>
-          Speaking with AI
-        </Button>
-      </div>
-      <div>
-        {room?.name && joinRoom?.participantToken && (
-          <SessionLiveKit room={room} joinRoom={joinRoom} />
-        )}
-      </div>
-    </>
+    <SpeakingLayout>
+      {/* Topic Selection */}
+      {!isSpeaking && !result && <TopicSelection onStart={handleStartSpeaking} />}
+
+      {/* Conversation */}
+      {isSpeaking && room?.name && joinRoom?.participantToken && (
+        <SessionLiveKit
+          room={room}
+          joinRoom={joinRoom}
+          topic={selectedTopic}
+          messages={messages}
+          setMessages={setMessages}
+          onEnd={(sessionResult: any) => {
+            setResult(sessionResult);
+            setIsSpeaking(false);
+          }}
+        />
+      )}
+
+      {/* Result */}
+      {!isSpeaking && result && (
+        <SpeakingResult
+          result={result}
+          onBackToTopics={() => {
+            setResult(null);
+            setSelectedTopic(null);
+          }}
+        />
+      )}
+    </SpeakingLayout>
   );
 };
 
-const SessionLiveKit = ({ room, joinRoom }: any) => {
+const SessionLiveKit = ({
+  room,
+  joinRoom,
+  topic,
+  onEnd,
+  messages,
+  setMessages,
+}: {
+  room: any;
+  joinRoom: any;
+  topic: Topic | null;
+  messages: Message[];
+  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
+  onEnd: (result: any) => void;
+}) => {
   const serverUrl = joinRoom?.serverUrl || LIVEKIT_URL;
   const participantToken = joinRoom?.participantToken || joinRoom?.token;
   const tokenSource = useMemo(() => {
@@ -100,14 +133,28 @@ const SessionLiveKit = ({ room, joinRoom }: any) => {
   }, [serverUrl, participantToken]);
 
   const session = useSession(tokenSource, {
-    roomName: room?.name || "default-room",
+    roomName: room?.name || 'default-room',
     participantIdentity: USERID,
     participantName: USERNAME,
   });
 
+  const handleEnd = async () => {
+    try {
+      const response = await LiveKitService.prototype.endRoom({
+        room_name: room.name,
+      });
+      const sessionResult = response.data.session_result;
+      console.log('RESULT:', sessionResult);
+      await session.end();
+      onEnd(sessionResult);
+    } catch (error) {
+      console.error('Failed to end call:', error);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
-    console.log("Session started");
+    console.log('Session started');
     session
       .start({
         tracks: {
@@ -123,28 +170,49 @@ const SessionLiveKit = ({ room, joinRoom }: any) => {
         if (!rs) return;
         const publication = rs.localParticipant.getTrackPublication(Track.Source.Microphone);
 
-        console.log("MIC PUBLICATION:", publication);
-        console.log("MIC TRACK:", publication?.track);
+        console.log('MIC PUBLICATION:', publication);
+        console.log('MIC TRACK:', publication?.track);
         // Engine is connected here — safe to publish
         // await rs.localParticipant.setMicrophoneEnabled(true);
         const handleDataReceived = (
           payload: Uint8Array,
           participant?: RemoteParticipant,
-          kind?: DataPacket_Kind
+          kind?: DataPacket_Kind,
         ) => {
-          const text = new TextDecoder().decode(payload);
-          console.log("Received data : ", text);
+          try {
+            const text = new TextDecoder().decode(payload);
+            console.log('Received data:', text);
+            const data = JSON.parse(text);
+            if (data.type !== 'conversation') {
+              return;
+            }
+            setMessages((prev) => [
+              ...prev,
+              {
+                id: `${Date.now()}-user`,
+                role: 'user',
+                message: data.user,
+              },
+              {
+                id: `${Date.now()}-ai`,
+                role: 'ai',
+                message: data.ai,
+              },
+            ]);
+          } catch (error) {
+            console.error('Failed to parse conversation data:', error);
+          }
         };
         rs.on(RoomEvent.DataReceived, handleDataReceived);
       })
       .catch((err) => {
-        console.error("Failed to start session / enable mic:", err);
+        console.error('Failed to start session / enable mic:', err);
       });
 
     return () => {
       cancelled = true;
       session.end().catch((err) => {
-        console.error("Failed to end session:", err);
+        console.error('Failed to end session:', err);
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -171,9 +239,16 @@ const SessionLiveKit = ({ room, joinRoom }: any) => {
   // }, [session.room]);
   return (
     <SessionProvider session={session}>
-      <StartAudio label="Enable Audio" />
       <RoomAudioRenderer />
-      <MicSection />
+      <div className="relative flex h-[650px] w-full flex-col overflow-hidden rounded-2xl bg-white border border-slate-200/80 shadow-sm">
+        <div className="absolute top-3 right-3 z-10">
+          <StartAudio
+            label="Enable Audio"
+            className="rounded-lg bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 hover:bg-slate-200"
+          />
+        </div>
+        <MicSection onEnd={handleEnd} messages={messages} />
+      </div>
     </SessionProvider>
   );
 };
