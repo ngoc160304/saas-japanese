@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Category Detail — StudyJLPT</title>
+  <meta name="description" content="Browse sources belonging to a specific learning category on StudyJLPT." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15,23,42,0.04), 0 1px 4px -1px rgba(15,23,42,0.02);
+    }
+    .shadow-hover { transition: all 0.25s cubic-bezier(0.4,0,0.2,1); }
+    .shadow-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -4px rgba(15,23,42,0.07), 0 3px 8px -2px rgba(15,23,42,0.03);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+<div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+  <!-- ========================================== -->
+  <!-- SIDEBAR — identical to dashboard.html      -->
+  <!-- ========================================== -->
+  <aside id="sidebar"
+    class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
+
+    <div>
+      <!-- Brand -->
+      <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
+            Studify <span class="text-sky-600 text-xs font-bold px-1.5 py-0.5 rounded bg-sky-50 uppercase tracking-wide">JLPT</span>
+          </span>
+        </div>
+        <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Toggle menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Section label -->
+      <div class="px-3 mb-2.5">
+        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Main Menu</span>
+      </div>
+
+      <!-- Nav -->
+      <nav id="navMenu" class="space-y-1.5">
+        <!-- Overview -->
+        <a href="dashboard.html" data-page="dashboard"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+          <span>Overview</span>
+        </a>
+
+        <!-- Sources -->
+        <a href="source.html" data-page="source"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Sources</span>
+        </a>
+
+        <!-- Category (active on category.html AND category_detail.html) -->
+        <a href="category.html" data-page="category"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+          </svg>
+          <span>Category</span>
+        </a>
+
+        <!-- JLPT Exams -->
+        <a href="jlpt_exams.html" data-page="jlpt_exams"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+          </svg>
+          <span>JLPT Exams</span>
+        </a>
+
+        <!-- Analytics -->
+        <a href="#analytics" data-page="analytics"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <span>Analytics</span>
+        </a>
+
+        <!-- Flashcards -->
+        <a href="#flashcards" data-page="flashcards"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Flashcards</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="#settings" data-page="settings"
+          class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom Promo Card (matches dashboard.html) -->
+    <div class="mt-8 pt-4">
+      <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-3 aspect-[4/3] flex flex-col justify-end shadow-md group">
+        <img src="../assets/images/sidebar_cottage.jpg" alt="StudyJLPT Community"
+          class="absolute inset-0 w-full h-full object-cover object-center opacity-85 transition-transform duration-500 group-hover:scale-105" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+        <div class="relative z-10 flex items-center justify-between bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-sm text-slate-900">
+          <div class="pl-1">
+            <p class="text-xs font-bold text-slate-900 leading-tight">Invite A Friend</p>
+            <p class="text-[10px] text-slate-500 font-medium">You'll Get A Special Offer...</p>
+          </div>
+          <button class="w-7 h-7 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-sky-600 transition-colors shrink-0" title="Invite Friends">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ========================================== -->
+  <!-- MAIN CONTENT: CATEGORY DETAIL              -->
+  <!-- ========================================== -->
+  <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+
+    <!-- Page Header with Back -->
+    <header class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-6">
+      <div>
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-2">
+          <a href="dashboard.html" class="hover:text-slate-600">Home</a>
+          <span>/</span>
+          <a href="category.html" class="hover:text-slate-600">Categories</a>
+          <span>/</span>
+          <span id="breadcrumbCategoryName">Từ vựng</span>
+        </nav>
+
+        <!-- Back button -->
+        <a href="category.html"
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 mb-3 transition-colors group">
+          <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Categories
+        </a>
+
+        <!-- Category title + description -->
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+          </div>
+          <div>
+            <h1 id="categoryTitle" class="text-2xl font-black text-slate-900">Từ vựng</h1>
+            <span id="categoryCodeBadge" class="inline-block text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md">—</span>
+          </div>
+        </div>
+        <p id="categoryDescription" class="mt-1 text-xs text-slate-500 max-w-2xl">Học và ôn tập từ vựng tiếng Nhật theo cấp độ JLPT từ N5 đến N1, từ vựng theo chủ đề đời sống và công sở.</p>
+      </div>
+    </header>
+
+    <!-- KPI Summary Row -->
+    <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+        <p class="text-xs font-semibold text-slate-400">Sources</p>
+        <p id="statSourceCount" class="text-2xl lg:text-3xl font-extrabold text-slate-900 mt-1">—</p>
+        <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">In This Category</span>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+        <p class="text-xs font-semibold text-slate-400">Free Sources</p>
+        <p id="statFreeCount" class="text-2xl lg:text-3xl font-extrabold text-emerald-600 mt-1">—</p>
+        <span class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-2">Open Access</span>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+        <p class="text-xs font-semibold text-slate-400">Total Lessons</p>
+        <p id="statLessonsCount" class="text-2xl lg:text-3xl font-extrabold text-indigo-600 mt-1">—</p>
+        <span class="inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full mt-2">Structured Content</span>
+      </div>
+      <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+        <p class="text-xs font-semibold text-slate-400">JLPT Levels</p>
+        <p id="statLevels" class="text-2xl lg:text-3xl font-extrabold text-amber-600 mt-1">—</p>
+        <span class="inline-block text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-2">Coverage</span>
+      </div>
+    </section>
+
+    <!-- Sources Section -->
+    <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+
+      <!-- Controls Bar -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-base font-extrabold text-slate-900">Sources in this Category</h2>
+          <p id="sourcesSubtitle" class="text-xs text-slate-400 font-medium mt-0.5">All sources filtered by selected category</p>
+        </div>
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Search -->
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input type="text" id="sourceSearchInput" placeholder="Search sources..."
+              class="pl-9 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all w-52" />
+          </div>
+          <!-- Level filter -->
+          <select id="levelFilter"
+            class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+            <option value="ALL">All Levels</option>
+            <option value="N5">N5</option>
+            <option value="N4">N4</option>
+            <option value="N3">N3</option>
+            <option value="N2">N2</option>
+            <option value="N1">N1</option>
+          </select>
+          <!-- Price filter -->
+          <select id="priceFilter"
+            class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+            <option value="ALL">All Pricing</option>
+            <option value="free">Free</option>
+            <option value="paid">Paid</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Sources Grid -->
+      <div id="sourcesCardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+        <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-extrabold text-slate-900 line-clamp-2 group-hover:text-sky-700 transition-colors">Từ vựng N5 Cơ bản</h3>
+                <span class="mt-0.5 inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">N5</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 text-xs leading-relaxed text-slate-500 line-clamp-2 flex-1">Bộ 800 từ vựng nền tảng theo chủ đề sinh hoạt hằng ngày cho người mới bắt đầu.</p>
+
+          <div class="mt-3 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span>10 lessons</span>
+            <span>450 min</span>
+            <span class="text-emerald-600 font-extrabold text-xs">Free</span>
+          </div>
+
+          <div class="mt-4">
+            <a href="source.html?source_id=101"
+              class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">
+              Start Learning →
+            </a>
+          </div>
+        </article>
+      
+
+        <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-extrabold text-slate-900 line-clamp-2 group-hover:text-sky-700 transition-colors">Từ vựng N4 Mở rộng</h3>
+                <span class="mt-0.5 inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-sky-50 text-sky-700 border border-sky-200">N4</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 text-xs leading-relaxed text-slate-500 line-clamp-2 flex-1">Luyện 1.500 từ vựng N4 qua flashcard ngữ cảnh và mini-quiz phản xạ.</p>
+
+          <div class="mt-3 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span>12 lessons</span>
+            <span>540 min</span>
+            <span class="text-xs font-semibold text-slate-600">299.000 ₫</span>
+          </div>
+
+          <div class="mt-4">
+            <a href="source.html?source_id=102"
+              class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">
+              Start Learning →
+            </a>
+          </div>
+        </article>
+      
+
+        <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-extrabold text-slate-900 line-clamp-2 group-hover:text-sky-700 transition-colors">Từ vựng N3 Nâng cao</h3>
+                <span class="mt-0.5 inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-700 border border-amber-200">N3</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 text-xs leading-relaxed text-slate-500 line-clamp-2 flex-1">3.000 từ vựng N3 phân nhóm chủ đề, có ví dụ câu và phân tích từ ghép Kanji.</p>
+
+          <div class="mt-3 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span>14 lessons</span>
+            <span>630 min</span>
+            <span class="text-xs font-semibold text-slate-600">399.000 ₫</span>
+          </div>
+
+          <div class="mt-4">
+            <a href="source.html?source_id=103"
+              class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">
+              Start Learning →
+            </a>
+          </div>
+        </article>
+      
+
+        <article class="group bg-white rounded-2xl border border-slate-200 p-5 shadow-soft hover:-translate-y-0.5 hover:shadow-md transition-all flex flex-col">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-11 h-11 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shrink-0 text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-sm font-extrabold text-slate-900 line-clamp-2 group-hover:text-sky-700 transition-colors">Từ vựng N2 Chuyên sâu</h3>
+                <span class="mt-0.5 inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200">N2</span>
+              </div>
+            </div>
+          </div>
+
+          <p class="mt-3 text-xs leading-relaxed text-slate-500 line-clamp-2 flex-1">6.000 từ vựng N2 gồm từ chính thức, văn phong trang trọng và từ chuyên ngành.</p>
+
+          <div class="mt-3 flex items-center gap-4 text-xs font-semibold text-slate-400">
+            <span>16 lessons</span>
+            <span>720 min</span>
+            <span class="text-xs font-semibold text-slate-600">499.000 ₫</span>
+          </div>
+
+          <div class="mt-4">
+            <a href="source.html?source_id=104"
+              class="block w-full rounded-xl bg-slate-900 hover:bg-sky-600 px-3 py-2.5 text-center text-xs font-bold text-white transition-colors">
+              Start Learning →
+            </a>
+          </div>
+        </article>
+      
+      </div>
+
+      <!-- Empty State -->
+      <div id="sourceEmptyState" class="hidden py-14 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+        </div>
+        <p class="text-sm font-bold text-slate-800">No sources match your filters</p>
+        <p class="text-xs text-slate-400 mt-1">Try a different level or search term.</p>
+      </div>
+
+      <!-- Not Found State (wrong category ID) -->
+      <div id="categoryNotFound" class="hidden py-14 text-center">
+        <div class="w-12 h-12 rounded-2xl bg-red-50 text-red-400 flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <p class="text-sm font-bold text-slate-800">Category not found</p>
+        <p class="text-xs text-slate-400 mt-1">The requested category ID does not exist.</p>
+        <a href="category.html" class="inline-block mt-4 px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-sky-600 transition-colors">
+          ← Back to Categories
+        </a>
+      </div>
+
+      <!-- Footer -->
+      <div id="sourceGridFooter" class="flex items-center justify-between pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
+        <p id="showingCount">—</p>
+        <a href="category.html"
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition-colors group">
+          <svg class="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Categories
+        </a>
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<!-- ========================================== -->
+<!-- DATA + RENDER LOGIC                        -->
+<!-- ========================================== -->
+
+</body>
+</html>

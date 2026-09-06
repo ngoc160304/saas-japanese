@@ -39,7 +39,7 @@
       box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(226, 232, 240, 0.8);
     }
   </style>
-  <link rel="stylesheet" href="assets/dashboard-theme.css" />
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-4 md:p-6 lg:p-8 bg-[#f3f6fa]">
@@ -252,42 +252,8 @@
     <span id="toastMessage">Tạo tài khoản thành công!</span>
   </div>
 
-  <script>
-    // Toggle Password Visibility
-    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
-    const passwordInput = document.getElementById("passwordInput");
-    togglePasswordBtn.addEventListener("click", () => {
-      passwordInput.type = passwordInput.type === "password" ? "text" : "password";
-    });
 
-    // Level selector
-    function selectLevel(code) {
-      document.querySelectorAll(".level-chip").forEach(el => {
-        el.classList.remove("border-2", "border-sky-500", "bg-sky-50", "text-sky-700");
-        el.classList.add("border-slate-200", "text-slate-700");
-      });
-      event.target.classList.remove("border-slate-200", "text-slate-700");
-      event.target.classList.add("border-2", "border-sky-500", "bg-sky-50", "text-sky-700");
-    }
-
-    // Form Submission Simulation
-    const registerForm = document.getElementById("registerForm");
-    const toast = document.getElementById("toast");
-
-    function showToast(msg) {
-      document.getElementById("toastMessage").textContent = msg;
-      toast.classList.remove("hidden");
-      setTimeout(() => toast.classList.add("hidden"), 3000);
-    }
-
-    registerForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      showToast("Tài khoản đã được tạo thành công! Đang chuyển đến Dashboard...");
-      setTimeout(() => {
-        window.location.href = "student_dashboard.html";
-      }, 1000);
-    });
-  </script>
 </body>
 
 </html>
+

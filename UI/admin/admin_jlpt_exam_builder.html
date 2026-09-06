@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT Admin — JLPT Exam Structure Builder</title>
+  <meta name="description"
+    content="StudyJLPT Admin JLPT Exam Builder. Manage Exam Sessions, Parts, Questions, Audio attachments, and Single-Choice Question Bank." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+      --color-navy: #2B4C7E;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Slim Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-card {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(5px);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa] flex flex-col">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP GLOBAL STICKY NAVBAR (Breadcrumbs & Exam Actions)                  -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 px-4 lg:px-8 py-3 shadow-xs shrink-0">
+    <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+      
+      <!-- Left: Logo & Exam Breadcrumbs -->
+      <div class="flex items-center gap-3 md:gap-5 min-w-0">
+        <a href="admin_jlpt_exam.html" class="flex items-center gap-2.5 shrink-0 group">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
+          </div>
+          <span class="hidden sm:inline text-lg font-extrabold tracking-tight text-slate-900">
+            StudyJLPT <span
+              class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 uppercase tracking-wider">ADMIN</span>
+          </span>
+        </a>
+
+        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-1.5 text-xs text-slate-500 truncate" aria-label="Breadcrumb">
+          <a href="admin_jlpt_exam.html" class="hover:text-slate-900 font-semibold text-slate-400">JLPT Exams</a>
+          <span class="text-slate-300">/</span>
+          <span class="font-bold text-slate-800 truncate" id="topExamTitleBreadcrumb">JLPT N3 Practice Test 01</span>
+          <span id="topExamLevelBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-100">N3</span>
+        </nav>
+      </div>
+
+      <!-- Right: Action Buttons -->
+      <div class="flex items-center gap-2 md:gap-3 shrink-0">
+        
+        <!-- Back to Exams -->
+        <a href="admin_jlpt_exam.html"
+          class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          <span>Exams List</span>
+        </a>
+
+        <!-- Preview Exam Mode -->
+        <button type="button" onclick="showToast('Opening Student Exam Preview...')"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold transition-all shadow-2xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>Student Preview</span>
+        </button>
+
+        <!-- Save Structure -->
+        <button type="button" onclick="quickSaveExam()"
+          class="flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs transition-all">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>Save Structure</span>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN BUILDER WORKSPACE                                                 -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+
+    <!-- ======================================================================= -->
+    <!-- A. EXAM OVERVIEW & KPI METRICS CARD                                     -->
+    <!-- ======================================================================= -->
+    <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
+      
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 pb-5 border-b border-slate-100">
+        
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+            <span id="examLevelHeroBadge" class="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-sky-600 text-white">N3</span>
+            <span class="text-slate-300">•</span>
+            <span id="examStatusHeroBadge" class="text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-100 text-xs font-bold inline-flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+            </span>
+            <span class="text-slate-300">•</span>
+            <span class="text-slate-400 text-xs font-mono">Exam ID: #301</span>
+          </div>
+
+          <h1 id="examTitleHero" class="text-xl md:text-2xl font-black text-slate-900 tracking-tight">JLPT N3 Practice Test 01 (Official Simulation)</h1>
+          <p id="examDescHero" class="text-xs md:text-sm text-slate-500 max-w-3xl leading-relaxed">Bộ đề thi thử chuẩn cấu trúc JLPT N3 năm 2026 với 3 phần thi: Chữ Hán - Từ Vựng, Ngữ Pháp - Đọc Hiểu, Nghe Hiểu.</p>
+        </div>
+
+        <!-- Header Actions -->
+        <div class="flex items-center gap-2 shrink-0 flex-wrap">
+          <button type="button" onclick="openEditExamDetailsModal()"
+            class="px-3.5 py-2 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-all">
+            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit Exam Info</span>
+          </button>
+
+          <button type="button" onclick="openAddSessionModal()"
+            class="px-4 py-2 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            <span> Add Session</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Quick Stats Counters Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-5">
+        <div class="px-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Total Sessions</span>
+          <span class="text-xl font-extrabold text-slate-900" id="summarySessionsCount">3 Sessions</span>
+        </div>
+
+        <div class="px-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Total Parts (Mondai)</span>
+          <span class="text-xl font-extrabold text-slate-900" id="summaryPartsCount">5 Parts</span>
+        </div>
+
+        <div class="px-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Total Questions</span>
+          <span class="text-xl font-extrabold text-indigo-600" id="summaryQuestionsCount">9 Questions</span>
+        </div>
+
+        <div class="px-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Max Score / Pass</span>
+          <span class="text-xl font-extrabold text-slate-900" id="summaryScoreInfo">180 / 95 pts</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- B. HIERARCHICAL SESSIONS & PARTS BUILDER LIST                            -->
+    <!-- ======================================================================= -->
+    <section class="space-y-5">
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <h2 class="text-base md:text-lg font-bold text-slate-900">Exam Structure & Content Hierarchy</h2>
+          <span class="text-xs text-slate-400 font-medium">| Exam → Session → Part → Question</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="toggleExpandAllSessions()" id="expandAllSessionsBtn"
+            class="px-3 py-1.5 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600 transition-colors">
+            Collapse All
+          </button>
+        </div>
+      </div>
+
+      <!-- Sessions Container -->
+      <div id="sessionsListContainer" class="space-y-5">
+
+        <!-- SESSION CARD CONTAINER (Session 1) -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all">
+          
+          <!-- Session Header -->
+          <div class="p-4 md:p-5 bg-slate-50/90 border-b border-slate-200/70 flex flex-col md:flex-row md:items-center justify-between gap-3 select-none">
+            
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0">
+                ▼
+              </span>
+              
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-900 text-white">Session 1</span>
+                  <span class="text-xs text-slate-500 font-mono">⏱️ 30 mins</span>
+                  <span class="text-xs text-slate-400 font-medium">• 2 Parts (5 Questions)</span>
+                </div>
+                <h3 class="text-sm md:text-base font-extrabold text-slate-900 mt-1 truncate">Session 1: Kiến thức ngôn ngữ (Chữ Hán - Từ Vựng)</h3>
+                <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">Phần thi kiểm tra cách đọc Kanji, tìm Kanji đúng, điền từ vào câu và từ đồng nghĩa.</p>
+              </div>
+            </div>
+
+            <!-- Session Actions -->
+            <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+              
+              <button type="button"
+                class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 text-sky-700 font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span> Part</span>
+              </button>
+
+              <button type="button" title="Edit Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs transition-all">
+                ✎
+              </button>
+
+              <button type="button" title="Delete Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs transition-all">
+                ✕
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Session Body: Parts List -->
+          <div class="p-4 md:p-5 space-y-4 bg-white">
+            
+              <!-- PART CARD (LEVEL 2: Mondai 1) -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-all">
+                
+                <!-- Part Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                  
+                  <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                      ▼
+                    </span>
+                    
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-xs md:text-sm font-bold text-slate-900">Mondai 1: Cách đọc chữ Hán (漢字読み)</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">3 Questions</span>
+                        
+                      </div>
+                      <p class="text-[11px] text-slate-500 font-medium italic mt-0.5">この言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。</p>
+                    </div>
+                  </div>
+
+                  <!-- Part Controls -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                    <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=new"
+                      class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span> Question</span>
+                    </a>
+
+                    <button type="button" title="Edit Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+
+                    <button type="button" title="Delete Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Part Questions List (LEVEL 3) -->
+                <div class="pt-3 space-y-2">
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #1
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=101"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            彼は毎朝近くの公園を<u>散歩</u>しています。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: さんぽ
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1 pt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=101"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #2
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=102"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            この工場では自動車を<u>製造</u>している。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: せいぞう
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1 pt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=102"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #3
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=103"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            明日の午後、大切な<u>会議</u>があります。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: かいぎ
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1 pt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-1&question_id=103"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                </div>
+
+              </div>
+            
+              <!-- PART CARD (LEVEL 2: Mondai 2) -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-all">
+                
+                <!-- Part Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                  
+                  <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                      ▼
+                    </span>
+                    
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-xs md:text-sm font-bold text-slate-900">Mondai 2: Tìm chữ Hán thích hợp (表記)</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">2 Questions</span>
+                        
+                      </div>
+                      <p class="text-[11px] text-slate-500 font-medium italic mt-0.5">この言葉の漢字として最もよいものを、1・2・3・4から一つ選びなさい。</p>
+                    </div>
+                  </div>
+
+                  <!-- Part Controls -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                    <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-2&question_id=new"
+                      class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span> Question</span>
+                    </a>
+
+                    <button type="button" title="Edit Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+
+                    <button type="button" title="Delete Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Part Questions List (LEVEL 3) -->
+                <div class="pt-3 space-y-2">
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #1
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-2&question_id=104"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            約束の時間を<u>まもる</u>ことは大切です。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: 守る
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1 pt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-2&question_id=104"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #2
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-2&question_id=105"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            新しいアパートを<u>さがして</u>います。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: 探して
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1 pt</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-1&part_id=part-2&question_id=105"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                </div>
+
+              </div>
+            
+          </div>
+
+        </div>
+      
+
+        <!-- SESSION CARD CONTAINER (Session 2) -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all">
+          
+          <!-- Session Header -->
+          <div class="p-4 md:p-5 bg-slate-50/90 border-b border-slate-200/70 flex flex-col md:flex-row md:items-center justify-between gap-3 select-none">
+            
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0">
+                ▼
+              </span>
+              
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-900 text-white">Session 2</span>
+                  <span class="text-xs text-slate-500 font-mono">⏱️ 70 mins</span>
+                  <span class="text-xs text-slate-400 font-medium">• 2 Parts (3 Questions)</span>
+                </div>
+                <h3 class="text-sm md:text-base font-extrabold text-slate-900 mt-1 truncate">Session 2: Ngữ Pháp & Đọc Hiểu (文法・読解)</h3>
+                <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">Phần thi ngữ pháp chọn dạng đúng, sắp xếp câu sao cho hợp lý và đọc hiểu đoạn văn ngắn, trung, dài.</p>
+              </div>
+            </div>
+
+            <!-- Session Actions -->
+            <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+              
+              <button type="button"
+                class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 text-sky-700 font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span> Part</span>
+              </button>
+
+              <button type="button" title="Edit Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs transition-all">
+                ✎
+              </button>
+
+              <button type="button" title="Delete Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs transition-all">
+                ✕
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Session Body: Parts List -->
+          <div class="p-4 md:p-5 space-y-4 bg-white">
+            
+              <!-- PART CARD (LEVEL 2: Mondai 1) -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-all">
+                
+                <!-- Part Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                  
+                  <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                      ▼
+                    </span>
+                    
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-xs md:text-sm font-bold text-slate-900">Mondai 1: Lựa chọn ngữ pháp câu (文法形式の判断)</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">2 Questions</span>
+                        
+                      </div>
+                      <p class="text-[11px] text-slate-500 font-medium italic mt-0.5">次の文の（　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。</p>
+                    </div>
+                  </div>
+
+                  <!-- Part Controls -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                    <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-3&question_id=new"
+                      class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span> Question</span>
+                    </a>
+
+                    <button type="button" title="Edit Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+
+                    <button type="button" title="Delete Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Part Questions List (LEVEL 3) -->
+                <div class="pt-3 space-y-2">
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #1
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-3&question_id=201"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            こんなに難しい試験、合格できる（　　）。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: わけがない
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1.5 pts</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-3&question_id=201"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #2
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-3&question_id=202"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            雨が降らない（　　）、ピクニックに行きましょう。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: うちに
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">1.5 pts</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-3&question_id=202"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                </div>
+
+              </div>
+            
+              <!-- PART CARD (LEVEL 2: Mondai 2) -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-all">
+                
+                <!-- Part Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                  
+                  <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                      ▼
+                    </span>
+                    
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-xs md:text-sm font-bold text-slate-900">Mondai 2: Đọc hiểu đoạn văn ngắn (短文読解)</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">1 Questions</span>
+                        
+                      </div>
+                      <p class="text-[11px] text-slate-500 font-medium italic mt-0.5">次の文章を読んで、後の問いに対する答えとして最もよいものを、1・2・3・4から一つ選びなさい。</p>
+                    </div>
+                  </div>
+
+                  <!-- Part Controls -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                    <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-4&question_id=new"
+                      class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span> Question</span>
+                    </a>
+
+                    <button type="button" title="Edit Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+
+                    <button type="button" title="Delete Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Part Questions List (LEVEL 3) -->
+                <div class="pt-3 space-y-2">
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #1
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-4&question_id=203"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            【短文】筆者が最も言いたいことは何か。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: 日々の努力が最も重要であるということ。
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">3 pts</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-2&part_id=part-4&question_id=203"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                </div>
+
+              </div>
+            
+          </div>
+
+        </div>
+      
+
+        <!-- SESSION CARD CONTAINER (Session 3) -->
+        <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all">
+          
+          <!-- Session Header -->
+          <div class="p-4 md:p-5 bg-slate-50/90 border-b border-slate-200/70 flex flex-col md:flex-row md:items-center justify-between gap-3 select-none">
+            
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <span class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs font-bold shrink-0">
+                ▼
+              </span>
+              
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="text-xs font-bold px-2.5 py-0.5 rounded-md bg-slate-900 text-white">Session 3</span>
+                  <span class="text-xs text-slate-500 font-mono">⏱️ 40 mins</span>
+                  <span class="text-xs text-slate-400 font-medium">• 1 Parts (1 Questions)</span>
+                </div>
+                <h3 class="text-sm md:text-base font-extrabold text-slate-900 mt-1 truncate">Session 3: Nghe Hiểu (聴解 - Choukai)</h3>
+                <p class="text-xs text-slate-500 mt-0.5 line-clamp-1">Phần thi nghe hiểu: hiểu chủ đề, nghe nắm bắt ý chính, phản xạ nhanh và nghe tổng hợp.</p>
+              </div>
+            </div>
+
+            <!-- Session Actions -->
+            <div class="flex items-center gap-2 self-end md:self-auto shrink-0">
+              
+              <button type="button"
+                class="px-3 py-1.5 rounded-xl bg-white hover:bg-sky-50 border border-slate-200 text-sky-700 font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                <svg class="w-3.5 h-3.5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span> Part</span>
+              </button>
+
+              <button type="button" title="Edit Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center text-xs transition-all">
+                ✎
+              </button>
+
+              <button type="button" title="Delete Session"
+                class="w-7 h-7 rounded-xl bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center text-xs transition-all">
+                ✕
+              </button>
+
+            </div>
+
+          </div>
+
+          <!-- Session Body: Parts List -->
+          <div class="p-4 md:p-5 space-y-4 bg-white">
+            
+              <!-- PART CARD (LEVEL 2: Mondai 1) -->
+              <div class="rounded-2xl border border-slate-200 bg-slate-50/50 p-4 transition-all">
+                
+                <!-- Part Header -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
+                  
+                  <div class="flex items-start gap-2.5 min-w-0 flex-1">
+                    <span class="w-6 h-6 rounded-lg bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold shrink-0">
+                      ▼
+                    </span>
+                    
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <h4 class="text-xs md:text-sm font-bold text-slate-900">Mondai 1: Nghe hiểu chủ đề cần làm (課題理解)</h4>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">1 Questions</span>
+                        <span class="text-[10px] font-bold px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100 flex items-center gap-1">🎧 Audio Track Attached</span>
+                      </div>
+                      <p class="text-[11px] text-slate-500 font-medium italic mt-0.5">問題用紙の絵を見ながら、質問を聞いて、1・2・3・4から一つ選びなさい。</p>
+                    </div>
+                  </div>
+
+                  <!-- Part Controls -->
+                  <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-auto">
+                    <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-3&part_id=part-5&question_id=new"
+                      class="px-2.5 py-1.5 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1 transition-all">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                      </svg>
+                      <span> Question</span>
+                    </a>
+
+                    <button type="button" title="Edit Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all">
+                      ✎
+                    </button>
+
+                    <button type="button" title="Delete Part"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                      ✕
+                    </button>
+                  </div>
+
+                </div>
+
+                <!-- Part Questions List (LEVEL 3) -->
+                <div class="pt-3 space-y-2">
+                  
+                    <!-- QUESTION ROW ITEM -->
+                    <div class="p-3 rounded-xl bg-white border border-slate-200/80 hover:border-sky-300 transition-all flex items-center justify-between gap-3 group">
+                      
+                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center shrink-0">
+                          #1
+                        </span>
+
+                        <div class="min-w-0 flex-1">
+                          <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-3&part_id=part-5&question_id=301"
+                            class="text-xs font-bold text-slate-900 hover:text-sky-600 hover:underline block truncate">
+                            男の人と女の人が話しています。男の人はこの後、まず何をしますか。
+                          </a>
+                          
+                          <div class="flex items-center gap-2 mt-0.5 text-[10px] font-medium text-slate-400 flex-wrap">
+                            <span class="text-emerald-700 font-bold bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-100">
+                              ✓ Correct: 資料をコピーする
+                            </span>
+                            <span>•</span>
+                            <span>4 Options</span>
+                            <span>•</span>
+                            <span class="font-bold text-slate-700">2 pts</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Question Actions -->
+                      <div class="flex items-center gap-1.5 shrink-0">
+                        <a href="admin_jlpt_question_editor.html?exam_id=1&session_id=sec-3&part_id=part-5&question_id=301"
+                          title="Open Question Authoring Editor"
+                          class="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-sky-50 border border-slate-200 text-sky-700 text-xs font-bold flex items-center gap-1 transition-all">
+                          ✎ <span>Edit</span>
+                        </a>
+
+                        <button type="button" title="Delete Question"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all">
+                          ✕
+                        </button>
+                      </div>
+
+                    </div>
+                  
+                </div>
+
+              </div>
+            
+          </div>
+
+        </div>
+      
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS SECTION                                                            -->
+  <!-- ========================================================================= -->
+
+  <!-- MODAL: ADD / EDIT SESSION -->
+  <div id="sessionModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="sessionModalTitle" class="text-base font-bold text-slate-900">Add Exam Session</h3>
+        <button onclick="closeSessionModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="sessionForm" class="space-y-4">
+        <input type="hidden" id="sessionEditId" value="" />
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Session Name *</label>
+          <input type="text" id="sessionTitleInput" required placeholder="e.g. Session 1: Kiến thức ngôn ngữ (Chữ Hán - Từ Vựng)"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Time Limit (Minutes)</label>
+            <input type="number" id="sessionTimeLimitInput" min="5" max="180" value="30"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Display Order</label>
+            <input type="number" id="sessionOrderInput" min="1" max="20" value="1"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Description / Section Guide</label>
+          <textarea id="sessionDescInput" rows="2" placeholder="Ghi chú thời gian và cấu trúc phần thi..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeSessionModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save Session</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT PART -->
+  <div id="partModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="partModalTitle" class="text-base font-bold text-slate-900">Add Part to Session</h3>
+        <button onclick="closePartModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="partForm" class="space-y-4">
+        <input type="hidden" id="partParentSessionId" value="" />
+        <input type="hidden" id="partEditId" value="" />
+        
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Part / Mondai Title *</label>
+          <input type="text" id="partTitleInput" required placeholder="e.g. Part 1: Mondai 1 - Cách đọc chữ Hán"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Instructions / Question Prompt Template</label>
+          <textarea id="partInstructionInput" rows="2" placeholder="e.g. この言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Audio Listening URL (Optional for Choukai)</label>
+          <input type="text" id="partAudioUrlInput" placeholder="https://cdn.studyjlpt.com/audio/n3/mondai1_choukai.mp3"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 placeholder-slate-400" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Part Order Number</label>
+            <input type="number" id="partOrderInput" min="1" max="50" value="1"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Default Points per Question</label>
+            <input type="number" id="partDefaultPointsInput" min="0.5" max="10" step="0.5" value="1.0"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closePartModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save Part</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT EXAM DETAILS -->
+  <div id="examDetailsModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 class="text-base font-bold text-slate-900">Edit Exam Information</h3>
+        <button onclick="closeEditExamDetailsModal()" class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</button>
+      </div>
+
+      <form id="examDetailsForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Exam Title *</label>
+          <input type="text" id="editHeroTitle" required
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">JLPT Level</label>
+            <select id="editHeroLevel" class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="N1">N1</option>
+              <option value="N2">N2</option>
+              <option value="N3">N3</option>
+              <option value="N4">N4</option>
+              <option value="N5">N5</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Publish Status</label>
+            <select id="editHeroStatus" class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Description</label>
+          <textarea id="editHeroDesc" rows="2"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-800"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button" onclick="closeEditExamDetailsModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save Changes</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- MODAL: UNIFIED DELETE CONFIRMATION -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 mb-1" id="deleteConfirmTitle">Confirm Deletion</h3>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed" id="deleteConfirmMessage">
+        Are you sure you want to delete this item? This action cannot be undone.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button" onclick="closeDeleteConfirmModal()"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
+          Cancel
+        </button>
+        <button type="button" id="confirmDeleteBtn"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2.5 transition-all">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="toastMessage">Action completed successfully</span>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: EXAM BUILDER HIERARCHY ENGINE                                 -->
+  <!-- ========================================================================= -->
+  
+</body>
+
+</html>
+
