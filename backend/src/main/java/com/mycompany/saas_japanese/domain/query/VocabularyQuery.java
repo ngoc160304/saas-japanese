@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class VocabularyQuery {
+public class VocabularyQuery extends BaseQuery {
 
   private String word;
 
@@ -17,7 +17,4 @@ public class VocabularyQuery {
 
   private Long lessonId;
 
-  private int page = 0;
-
-  private int size = 10;
 }

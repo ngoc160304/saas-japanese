@@ -8,24 +8,26 @@ import org.springframework.stereotype.Component;
 @Component
 public class CourseCategoryMapper {
 
-  public CourseCategoryResponse toResponse(
-      CourseCategory category) {
+    public CourseCategoryResponse toResponse(
+            CourseCategory category) {
 
-    return CourseCategoryResponse.builder()
-        .id(category.getId())
-        .name(category.getName())
-        .slug(category.getSlug())
-        .description(category.getDescription())
-        .mediaId(
-            category.getMedia() != null
-                ? category.getMedia().getId()
-                : null)
-        .mediaUrl(
-            category.getMedia() != null
-                ? category.getMedia().getSecureUrl()
-                : null)
-        .createdAt(category.getCreatedAt())
-        .updatedAt(category.getUpdatedAt())
-        .build();
-  }
+        return CourseCategoryResponse.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .slug(category.getSlug())
+                .description(category.getDescription())
+                .mediaId(
+                        category.getMedia() != null
+                                ? category.getMedia().getId()
+                                : null)
+                .mediaUrl(
+                        category.getMedia() != null
+                                ? category.getMedia().getSecureUrl()
+                                : null)
+                .createdAt(category.getCreatedAt())
+
+                .updatedAt(category.getUpdatedAt())
+                .build();
+
+    }
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class KanjiQuery {
+public class KanjiQuery extends BaseQuery {
 
   private String kanji;
 
@@ -13,7 +13,4 @@ public class KanjiQuery {
 
   private Long lessonId;
 
-  private int page = 0;
-
-  private int size = 10;
 }

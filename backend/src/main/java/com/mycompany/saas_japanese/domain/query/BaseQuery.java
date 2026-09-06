@@ -13,6 +13,6 @@ public class BaseQuery {
     private Integer page = 0;
 
     @Min(value = 0, message = "page phai >= 0")
-    @Max(value = 10, message = "size toi da bang 10")
+    @Max(value = 12, message = "size toi da bang 10")
     private Integer size = 3;
 }
