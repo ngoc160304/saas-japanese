@@ -95,7 +95,7 @@
       filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15));
     }
   </style>
-  <link rel="stylesheet" href="assets/dashboard-theme.css" />
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
 </head>
 
 <body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
@@ -144,18 +144,19 @@
         <!-- Nav Links List -->
         <nav id="navMenu" class="space-y-1.5">
           <!-- Overview (Active) -->
-          <a href="#"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <a href="dashboard.html" data-page="dashboard"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             <span>Overview</span>
           </a>
 
-          <!-- Courses -->
-          <a href="admin_courses.html"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <!-- Sources -->
+          <a href="source.html" data-page="source"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -165,8 +166,8 @@
           </a>
 
           <!-- Category -->
-          <a href="admin_categories.html"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <a href="category.html" data-page="category"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -176,8 +177,8 @@
           </a>
 
           <!-- JLPT Practice / Mock Exams -->
-          <a href="#jlpt-exams"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <a href="jlpt_exams.html" data-page="jlpt_exams"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
@@ -188,8 +189,8 @@
           </a>
 
           <!-- Analytics & Progress -->
-          <a href="#analytics"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <a href="#analytics" data-page="analytics"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
@@ -198,8 +199,8 @@
           </a>
 
           <!-- Flashcards / Decks -->
-          <a href="#flashcards"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <a href="#flashcards" data-page="flashcards"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -209,8 +210,8 @@
           </a>
 
           <!-- Settings -->
-          <a href="#settings"
-            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+          <a href="#settings" data-page="settings"
+            class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
             <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
               stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -227,7 +228,7 @@
         <div
           class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-3 aspect-[4/3] flex flex-col justify-end shadow-md group">
           <!-- Background 3D Japanese Garden Cottage Image -->
-          <img src="assets/images/sidebar_cottage.jpg" alt="StudyJLPT Community"
+          <img src="../assets/images/sidebar_cottage.jpg" alt="StudyJLPT Community"
             class="absolute inset-0 w-full h-full object-cover object-center opacity-85 transition-transform duration-500 group-hover:scale-105" />
 
           <!-- Gradient Overlay -->
@@ -265,7 +266,7 @@
               class="inline-block transform hover:rotate-12 transition-transform origin-bottom-right">👋</span>
           </h1>
           <p class="text-slate-500 font-medium text-sm mt-0.5">
-            Welcome Back, <span id="studentGreetingName" class="text-slate-800 font-semibold">Alex</span>
+            Welcome Back, <span id="studentGreetingName">Alex Williamson</span>
             <span class="mx-2 text-slate-300">•</span>
             <span id="currentLiveDate" class="text-slate-400 font-normal">Tuesday, 10:03 AM</span>
           </p>
@@ -316,7 +317,7 @@
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Active Courses"
+              <img src="../assets/images/book_3d.jpg" alt="Active Courses"
                 class="w-full h-full object-contain drop-shadow-md rounded-xl" />
             </div>
           </div>
@@ -333,7 +334,7 @@
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="In Progress"
+              <img src="../assets/images/book_3d.jpg" alt="In Progress"
                 class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-15" />
             </div>
           </div>
@@ -350,7 +351,7 @@
             </div>
             <!-- 3D Book Icon Visual -->
             <div class="w-16 h-16 shrink-0 relative flex items-center justify-center">
-              <img src="assets/images/book_3d.jpg" alt="Completed Courses"
+              <img src="../assets/images/book_3d.jpg" alt="Completed Courses"
                 class="w-full h-full object-contain drop-shadow-md rounded-xl filter hue-rotate-90" />
             </div>
           </div>
@@ -376,7 +377,7 @@
 
             <!-- Big Metric -->
             <div class="flex items-baseline gap-1 mb-4">
-              <span id="activityTotalMinutes" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
+              <span id="activityTotalMinutes">2,040</span>
               <span class="text-xs font-semibold text-slate-400">/Mins</span>
             </div>
 
@@ -500,7 +501,7 @@
 
             <!-- Longest Streak Total -->
             <div class="flex items-baseline gap-1 mb-2">
-              <span id="streakDaysTotal" class="text-2xl md:text-3xl font-extrabold text-slate-900">2,040</span>
+              <span id="streakDaysTotal">2,040</span>
               <span class="text-xs font-semibold text-slate-400">/days</span>
             </div>
 
@@ -524,8 +525,7 @@
 
               <!-- Central Label in Gauge -->
               <div class="absolute bottom-0 text-center">
-                <span id="currentStreakCenterNum"
-                  class="text-2xl font-extrabold text-slate-900 tracking-tight">124</span>
+                <span id="currentStreakCenterNum">124</span>
                 <p class="text-[10px] text-slate-400 font-medium -mt-0.5">your learning streak</p>
               </div>
             </div>
@@ -823,7 +823,7 @@
           <!-- Student Avatar with Online Badge -->
           <div class="relative shrink-0">
             <img id="profileAvatarImg" class="w-13 h-13 rounded-2xl ring-2 ring-sky-100 object-cover shadow-sm"
-              src="assets/images/student_hero.jpg" alt="Student Profile" />
+              src="../assets/images/student_hero.jpg" alt="Student Profile" />
             <span class="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white"></span>
           </div>
 
@@ -985,7 +985,7 @@
         class="bg-gradient-to-br from-sky-50 via-white to-indigo-50/60 rounded-3xl p-4 border border-sky-100 shadow-soft">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 shrink-0 rounded-2xl bg-sky-500/10 p-1 flex items-center justify-center">
-            <img src="assets/images/streak_badge.jpg" alt="Badge"
+            <img src="../assets/images/streak_badge.jpg" alt="Badge"
               class="w-full h-full object-contain drop-shadow-sm rounded-xl" />
           </div>
           <div class="min-w-0 flex-1">
@@ -1008,162 +1008,7 @@
   <!-- ========================================== -->
   <!-- 4. REALISTIC MOCK DATA & SCRIPT LOGIC       -->
   <!-- ========================================== -->
-  <script>
-    /**
-     * StudyJLPT Mock Data Model
-     * Aligned 100% with the analyzed database schema:
-     * - users
-     * - learning_streaks
-     * - user_course_enrollments -> courses -> jlpt_levels
-     * - user_lesson_progress
-     * - user_quiz_attempts & user_jlpt_attempts
-     */
-    const studentDashboardData = {
-      // Current Authenticated Student (from `users` table)
-      user: {
-        id: 1,
-        full_name: "Alex Williamson",
-        email: "alexwilliamson@gmail.com",
-        avatar_url: "assets/images/student_hero.jpg",
-        role: "student",
-        target_jlpt_level: "N3",
-        is_active: 1,
-        last_login_at: "2026-08-23T10:03:00Z"
-      },
 
-      // Learning Streak Record (from `learning_streaks` table)
-      learningStreak: {
-        id: 1,
-        user_id: 1,
-        current_streak: 7,
-        longest_streak: 24,
-        last_study_date: "2026-08-23",
-        gauge_display_value: 124,
-        total_historical_streak_days: 2040,
-        streak_badge_earned_times: 12,
-        current_badge_progress_days: 4,
-        target_badge_days: 12,
-        calendar_month: "August 2024",
-        studied_dates: [10, 11, 12, 13, 14, 15, 16],
-        current_day: 17
-      },
-
-      // Learning Progress Statistics (aggregated from `user_course_enrollments` & `user_lesson_progress`)
-      learningStats: {
-        active_courses_count: 62,
-        in_progress_courses_count: 18,
-        completed_courses_count: 44,
-        total_study_minutes_month: 2040,
-        weekly_study_hours: 12,
-        monthly_study_hours: 38,
-        growth_rate_mom_percent: 18,
-        daily_sessions_completed: 2,
-        daily_sessions_target: 5
-      },
-
-      // Enrolled Courses List (from `user_course_enrollments` JOIN `courses` JOIN `jlpt_levels`)
-      enrolledCourses: [
-        {
-          id: 101,
-          course_id: 1,
-          title: "Tiếng Nhật Trung Cấp N3 Soumatome",
-          slug: "n3-soumatome",
-          jlpt_level_code: "N3",
-          jlpt_level_badge_bg: "bg-sky-600",
-          enrolled_at: "Jan 4, 2026",
-          status: "active",
-          progress_percent: 40.00,
-          batch_learners_count: "+5"
-        },
-        {
-          id: 102,
-          course_id: 2,
-          title: "Luyện Đề Thi Thử Toàn Diện N2",
-          slug: "n2-exam-mastery",
-          jlpt_level_code: "N2",
-          jlpt_level_badge_bg: "bg-slate-900",
-          enrolled_at: "Jan 4, 2026",
-          status: "active",
-          progress_percent: 60.00,
-          batch_learners_count: "+8"
-        },
-        {
-          id: 103,
-          course_id: 3,
-          title: "Kanji & Từ Vựng Cấp Tốc N4",
-          slug: "n4-kanji-vocab",
-          jlpt_level_code: "N4",
-          jlpt_level_badge_bg: "bg-emerald-500",
-          enrolled_at: "Jan 2, 2026",
-          status: "active",
-          progress_percent: 90.00,
-          batch_learners_count: "+9"
-        },
-        {
-          id: 104,
-          course_id: 4,
-          title: "Tiếng Nhật Cơ Bản Cho Người Mới Bắt Đầu N5",
-          slug: "n5-starter",
-          jlpt_level_code: "N5",
-          jlpt_level_badge_bg: "bg-amber-500",
-          enrolled_at: "Jan 6, 2026",
-          status: "active",
-          progress_percent: 30.00,
-          batch_learners_count: "+6"
-        },
-        {
-          id: 105,
-          course_id: 5,
-          title: "Luyện Giao Tiếp & Shadowing N3",
-          slug: "n3-shadowing",
-          jlpt_level_code: "N3",
-          jlpt_level_badge_bg: "bg-sky-600",
-          enrolled_at: "Jan 8, 2026",
-          status: "active",
-          progress_percent: 80.00,
-          batch_learners_count: "+4"
-        }
-      ]
-    };
-
-    // Populate Dashboard Data dynamically
-    document.addEventListener("DOMContentLoaded", () => {
-      // 1. Set Greetings & User info
-      const firstName = studentDashboardData.user.full_name.split(" ")[0];
-      document.getElementById("studentGreetingName").textContent = firstName;
-      document.getElementById("profileFullName").textContent = studentDashboardData.user.full_name;
-      document.getElementById("profileEmail").textContent = studentDashboardData.user.email;
-
-      // 2. Set Top Stats Cards
-      document.getElementById("statActiveCourses").textContent = studentDashboardData.learningStats.active_courses_count;
-      document.getElementById("statInProgressCourses").textContent = studentDashboardData.learningStats.in_progress_courses_count;
-      document.getElementById("statCompletedCourses").textContent = studentDashboardData.learningStats.completed_courses_count;
-
-      // 3. Set Middle Analytic Cards
-      document.getElementById("activityTotalMinutes").textContent = studentDashboardData.learningStats.total_study_minutes_month.toLocaleString();
-      document.getElementById("streakDaysTotal").textContent = studentDashboardData.learningStreak.total_historical_streak_days.toLocaleString();
-      document.getElementById("currentStreakCenterNum").textContent = studentDashboardData.learningStreak.gauge_display_value;
-      document.getElementById("badgeCurrentStreak").textContent = `${studentDashboardData.learningStreak.current_streak} days`;
-      document.getElementById("badgeLongestStreak").textContent = `${studentDashboardData.learningStreak.longest_streak} days`;
-
-      // 4. Focus Mode Button Interactive Feedback
-      const focusBtn = document.getElementById("focusModeBtn");
-      if (focusBtn) {
-        focusBtn.addEventListener("click", () => {
-          alert("⚡ Focus Mode Activated! 25-minute Japanese study session started.");
-        });
-      }
-
-      // 5. Mobile Menu Toggle
-      const mobileBtn = document.getElementById("mobileMenuBtn");
-      const navMenu = document.getElementById("navMenu");
-      if (mobileBtn && navMenu) {
-        mobileBtn.addEventListener("click", () => {
-          navMenu.classList.toggle("hidden");
-        });
-      }
-    });
-  </script>
 </body>
 
 </html>

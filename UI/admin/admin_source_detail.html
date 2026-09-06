@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Source Lessons Outline — Admin Control</title>
+  <meta name="description"
+    content="Manage course lessons outline and curriculum content in Studify JLPT Admin Portal." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+    <!-- ========================================== -->
+    <!-- 1. LEFT SIDEBAR: STANDARDIZED ADMIN NAV    -->
+    <!-- ========================================== -->
+    <aside id="sidebar"
+      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
+
+      <div>
+        <!-- Admin Brand Header -->
+        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-9 h-9 rounded-xl bg-slate-900 flex items-center justify-center shadow-md shadow-slate-900/20 text-white">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
+                Studify <span
+                  class="text-indigo-600 text-xs font-bold px-1.5 py-0.5 rounded bg-indigo-50 uppercase tracking-wide">ADMIN</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100"
+            aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Menu Section Label -->
+        <div class="px-3 mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Admin Control</span>
+        </div>
+
+        <!-- Standardized Admin Nav Links (4 items) -->
+        <nav id="navMenu" class="space-y-1.5">
+          <!-- 1. Dashboard -->
+          <a href="admin_dashboard.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- 2. Categories -->
+          <a href="admin_category.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>Categories</span>
+            <span class="ml-auto text-[11px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">8</span>
+          </a>
+
+          <!-- 3. Sources (Active) -->
+          <a href="admin_source.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Sources</span>
+            <span class="ml-auto text-[11px] font-bold bg-sky-500 text-white px-2 py-0.5 rounded-full">62</span>
+          </a>
+
+          <!-- 4. JLPT Exams -->
+          <a href="admin_jlpt_exam.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            <span>JLPT Exams</span>
+          </a>
+
+          <!-- Divider -->
+          <div class="py-1">
+            <div class="h-px bg-slate-100 mx-2"></div>
+          </div>
+
+          <!-- Student Portal Link -->
+          <a href="../user/dashboard.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>Student Portal</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Admin Profile Bottom -->
+      <div class="mt-8 pt-4 border-t border-slate-100 flex items-center gap-3 px-2">
+        <img src="../assets/images/student_hero.jpg" alt="Admin"
+          class="w-10 h-10 rounded-2xl object-cover ring-2 ring-slate-100 shrink-0" />
+        <div class="flex flex-col min-w-0 flex-1">
+          <span class="text-xs font-bold text-slate-900 truncate">Admin Sarah</span>
+          <span class="text-[11px] text-indigo-500 font-semibold truncate">Administrator</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN CENTER CONTENT: SOURCE DETAIL      -->
+    <!-- ========================================== -->
+    <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+
+      <!-- Breadcrumbs & Header -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="admin_source.html" class="hover:text-slate-600 flex items-center gap-1 font-bold text-slate-500">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span>Back to Sources</span>
+            </a>
+            <span>/</span>
+            <span class="text-slate-600 font-bold truncate max-w-xs" id="courseBreadcrumbName">N3 Soumatome</span>
+            <span>/</span>
+            <span class="text-slate-900">Lessons Outline</span>
+          </nav>
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight" id="courseHeaderTitle">
+              Tiếng Nhật Trung Cấp N3 Soumatome
+            </h1>
+            <span id="courseHeaderLevelBadge" class="px-2.5 py-1 rounded-xl bg-sky-600 text-white font-extrabold text-xs shadow-xs">N3</span>
+          </div>
+          <p class="text-slate-500 font-medium text-sm mt-0.5" id="courseHeaderDesc">
+            Lộ trình bài học. Quản lý danh sách bài học và nội dung chi tiết.
+          </p>
+        </div>
+
+        <!-- Add Lesson & Edit Course Actions -->
+        <div class="flex items-center gap-2.5">
+          <a id="sourceSettingsBtn" href="admin_source_create.html?edit_id=1"
+            class="px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Source Settings</span>
+          </a>
+
+          <!-- Primary Add Lesson Button -->
+          <a id="addLessonBtn" href="admin_lesson_create.html?source_id=1"
+            class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm transition-all flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>Add Lesson</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Source Summary Card -->
+      <div class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+        <div class="flex items-center gap-4">
+          <div class="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 p-2 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
+            <img src="../assets/images/book_3d.jpg" alt="Course Thumbnail" class="w-full h-full object-contain" />
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="sourceStatusBadge" class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+              </span>
+              <span id="sourceCategoryBadge" class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">Ngữ pháp</span>
+            </div>
+            <p class="text-xs text-slate-600 font-medium mt-1" id="courseSummaryDesc">
+              Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-between md:justify-end text-right">
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Total Lessons</p>
+            <p class="text-lg font-extrabold text-slate-900 mt-0.5" id="courseTotalLessonsCount">5 Lessons</p>
+          </div>
+          <div>
+            <p class="text-xs text-slate-400 font-medium">Source Price</p>
+            <p class="text-lg font-extrabold text-sky-600 mt-0.5" id="coursePriceDisplay">499.000 đ</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lessons Table Section -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+        
+        <!-- Controls Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div>
+            <h2 class="text-base font-bold text-slate-900">Source Lessons Curriculum</h2>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Danh sách bài học và truy cập quản lý chi tiết từng phần nội dung.</p>
+          </div>
+
+          <div class="relative max-w-xs w-full">
+            <input type="text" id="lessonSearchInput" placeholder="Filter lessons by title..."
+              class="w-full pl-9 pr-3 py-2 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+            <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                <th class="pb-3 pl-3 font-semibold text-center w-14">#</th>
+                <th class="pb-3 px-4 font-semibold">Lesson Title</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Duration</th>
+                <th class="pb-3 px-4 font-semibold text-center w-32">Status</th>
+                <th class="pb-3 pr-4 font-semibold text-right w-48">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lessonsTableBody" class="divide-y divide-slate-100/70 text-xs">
+              <!-- Lesson 1 -->
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">1</td>
+                <td class="py-4 px-4">
+                  <a href="admin_lesson_content.html?lesson_id=101&source_id=1"
+                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
+                    Bài 1: Khởi động &amp; Nền tảng cốt lõi [N3]
+                  </a>
+                </td>
+                <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">45 mins</td>
+                <td class="py-4 px-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                  </span>
+                </td>
+                <td class="py-4 pr-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <a href="admin_lesson_content.html?lesson_id=101&source_id=1"
+                      class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs">
+                      <span>Manage Lesson Content</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    <a href="admin_lesson_create.html?edit_id=101&source_id=1"
+                      class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Edit Lesson Outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <!-- Lesson 2 -->
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">2</td>
+                <td class="py-4 px-4">
+                  <a href="admin_lesson_content.html?lesson_id=102&source_id=1"
+                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
+                    Bài 2: Các cấu trúc trọng tâm &amp; Từ vựng theo chủ đề
+                  </a>
+                </td>
+                <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">50 mins</td>
+                <td class="py-4 px-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                  </span>
+                </td>
+                <td class="py-4 pr-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <a href="admin_lesson_content.html?lesson_id=102&source_id=1"
+                      class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs">
+                      <span>Manage Lesson Content</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    <a href="admin_lesson_create.html?edit_id=102&source_id=1"
+                      class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Edit Lesson Outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <!-- Lesson 3 -->
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">3</td>
+                <td class="py-4 px-4">
+                  <a href="admin_lesson_content.html?lesson_id=103&source_id=1"
+                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
+                    Bài 3: Phân tích ngữ cảnh &amp; Phân biệt các điểm dễ nhầm
+                  </a>
+                </td>
+                <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">40 mins</td>
+                <td class="py-4 px-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                  </span>
+                </td>
+                <td class="py-4 pr-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <a href="admin_lesson_content.html?lesson_id=103&source_id=1"
+                      class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs">
+                      <span>Manage Lesson Content</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    <a href="admin_lesson_create.html?edit_id=103&source_id=1"
+                      class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Edit Lesson Outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <!-- Lesson 4 -->
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">4</td>
+                <td class="py-4 px-4">
+                  <a href="admin_lesson_content.html?lesson_id=104&source_id=1"
+                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
+                    Bài 4: Luyện tập ứng dụng &amp; Bài tập trắc nghiệm chuyên sâu
+                  </a>
+                </td>
+                <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">35 mins</td>
+                <td class="py-4 px-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                  </span>
+                </td>
+                <td class="py-4 pr-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <a href="admin_lesson_content.html?lesson_id=104&source_id=1"
+                      class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs">
+                      <span>Manage Lesson Content</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    <a href="admin_lesson_create.html?edit_id=104&source_id=1"
+                      class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Edit Lesson Outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              <!-- Lesson 5 -->
+              <tr class="hover:bg-slate-50/80 transition-colors group">
+                <td class="py-4 pl-3 font-mono text-center font-bold text-slate-400 text-xs">5</td>
+                <td class="py-4 px-4">
+                  <a href="admin_lesson_content.html?lesson_id=105&source_id=1"
+                    class="font-bold text-slate-900 text-xs md:text-sm hover:text-sky-600 transition-colors">
+                    Bài 5: Ôn tập tổng kết &amp; Đề kiểm tra đánh giá tiến độ
+                  </a>
+                </td>
+                <td class="py-4 px-4 text-center font-medium text-slate-600 whitespace-nowrap">60 mins</td>
+                <td class="py-4 px-4 text-center">
+                  <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Live
+                  </span>
+                </td>
+                <td class="py-4 pr-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <a href="admin_lesson_content.html?lesson_id=105&source_id=1"
+                      class="min-w-[142px] px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs inline-flex items-center justify-center gap-2 transition-all shadow-xs">
+                      <span>Manage Lesson Content</span>
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </a>
+                    <a href="admin_lesson_create.html?edit_id=105&source_id=1"
+                      class="w-8 h-8 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors" title="Edit Lesson Outline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="flex items-center justify-between pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
+          <p id="tableShowingLessonsCount">Showing 5 of 5 Lessons</p>
+          <a href="admin_lesson_create.html?source_id=1" class="font-bold text-sky-600 hover:text-sky-700">
+            + Add Another Lesson
+          </a>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</body>
+
+</html>
+

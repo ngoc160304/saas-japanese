@@ -1,0 +1,1633 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT Admin — Lesson Content & Curriculum Tree</title>
+  <meta name="description"
+    content="StudyJLPT Admin Lesson Content Management Workspace. Manage Course Sections, Lessons, Grammar, Vocabulary, Kanji, Quizzes, and Supporting Resources." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+      --color-navy: #2B4C7E;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Slim Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-card {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(5px);
+    }
+
+    /* Static modal navigation: opens dialogs with URL hash, no JavaScript */
+    .modal-backdrop:target {
+      display: flex !important;
+    }
+
+    /* Active Lesson in Tree */
+    .tree-lesson-active {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+    .tree-lesson-active .lesson-title {
+      color: #ffffff !important;
+    }
+    .tree-lesson-active .lesson-meta {
+      color: #94a3b8 !important;
+    }
+
+    .tree-content-active {
+      background-color: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      border-color: #bae6fd;
+    }
+
+    /* Main Tab Indicator */
+    .tab-active {
+      background-color: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.15);
+    }
+
+    .tab-inactive {
+      background-color: #ffffff;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+    .tab-inactive:hover {
+      background-color: #f8fafc;
+      color: #1e293b;
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+<style>
+  /* Static tab switching: no JavaScript required */
+  #contentTabGrammar:checked ~ .content-tab-nav #tabBtn-grammar,
+  #contentTabVocab:checked ~ .content-tab-nav #tabBtn-vocab,
+  #contentTabKanji:checked ~ .content-tab-nav #tabBtn-kanji,
+  #contentTabQuiz:checked ~ .content-tab-nav #tabBtn-quiz {
+    background-color: rgb(15 23 42);
+    color: white;
+  }
+
+  #contentTabGrammar:checked ~ .content-tab-panels #panel-grammar,
+  #contentTabVocab:checked ~ .content-tab-panels #panel-vocab,
+  #contentTabKanji:checked ~ .content-tab-panels #panel-kanji,
+  #contentTabQuiz:checked ~ .content-tab-panels #panel-quiz {
+    display: block;
+  }
+
+  #contentTabGrammar:not(:checked) ~ .content-tab-panels #panel-grammar,
+  #contentTabVocab:not(:checked) ~ .content-tab-panels #panel-vocab,
+  #contentTabKanji:not(:checked) ~ .content-tab-panels #panel-kanji,
+  #contentTabQuiz:not(:checked) ~ .content-tab-panels #panel-quiz {
+    display: none;
+  }
+</style>
+
+<style>
+  /* Static HTML modal controls: no JavaScript required. */
+  #addContentModal:target,
+  #vocabModal:target,
+  #kanjiModal:target,
+  #grammarModal:target,
+  #questionModal:target,
+  #lessonModal:target,
+  #sourceModal:target,
+  #deleteConfirmModal:target {
+    display: flex !important;
+  }
+</style>
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa] flex flex-col overflow-x-hidden">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP GLOBAL NAVBAR (Course Switcher, Breadcrumbs, Actions)               -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200/80 sticky top-0 z-40 px-4 lg:px-6 py-2.5 shadow-xs shrink-0">
+    <div class="flex items-center justify-between gap-4">
+
+      <!-- Left: Brand & Course Info -->
+      <div class="flex items-center gap-3 md:gap-5">
+        <!-- Logo -->
+        <a href="admin_source.html" class="flex items-center gap-2.5 shrink-0 group">
+          <div
+            class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
+          </div>
+          <span class="hidden sm:inline text-lg font-extrabold tracking-tight text-slate-900">
+            StudyJLPT <span
+              class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-100 uppercase tracking-wider">ADMIN</span>
+          </span>
+        </a>
+
+        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+
+        <!-- Breadcrumb & Course Title -->
+        <nav class="flex items-center gap-1.5 text-xs text-slate-500 flex-wrap" aria-label="Breadcrumb">
+          <a href="admin_source.html" class="hover:text-slate-900 font-semibold text-slate-400">Courses</a>
+          <span class="text-slate-300">/</span>
+          <div class="relative group">
+            <a href="admin_source_detail.html?id=1" id="topCourseLink"
+              class="flex items-center gap-1.5 font-bold text-slate-800 hover:text-sky-600 bg-slate-50 hover:bg-slate-100 px-2.5 py-1 rounded-xl transition-colors">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span id="topCourseTitle">Tiếng Nhật Trung Cấp N3 Soumatome</span>
+              <span class="px-1.5 py-0.2 rounded text-[10px] font-extrabold bg-sky-100 text-sky-700">N3</span>
+            </a>
+          </div>
+          <span class="text-slate-300">/</span>
+          <span id="topBreadcrumbLesson">Lesson 1: Cấu trúc ~わけがない & ~わけではない</span>
+        </nav>
+      </div>
+
+      <!-- Right: Action Controls -->
+      <div class="flex items-center gap-2 md:gap-3">
+
+        <!-- Toggle Sidebar (Mobile / Tablet) -->
+        <button id="mobileTreeToggleBtn"
+          class="lg:hidden p-2 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-100"
+          title="Toggle Content Tree">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+          </svg>
+        </button>
+
+        <!-- Source Detail Link -->
+        <a id="sourceOutlineLink" href="admin_source_detail.html?id=1"
+          class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+            viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Outline</span>
+        </a>
+
+        <!-- Student Portal Preview -->
+        <a id="studentPreviewLink" href="../user/dashboard.html" target="_blank"
+          class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-xs font-bold transition-all shadow-2xs">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>Student View</span>
+        </a>
+
+        <!-- Admin Avatar -->
+        <div class="flex items-center gap-2 pl-2 border-l border-slate-200">
+          <div class="w-8 h-8 rounded-xl bg-slate-900 text-white font-bold text-xs flex items-center justify-center">
+            AD
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. TWO-COLUMN MAIN WORKSPACE CONTAINER                                    -->
+  <!-- ========================================================================= -->
+  <div class="flex-1 flex overflow-hidden relative">
+
+    <!-- ======================================================================= -->
+    <!-- COLUMN 1: LEFT CONTENT TREE NAVIGATION (Clean 2-Level Section -> Lesson)-->
+    <!-- ======================================================================= -->
+    <aside id="contentTreeSidebar"
+      class="w-80 lg:w-[320px] bg-white border-r border-slate-200 flex flex-col shrink-0 z-30 transition-all duration-300 fixed lg:static inset-y-0 left-0 -translate-x-full lg:translate-x-0 h-[calc(100vh-53px)]">
+
+      <!-- Tree Header: Search & Expand Toggle -->
+      <div class="p-4 border-b border-slate-100 shrink-0 bg-slate-50/50">
+
+        <div class="flex items-center justify-between mb-2.5">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" stroke-width="2.5"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
+              <span>Curriculum Tree</span>
+            </span>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <button type="button" id="expandCollapseAllBtn"
+              class="px-2 py-1 rounded-lg text-[11px] font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+              title="Expand / Collapse all sections">
+              Collapse All
+            </button>
+            <!-- Close button for mobile drawer -->
+            <button
+              class="lg:hidden p-1 text-slate-400 hover:text-slate-700">✕</button>
+          </div>
+        </div>
+
+        <!-- Realtime Search Bar -->
+        <div class="relative">
+          <input type="text" id="treeSearchInput"
+            placeholder="Search lesson or chapter..."
+            class="w-full pl-8 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-2xs" />
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor"
+            stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <button id="clearTreeSearchBtn"
+            class="hidden absolute right-2.5 top-2 text-slate-400 hover:text-slate-600 text-xs">✕</button>
+        </div>
+
+        <!-- Curriculum Statistics Bar -->
+        <div class="flex items-center justify-between text-[11px] font-semibold text-slate-500 mt-2.5 px-0.5">
+          <span id="treeStatsOverview">5 Lessons</span>
+          <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100 font-bold"
+            id="treeCourseBadge">JLPT N3</span>
+        </div>
+      </div>
+
+      <!-- Tree Nodes Scroll Area (Static Lesson Curriculum) -->
+      <div id="treeContainer" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+        <!-- Static curriculum tree: Lesson 1 -->
+        <div class="rounded-2xl border border-slate-200 bg-white shadow-2xs overflow-hidden">
+          <div class="tree-lesson-active rounded-xl px-3.5 py-3">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-[11px] font-black shrink-0">
+                1
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="lesson-title text-xs truncate">Lesson 1</div>
+                <div class="lesson-meta text-[10px] mt-0.5">45 mins • Published • N3</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="px-2.5 py-2.5 space-y-1.5">
+            <label for="contentTabGrammar" class="tree-content-active flex items-center gap-2 px-3 py-2 rounded-xl border text-xs cursor-pointer">
+              <span class="w-5 h-5 rounded-md bg-sky-100 text-sky-700 flex items-center justify-center text-[10px] font-black shrink-0">文</span>
+              <span class="font-bold">Grammar + Video</span>
+            </label>
+
+            <label for="contentTabVocab" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-600 border border-transparent cursor-pointer">
+              <span class="w-5 h-5 rounded-md bg-emerald-50 text-emerald-700 flex items-center justify-center text-[10px] font-black shrink-0">語</span>
+              <span class="font-semibold">Vocabulary</span>
+            </label>
+
+            <label for="contentTabKanji" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-600 border border-transparent cursor-pointer">
+              <span class="w-5 h-5 rounded-md bg-purple-50 text-purple-700 flex items-center justify-center text-[10px] font-black shrink-0">漢</span>
+              <span class="font-semibold">Kanji</span>
+            </label>
+
+            <label for="contentTabQuiz" class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-slate-600 border border-transparent cursor-pointer">
+              <span class="w-5 h-5 rounded-md bg-amber-50 text-amber-700 flex items-center justify-center text-[10px] font-black shrink-0">?</span>
+              <span class="font-semibold">Quiz</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tree Bottom Action Buttons -->
+      <div class="p-3 border-t border-slate-100 bg-slate-50/70 shrink-0">
+        <button type="button"
+          class="w-full px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-2xs flex items-center justify-center gap-2 transition-all cursor-pointer">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>Add New Lesson</span>
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- Mobile Overlay Backdrop -->
+    <div id="mobileTreeBackdrop"
+      class="fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-xs hidden lg:hidden"></div>
+
+    <!-- ======================================================================= -->
+    <!-- COLUMN 2: MAIN CONTENT WORKSPACE                                        -->
+    <!-- ======================================================================= -->
+    <main class="flex-1 flex flex-col h-[calc(100vh-53px)] overflow-y-auto bg-[#f3f6fa] p-4 md:p-6 lg:p-7">
+
+      <!-- Static tab controls (HTML/CSS only; no JavaScript) -->
+      <input type="radio" name="contentTab" id="contentTabGrammar" class="sr-only" checked>
+      <input type="radio" name="contentTab" id="contentTabVocab" class="sr-only">
+      <input type="radio" name="contentTab" id="contentTabKanji" class="sr-only">
+      <input type="radio" name="contentTab" id="contentTabQuiz" class="sr-only">
+
+
+
+      <!-- ===================================================================== -->
+      <!-- A. LESSON HEADER BANNER (With Secondary Resources Button)              -->
+      <!-- ===================================================================== -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft mb-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+
+          <div class="flex-1 min-w-0">
+            <!-- Breadcrumbs in Card (No Chapter level) -->
+            <div class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1.5 flex-wrap">
+              <span id="wsLessonBadge" class="text-xs font-bold px-2 py-0.5 rounded-lg bg-sky-50 text-sky-700 border border-sky-100">Lesson #1</span>
+              <span>•</span>
+              <span id="wsLessonDurationBadge" class="text-xs font-mono text-slate-500">45 mins</span>
+              <span>•</span>
+              <span
+                class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 font-bold inline-flex items-center gap-1"
+                id="wsLessonStatusBadge">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+              </span>
+            </div>
+
+            <h1 id="wsLessonTitle" class="text-base md:text-lg font-black text-slate-900 truncate">Lesson 1: Cấu trúc ~わけがない & ~わけではない</h1>
+
+            <p id="wsLessonSubtitle" class="text-xs md:text-sm text-slate-500 font-medium mt-1">
+              Quản lý ngữ pháp, từ vựng, chữ Hán, bài tập kiểm tra và tài liệu đính kèm của bài học.
+            </p>
+          </div>
+
+          <!-- Lesson Header Controls (Resources Drawer + Actions) -->
+          <div class="flex items-center gap-2 shrink-0 flex-wrap md:flex-nowrap">
+
+            <!-- Secondary Resources / Attachments Trigger Button -->
+            <button type="button" id="wsResourcesBtn"
+              class="px-3.5 py-2 rounded-2xl bg-sky-50 hover:bg-sky-100 border border-sky-200/80 text-sky-800 font-bold text-xs shadow-2xs flex items-center gap-2 transition-all group">
+              <svg class="w-4 h-4 text-sky-600 group-hover:scale-110 transition-transform" fill="none"
+                stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+              <span>Resources</span>
+              <span id="wsResourcesBadgeCount" class="w-4 h-4 rounded-full bg-slate-900 text-white text-[9px] flex items-center justify-center font-bold">3</span>
+            </button>
+
+            <!-- Edit Lesson Details -->
+            <a href="#lessonModal"
+              class="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-all">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              <span>Edit Lesson</span>
+            </a>
+
+            <!-- Toggle Publish Status -->
+            <button type="button" id="wsToggleStatusBtn"
+              class="px-3.5 py-2 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-all">
+              Toggle Status
+            </button>
+
+            <!-- Save Feedback -->
+            <button type="button"
+              class="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>Save</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===================================================================== -->
+      <!-- B. 4 PRIMARY LEARNING CONTENT TABS ([Grammar] [Vocab] [Kanji] [Quiz]) -->
+      <!-- ===================================================================== -->
+      <nav class="flex items-center gap-2 overflow-x-auto pb-2 mb-5 shrink-0 scrollbar-none" aria-label="Content Tabs" content-tab-nav">
+
+        <!-- Tab 1: Grammar -->
+        <label for="contentTabGrammar" id="tabBtn-grammar"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-active">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>Grammar + Video</span>
+          <span id="tabCount-grammar" class="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">2</span>
+        </label>
+
+        <!-- Tab 2: Vocabulary -->
+        <label for="contentTabVocab" id="tabBtn-vocab"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>Vocabulary</span>
+          <span id="tabCount-vocab" class="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">5</span>
+        </label>
+
+        <!-- Tab 3: Kanji -->
+        <label for="contentTabKanji" id="tabBtn-kanji"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <span
+            class="w-4 h-4 rounded bg-emerald-100 text-emerald-800 text-[11px] font-black flex items-center justify-center">漢</span>
+          <span>Kanji</span>
+          <span id="tabCount-kanji" class="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">3</span>
+        </label>
+
+        <!-- Tab 4: Quiz -->
+        <label for="contentTabQuiz" id="tabBtn-quiz"
+          class="px-4 py-2.5 rounded-2xl font-bold text-xs flex items-center gap-2 transition-all shrink-0 tab-inactive">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Quiz</span>
+          <span id="tabCount-quiz" class="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-slate-100 text-slate-600">2</span>
+        </label>
+
+      </nav>
+
+      <!-- ===================================================================== -->
+      <!-- C. ACTIVE CONTENT PANELS CONTAINER                                    -->
+      <!-- ===================================================================== -->
+      <div class="flex-1 content-tab-panels">
+
+        <!-- =================================================================== -->
+        <!-- PANEL 1: GRAMMAR + VIDEO MANAGEMENT                                 -->
+        <!-- =================================================================== -->
+        <section id="panel-grammar" class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Grammar & Lecture Video</span>
+                <span class="text-xs font-normal text-slate-400">| Ngữ pháp & Video bài giảng</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Video bài giảng lý thuyết và các mẫu ngữ pháp trọng
+                điểm của bài học.</p>
+            </div>
+
+            <button type="button"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-amber-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Grammar Point</span>
+            </button>
+          </div>
+
+          <div id="grammarContainer">
+
+        <div class="space-y-6">
+          
+          <!-- Video Lecture Box -->
+          <div class="bg-white rounded-2xl p-4 md:p-5 border border-slate-200 shadow-2xs">
+            <div class="flex items-center justify-between mb-3">
+              <h4 class="text-xs font-bold text-slate-800 flex items-center gap-2 uppercase tracking-wider">
+                <span class="text-rose-600 font-black">▶</span> Lecture Video
+              </h4>
+              <div class="flex items-center gap-2">
+                
+                  <button type="button" class="text-xs font-bold text-sky-600 hover:text-sky-700 cursor-pointer">Replace Video</button>
+                  <span class="text-slate-300">•</span>
+                  <button type="button" class="text-xs font-bold text-rose-600 hover:text-rose-700 cursor-pointer">Detach</button>
+                
+              </div>
+            </div>
+
+            
+              <div class="p-4 rounded-xl bg-slate-900 text-white flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center text-xl shrink-0">🎬</div>
+                  <div class="min-w-0">
+                    <p class="text-xs font-bold text-white truncate">video_n3_lesson_1_wakeganai.mp4 (45:12)</p>
+                    <p class="text-[11px] text-slate-400 truncate mt-0.5">https://cdn.studyjlpt.com/videos/n3/lesson_1_wakeganai.mp4</p>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">Ready</span>
+                </div>
+              </div>
+            
+          </div>
+
+          <!-- Grammar Points Header & List -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Grammar Points (2)</h3>
+              <p class="text-xs text-slate-500 font-medium">Danh sách các mẫu ngữ pháp trọng tâm trong bài học</p>
+            </div>
+            <a href="#grammarModal" type="button"
+              class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Add Grammar Point</span>
+            </a>
+          </div>
+
+          
+            <div class="space-y-4">
+              
+                <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-sky-300 transition-all">
+                  <div class="flex items-start justify-between gap-4 mb-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-6 h-6 rounded-lg bg-sky-50 text-sky-700 font-extrabold text-xs flex items-center justify-center">1</span>
+                      <h4 class="text-sm font-bold text-slate-900">~わけがない (Tuyệt đối không / Làm sao mà...)</h4>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <a href="#grammarModal" title="Edit Grammar"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                        ✎
+                      </a>
+                      <button type="button" title="Delete Grammar"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-100 whitespace-pre-line font-normal">
+                    **Ý nghĩa**: Biểu thị sự khẳng định chắc chắn của người nói rằng không thể có chuyện đó xảy ra, dựa trên căn cứ hoặc lý do xác thực.
+
+**Cấu trúc**:
+- V / A-i / A-na / N + わけがない (A-na な, N の)
+
+**Ví dụ**:
+1. こんなに難しい問題、彼に解けるわけがない。(Bài toán khó thế này, làm sao cậu ấy giải được!)
+2. 褒められて、嬉しくないわけがない。(Được khen như thế thì làm sao mà không vui cho được!)
+                  </div>
+                </div>
+              
+                <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-sky-300 transition-all">
+                  <div class="flex items-start justify-between gap-4 mb-3">
+                    <div class="flex items-center gap-2.5">
+                      <span class="w-6 h-6 rounded-lg bg-sky-50 text-sky-700 font-extrabold text-xs flex items-center justify-center">2</span>
+                      <h4 class="text-sm font-bold text-slate-900">~わけではない (Không hẳn là / Không có nghĩa là...)</h4>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <a href="#grammarModal" title="Edit Grammar"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                        ✎
+                      </a>
+                      <button type="button" title="Delete Grammar"
+                        class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="text-xs text-slate-600 space-y-2 bg-slate-50 p-3.5 rounded-xl border border-slate-100 whitespace-pre-line font-normal">
+                    **Ý nghĩa**: Phủ định một phần hoặc làm giảm mức độ khẳng định (không phải 100% như vậy).
+
+**Cấu trúc**:
+- Thể thông thường (A-na な, N な/の) + わけではない
+
+**Ví dụ**:
+1. 日本料理が嫌いなわけではないが、納豆は食べられない。(Không hẳn là ghét đồ ăn Nhật, nhưng tôi không ăn được Natto).
+                  </div>
+                </div>
+              
+            </div>
+          
+        </div>
+      
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 2: VOCABULARY MANAGEMENT                                      -->
+        <!-- =================================================================== -->
+        <section id="panel-vocab" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Vocabulary List</span>
+                <span class="text-xs font-normal text-slate-400">| Từ vựng bài học</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Danh sách các từ vựng tiếng Nhật, cách đọc Kana,
+                nghĩa tiếng Việt và câu ví dụ tương ứng.</p>
+            </div>
+
+            <div class="flex items-center gap-2.5 self-start sm:self-auto">
+              <div class="relative w-48 md:w-60">
+                <input type="text" id="vocabSearchInput" placeholder="Search vocab..."
+                  class="w-full pl-8 pr-3 py-2 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor"
+                  stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                  </path>
+                </svg>
+              </div>
+
+              <button type="button"
+                class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                <span> Add Vocabulary</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="vocabContainer">
+
+        <div class="space-y-4">
+          
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Vocabulary List (5)</h3>
+              <p class="text-xs text-slate-500 font-medium">Bảng từ vựng tương ứng với bài học</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button"
+                class="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer">
+                <span>📥 Import CSV</span>
+              </button>
+              <a href="#vocabModal" type="button"
+                class="px-3.5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Add Vocabulary</span>
+              </a>
+            </div>
+          </div>
+
+          
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-2xs">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="py-3 px-4 w-12">#</th>
+                      <th class="py-3 px-4">Word (Kanji)</th>
+                      <th class="py-3 px-4">Reading (Kana)</th>
+                      <th class="py-3 px-4">Vietnamese Meaning</th>
+                      <th class="py-3 px-4">Example Sentence</th>
+                      <th class="py-3 px-4 text-right w-24">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100">
+                    
+                      <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 text-slate-400 font-bold">1</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 text-sm">会社員</td>
+                        <td class="py-3 px-4 text-sky-700 font-medium">かいしゃいん</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">Nhân viên công ty</td>
+                        <td class="py-3 px-4 text-slate-500 text-[11px] max-w-xs truncate">彼は大手IT企業の会社員です。</td>
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <a href="#vocabModal" title="Edit"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                                ✎
+                              </a>
+                            <button type="button" title="Delete"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 text-slate-400 font-bold">2</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 text-sm">残業</td>
+                        <td class="py-3 px-4 text-sky-700 font-medium">ざんぎょう</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">Làm thêm giờ, tăng ca</td>
+                        <td class="py-3 px-4 text-slate-500 text-[11px] max-w-xs truncate">今週は毎日残業しなければなりません。</td>
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <a href="#vocabModal" title="Edit"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                                ✎
+                              </a>
+                            <button type="button" title="Delete"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 text-slate-400 font-bold">3</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 text-sm">締め切り</td>
+                        <td class="py-3 px-4 text-sky-700 font-medium">しめきり</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">Hạn chót, deadline</td>
+                        <td class="py-3 px-4 text-slate-500 text-[11px] max-w-xs truncate">レポートの締め切りは金曜日です。</td>
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <a href="#vocabModal" title="Edit"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                                ✎
+                              </a>
+                            <button type="button" title="Delete"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 text-slate-400 font-bold">4</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 text-sm">同僚</td>
+                        <td class="py-3 px-4 text-sky-700 font-medium">どうりょう</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">Đồng nghiệp</td>
+                        <td class="py-3 px-4 text-slate-500 text-[11px] max-w-xs truncate">会社の同僚と一緒に昼ご飯を食べました。</td>
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <a href="#vocabModal" title="Edit"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                                ✎
+                              </a>
+                            <button type="button" title="Delete"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                      <tr class="hover:bg-slate-50/60 transition-colors">
+                        <td class="py-3 px-4 text-slate-400 font-bold">5</td>
+                        <td class="py-3 px-4 font-bold text-slate-900 text-sm">出張</td>
+                        <td class="py-3 px-4 text-sky-700 font-medium">しゅっちょう</td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">Đi công tác</td>
+                        <td class="py-3 px-4 text-slate-500 text-[11px] max-w-xs truncate">来週から大阪へ出張します。</td>
+                        <td class="py-3 px-4 text-right">
+                          <div class="flex items-center justify-end gap-1">
+                            <a href="#vocabModal" title="Edit"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center transition-all cursor-pointer">
+                                ✎
+                              </a>
+                            <button type="button" title="Delete"
+                              class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                              ✕
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          
+        </div>
+      
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 3: KANJI MANAGEMENT                                           -->
+        <!-- =================================================================== -->
+        <section id="panel-kanji" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Kanji Characters</span>
+                <span class="text-xs font-normal text-slate-400">| Chữ Hán bài học</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Chữ Hán, âm On/Kun, số nét, Hán Việt và các từ ghép
+                minh họa.</p>
+            </div>
+
+            <button type="button"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-emerald-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Kanji</span>
+            </button>
+          </div>
+
+          <div id="kanjiContainer">
+
+        <div class="space-y-4">
+          
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Kanji Cards (3)</h3>
+              <p class="text-xs text-slate-500 font-medium">Chữ Hán, âm On/Kun và các từ vựng phái sinh</p>
+            </div>
+            <a href="#kanjiModal" type="button"
+              class="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Add Kanji Character</span>
+            </a>
+          </div>
+
+          
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-purple-300 transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-3xl font-extrabold text-purple-900">
+                        働
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <a href="#kanjiModal" title="Edit Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-purple-50 border border-slate-200 text-slate-500 hover:text-purple-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✎
+                        </a>
+                        <button type="button" title="Delete Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-slate-900 mb-1">ĐỘNG - Làm việc, lao động</h4>
+                    <p class="text-[10px] text-slate-400 mb-2">13 strokes</p>
+
+                    <div class="space-y-1 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
+                      <div><span class="font-bold text-slate-400">On:</span> <span class="font-semibold text-purple-700">ドウ</span></div>
+                      <div><span class="font-bold text-slate-400">Kun:</span> <span class="font-semibold text-slate-700">はたら.く</span></div>
+                    </div>
+                  </div>
+
+                  
+                    <p class="text-[10px] text-slate-500 line-clamp-2"><span class="font-bold text-slate-600">Compounds:</span> 労働 (lao động), 働き者 (người chăm chỉ)</p>
+                  
+                </div>
+              
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-purple-300 transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-3xl font-extrabold text-purple-900">
+                        議
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <a href="#kanjiModal" title="Edit Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-purple-50 border border-slate-200 text-slate-500 hover:text-purple-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✎
+                        </a>
+                        <button type="button" title="Delete Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-slate-900 mb-1">NGHỊ - Bàn bạc, hội nghị</h4>
+                    <p class="text-[10px] text-slate-400 mb-2">20 strokes</p>
+
+                    <div class="space-y-1 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
+                      <div><span class="font-bold text-slate-400">On:</span> <span class="font-semibold text-purple-700">ギ</span></div>
+                      <div><span class="font-bold text-slate-400">Kun:</span> <span class="font-semibold text-slate-700">ー</span></div>
+                    </div>
+                  </div>
+
+                  
+                    <p class="text-[10px] text-slate-500 line-clamp-2"><span class="font-bold text-slate-600">Compounds:</span> 会議 (cuộc họp), 議員 (nghị viên)</p>
+                  
+                </div>
+              
+                <div class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs hover:border-purple-300 transition-all flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-start justify-between mb-3">
+                      <div class="w-14 h-14 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-3xl font-extrabold text-purple-900">
+                        約
+                      </div>
+                      <div class="flex items-center gap-1">
+                        <a href="#kanjiModal" title="Edit Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-purple-50 border border-slate-200 text-slate-500 hover:text-purple-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✎
+                        </a>
+                        <button type="button" title="Delete Kanji"
+                          class="w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <h4 class="text-xs font-bold text-slate-900 mb-1">ƯỚC - Lời hứa, ước lượng</h4>
+                    <p class="text-[10px] text-slate-400 mb-2">9 strokes</p>
+
+                    <div class="space-y-1 text-[11px] bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-2">
+                      <div><span class="font-bold text-slate-400">On:</span> <span class="font-semibold text-purple-700">ヤク</span></div>
+                      <div><span class="font-bold text-slate-400">Kun:</span> <span class="font-semibold text-slate-700">ー</span></div>
+                    </div>
+                  </div>
+
+                  
+                    <p class="text-[10px] text-slate-500 line-clamp-2"><span class="font-bold text-slate-600">Compounds:</span> 約束 (lời hứa), 予約 (đặt chỗ trước)</p>
+                  
+                </div>
+              
+            </div>
+          
+        </div>
+      
+          </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- PANEL 4: QUIZ MANAGEMENT                                            -->
+        <!-- =================================================================== -->
+        <section id="panel-quiz" class="hidden bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 pb-4 border-b border-slate-100">
+            <div>
+              <h2 class="text-base md:text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>Quiz Assessment & Question Bank</span>
+                <span class="text-xs font-normal text-slate-400">| Bài kiểm tra</span>
+              </h2>
+              <p class="text-xs text-slate-500 font-medium mt-0.5">Cấu hình đề kiểm tra cuối bài và ngân hàng câu hỏi
+                trắc nghiệm.</p>
+            </div>
+
+            <button type="button"
+              class="px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-indigo-600 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              <span> Add Question</span>
+            </button>
+          </div>
+
+          <div id="quizContainer">
+
+        <div class="space-y-6">
+          
+          <!-- Quiz Configuration Box -->
+          <div class="p-4 md:p-5 rounded-2xl bg-amber-50/50 border border-amber-200/80">
+            <h4 class="text-xs font-bold text-amber-900 mb-3 flex items-center gap-1.5">
+              <span>⚙️</span> Quiz Settings & Rules
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Quiz Title</label>
+                <input type="text" value="Kiểm tra Đánh giá Ngữ pháp Bài 1"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Pass Score (%)</label>
+                <input type="number" min="0" max="100" value="60"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-600 mb-1">Time Limit (seconds)</label>
+                <input type="number" min="60" step="60" value="900"
+                  class="w-full px-3 py-2 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Questions Header -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900">Quiz Questions (2)</h3>
+              <p class="text-xs text-slate-500 font-medium">Câu hỏi trắc nghiệm kiểm tra kiến thức bài học</p>
+            </div>
+            <a href="#questionModal" type="button"
+              class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+              </svg>
+              <span>Add Question</span>
+            </a>
+          </div>
+
+          <!-- Question Items -->
+          <div class="space-y-4">
+            
+              <div class="p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-extrabold text-slate-900">Question 1 (1 pt)</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono">single_choice</span>
+                    <a href="#questionModal" title="Edit Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 flex items-center justify-center transition-all cursor-pointer">
+                      ✎
+                    </a>
+                    <button type="button" title="Delete Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-xs font-semibold text-slate-800 mb-3">あの真面目な彼が、嘘を＿＿＿＿＿。</p>
+                
+                <div class="space-y-1.5 pl-2">
+                  
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-700">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-emerald-500 text-white">
+                        ✓
+                      </span>
+                      <span>A. つくわけがない</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>B. つくわけではない</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>C. つくはずでした</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>D. つくそうです</span>
+                    </div>
+                  
+                </div>
+              </div>
+            
+              <div class="p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-extrabold text-slate-900">Question 2 (1 pt)</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 font-mono">single_choice</span>
+                    <a href="#questionModal" title="Edit Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 flex items-center justify-center transition-all cursor-pointer">
+                      ✎
+                    </a>
+                    <button type="button" title="Delete Question"
+                      class="w-7 h-7 rounded-lg bg-white hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 flex items-center justify-center transition-all cursor-pointer">
+                      ✕
+                    </button>
+                  </div>
+                </div>
+
+                <p class="text-xs font-semibold text-slate-800 mb-3">Chọn cách đọc đúng của chữ Hán: 「労働」</p>
+                
+                <div class="space-y-1.5 pl-2">
+                  
+                    <div class="flex items-center gap-2 text-xs font-bold text-emerald-700">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-emerald-500 text-white">
+                        ✓
+                      </span>
+                      <span>A. ろうどう</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>B. ろどう</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>C. ろうとう</span>
+                    </div>
+                  
+                    <div class="flex items-center gap-2 text-xs text-slate-600">
+                      <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] bg-slate-200 text-slate-600">
+                        •
+                      </span>
+                      <span>D. ろっとう</span>
+                    </div>
+                  
+                </div>
+              </div>
+            
+          </div>
+
+        </div>
+      
+          </div>
+        </section>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. SECONDARY RESOURCES / ATTACHMENTS SLIDE-OVER DRAWER                    -->
+  <!-- ========================================================================= -->
+  <div id="resourcesDrawerBackdrop"
+    class="fixed inset-0 z-50 modal-backdrop hidden transition-opacity duration-300"></div>
+
+  <div id="resourcesDrawer"
+    class="fixed inset-y-0 right-0 z-50 w-full max-w-xl bg-white shadow-2xl border-l border-slate-200 flex flex-col translate-x-full transition-transform duration-300 ease-in-out">
+
+    <!-- Drawer Header -->
+    <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70 shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-sky-100 text-sky-700 flex items-center justify-center font-bold">
+          <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2">
+            <span>Lesson Resources & Files</span>
+            <span id="drawerResourceCountBadge"
+              class="text-xs px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 font-bold">3 items</span>
+          </h3>
+          <p class="text-xs text-slate-500 font-medium mt-0.5">Tài liệu đính kèm, giáo trình PDF, audio luyện nghe và
+            flashcard bổ trợ.</p>
+        </div>
+      </div>
+
+      <button
+        class="w-8 h-8 rounded-xl bg-white hover:bg-slate-200/60 border border-slate-200 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors">
+        ✕
+      </button>
+    </div>
+
+    <!-- Drawer Action Bar -->
+    <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+      <span class="text-xs font-bold text-slate-700">Attached Materials</span>
+      <button type="button"
+        class="px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-2xs flex items-center gap-1.5 transition-all">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+        </svg>
+        <span> Add Resource</span>
+      </button>
+    </div>
+
+    <!-- Drawer Body / Resources List -->
+    <div id="drawerResourcesContainer" class="flex-1 overflow-y-auto p-4 space-y-3">
+      <!-- No original resource records are present in this static HTML source.
+           Resource CRUD UI is preserved; resource data is intentionally not fabricated. -->
+      <div class="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center">
+        <div class="w-10 h-10 rounded-xl bg-white border border-slate-200 text-slate-400 flex items-center justify-center mx-auto mb-2">
+          📎
+        </div>
+        <p class="text-xs font-bold text-slate-700">No resource records available</p>
+        <p class="text-[11px] text-slate-400 mt-1">Original resource data was not present in the supplied static HTML.</p>
+      </div>
+    </div>
+
+    <!-- Drawer Footer -->
+    <div class="p-4 border-t border-slate-100 bg-slate-50 shrink-0 text-center">
+      <p class="text-[11px] text-slate-400">Students can download these attachments from the Student Lesson Portal.</p>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS SECTION                                                            -->
+  <!-- ========================================================================= -->
+
+<!-- MODAL: ADD CONTENT TO LESSON -->
+  <div id="addContentModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <div>
+          <h3 class="text-base font-bold text-slate-900">Add Content Item</h3>
+          <p class="text-xs text-slate-400 font-medium mt-0.5" id="addContentTargetLessonName">Target: Lesson 1</p>
+        </div>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center cursor-pointer">✕</a>
+      </div>
+
+      <div class="space-y-2.5 mb-5">
+        <button type="button"
+          class="w-full flex items-center gap-3.5 p-3 rounded-2xl border border-sky-100 bg-sky-50/60 hover:bg-sky-50 text-left transition-all group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-sky-600 text-white flex items-center justify-center shrink-0">
+            📘
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-slate-900 group-hover:text-sky-700">Grammar & Video</p>
+            <p class="text-[11px] text-slate-500">Add a grammar point explanation or video lecture</p>
+          </div>
+          <span class="text-xs font-bold text-sky-600">Add →</span>
+        </button>
+
+        <button type="button"
+          class="w-full flex items-center gap-3.5 p-3 rounded-2xl border border-emerald-100 bg-emerald-50/60 hover:bg-emerald-50 text-left transition-all group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+            📝
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-slate-900 group-hover:text-emerald-700">Vocabulary Item</p>
+            <p class="text-[11px] text-slate-500">Add vocabulary word, furigana and audio</p>
+          </div>
+          <span class="text-xs font-bold text-emerald-600">Add →</span>
+        </button>
+
+        <button type="button"
+          class="w-full flex items-center gap-3.5 p-3 rounded-2xl border border-purple-100 bg-purple-50/60 hover:bg-purple-50 text-left transition-all group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-purple-600 text-white font-bold text-xs flex items-center justify-center shrink-0">
+            🈸
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-slate-900 group-hover:text-purple-700">Kanji Character</p>
+            <p class="text-[11px] text-slate-500">Add kanji character, onyomi/kunyomi and examples</p>
+          </div>
+          <span class="text-xs font-bold text-purple-600">Add →</span>
+        </button>
+
+        <button type="button"
+          class="w-full flex items-center gap-3.5 p-3 rounded-2xl border border-amber-100 bg-amber-50/60 hover:bg-amber-50 text-left transition-all group cursor-pointer">
+          <div class="w-9 h-9 rounded-xl bg-amber-600 text-white flex items-center justify-center shrink-0">
+            ❓
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-xs font-bold text-slate-900 group-hover:text-amber-700">Quiz Question</p>
+            <p class="text-[11px] text-slate-500">Add a multiple choice or practice question</p>
+          </div>
+          <span class="text-xs font-bold text-amber-600">Add →</span>
+        </button>
+      </div>
+
+      <button type="button"
+        class="w-full py-2.5 rounded-2xl bg-slate-100 text-slate-600 font-bold text-xs hover:bg-slate-200 transition-colors cursor-pointer">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT LESSON -->
+  <div id="lessonModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in duration-200">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="lessonModalTitle" class="text-base font-bold text-slate-900">Add New Lesson</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center cursor-pointer">✕</a>
+      </div>
+
+      <form id="lessonForm" class="space-y-4">
+        <input type="hidden" id="lessonEditId" value="" />
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Lesson Title *</label>
+          <input type="text" id="lessonTitleInput" required placeholder="e.g. Cấu trúc ~わけがない & ~わけではない"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Estimated Duration (minutes)</label>
+            <input type="number" id="lessonDurationInput" min="5" max="300" value="45"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Publish Status</label>
+            <select id="lessonStatusInput"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="1">Published (Live)</option>
+              <option value="0">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer">Save
+            Lesson</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT SOURCE / RESOURCE -->
+  <div id="sourceModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="sourceModalTitle" class="text-base font-bold text-slate-900">Add Lesson Resource</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</a>
+      </div>
+
+      <form id="sourceForm" class="space-y-4">
+        <input type="hidden" id="sourceEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Resource Title *</label>
+          <input type="text" id="sourceTitle" required placeholder="e.g. Giáo trình Soumatome N3 Ngữ pháp - Bài 1.pdf"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Resource Type *</label>
+            <select id="sourceType"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="pdf">PDF Document</option>
+              <option value="audio">Audio MP3</option>
+              <option value="video">Video Supplementary</option>
+              <option value="link">External Reference Link</option>
+              <option value="flashcard">Flashcard Set</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">File Size / Duration</label>
+            <input type="text" id="sourceSize" placeholder="e.g. 4.2 MB or 12:45 mins"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">URL / File Path *</label>
+          <input type="text" id="sourceUrl" required
+            placeholder="https://cdn.studyjlpt.com/resources/n3/lesson_1_grammar.pdf"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-800 placeholder-slate-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Description / Notes</label>
+          <textarea id="sourceDesc" rows="2" placeholder="Ghi chú sử dụng tài liệu..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Resource</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT VOCABULARY -->
+  <div id="vocabModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="vocabModalTitle" class="text-base font-bold text-slate-900">Add Vocabulary</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</a>
+      </div>
+
+      <form id="vocabForm" class="space-y-4">
+        <input type="hidden" id="vocabEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Vocabulary (Kanji / Kana) *</label>
+          <input type="text" id="vocabWord" required placeholder="e.g. 会社員"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Reading (Hiragana / Katakana)</label>
+          <input type="text" id="vocabReading" placeholder="かいしゃいん"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Meaning (Vietnamese) *</label>
+          <input type="text" id="vocabMeaning" required placeholder="Nhân viên công ty"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Example Sentence</label>
+          <input type="text" id="vocabExample" placeholder="彼は有名な会社員です。"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800 placeholder-slate-400" />
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold shadow-xs">Save
+            Word</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT KANJI -->
+  <div id="kanjiModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="kanjiModalTitle" class="text-base font-bold text-slate-900">Add Kanji to Lesson</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</a>
+      </div>
+
+      <form id="kanjiForm" class="space-y-3.5">
+        <input type="hidden" id="kanjiEditId" value="" />
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kanji Character *</label>
+            <input type="text" id="kanjiChar" required maxlength="10" placeholder="e.g. 働"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-base font-bold text-center text-slate-900" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Stroke Count</label>
+            <input type="number" id="kanjiStrokes" min="1" max="50" placeholder="13"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Meaning (Hán Việt & Nghĩa) *</label>
+          <input type="text" id="kanjiMeaning" required placeholder="ĐỘNG (Lao động, làm việc)"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Onyomi</label>
+            <input type="text" id="kanjiOn" placeholder="ドウ"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Kunyomi</label>
+            <input type="text" id="kanjiKun" placeholder="はたら.く"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Example Compound Words</label>
+          <input type="text" id="kanjiExamples" placeholder="労働 (ろうどう), 働き者 (はたらきもの)"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-800" />
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold shadow-xs">Save
+            Kanji</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT GRAMMAR POINT -->
+  <div id="grammarModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="grammarModalTitle" class="text-base font-bold text-slate-900">Add Grammar Point</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</a>
+      </div>
+
+      <form id="grammarForm" class="space-y-3.5">
+        <input type="hidden" id="grammarEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Grammar Pattern Structure *</label>
+          <input type="text" id="grammarTitle" required placeholder="e.g. ~わけがない / ~わけはない"
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-900" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Explanation & Examples *</label>
+          <textarea id="grammarExplanation" required rows="5"
+            placeholder="Nhập ý nghĩa, cấu trúc kết hợp, và các câu ví dụ mẫu..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed"></textarea>
+        </div>
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-amber-600 text-white text-xs font-bold shadow-xs">Save
+            Grammar Point</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT QUIZ QUESTION -->
+  <div id="questionModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100">
+      <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+        <h3 id="questionModalTitle" class="text-base font-bold text-slate-900">Add Quiz Question</h3>
+        <a href="#"
+          class="w-7 h-7 rounded-lg text-slate-400 hover:bg-slate-100 flex items-center justify-center">✕</a>
+      </div>
+
+      <form id="questionForm" class="space-y-3.5">
+        <input type="hidden" id="questionEditId" value="" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Question Text *</label>
+          <textarea id="qText" required rows="2" placeholder="Nhập nội dung câu hỏi tiếng Nhật..."
+            class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-medium text-slate-900"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Points</label>
+            <input type="number" id="qPoints" value="1.0" step="0.5" min="0.5"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Type</label>
+            <select id="qType"
+              class="w-full px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-800">
+              <option value="single_choice">Single Choice</option>
+              <option value="multiple_choice">Multiple Choice</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-700">Options (Select correct answer radio)</label>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="0" checked class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt0" required placeholder="Option A"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="1" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt1" required placeholder="Option B"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="2" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt2" placeholder="Option C (Optional)"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="radio" name="correctOpt" value="3" class="text-sky-600 accent-sky-600" />
+            <input type="text" id="opt3" placeholder="Option D (Optional)"
+              class="w-full px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800" />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button type="button"
+            class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit"
+            class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-indigo-600 text-white text-xs font-bold shadow-xs">Save
+            Question</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: UNIFIED DELETE CONFIRMATION -->
+  <div id="deleteConfirmModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center">
+      <div
+        class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 mb-1" id="deleteConfirmTitle">Confirm Deletion</h3>
+      <p class="text-xs text-slate-500 mb-5 leading-relaxed" id="deleteConfirmMessage">
+        Are you sure you want to delete this item? This action cannot be undone.
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button type="button"
+          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="confirmDeleteBtn"
+          class="flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast"
+    class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2.5 transition-all">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span id="toastMessage">Action completed successfully</span>
+  </div>
+
+</body>
+
+</html

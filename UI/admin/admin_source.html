@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT Admin - Quản lý Khóa học (Courses)</title>
+  <meta name="description"
+    content="Admin Courses Management Interface for StudyJLPT Platform. Manage JLPT courses, lessons count, pricing, and publication statuses." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-hover {
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .shadow-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.07), 0 3px 8px -2px rgba(15, 23, 42, 0.03);
+    }
+
+    .modal-backdrop {
+      background-color: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+    <!-- ========================================== -->
+    <!-- 1. LEFT SIDEBAR: ADMIN NAVIGATION          -->
+    <!-- ========================================== -->
+    <aside id="sidebar"
+      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
+      
+      <div>
+        <!-- Brand Logo -->
+        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1.5">
+                Studify <span class="text-indigo-600 text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-50 uppercase tracking-wider border border-indigo-100">ADMIN</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Mobile Hamburger Toggle -->
+          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Menu Section Label -->
+        <div class="px-3 mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Admin Control</span>
+        </div>
+
+        <!-- Admin Nav Links -->
+        <nav id="navMenu" class="space-y-1.5">
+          <!-- 1. Dashboard -->
+          <a href="admin_dashboard.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Dashboard</span>
+          </a>
+
+          <!-- 2. Categories -->
+          <a href="admin_category.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <span>Categories</span>
+            <span class="ml-auto text-[11px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">8</span>
+          </a>
+
+          <!-- 3. Sources (Active) -->
+          <a href="admin_source.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <span>Courses</span>
+            <span class="ml-auto text-[11px] font-bold bg-sky-500 text-white px-2 py-0.5 rounded-full">62</span>
+          </a>
+
+          <!-- 4. JLPT Exams -->
+          <a href="admin_jlpt_exam.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            <span>JLPT Exams</span>
+          </a>
+
+          <!-- Divider -->
+          <div class="py-1">
+            <div class="h-px bg-slate-100 mx-2"></div>
+          </div>
+
+          <!-- Student Portal Link -->
+          <a href="../user/dashboard.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            <span>Student Portal</span>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Admin Profile Bottom -->
+      <div class="mt-8 pt-4 border-t border-slate-100 flex items-center gap-3 px-2">
+        <img src="../assets/images/student_hero.jpg" alt="Admin"
+          class="w-10 h-10 rounded-2xl object-cover ring-2 ring-slate-100 shrink-0" />
+        <div class="flex flex-col min-w-0 flex-1">
+          <span class="text-xs font-bold text-slate-900 truncate">Admin Sarah</span>
+          <span class="text-[11px] text-indigo-500 font-semibold truncate">Administrator</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN CENTER CONTENT: COURSES MANAGEMENT -->
+    <!-- ========================================== -->
+    <main class="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">
+
+      <!-- Breadcrumbs & Header -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="admin_source.html" class="hover:text-slate-600">Admin</a>
+            <span>/</span>
+            <span class="text-slate-800">Courses</span>
+          </nav>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+            Courses Management
+          </h1>
+          <p class="text-slate-500 font-medium text-sm mt-0.5">
+            Quản lý các khóa học tiếng Nhật theo cấp độ JLPT (N5 - N1), lộ trình bài học và trạng thái xuất bản.
+          </p>
+        </div>
+
+        <!-- Create Source Button -->
+        <div class="flex items-center gap-3">
+          <a href="admin_source_create.html"
+            class="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs md:text-sm shadow-sm hover:shadow-md transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span> Add New Source</span>
+          </a>
+
+          <div class="flex items-center gap-2.5 pl-2 pr-3 py-1.5 bg-white border border-slate-100 rounded-2xl shadow-soft">
+            <img class="w-8 h-8 rounded-xl object-cover ring-1 ring-slate-100"
+              src="../assets/images/student_hero.jpg" alt="Admin" />
+            <div class="text-left hidden sm:block">
+              <p class="text-xs font-bold text-slate-900 leading-tight">Admin Sarah</p>
+              <p class="text-[10px] text-slate-400 font-medium">Administrator</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- KPI Stats Row (4 Cards) -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        
+        <!-- Total Courses -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Total Courses</p>
+          <p id="statTotalCourses" class="text-2xl lg:text-3xl font-extrabold text-slate-900 mt-1">62</p>
+          <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">Course catalogue</span>
+        </div>
+
+        <!-- Published Courses -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Published</p>
+          <p id="statPublishedCourses" class="text-2xl lg:text-3xl font-extrabold text-emerald-600 mt-1">54</p>
+          <span class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-2">Live for Students</span>
+        </div>
+
+        <!-- Draft Courses -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Drafts / In Prep</p>
+          <p id="statDraftCourses" class="text-2xl lg:text-3xl font-extrabold text-amber-600 mt-1">8</p>
+          <span class="inline-block text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-2">Pending Content</span>
+        </div>
+
+        <!-- Total Lessons Across Courses -->
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
+          <p class="text-xs font-semibold text-slate-400">Total Lessons</p>
+          <p id="statTotalLessons" class="text-2xl lg:text-3xl font-extrabold text-indigo-600 mt-1">428</p>
+          <span class="inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full mt-2">Structured Lessons</span>
+        </div>
+
+      </section>
+
+      <!-- Source Data Table Section -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+        
+        <!-- Controls Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          
+          <!-- Search Input -->
+          <div class="relative flex-1 max-w-md">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <input type="text" id="courseSearchInput" placeholder="Search source..."
+              class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
+          </div>
+
+          <!-- Actions & Filters -->
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="admin_source_create.html"
+              class="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span> Add New Source</span>
+            </a>
+
+            <!-- Filter by Publish Status -->
+            <select id="statusFilter"
+              class="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+              <option value="ALL">All Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+
+            <!-- Reset Filter -->
+            <button id="resetCoursesFilterBtn"
+              class="px-3 py-2.5 rounded-2xl border border-slate-200 text-slate-500 hover:text-slate-800 hover:bg-slate-50 text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
+              title="Reset Filters">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Data Table Container (Responsive overflow-x-auto) -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-100">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead class="bg-slate-50/80 border-b border-slate-100 text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+              <tr>
+                <th class="py-3.5 px-4">Source</th>
+                <th class="py-3.5 px-4">Description</th>
+                <th class="py-3.5 px-4">Stats</th>
+                <th class="py-3.5 px-4">Price</th>
+                <th class="py-3.5 px-4">Popularity</th>
+                <th class="py-3.5 px-4">Activities</th>
+                <th class="py-3.5 px-4">Status</th>
+                <th class="py-3.5 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="sourcesTableBody">
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=1"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Tiếng Nhật Trung Cấp N3 Soumatome
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">14 lessons</div>
+                <div class="text-slate-500 font-medium">10h 30m</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="text-xs font-bold text-slate-800">499.000 đ</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 259
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              56 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=1"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=1" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=2"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Luyện Đề Thi Thử Toàn Diện N2 Master
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Ngân hàng 20 bộ đề thi thử sát cấu trúc đề thi chính thức kèm giải thích.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">20 lessons</div>
+                <div class="text-slate-500 font-medium">15h</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="text-xs font-bold text-slate-800">699.000 đ</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 374
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              80 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=2"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=2" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=3"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Kanji & Từ Vựng Cấp Tốc N4
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Chinh phục 300 chữ Hán và 1500 từ vựng cốt lõi N4 bằng phương pháp ghi nhớ hình ảnh.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">12 lessons</div>
+                <div class="text-slate-500 font-medium">9h</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="text-xs font-bold text-slate-800">350.000 đ</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 237
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              48 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=3"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=3" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=4"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Tiếng Nhật Sơ Cấp Minna No Nihongo N5
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Khóa học nhập môn từ bảng chữ cái Hiragana/Katakana đến 25 bài Minna No Nihongo.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">25 lessons</div>
+                <div class="text-slate-500 font-medium">18h 45m</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Free</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 478
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              100 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=4"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=4" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=5"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Luyện Giao Tiếp & Shadowing N3
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Phương pháp Shadowing cải thiện phản xạ và phát âm chuẩn giọng Tokyo.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">10 lessons</div>
+                <div class="text-slate-500 font-medium">7h 30m</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="text-xs font-bold text-slate-800">420.000 đ</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 215
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              40 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Published
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=5"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=5" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+
+          <tr class="hover:bg-slate-50/70 transition-colors border-b border-slate-100 last:border-0">
+            <!-- 1. Source: Icon + Name -->
+            <td class="py-3.5 px-4 align-middle">
+              <div class="flex items-center gap-3 min-w-[200px]">
+                <img src="../assets/images/book_3d.jpg" alt=""
+                  class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 object-contain p-1 shrink-0" />
+                <div class="min-w-0">
+                  <a href="admin_source_detail.html?id=6"
+                    class="block text-xs md:text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1">
+                    Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp
+                  </a>
+                </div>
+              </div>
+            </td>
+
+            <!-- 2. Description -->
+            <td class="py-3.5 px-4 align-middle max-w-xs">
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+                Phân tích cấu trúc bài đọc dài, bình luận xã hội và ngữ pháp hiếm gặp N1.
+              </p>
+            </td>
+
+            <!-- 3. Stats: Lessons count + Total duration -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <div class="space-y-0.5 text-xs">
+                <div class="font-bold text-slate-800">8 lessons</div>
+                <div class="text-slate-500 font-medium">6h</div>
+              </div>
+            </td>
+
+            <!-- 4. Price -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="text-xs font-bold text-slate-800">850.000 đ</span>
+            </td>
+
+            <!-- 5. Popularity -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-bold text-orange-600">
+                🔥 186
+              </span>
+            </td>
+
+            <!-- 6. Activities -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap text-xs font-bold text-sky-600">
+              32 activities
+            </td>
+
+            <!-- 7. Status -->
+            <td class="py-3.5 px-4 align-middle whitespace-nowrap">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+           <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Draft
+         </span>
+            </td>
+
+            <!-- 8. Actions: View Source, Edit, Delete -->
+            <td class="py-3.5 px-4 align-middle text-right whitespace-nowrap">
+              <div class="flex items-center justify-end gap-1.5">
+                <a href="admin_source_detail.html?id=6"
+                  class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs transition-colors shadow-sm inline-block">
+                  View Source
+                </a>
+                <a href="admin_source_create.html?id=6" title="Edit" aria-label="Edit"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 text-slate-600 hover:text-sky-600 transition-colors inline-flex items-center justify-center">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </a>
+                <button type="button" title="Delete" aria-label="Delete"
+                  class="p-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-slate-400 hover:text-rose-600 transition-colors cursor-pointer">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        
+          </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State -->
+        <div id="courseEmptyState" class="hidden py-12 text-center">
+          <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+          </div>
+          <p class="text-sm font-bold text-slate-800">No sources match your criteria</p>
+          <p class="text-xs text-slate-400 mt-1">Try changing search keywords or status filter.</p>
+        </div>
+
+        <!-- Table Footer / Pagination -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-5 mt-4 border-t border-slate-100 text-xs text-slate-500 font-medium">
+          <p id="tableShowingCoursesCount">Showing 1–6 of 6 Sources</p>
+          <div class="flex items-center gap-1.5">
+            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-400 cursor-not-allowed text-xs font-semibold">Previous</button>
+            <button class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs">1</button>
+            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold">2</button>
+            <button class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold">Next</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Delete Course Modal -->
+  <div id="deleteCourseModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mx-auto mb-3">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      </div>
+      <h3 class="text-base font-bold text-slate-900">Delete Course?</h3>
+      <p class="text-xs text-slate-500 mt-1 mb-4 leading-relaxed">
+        Are you sure you want to delete <strong id="deleteCourseTitle" class="text-slate-800"></strong>?
+        <span class="block text-rose-500 text-[11px] font-semibold mt-1">This will cascade delete all linked lessons and content.</span>
+      </p>
+      <div class="flex items-center justify-center gap-3">
+        <button id="cancelDeleteCourseBtn" class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-xs transition-colors">
+          Cancel
+        </button>
+        <button id="confirmDeleteCourseBtn" class="w-full px-4 py-2.5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs shadow-sm transition-all">
+          Delete Course
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 text-white text-xs font-bold px-4 py-3 rounded-2xl shadow-xl border border-slate-800 flex items-center gap-2 transition-all">
+    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+    <span id="toastMessage">Course deleted successfully</span>
+  </div>
+
+  <!-- Mock Data & Script -->
+  
+</body>
+
+</html>
+
+

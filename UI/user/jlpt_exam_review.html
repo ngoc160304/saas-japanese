@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Review Exam Answers & Explanations — StudyJLPT</title>
+  <meta name="description"
+    content="Review your submitted JLPT answers, check detailed grammatical and vocabulary explanations, and analyze mistakes." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+      --color-navy: #2B4C7E;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Slim Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-card {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa] flex flex-col">
+
+  <!-- ========================================================================= -->
+  <!-- 1. TOP GLOBAL BAR (Breadcrumbs & Exit to Result)                          -->
+  <!-- ========================================================================= -->
+  <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 px-4 lg:px-8 py-3 shadow-xs shrink-0">
+    <div class="flex items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+      
+      <div class="flex items-center gap-3 min-w-0">
+        <a id="backToResultBtn" href="jlpt_exam_result.html?exam_id=1&mode=full"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors">
+          <span>← Back to Result</span>
+        </a>
+
+        <div class="h-6 w-px bg-slate-200 hidden sm:block"></div>
+
+        <nav class="flex items-center gap-1.5 text-xs text-slate-500 truncate" aria-label="Breadcrumb">
+          <span class="text-slate-400 font-semibold hidden md:inline">JLPT Exams /</span>
+          <span class="font-bold text-slate-800 truncate" id="reviewExamTitleBreadcrumb">JLPT N5 Korean Practice Test 1 – 2026</span>
+          <span class="text-slate-300">/</span>
+          <span class="text-sky-700 font-bold" id="reviewContextModeText">Full Exam Review</span>
+        </nav>
+      </div>
+
+      <!-- Filter Tabs in Top Bar -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button type="button" onclick="setReviewFilter('all')" id="filterBtnAll"
+          class="px-3 py-1.5 rounded-xl bg-slate-900 text-white font-bold text-xs shadow-2xs">
+          All (<span id="countAll">6</span>)
+        </button>
+        <button type="button" onclick="setReviewFilter('incorrect')" id="filterBtnIncorrect"
+          class="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-rose-50 border border-slate-200 text-rose-600 font-bold text-xs">
+          Incorrect (<span id="countIncorrect">0</span>)
+        </button>
+        <button type="button" onclick="setReviewFilter('correct')" id="filterBtnCorrect"
+          class="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 text-emerald-700 font-bold text-xs">
+          Correct (<span id="countCorrect">6</span>)
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- 2. MAIN REVIEW WORKSPACE (2 Columns on Desktop)                           -->
+  <!-- ========================================================================= -->
+  <main class="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- ===================================================================== -->
+      <!-- LEFT COLUMN: QUESTION REVIEW CARD & DETAILED EXPLANATIONS (8 Columns) -->
+      <!-- ===================================================================== -->
+      <div class="lg:col-span-8 space-y-5">
+        
+        <!-- Question Review Card -->
+        <section class="bg-white rounded-3xl p-5 md:p-8 border border-slate-100 shadow-soft space-y-6">
+          
+          <!-- Question Header & Accuracy Badge -->
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-3">
+            <div class="flex items-center gap-2.5">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                Question <span id="reviewQNumberDisplay">01</span> / <span id="reviewTotalQsDisplay">06</span>
+              </span>
+              <span class="text-slate-300">•</span>
+              <span id="reviewMondaiTitle">もんだい 1: Kanji Reading (漢字読み)</span>
+            </div>
+
+            <!-- Result Status Badge -->
+            <div id="questionStatusBadgeContainer">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 shadow-2xs">
+                <span>✓ Correct</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Japanese Question Prompt -->
+          <div>
+            <h2 id="reviewPromptText" class="text-base md:text-lg font-extrabold text-slate-900 leading-relaxed">
+              およいで <u>川</u> を わたりました。
+            </h2>
+          </div>
+
+          <!-- Multiple-Choice Options Review (User choice vs Correct answer) -->
+          <div id="reviewOptionsList" class="space-y-2.5">
+
+          <div class="p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70 border-slate-200 text-slate-700">
+            <span class="text-xs md:text-sm font-semibold">1. はし</span>
+            
+          </div>
+        
+
+          <div class="p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-50 border-emerald-400 text-emerald-950 font-bold ring-2 ring-emerald-500/20">
+            <span class="text-xs md:text-sm font-semibold">2. かわ</span>
+            <div class="shrink-0 self-end sm:self-auto"><span class="px-2.5 py-0.5 rounded-md bg-emerald-600 text-white text-[10px] font-bold">✓ Your Answer (Correct)</span></div>
+          </div>
+        
+
+          <div class="p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70 border-slate-200 text-slate-700">
+            <span class="text-xs md:text-sm font-semibold">3. そら</span>
+            
+          </div>
+        
+
+          <div class="p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/70 border-slate-200 text-slate-700">
+            <span class="text-xs md:text-sm font-semibold">4. みち</span>
+            
+          </div>
+        
+              </div>
+
+          <!-- Comprehensive Solution & Explanation Box -->
+          <div class="p-5 md:p-6 rounded-2xl bg-slate-50/90 border border-slate-200/80 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-base">💡</span>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-800">
+                Detailed Explanation & Solution Notes (Giải thích chi tiết)
+              </h3>
+            </div>
+
+            <div id="reviewExplanationText" class="p-4 rounded-2xl bg-amber-50/60 border border-amber-200/80 text-xs">
+              <div class="text-slate-800 font-semibold mb-2">
+                <strong>Dịch nghĩa câu:</strong> <em>"Tôi đã bơi qua con sông."</em>
+              </div>
+              <div class="text-slate-700 whitespace-pre-line leading-relaxed">
+                • Chữ Hán 川 (XUYÊN) có cách đọc âm Kun là かわ (con sông).
+• Các đáp án khác: 1. はし (cầu), 3. そら (bầu trời), 4. みち (con đường).
+              </div>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Bottom Review Navigation Controls -->
+        <div class="flex items-center justify-between gap-3 pt-2">
+          
+          <button type="button" onclick="prevReviewQuestion()" id="reviewPrevBtn"
+            class="px-5 py-2.5 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 disabled:opacity-40 disabled:pointer-events-none">
+            <span>← Previous Question</span>
+          </button>
+
+          <button type="button" onclick="nextReviewQuestion()" id="reviewNextBtn"
+            class="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-extrabold text-xs shadow-xs transition-all flex items-center gap-1.5">
+            <span>Next Question →</span>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- ===================================================================== -->
+      <!-- RIGHT COLUMN: REVIEW QUESTION NAVIGATOR (4 Columns)                   -->
+      <!-- ===================================================================== -->
+      <aside class="lg:col-span-4 space-y-4">
+        
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft sticky top-20">
+          
+          <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Review Navigator</h3>
+            <span id="reviewScoreSummaryBadge">6 Correct • 0 Incorrect</span>
+          </div>
+
+          <!-- Legend -->
+          <div class="flex items-center justify-between text-[11px] text-slate-500 font-medium mb-4 px-1">
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Correct</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Incorrect</span>
+            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full ring-2 ring-sky-500 bg-white"></span> Active</span>
+          </div>
+
+          <!-- Navigator Buttons Grid -->
+          <div id="reviewNavGrid" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-4 gap-2">
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold ring-2 ring-sky-500 scale-105">
+            <span>1</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+            <span>2</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+            <span>3</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+            <span>4</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+            <span>5</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+
+          <button type="button"
+            class="h-9 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-0.5 bg-emerald-50 text-emerald-700 border-emerald-200 font-bold">
+            <span>6</span>
+            <span class="text-[10px]">✓</span>
+          </button>
+        
+          </div>
+
+        </div>
+
+      </aside>
+
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT: REVIEW DATA & RENDERING ENGINE -->
+  <!-- ========================================== -->
+  
+</body>
+
+</html>
+

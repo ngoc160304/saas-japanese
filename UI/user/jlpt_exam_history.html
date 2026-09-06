@@ -1,0 +1,493 @@
+﻿<!DOCTYPE html>
+<html lang="vi" class="h-full bg-[#f3f6fa]">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JLPT Exam History — StudyJLPT</title>
+  <meta name="description"
+    content="Review all your past JLPT examination attempts, track full exam simulation and individual part drill progress." />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 CDN -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      --color-brand: #0284c7;
+      --color-brand-dark: #0f172a;
+      --color-navy: #2B4C7E;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f3f6fa;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Custom Slim Scrollbars */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    .shadow-soft {
+      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .shadow-card {
+      box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
+  <div class="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
+
+    <!-- ========================================== -->
+    <!-- 1. LEFT STUDENT SIDEBAR NAVIGATION         -->
+    <!-- ========================================== -->
+    <aside id="sidebar"
+      class="w-full xl:w-64 bg-white border-r border-slate-100 flex flex-col justify-between shrink-0 p-5 xl:min-h-screen z-30 transition-all duration-300">
+
+      <div>
+        <div class="flex items-center justify-between xl:justify-start gap-3 px-2 py-2 mb-7">
+          <div class="flex items-center gap-2.5">
+            <div
+              class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-md shadow-sky-500/20 text-white">
+              <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xl font-extrabold tracking-tight text-slate-900 flex items-center gap-1">
+                Studify <span
+                  class="text-sky-600 text-xs font-bold px-1.5 py-0.5 rounded bg-sky-50 uppercase tracking-wide">JLPT</span>
+              </span>
+            </div>
+          </div>
+
+          <button id="mobileMenuBtn" class="xl:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100"
+            aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="px-3 mb-2.5">
+          <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Student Menu</span>
+        </div>
+
+        <nav id="navMenu" class="space-y-1.5">
+          <a href="dashboard.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span>Overview</span>
+          </a>
+
+          <a href="jlpt_exams.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+            </svg>
+            <span>JLPT Exams</span>
+          </a>
+
+          <!-- Exam History (ACTIVE) -->
+          <a href="jlpt_exam_history.html"
+            class="flex items-center gap-3.5 px-4 py-3 rounded-2xl bg-slate-900 text-white font-semibold text-sm shadow-sm transition-all group">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>Exam History</span>
+            <span class="ml-auto text-[11px] font-bold bg-sky-500 text-white px-2 py-0.5 rounded-full" id="historyCountBadge">4</span>
+          </a>
+        </nav>
+      </div>
+
+      <div class="pt-4 border-t border-slate-100 flex items-center gap-3 px-2">
+        <img src="../assets/images/student_hero.jpg" alt="Alex Student"
+          class="w-10 h-10 rounded-2xl object-cover ring-2 ring-slate-100 shrink-0" />
+        <div class="flex flex-col min-w-0 flex-1">
+          <span class="text-xs font-bold text-slate-900 truncate">Alex Tran</span>
+          <span class="text-[11px] text-slate-400 truncate">Target: JLPT N3</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ========================================== -->
+    <!-- 2. MAIN CENTER CONTENT: EXAM HISTORY       -->
+    <!-- ========================================== -->
+    <main class="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto max-w-7xl mx-auto w-full">
+
+      <!-- Header Row -->
+      <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <nav class="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
+            <a href="dashboard.html" class="hover:text-slate-600">Student Portal</a>
+            <span>/</span>
+            <span class="text-slate-800">Exam History</span>
+          </nav>
+          <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+            JLPT Examination History
+          </h1>
+          <p class="text-slate-500 font-medium text-xs md:text-sm mt-0.5">
+            Track your performance progress across full exam simulations and individual section practice drills.
+          </p>
+        </div>
+
+        <a href="jlpt_exams.html"
+          class="px-5 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-2 self-start sm:self-auto">
+          <span>+ Take New Exam</span>
+        </a>
+      </header>
+
+      <!-- KPI METRIC CARDS -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Attempts</span>
+            <span class="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-bold text-xs">📝</span>
+          </div>
+          <p class="text-2xl md:text-3xl font-extrabold text-slate-900" id="statHistoryTotal">4</p>
+          <span class="text-[11px] font-medium text-slate-400 mt-1 block">Full exams & part drills</span>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Passed Exams</span>
+            <span class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs">🎉</span>
+          </div>
+          <p class="text-2xl md:text-3xl font-extrabold text-emerald-600" id="statHistoryPassed">3</p>
+          <span class="text-[11px] font-medium text-emerald-600/80 mt-1 block">75% Success rate</span>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Average Score</span>
+            <span class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">📊</span>
+          </div>
+          <p class="text-2xl md:text-3xl font-extrabold text-indigo-600" id="statHistoryAvg">74.2%</p>
+          <span class="text-[11px] font-medium text-indigo-600/80 mt-1 block">Across all submissions</span>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Practice Time</span>
+            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">⏱️</span>
+          </div>
+          <p class="text-2xl md:text-3xl font-extrabold text-slate-900" id="statHistoryTime">5.8 hrs</p>
+          <span class="text-[11px] font-medium text-slate-400 mt-1 block">Total time spent testing</span>
+        </div>
+
+      </section>
+
+      <!-- FILTER CONTROLS & ATTEMPTS LIST -->
+      <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
+        
+        <!-- Filter Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          
+          <!-- Mode Tabs -->
+          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
+            <button type="button" onclick="setModeFilter('all')" id="modeFilterAll"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-white shadow-2xs">
+              All Attempts
+            </button>
+            <button type="button" onclick="setModeFilter('full')" id="modeFilterFull"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+              Full Exam Only
+            </button>
+            <button type="button" onclick="setModeFilter('part')" id="modeFilterPart"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+              Individual Part Drills
+            </button>
+          </div>
+
+          <!-- Level Dropdown -->
+          <div class="flex items-center gap-2">
+            <select id="historyLevelSelect" onchange="renderHistoryTable()"
+              class="px-3.5 py-2 rounded-2xl bg-slate-50 border border-slate-100 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer">
+              <option value="">All JLPT Levels</option>
+              <option value="N1">N1</option>
+              <option value="N2">N2</option>
+              <option value="N3">N3</option>
+              <option value="N4">N4</option>
+              <option value="N5">N5</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- History Records Table (Desktop) / Cards (Mobile) -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <th class="py-3 px-3">Examination & Mode</th>
+                <th class="py-3 px-3">Level</th>
+                <th class="py-3 px-3">Date Taken</th>
+                <th class="py-3 px-3">Score & Accuracy</th>
+                <th class="py-3 px-3">Result</th>
+                <th class="py-3 px-3 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody" class="divide-y divide-slate-100 text-xs">
+
+      <tr class="hover:bg-slate-50/70 transition-colors">
+        <!-- Title & Mode -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-900 text-xs md:text-sm">JLPT N3 Practice Test 01 (Official Simulation)</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-extrabold text-[10px] uppercase">Full Simulation</span>
+              
+            </div>
+          </div>
+        </td>
+
+        <!-- Level -->
+        <td class="py-4 px-3">
+          <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border-sky-100 font-black text-xs border">N3</span>
+        </td>
+
+        <!-- Date -->
+        <td class="py-4 px-3 text-slate-500 font-medium">
+          Sep 1, 2026
+        </td>
+
+        <!-- Score & Accuracy -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-extrabold text-slate-900 text-xs md:text-sm">128 / 180 pts</span>
+            <span class="text-[11px] text-slate-400 font-medium">71.5% accuracy (118 min)</span>
+          </div>
+        </td>
+
+        <!-- Result -->
+        <td class="py-4 px-3">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px] border border-emerald-100">✓ Passed</span>
+        </td>
+
+        <!-- Action Buttons -->
+        <td class="py-4 px-3 text-right">
+          <div class="flex items-center justify-end gap-1.5">
+            <a href="jlpt_exam_result.html?exam_id=1&mode=full"
+              class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-[11px] shadow-2xs transition-all">
+              Result
+            </a>
+            <a href="jlpt_exam_review.html?exam_id=1&mode=full"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition-colors">
+              Review
+            </a>
+          </div>
+        </td>
+      </tr>
+    
+
+      <tr class="hover:bg-slate-50/70 transition-colors">
+        <!-- Title & Mode -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-900 text-xs md:text-sm">JLPT N3 Practice Test 01</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold text-[10px] uppercase">Part Drill</span>
+              <span class="text-[11px] text-slate-500 font-medium truncate max-w-xs">Mondai 1: Cách đọc chữ Hán (漢字読み)</span>
+            </div>
+          </div>
+        </td>
+
+        <!-- Level -->
+        <td class="py-4 px-3">
+          <span class="px-2.5 py-0.5 rounded-lg bg-sky-50 text-sky-700 border-sky-100 font-black text-xs border">N3</span>
+        </td>
+
+        <!-- Date -->
+        <td class="py-4 px-3 text-slate-500 font-medium">
+          Aug 29, 2026
+        </td>
+
+        <!-- Score & Accuracy -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-extrabold text-slate-900 text-xs md:text-sm">16 / 20 Qs</span>
+            <span class="text-[11px] text-slate-400 font-medium">80% accuracy (12 min)</span>
+          </div>
+        </td>
+
+        <!-- Result -->
+        <td class="py-4 px-3">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px] border border-emerald-100">✓ Passed</span>
+        </td>
+
+        <!-- Action Buttons -->
+        <td class="py-4 px-3 text-right">
+          <div class="flex items-center justify-end gap-1.5">
+            <a href="jlpt_exam_result.html?exam_id=1&mode=part"
+              class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-[11px] shadow-2xs transition-all">
+              Result
+            </a>
+            <a href="jlpt_exam_review.html?exam_id=1&mode=part"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition-colors">
+              Review
+            </a>
+          </div>
+        </td>
+      </tr>
+    
+
+      <tr class="hover:bg-slate-50/70 transition-colors">
+        <!-- Title & Mode -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-900 text-xs md:text-sm">JLPT N4 Foundation Practice Exam Test A</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold text-[10px] uppercase">Part Drill</span>
+              <span class="text-[11px] text-slate-500 font-medium truncate max-w-xs">Mondai 1: Lựa chọn ngữ pháp câu</span>
+            </div>
+          </div>
+        </td>
+
+        <!-- Level -->
+        <td class="py-4 px-3">
+          <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border-emerald-100 font-black text-xs border">N4</span>
+        </td>
+
+        <!-- Date -->
+        <td class="py-4 px-3 text-slate-500 font-medium">
+          Aug 24, 2026
+        </td>
+
+        <!-- Score & Accuracy -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-extrabold text-slate-900 text-xs md:text-sm">14 / 15 Qs</span>
+            <span class="text-[11px] text-slate-400 font-medium">93.3% accuracy (14 min)</span>
+          </div>
+        </td>
+
+        <!-- Result -->
+        <td class="py-4 px-3">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold text-[11px] border border-emerald-100">✓ Passed</span>
+        </td>
+
+        <!-- Action Buttons -->
+        <td class="py-4 px-3 text-right">
+          <div class="flex items-center justify-end gap-1.5">
+            <a href="jlpt_exam_result.html?exam_id=4&mode=part"
+              class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-[11px] shadow-2xs transition-all">
+              Result
+            </a>
+            <a href="jlpt_exam_review.html?exam_id=4&mode=part"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition-colors">
+              Review
+            </a>
+          </div>
+        </td>
+      </tr>
+    
+
+      <tr class="hover:bg-slate-50/70 transition-colors">
+        <!-- Title & Mode -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-bold text-slate-900 text-xs md:text-sm">JLPT N2 Official Mock Exam 2026</span>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-extrabold text-[10px] uppercase">Full Simulation</span>
+              
+            </div>
+          </div>
+        </td>
+
+        <!-- Level -->
+        <td class="py-4 px-3">
+          <span class="px-2.5 py-0.5 rounded-lg bg-purple-50 text-purple-700 border-purple-100 font-black text-xs border">N2</span>
+        </td>
+
+        <!-- Date -->
+        <td class="py-4 px-3 text-slate-500 font-medium">
+          Aug 18, 2026
+        </td>
+
+        <!-- Score & Accuracy -->
+        <td class="py-4 px-3">
+          <div class="flex flex-col">
+            <span class="font-extrabold text-slate-900 text-xs md:text-sm">78 / 180 pts</span>
+            <span class="text-[11px] text-slate-400 font-medium">43.3% accuracy (145 min)</span>
+          </div>
+        </td>
+
+        <!-- Result -->
+        <td class="py-4 px-3">
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 font-bold text-[11px] border border-rose-100">✕ Not Passed</span>
+        </td>
+
+        <!-- Action Buttons -->
+        <td class="py-4 px-3 text-right">
+          <div class="flex items-center justify-end gap-1.5">
+            <a href="jlpt_exam_result.html?exam_id=2&mode=full"
+              class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-[11px] shadow-2xs transition-all">
+              Result
+            </a>
+            <a href="jlpt_exam_review.html?exam_id=2&mode=full"
+              class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition-colors">
+              Review
+            </a>
+          </div>
+        </td>
+      </tr>
+    
+          </tbody>
+          </table>
+        </div>
+
+        <!-- Empty State Container -->
+        <div id="historyEmptyState" class="hidden py-16 text-center">
+          <div class="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 text-xl font-bold">
+            📜
+          </div>
+          <h3 class="text-sm font-bold text-slate-800">No examination attempts found</h3>
+          <p class="text-xs text-slate-400 mt-1">Take a practice exam to start recording your score history.</p>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT: HISTORY DATA & ENGINE          -->
+  <!-- ========================================== -->
+  
+</body>
+
+</html>
+
