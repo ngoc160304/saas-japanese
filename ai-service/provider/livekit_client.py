@@ -5,16 +5,18 @@ import uuid
 import time
 import numpy as np
 import torch
+import json
 from livekit import api, rtc
 from livekit.api import CreateRoomRequest
 from scipy.signal import resample_poly
 from silero_vad import get_speech_timestamps, load_silero_vad
 
 from config.enviroments import eviroment
-from provider.azure_tts import generate_tts_stream
+from provider.azure_tts import generate_tts_stream, generate_tts_to_file
 from util.generate_token_livekit import generate_token
 from provider.groq_stt import transcribe
 from provider.groq_llm import generate_response
+from service.speaking_score import compute_session_score
 import soundfile as sf
 from pathlib import Path
 
@@ -34,6 +36,8 @@ class SessionState:
     def __init__(self):
         self.is_bot_speaking = False
         self.bot_finished_at: float = 0.0
+        self.utterances = []
+        self.chat_history: list[dict] = []
 
 # AZURE TTS
 async def speak(text: str, audio_source: rtc.AudioSource, session: SessionState):
@@ -52,10 +56,10 @@ async def speak(text: str, audio_source: rtc.AudioSource, session: SessionState)
         asyncio.to_thread(generate_tts_stream, text, loop, async_queue)
     )
 
-    leftover = b""
-    frame_count = 0
-    stream_start = None
-    first_chunk_logged = False
+    leftover = b"" #giữ audio chưa đủ 1frame
+    frame_count = 0 #đếm số frame
+    stream_start = None #lưu thời điểm bắt đầu stream, để tính sleep_time
+    first_chunk_logged = False #đảm bảo chỉ nhận thời điểm chunk đầu tiên 1 lần
     was_cancelled = False   # <-- FIX 1: khởi tạo TRƯỚC try, luôn tồn tại dù rơi vào nhánh nào
 
     try:
@@ -63,16 +67,16 @@ async def speak(text: str, audio_source: rtc.AudioSource, session: SessionState)
             chunk = await async_queue.get()
             if chunk is None:
                 break
-
+            #xác định thời điểm audio bắt đầu
             if not first_chunk_logged:
                 stream_start = time.monotonic()
                 first_chunk_logged = True
 
             data = leftover + chunk
-            usable_len = (len(data) // BYTES_PER_FRAME) * BYTES_PER_FRAME
+            usable_len = (len(data) // BYTES_PER_FRAME) * BYTES_PER_FRAME #Lấy đủ 960byte
             leftover = data[usable_len:]
             pcm = np.frombuffer(data[:usable_len], dtype=np.int16)
-
+            # Gửi từng frame 20ms (480 sample) đến audio_source
             for i in range(0, len(pcm), FRAME_SIZE):
                 frame_chunk = pcm[i:i + FRAME_SIZE]
                 frame = rtc.AudioFrame(
@@ -81,7 +85,7 @@ async def speak(text: str, audio_source: rtc.AudioSource, session: SessionState)
                     num_channels=1,
                     samples_per_channel=FRAME_SIZE,
                 )
-                await audio_source.capture_frame(frame)
+                await audio_source.capture_frame(frame) #đẩy frame vào livekit
                 frame_count += 1
 
                 expected_time = stream_start + frame_count * 0.02
@@ -141,6 +145,8 @@ async def process_utterance(
     participant: rtc.RemoteParticipant,
     audio_source: rtc.AudioSource,
     session: SessionState,
+    room: rtc.Room,
+    topic: dict,
 ):  
     rms = np.sqrt(np.mean(sentence_audio ** 2))
     print(f"Utterance RMS energy: {rms:.5f}")
@@ -149,42 +155,38 @@ async def process_utterance(
         print(f"RMS quá thấp ({rms:.5f} < {MIN_RMS_ENERGY}) — bỏ qua, không gọi STT (nghi echo/nhiễu)")
         return
 
-    try:
-        start = time.perf_counter()
-        text = await asyncio.to_thread(transcribe, sentence_audio)
-        print(f"Groq STT: {time.perf_counter() - start:.2f}s")
-    except Exception:
-        logger.exception("Groq STT failed")
-        return
     """STT -> LLM -> TTS cho một câu nói đã cắt xong, mỗi bước có try/except riêng
     để biết chính xác provider nào lỗi (Groq STT, Groq LLM hay Azure TTS)."""
     try:
         start = time.perf_counter()
         # Đưa hàm transcribe() sang một thread khác để không chặn asyncio event loop.
-        debug_filename = DEBUG_AUDIO_DIR / f"utt_{time.time():.0f}.wav"
-        sf.write(debug_filename, sentence_audio, samplerate=16000)
-        print(f"🎙️ Saved debug audio: {debug_filename}")
-        rms = np.sqrt(np.mean(sentence_audio ** 2))
-        print(f"🔊 Utterance RMS energy: {rms:.5f}")
+        user_audio = DEBUG_AUDIO_DIR / f"utt_{time.time():.0f}.wav"
+        sf.write(user_audio, sentence_audio, samplerate=16000)
+
         text = await asyncio.to_thread(transcribe, sentence_audio)
         print(f"Groq STT: {time.perf_counter() - start:.2f}s")
     except Exception:
         logger.exception("Groq STT failed")
         return
-
+    
     if not text:
         return
-
+    
     print(f"[{participant.identity}] {text}")
-
+    
     try:
         start = time.perf_counter()
-        ai_reply = await asyncio.to_thread(generate_response, text)
+        ai_reply = await asyncio.to_thread(generate_response, text, topic, session.chat_history)
         print(f"Groq LLM: {time.perf_counter() - start:.2f}s")
         print(f"AI: {ai_reply}")
     except Exception:
         logger.exception("Groq LLM failed")
         return
+    session.chat_history.append({"role": "user", "content": text})
+    session.chat_history.append({"role": "assistant", "content": ai_reply})
+    session.utterances.append({"user_audio_path": str(user_audio), "text": text, "llm_text": ai_reply,})
+    conversation_data = {"type": "conversation", "user": text, "ai": ai_reply}
+    await room.local_participant.publish_data(json.dumps(conversation_data).encode("utf-8"), reliable=True)
 
     try:
         start = time.perf_counter()
@@ -194,7 +196,7 @@ async def process_utterance(
         logger.exception("Azure TTS failed")
 
 
-async def start_livekit(room_name: str):
+async def start_livekit(room_name: str, topic: dict):
     room = rtc.Room()
     session = SessionState()  # thay cho is_bot_speaking global
     background_tasks: set[asyncio.Task] = set()
@@ -290,7 +292,7 @@ async def start_livekit(room_name: str):
                     if len(sentence_audio) / TARGET_SAMPLE_RATE < MIN_SPEECH_DURATION_SEC:
                         continue
                     # Xử lý câu nói đã cắt xong: STT -> LLM -> TTS
-                    await process_utterance(sentence_audio, participant, audio_source, session)
+                    await process_utterance(sentence_audio, participant, audio_source, session, room, topic)
                     raw_48k_buffer = np.array([], dtype=np.float32)
                     # dừng hệ thống 
                     await asyncio.sleep(0.2)
@@ -319,6 +321,7 @@ async def start_livekit(room_name: str):
         )
         _track_task(task,f"receive_audio_frames-{participant.identity}")
 
+
     @room.on("disconnected")
     def on_disconnected():
         logger.info("Python Client disconnected from room")
@@ -339,20 +342,25 @@ async def start_livekit(room_name: str):
             task.cancel()
         if background_tasks:
             await asyncio.gather(*background_tasks, return_exceptions=True)
+
+        session_result = await compute_session_score(session)
+        logger.info(f"Session score: {session_result}")
         await room.disconnect()
+
+    return session_result
 
 _room_tasks: dict[str, asyncio.Task] = {}
 
-def launch_bot_for_room(room_name: str) -> asyncio.Task:
+def launch_bot_for_room(room_name: str, topic: dict) -> asyncio.Task:
     """Tạo (hoặc tái sử dụng) task start_livekit cho 1 room, tránh bị GC và tránh trùng bot."""
     existing = _room_tasks.get(room_name)
     if existing and not existing.done():
         logger.info(f"Bot already running for room {room_name}, skip creating new one")
         return existing
 
-    task = asyncio.create_task(start_livekit(room_name))
+    task = asyncio.create_task(start_livekit(room_name, topic))
     _room_tasks[room_name] = task
-
+    print("selected topic", topic)
     def _on_done(t: asyncio.Task):
         # log lỗi thật nếu task chết bất thường, thay vì để nó âm thầm biến mất
         if not t.cancelled() and t.exception() is not None:

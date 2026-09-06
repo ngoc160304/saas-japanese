@@ -1,0 +1,3 @@
+[submodule "ai-service/onsei"]
+	path = ai-service/onsei
+	url = https://github.com/itsupera/onsei.git
