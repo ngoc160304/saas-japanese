@@ -71,7 +71,7 @@ const Speaking = () => {
       setResult(null);
     }
   };
-  
+
   const handleStartSpeaking = async (topic: Topic) => {
     setSelectedTopic(topic);
     setMessages([]);
@@ -183,22 +183,41 @@ const SessionLiveKit = ({
             const text = new TextDecoder().decode(payload);
             console.log('Received data:', text);
             const data = JSON.parse(text);
-            if (data.type !== 'conversation') {
-              return;
+            if (data.type === 'user_message') {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: `${Date.now()}-user`,
+                  role: 'user',
+                  message: data.text,
+                },
+                {
+                  id: `${Date.now()}-ai`,
+                  role: 'ai',
+                  message: '...',
+                },
+              ]);
             }
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: `${Date.now()}-user`,
-                role: 'user',
-                message: data.user,
-              },
-              {
-                id: `${Date.now()}-ai`,
-                role: 'ai',
-                message: data.ai,
-              },
-            ]);
+
+            if (data.type === 'ai_message') {
+              setMessages((prev) => {
+                const messages = [...prev];
+
+                // tìm message AI cuối cùng đang là "..."
+                const index = messages.findLastIndex(
+                  (message) => message.role === 'ai' && message.message === '...',
+                );
+
+                if (index !== -1) {
+                  messages[index] = {
+                    ...messages[index],
+                    message: data.text,
+                  };
+                }
+
+                return messages;
+              });
+            }
           } catch (error) {
             console.error('Failed to parse conversation data:', error);
           }
