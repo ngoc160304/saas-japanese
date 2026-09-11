@@ -36,8 +36,7 @@ export default function SpeakingLayout({ children }: SpeakingLayoutProps) {
             border
             border-[#E2E8F0]
             bg-white
-            p-4
-            md:p-6
+            p-0
           "
         >
           {children}

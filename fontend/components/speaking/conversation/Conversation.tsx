@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import MessageBubble from './MessageBubble';
 import SpeakingWaveform from './SpeakingWaveform';
 import SpeakingControls from './SpeakingControls';
-
+import { Bot } from 'lucide-react';
 interface ConversationProps {
   trackRef: any;
   messages: {
@@ -37,13 +37,12 @@ export default function Conversation({ trackRef, messages, onEnd }: Conversation
   }, [messages, shouldReduceMotion]);
 
   return (
-    <div className="flex h-full w-full flex-col p-6">
+    <div className="flex h-full w-full flex-col p-0">
       {/* Header */}
-      <div className="border-b border-slate-100 pb-4">
-        <h3 className="text-xl font-bold text-slate-900">Luyện nói tiếng Nhật cùng AI</h3>
-        <p className="mt-0.5 text-sm font-medium text-slate-500">
-          Trò chuyện trực tiếp bằng giọng nói realtime
-        </p>
+      <div className="flex justify-center border-b border-slate-100 py-4">
+        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-blue-50 text-[#2B4C7E] ring-4 ring-blue-50/50">
+          <Bot className="h-8 w-8" strokeWidth={1.8} />
+        </div>
       </div>
 
       {/* Messages Container (Tự động phình to h-full để chiếm hết khoảng trống) */}
@@ -71,7 +70,7 @@ export default function Conversation({ trackRef, messages, onEnd }: Conversation
       </div>
 
       {/* Bottom Area (Sóng âm + Nút bấm ghim chặt xuống đáy) */}
-      <div className="mt-auto border-t border-slate-100 pt-4 flex flex-col items-center gap-3">
+      <div className="mt-auto border-t border-slate-100 py-6 flex flex-col items-center gap-4">
         <SpeakingWaveform trackRef={trackRef} />
         <SpeakingControls onEnd={onEnd} />
       </div>
