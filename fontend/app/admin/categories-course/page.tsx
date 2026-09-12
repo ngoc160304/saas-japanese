@@ -3,12 +3,15 @@
 import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
 import { GetCoursesResponse } from '@/apis/categories-course/categories-course.type';
 import { CreateButton } from '@/components/common/CreateButton';
+import { DataTableToolbar } from '@/components/common/table/DataTableToolbar';
+import { DataTableFilter } from '@/components/common/table/search-bar/DataTableFilters';
 import Card from '@/components/dashboard/card/Card';
 import FilterBar from '@/components/dashboard/search-bar/FilterBar';
 import StatCard from '@/components/dashboard/stat-card/StatCard';
 import { IStatCardProp } from '@/components/dashboard/stat-card/StatCardItem';
-import Header from '@/components/layout/header/Header';
-import PageSection from '@/components/layout/page-section/PageSection';
+import Header from '@/components/layout/management/header/Header';
+import PageSection from '@/components/layout/management/page-section/PageSection';
+import { CourseCategoriesTable } from '@/features/category-course/component/CategoryCourseTable';
 import React from 'react';
 
 const STATCARD_ITEMS: IStatCardProp[] = [
@@ -34,12 +37,15 @@ const STATCARD_ITEMS: IStatCardProp[] = [
 const CategoriesCoursePage = () => {
   const [categories, setCategories] = React.useState<GetCoursesResponse | null>(null);
 
-  React.useEffect(() => {
+  const reloadCategories = () => {
     categoryCourseAPI.getCategoriesCourse().then((data) => {
       setCategories(data);
     });
+  };
+
+  React.useEffect(() => {
+    reloadCategories();
   }, []);
-  const [textSearch, setTextSearch] = React.useState<string | null>(null);
 
   return (
     <>
@@ -50,19 +56,45 @@ const CategoriesCoursePage = () => {
       />
       <StatCard statCardItem={STATCARD_ITEMS} />
       <PageSection>
-        <FilterBar />
-        {categories && (
-          <Card
-            cardItems={categories.data.content.map((item) => {
-              return {
-                description: item.description,
-                title: item.name,
-                courseStats: `${item.courseCount} Courses`,
-                thumbnail: item.mediaUrl,
-              };
-            })}
-          />
-        )}
+        <div className="space-y-6">
+          <DataTableToolbar
+            // searchValue={search}
+            // onSearchChange={setSearch}
+            searchPlaceholder="Search course..."
+            // onReset={handleReset}
+          >
+            <DataTableFilter
+              // value={status}
+              // onChange={(value) => setStatus(value as 'ALL' | CourseStatus)}
+              options={[
+                {
+                  label: 'All Status',
+                  value: 'ALL',
+                },
+                {
+                  label: 'Published',
+                  value: 'published',
+                },
+                {
+                  label: 'Draft',
+                  value: 'draft',
+                },
+              ]}
+            />
+          </DataTableToolbar>
+
+          {categories && (
+            <CourseCategoriesTable
+              courseCategories={categories.data.content}
+              canEdit
+              canDelete
+              onDelete={(id) => {
+                console.log('delete course:', id);
+              }}
+              onReload={reloadCategories}
+            />
+          )}
+        </div>
       </PageSection>
     </>
   );

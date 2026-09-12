@@ -12,6 +12,16 @@ const getCategoriesCourse = async () => {
     throw error;
   }
 };
+const deleteCategortByid = async (id: string) => {
+  try {
+    const response = await authorizeAxiosIntance.delete(`${API_URL}/course-categories/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories course:', error);
+    throw error;
+  }
+};
 export const categoryCourseAPI = {
   getCategoriesCourse,
+  deleteCategortByid,
 };

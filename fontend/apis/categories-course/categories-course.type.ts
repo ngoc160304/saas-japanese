@@ -1,7 +1,7 @@
 import { ApiResponse } from '@/types/api';
 import { PageResponse } from '@/types/pagination';
 
-export interface Course {
+export interface CourseCategory {
   id: number;
   name: string;
   slug: string;
@@ -13,4 +13,4 @@ export interface Course {
   updatedAt: string;
 }
 
-export type GetCoursesResponse = ApiResponse<PageResponse<Course>>;
+export type GetCoursesResponse = ApiResponse<PageResponse<CourseCategory>>;
