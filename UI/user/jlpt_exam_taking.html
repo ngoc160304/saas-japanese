@@ -1,394 +1,436 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" class="h-full bg-[#f8fafc]">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>JLPT Exam Session — StudyJLPT</title>
-  <meta name="description"
-    content="Continuous scrolling JLPT exam testing interface with session navigation, live timer, and question sheet." />
-
-  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind CSS v4 CDN -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 
   <style type="text/tailwindcss">
     @theme {
       --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif;
       --color-brand: #0284c7;
-      --color-brand-dark: #0f172a;
       --color-navy: #2B4C7E;
     }
-
+    
     body {
       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
       background-color: #f8fafc;
       color: #0f172a;
-      -webkit-font-smoothing: antialiased;
     }
 
-    /* Custom Slim Scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Custom CSS for states */
+    .question-number {
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      color: #334155;
     }
-    ::-webkit-scrollbar-track {
-      background: transparent;
+    .question-number.current {
+      border-color: #0284c7;
+      background-color: #f0f9ff;
+      color: #0284c7;
+      box-shadow: 0 0 0 1px #0284c7;
     }
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 9999px;
+    .question-number.answered {
+      background-color: #e2e8f0;
+      color: #64748b;
     }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
+    .question-number.flagged {
+      border-color: #f59e0b;
+      background-color: #fef3c7;
+      color: #d97706;
     }
 
-    .shadow-soft {
-      box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02);
+    .answer-option {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background-color: #ffffff;
+      cursor: pointer;
+      margin-bottom: 8px;
     }
-
-    .modal-backdrop {
-      background-color: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(6px);
-    }
-
-    /* Question Radio Option States */
-    .option-item:hover {
+    .answer-option:hover {
       border-color: #38bdf8;
       background-color: #f0f9ff;
     }
-    .option-item.selected {
-      border-color: #0284c7;
-      background-color: #f0f9ff;
-      box-shadow: 0 0 0 1px #0284c7;
-    }
-    .option-item.selected .radio-circle {
-      border-color: #0284c7;
-      background-color: #0284c7;
-    }
-    .option-item.selected .radio-dot {
-      display: block;
+    .answer-option input[type="radio"] {
+      margin-right: 12px;
+      width: 16px;
+      height: 16px;
+      accent-color: #0284c7;
     }
   </style>
-  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
 </head>
 
-<body class="min-h-screen antialiased text-slate-800 bg-[#f8fafc] flex flex-col">
+<body class="min-h-screen antialiased flex flex-col h-screen overflow-hidden">
 
-  <!-- ========================================================================= -->
-  <!-- 1. STICKY TOP BAR (Exact Image 2 Reference)                               -->
-  <!-- ========================================================================= -->
-  <header class="bg-white border-b border-slate-200/90 sticky top-0 z-40 px-4 lg:px-6 py-2.5 shadow-xs shrink-0 flex items-center justify-between gap-4">
-    
-    <!-- Left: Hamburger Toggle + Exam Title -->
-    <div class="flex items-center gap-3 min-w-0">
-      <button id="sidebarToggleBtn" onclick="toggleSidebar()" class="p-1.5 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors" title="Toggle Sidebar">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-        </svg>
-      </button>
-
-      <div class="flex items-center gap-2 min-w-0">
-        <h1 id="topExamTitle" class="text-xs md:text-sm font-bold text-slate-900 truncate uppercase tracking-wide">
-          JLPT N5 KOREAN PRACTICE TEST 1 – 2026
-        </h1>
-        <span id="topModeBadge" class="hidden sm:inline-block px-2.5 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold text-xs uppercase border border-indigo-100">Individual Session</span>
-      </div>
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 px-6 py-3 shadow-sm shrink-0 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <h1 class="text-sm font-bold text-slate-900 tracking-wide uppercase">JLPT N5 PRACTICE EXAM</h1>
     </div>
-
-    <!-- Right: Countdown Timer + Exit Button -->
-    <div class="flex items-center gap-3 shrink-0">
-      
-      <!-- Timer Pill (Image 2 Reference: ⏱ 00:19:59) -->
-      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-mono text-xs md:text-sm font-extrabold shadow-2xs">
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-mono text-sm font-extrabold shadow-sm">
         <span>⏱</span>
-        <span id="countdownTimerDisplay">00:19:59</span>
+        <span>00:19:59</span>
       </div>
-
-      <!-- Exit Button -->
-      <button type="button" onclick="confirmExitExam()" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Leave Exam">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-      </button>
-
+      <a href="#" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 font-medium text-sm">Exit</a>
     </div>
-
   </header>
 
-  <!-- ========================================================================= -->
-  <!-- 2. MAIN LAYOUT: LEFT SIDEBAR + CONTINUOUS QUESTION SHEET WORKSPACE        -->
-  <!-- ========================================================================= -->
+  <!-- Layout: Sidebar + Main Content -->
   <div class="flex-1 flex overflow-hidden">
     
-    <!-- ======================================================================= -->
-    <!-- LEFT SIDEBAR: SESSION LIST & MONDAI QUESTION NAVIGATOR (Image 2)        -->
-    <!-- ======================================================================= -->
-    <aside id="examNavSidebar"
-      class="w-72 md:w-80 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-300 z-30 fixed lg:static inset-y-0 left-0 top-[49px] bottom-0 -translate-x-full lg:translate-x-0 shadow-sm overflow-y-auto">
-      
-      <div class="p-4 space-y-4">
+    <!-- Left Sidebar -->
+    <aside class="w-80 bg-white border-r border-slate-200 flex flex-col shrink-0 relative shadow-sm">
+      <div class="p-5 flex-1 overflow-y-auto space-y-6">
         
-        <!-- Sessions & Mondai Tree -->
-        <div id="sidebarSessionsContainer" class="space-y-4">
+        <!-- Session 1 -->
+        <div>
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100 mb-3 text-sky-600 font-extrabold text-sm">
+            <span>言語知識（文字・語彙）</span>
+            <span class="text-xs font-mono text-slate-400 bg-slate-50 px-2 py-1 rounded-md">20min</span>
+          </div>
 
-          <div>
-            <!-- Active Session Header -->
-            <div class="flex items-center justify-between py-2 text-sky-600 font-extrabold text-xs">
-              <span>言語知識（文字・語彙）</span>
-              <span class="text-[11px] font-mono text-slate-400">20min</span>
-            </div>
-
-            <!-- Mondai Groups List -->
-            <div class="space-y-3 mt-2 pl-1">
-              
-                <div>
-                  <div class="text-[11px] text-slate-500 font-bold mb-1.5">もんだい 1: Kanji Reading</div>
-                  <div class="grid grid-cols-6 gap-1.5">
-                    
-                        <button type="button" onclick="scrollToQuestion(1)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          1
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(2)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          2
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(3)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          3
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(4)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          4
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(5)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          5
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(6)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          6
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(7)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          7
-                        </button>
-                      
-                  </div>
-                </div>
-              
-                <div>
-                  <div class="text-[11px] text-slate-500 font-bold mb-1.5">もんだい 2: Orthography</div>
-                  <div class="grid grid-cols-6 gap-1.5">
-                    
-                        <button type="button" onclick="scrollToQuestion(8)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          8
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(9)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          9
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(10)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          10
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(11)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          11
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(12)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          12
-                        </button>
-                      
-                  </div>
-                </div>
-              
-                <div>
-                  <div class="text-[11px] text-slate-500 font-bold mb-1.5">もんだい 3: Contextually-defined Expressions</div>
-                  <div class="grid grid-cols-6 gap-1.5">
-                    
-                        <button type="button" onclick="scrollToQuestion(13)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          13
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(14)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          14
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(15)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          15
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(16)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          16
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(17)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          17
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(18)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          18
-                        </button>
-                      
-                  </div>
-                </div>
-              
-                <div>
-                  <div class="text-[11px] text-slate-500 font-bold mb-1.5">もんだい 4: Paraphrases</div>
-                  <div class="grid grid-cols-6 gap-1.5">
-                    
-                        <button type="button" onclick="scrollToQuestion(19)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          19
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(20)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          20
-                        </button>
-                      
-                        <button type="button" onclick="scrollToQuestion(21)"
-                          class="h-7 rounded-lg border text-xs font-bold transition-all flex items-center justify-center bg-white border-slate-200 text-slate-700 hover:border-sky-400">
-                          21
-                        </button>
-                      
-                  </div>
-                </div>
-              
+          <!-- Mondai 1 -->
+          <div class="mb-4">
+            <div class="text-xs text-slate-500 font-bold mb-2">もんだい 1・Kanji Reading</div>
+            <div class="grid grid-cols-6 gap-2">
+              <div class="question-number current">1</div>
+              <div class="question-number answered">2</div>
+              <div class="question-number answered">3</div>
+              <div class="question-number">4</div>
+              <div class="question-number flagged">5</div>
+              <div class="question-number">6</div>
+              <div class="question-number">7</div>
             </div>
           </div>
+
+          <!-- Mondai 2 -->
+          <div class="mb-4">
+            <div class="text-xs text-slate-500 font-bold mb-2">もんだい 2・Orthography</div>
+            <div class="grid grid-cols-6 gap-2">
+              <div class="question-number">8</div>
+              <div class="question-number">9</div>
+              <div class="question-number">10</div>
+              <div class="question-number">11</div>
+              <div class="question-number">12</div>
+            </div>
+          </div>
+          
+          <!-- Mondai 3 -->
+          <div class="mb-4">
+            <div class="text-xs text-slate-500 font-bold mb-2">もんだい 3・Contextually-defined Expressions</div>
+            <div class="grid grid-cols-6 gap-2">
+              <div class="question-number">13</div>
+              <div class="question-number">14</div>
+              <div class="question-number">15</div>
+              <div class="question-number">16</div>
+              <div class="question-number">17</div>
+              <div class="question-number">18</div>
+            </div>
+          </div>
+
+          <!-- Mondai 4 -->
+          <div class="mb-4">
+            <div class="text-xs text-slate-500 font-bold mb-2">もんだい 4・Paraphrases</div>
+            <div class="grid grid-cols-6 gap-2">
+              <div class="question-number">19</div>
+              <div class="question-number">20</div>
+              <div class="question-number">21</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Break -->
+        <div class="flex items-center justify-between py-3 px-3 rounded-xl bg-slate-50 border border-slate-100">
+            <span class="text-sm font-bold text-slate-500">Break ☕</span>
+            <span class="text-xs font-mono text-slate-400">5min</span>
+        </div>
+
+        <!-- Session 2 (Upcoming) -->
+        <div class="opacity-60">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-slate-500 font-extrabold text-sm">
+            <span>言語知識（文法）・読解</span>
+            <span class="text-xs font-mono text-slate-400">40min</span>
+          </div>
+        </div>
         
+        <!-- Break -->
+        <div class="flex items-center justify-between py-3 px-3 rounded-xl bg-slate-50 border border-slate-100 opacity-60">
+            <span class="text-sm font-bold text-slate-500">Break ☕</span>
+            <span class="text-xs font-mono text-slate-400">5min</span>
+        </div>
+
+        <!-- Session 3 (Upcoming) -->
+        <div class="opacity-60 pb-8">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-slate-500 font-extrabold text-sm">
+            <span>ちょうかい</span>
+            <span class="text-xs font-mono text-slate-400">30min</span>
+          </div>
         </div>
 
       </div>
 
-      <!-- Bottom Sticky Submit Button (Submit Exam / Submit Section) -->
-      <div class="p-4 border-t border-slate-200 bg-white sticky bottom-0">
-        <button type="button" id="sidebarSubmitBtn" onclick="openSubmitModal()"
-          class="w-full py-2.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs shadow-2xs transition-all flex items-center justify-center">
+      <!-- Submit Section Button -->
+      <div class="p-4 border-t border-slate-200 bg-white shadow-sm mt-auto">
+        <div class="w-full py-3 rounded-xl bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-800 font-bold text-sm text-center cursor-pointer transition-colors">
           Submit Section
-        </button>
+        </div>
       </div>
-
     </aside>
 
-    <!-- Mobile Backdrop for Sidebar -->
-    <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 z-20 bg-slate-900/40 backdrop-blur-2xs hidden lg:hidden"></div>
+    <!-- Main Question Content -->
+    <main class="flex-1 overflow-y-auto bg-[#f8fafc] p-8 pb-32">
+      <div class="max-w-3xl mx-auto space-y-8">
+        
+        <!-- Section Title -->
+        <div>
+          <h2 class="text-2xl font-extrabold text-slate-900 mb-4">言語知識（文字・語彙）</h2>
+          
+          <!-- Instruction Card -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-2">もんだい 1</h3>
+            <p class="text-slate-600 leading-relaxed">＿＿＿の ことばは ひらがなで どう かきますか。<br>1・2・3・4 から いちばん いいものを ひとつ えらんで ください。</p>
+          </div>
+        </div>
 
-    <!-- ======================================================================= -->
-    <!-- MAIN CONTENT: CONTINUOUS VERTICAL QUESTION SHEET (Image 2 Reference)   -->
-    <!-- ======================================================================= -->
-    <main id="mainQuestionArea" class="flex-1 overflow-y-auto p-4 md:p-8 max-w-4xl mx-auto w-full space-y-6">
-      
-      <!-- Session Header Block (Top of Sheet) -->
-      <div class="pb-2">
-        <h2 id="sheetSessionTitle" class="text-xl md:text-2xl font-extrabold text-slate-900 tracking-tight">
-          言語知識（文字・語彙）
-        </h2>
+        <!-- Questions List -->
+        
+        <!-- Question 1 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">1</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">およいで <span class="underline underline-offset-4 decoration-2">川</span>を わたりました。</p>
+            </div>
+            <div class="text-slate-300 hover:text-amber-500 cursor-pointer" title="Flag for review">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-1">
+              <span class="font-medium text-slate-700">1. はし</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-1" checked>
+              <span class="font-medium text-slate-700">2. かわ</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-1">
+              <span class="font-medium text-slate-700">3. そら</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-1">
+              <span class="font-medium text-slate-700">4. みち</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">2</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">きのうは <span class="underline underline-offset-4 decoration-2">雨</span>が ふりました。</p>
+            </div>
+            <div class="text-slate-300 hover:text-amber-500 cursor-pointer">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-2">
+              <span class="font-medium text-slate-700">1. ゆき</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-2">
+              <span class="font-medium text-slate-700">2. かぜ</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-2" checked>
+              <span class="font-medium text-slate-700">3. あめ</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-2">
+              <span class="font-medium text-slate-700">4. くも</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">3</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">わたしの <span class="underline underline-offset-4 decoration-2">先生</span>は やさしいです。</p>
+            </div>
+            <div class="text-slate-300 hover:text-amber-500 cursor-pointer">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-3" checked>
+              <span class="font-medium text-slate-700">1. せんせい</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-3">
+              <span class="font-medium text-slate-700">2. がくせい</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-3">
+              <span class="font-medium text-slate-700">3. ともだち</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-3">
+              <span class="font-medium text-slate-700">4. いしゃ</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Instruction Card Mondai 2 -->
+        <div class="mt-12">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-2">もんだい 2</h3>
+            <p class="text-slate-600 leading-relaxed">＿＿＿の ことばは どう かきますか。<br>1・2・3・4 から いちばん いいものを ひとつ えらんで ください。</p>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">4</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">えきまで <span class="underline underline-offset-4 decoration-2">あるいて</span> いきます。</p>
+            </div>
+            <div class="text-amber-500 cursor-pointer">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-4">
+              <span class="font-medium text-slate-700">1. 歩いて</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-4">
+              <span class="font-medium text-slate-700">2. 走って</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-4">
+              <span class="font-medium text-slate-700">3. 乗って</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-4">
+              <span class="font-medium text-slate-700">4. 飛んで</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">5</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">あたらしい <span class="underline underline-offset-4 decoration-2">くるま</span>を かいました。</p>
+            </div>
+            <div class="text-slate-300 hover:text-amber-500 cursor-pointer">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-5">
+              <span class="font-medium text-slate-700">1. 傘</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-5">
+              <span class="font-medium text-slate-700">2. 本</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-5">
+              <span class="font-medium text-slate-700">3. 靴</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-5">
+              <span class="font-medium text-slate-700">4. 車</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- SECOND SECTION -->
+        <div class="pt-8">
+          <h2 class="text-2xl font-extrabold text-slate-900 mb-4">言語知識（文法）・読解</h2>
+          
+          <!-- Instruction Card -->
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-800 mb-2">もんだい 1</h3>
+            <p class="text-slate-600 leading-relaxed">（　　　）に なにを いれますか。<br>1・2・3・4 から いちばん いいものを ひとつ えらんで ください。</p>
+          </div>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm relative">
+          <div class="flex justify-between items-start mb-6">
+            <div class="flex gap-4">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-bold text-slate-700">6</span>
+              <p class="text-lg text-slate-800 font-medium pt-0.5">わたしは 日本（　　　） いきます。</p>
+            </div>
+            <div class="text-slate-300 hover:text-amber-500 cursor-pointer">
+              <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z" clip-rule="evenodd"></path></svg>
+            </div>
+          </div>
+          
+          <div class="space-y-3 pl-12">
+            <label class="answer-option">
+              <input type="radio" name="question-6">
+              <span class="font-medium text-slate-700">1. を</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-6">
+              <span class="font-medium text-slate-700">2. が</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-6">
+              <span class="font-medium text-slate-700">3. へ</span>
+            </label>
+            <label class="answer-option">
+              <input type="radio" name="question-6">
+              <span class="font-medium text-slate-700">4. で</span>
+            </label>
+          </div>
+        </div>
+
       </div>
-
-      <!-- Continuous Question Cards Container -->
-      <div id="continuousQuestionsContainer" class="space-y-6">
-        <!-- Rendered dynamically via renderQuestionSheet() -->
-      </div>
-
-      <!-- Bottom Spacer & Submit Section Card -->
-      <div class="p-6 rounded-3xl bg-white border border-slate-200 shadow-soft text-center space-y-3 mt-8">
-        <h3 class="text-sm font-bold text-slate-800">You have reached the end of this session</h3>
-        <p class="text-xs text-slate-400">Review your answered and flagged questions before submitting.</p>
-        <button type="button" onclick="openSubmitModal()"
-          class="px-6 py-2.5 rounded-2xl bg-slate-900 hover:bg-emerald-600 text-white font-extrabold text-xs shadow-xs transition-all">
-          <span id="bottomSubmitBtnText">Submit Section</span>
-        </button>
-      </div>
-
     </main>
 
   </div>
-
-  <!-- ========================================================================= -->
-  <!-- 3. IN-PAGE SUBMIT CONFIRMATION MODAL                                      -->
-  <!-- ========================================================================= -->
-  <div id="submitModal" class="fixed inset-0 z-50 modal-backdrop hidden items-center justify-center p-4">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 md:p-7 shadow-2xl border border-slate-100 text-center">
-      
-      <div class="w-14 h-14 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
-        🏁
-      </div>
-
-      <h3 class="text-lg font-extrabold text-slate-900 mb-1" id="submitModalTitle">Submit Section?</h3>
-      <p class="text-xs text-slate-500 mb-5 leading-relaxed" id="submitModalSubtitle">
-        Are you ready to submit your answers and complete this examination session?
-      </p>
-
-      <!-- Counters Summary Box -->
-      <div class="grid grid-cols-3 gap-2 mb-5 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center">
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Answered</span>
-          <span id="modalAnsweredCount" class="text-base font-extrabold text-slate-900">0</span>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Unanswered</span>
-          <span id="modalUnansweredCount" class="text-base font-extrabold text-rose-600">0</span>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Flagged 🚩</span>
-          <span id="modalFlaggedCount" class="text-base font-extrabold text-amber-600">0</span>
-        </div>
-      </div>
-
-      <!-- Warning Banner if Unanswered Remaining -->
-      <div id="modalWarningBanner" class="hidden mb-5 p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold text-left flex items-start gap-2">
-        <span>⚠️</span>
-        <span>You still have unanswered questions. Once submitted, answers cannot be modified.</span>
-      </div>
-
-      <!-- Modal Actions -->
-      <div class="flex items-center gap-3">
-        <button type="button" onclick="closeSubmitModal()"
-          class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors">
-          Continue Exam
-        </button>
-        <button type="button" onclick="confirmAndSubmit()"
-          class="flex-1 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-emerald-600 text-white text-xs font-bold shadow-xs transition-colors">
-          Confirm & Submit
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ========================================================================= -->
-  <!-- JAVASCRIPT: SESSION-BASED CONTINUOUS TESTING ENGINE                       -->
-  <!-- ========================================================================= -->
-  
 </body>
-
 </html>
-
