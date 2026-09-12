@@ -9,7 +9,7 @@ const StatCard = (props: IProp) => {
   return (
     <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {statCardItem.map((item, index) => (
-        <StatCardItem key={index} quantity={item.quantity} />
+        <StatCardItem key={index} quantity={item.quantity} staus={item.staus} title={item.title} />
       ))}
     </section>
   );

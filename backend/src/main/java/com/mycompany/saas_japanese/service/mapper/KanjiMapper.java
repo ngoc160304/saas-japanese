@@ -1,9 +1,12 @@
 package com.mycompany.saas_japanese.service.mapper;
 
+import org.springframework.stereotype.Component;
+
 import com.mycompany.saas_japanese.domain.Kanji;
 import com.mycompany.saas_japanese.domain.request.ReqKanji;
 import com.mycompany.saas_japanese.domain.response.KanjiResponse;
 
+@Component
 public class KanjiMapper {
 
   private KanjiMapper() {

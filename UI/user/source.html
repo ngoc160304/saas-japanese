@@ -218,7 +218,8 @@
               Learning Courses
             </h1>
             <p class="text-slate-500 font-medium text-sm mt-0.5">
-              Discover Japanese learning Courses from N5 to N1 — structured lessons, vocabulary, grammar, kanji and quizzes.
+              Discover Japanese learning Courses from N5 to N1 — structured lessons, vocabulary, grammar, kanji and
+              quizzes.
             </p>
           </div>
         </header>
@@ -228,37 +229,47 @@
           <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
             <p class="text-xs font-semibold text-slate-400">Total Courses</p>
             <p id="statTotalSources" class="text-2xl lg:text-3xl font-extrabold text-slate-900 mt-1">6</p>
-            <span class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">Available to Browse</span>
+            <span
+              class="inline-block text-[10px] font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded-full mt-2">Available
+              to Browse</span>
           </div>
 
           <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
             <p class="text-xs font-semibold text-slate-400">Free Courses</p>
             <p id="statFreeSources" class="text-2xl lg:text-3xl font-extrabold text-emerald-600 mt-1">1</p>
-            <span class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-2">Open Access</span>
+            <span
+              class="inline-block text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-2">Open
+              Access</span>
           </div>
 
           <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
             <p class="text-xs font-semibold text-slate-400">Total Lessons</p>
             <p id="statTotalLessons" class="text-2xl lg:text-3xl font-extrabold text-indigo-600 mt-1">89</p>
-            <span class="inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full mt-2">2-Level Hierarchy</span>
+            <span
+              class="inline-block text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full mt-2">2-Level
+              Hierarchy</span>
           </div>
 
           <div class="bg-white rounded-3xl p-5 border border-slate-100 shadow-soft shadow-hover">
             <p class="text-xs font-semibold text-slate-400">Learning Levels</p>
             <p class="text-2xl lg:text-3xl font-extrabold text-amber-600 mt-1">N5–N1</p>
-            <span class="inline-block text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-2">All JLPT Levels</span>
+            <span
+              class="inline-block text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full mt-2">All
+              JLPT Levels</span>
           </div>
         </section>
 
         <!-- Source Card Gallery -->
         <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
           <!-- Controls Bar -->
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
             <!-- Search Input -->
             <div class="relative flex-1 max-w-md">
               <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                  </path>
                 </svg>
               </div>
               <input type="text" id="sourceSearchInput" placeholder="Search learning sources by title or level..."
@@ -291,7 +302,8 @@
                 title="Reset Filters">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                  </path>
                 </svg>
                 <span>Reset</span>
               </button>
@@ -301,334 +313,372 @@
           <!-- Cards Grid -->
           <div id="sourcesCardGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
 
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-sky-600 text-white">
-              N3
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="text-xs font-bold text-slate-800">499.000 đ</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Tiếng Nhật Trung Cấp N3 Soumatome"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-sky-600 text-white">
+                    N3
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span class="text-xs font-bold text-slate-800">499.000 đ</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Tiếng Nhật Trung Cấp N3 Soumatome"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Tiếng Nhật Trung Cấp N3 Soumatome
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 97</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=1"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
+
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-slate-900 text-white">
+                    N2
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span class="text-xs font-bold text-slate-800">699.000 đ</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Luyện Đề Thi Thử Toàn Diện N2 Master"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Luyện Đề Thi Thử Toàn Diện N2 Master
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Ngân hàng 20 bộ đề thi thử sát cấu trúc đề thi chính thức kèm giải thích.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 104</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=2"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
+
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-emerald-500 text-white">
+                    N4
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span class="text-xs font-bold text-slate-800">350.000 đ</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Kanji & Từ Vựng Cấp Tốc N4"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Kanji & Từ Vựng Cấp Tốc N4
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Chinh phục 300 chữ Hán và 1500 từ vựng cốt lõi N4 bằng phương pháp ghi nhớ hình ảnh.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 111</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=3"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
+
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-amber-500 text-white">
+                    N5
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span
+                      class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Free</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Tiếng Nhật Sơ Cấp Minna No Nihongo N5"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Tiếng Nhật Sơ Cấp Minna No Nihongo N5
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Khóa học nhập môn từ bảng chữ cái Hiragana/Katakana đến 25 bài Minna No Nihongo.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 118</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=4"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
+
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-sky-600 text-white">
+                    N3
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span class="text-xs font-bold text-slate-800">420.000 đ</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Luyện Giao Tiếp & Shadowing N3"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Luyện Giao Tiếp & Shadowing N3
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Phương pháp Shadowing cải thiện phản xạ và phát âm chuẩn giọng Tokyo.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 125</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=5"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
+
+            <div
+              class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+
+              <div>
+                <!-- Card Top: Thumbnail + Level Badge + Price -->
+                <div
+                  class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
+                  <span
+                    class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-indigo-600 text-white">
+                    N1
+                  </span>
+                  <span class="absolute top-2.5 right-2.5">
+                    <span class="text-xs font-bold text-slate-800">850.000 đ</span>
+                  </span>
+                  <img src="../assets/images/book_3d.jpg" alt="Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp"
+                    class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
+                </div>
+
+                <!-- Course Title -->
+                <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
+                  Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp
+                </h3>
+
+                <!-- Course Description -->
+                <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
+                  Phân tích cấu trúc bài đọc dài, bình luận xã hội và ngữ pháp hiếm gặp N1.
+                </p>
+
+                <!-- Metrics Row -->
+                <div
+                  class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2"
+                      viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    5 Lessons
+                  </span>
+                  <span>•</span>
+                  <span>⏱️ 3h 45m</span>
+                  <span>•</span>
+                  <span class="text-orange-600 font-bold">🔥 132</span>
+                </div>
+              </div>
+
+              <!-- Card Action: Open Lessons View -->
+              <div class="mt-4 pt-3 border-t border-slate-100">
+                <a href="source.html?source_id=6"
+                  class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
+                  <span>View Lessons</span>
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                  </svg>
+                </a>
+              </div>
+
+            </div>
+
           </div>
 
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Tiếng Nhật Trung Cấp N3 Soumatome
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Lộ trình toàn diện ngữ pháp, từ vựng và đọc hiểu cho kỳ thi JLPT N3.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 97</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=1"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-slate-900 text-white">
-              N2
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="text-xs font-bold text-slate-800">699.000 đ</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Luyện Đề Thi Thử Toàn Diện N2 Master"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Luyện Đề Thi Thử Toàn Diện N2 Master
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Ngân hàng 20 bộ đề thi thử sát cấu trúc đề thi chính thức kèm giải thích.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 104</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=2"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-emerald-500 text-white">
-              N4
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="text-xs font-bold text-slate-800">350.000 đ</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Kanji & Từ Vựng Cấp Tốc N4"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Kanji & Từ Vựng Cấp Tốc N4
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Chinh phục 300 chữ Hán và 1500 từ vựng cốt lõi N4 bằng phương pháp ghi nhớ hình ảnh.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 111</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=3"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-amber-500 text-white">
-              N5
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Free</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Tiếng Nhật Sơ Cấp Minna No Nihongo N5"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Tiếng Nhật Sơ Cấp Minna No Nihongo N5
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Khóa học nhập môn từ bảng chữ cái Hiragana/Katakana đến 25 bài Minna No Nihongo.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 118</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=4"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-sky-600 text-white">
-              N3
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="text-xs font-bold text-slate-800">420.000 đ</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Luyện Giao Tiếp & Shadowing N3"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Luyện Giao Tiếp & Shadowing N3
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Phương pháp Shadowing cải thiện phản xạ và phát âm chuẩn giọng Tokyo.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 125</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=5"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-
-      <div class="group relative rounded-3xl border border-slate-200/80 bg-white p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Card Top: Thumbnail + Level Badge + Price -->
-          <div class="relative overflow-hidden rounded-2xl bg-slate-50 border border-slate-100 p-4 mb-4 flex items-center justify-center">
-            <span class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide shadow-xs bg-indigo-600 text-white">
-              N1
-            </span>
-            <span class="absolute top-2.5 right-2.5">
-              <span class="text-xs font-bold text-slate-800">850.000 đ</span>
-            </span>
-            <img src="../assets/images/book_3d.jpg" alt="Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp"
-              class="w-24 h-24 object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
-
-          <!-- Course Title -->
-          <h3 class="text-sm font-black text-slate-900 line-clamp-2 group-hover:text-sky-600 transition-colors">
-            Chuyên Đề Đọc Hiểu & Ngữ Pháp N1 Cao Cấp
-          </h3>
-
-          <!-- Course Description -->
-          <p class="mt-2 text-xs text-slate-500 line-clamp-2 leading-relaxed font-normal">
-            Phân tích cấu trúc bài đọc dài, bình luận xã hội và ngữ pháp hiếm gặp N1.
-          </p>
-
-          <!-- Metrics Row -->
-          <div class="mt-4 flex items-center gap-3 text-[11px] font-semibold text-slate-500 border-t border-slate-100 pt-3">
-            <span class="flex items-center gap-1">
-              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-              5 Lessons
-            </span>
-            <span>•</span>
-            <span>⏱️ 3h 45m</span>
-            <span>•</span>
-            <span class="text-orange-600 font-bold">🔥 132</span>
-          </div>
-        </div>
-
-        <!-- Card Action: Open Lessons View -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-          <a href="source.html?source_id=6"
-            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-            <span>View Lessons</span>
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-            </svg>
-          </a>
-        </div>
-
-      </div>
-    
-        </div>
-
-        <!-- Empty State -->
+          <!-- Empty State -->
           <div id="sourceEmptyState" class="hidden py-12 text-center">
-            <div class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+            <div
+              class="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round"
                   d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -696,17 +746,21 @@
           <div class="flex items-center gap-4">
             <div
               class="w-14 h-14 rounded-2xl bg-sky-50 border border-sky-100 p-2 overflow-hidden shrink-0 flex items-center justify-center shadow-xs">
-              <img id="userDetailThumbnail" src="../assets/images/book_3d.jpg" alt="Source" class="w-full h-full object-contain" />
+              <img id="userDetailThumbnail" src="../assets/images/book_3d.jpg" alt="Source"
+                class="w-full h-full object-contain" />
             </div>
             <div>
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
+                <span
+                  class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
                   <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Course
                 </span>
-                <span id="userDetailPriceBadge" class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
+                <span id="userDetailPriceBadge"
+                  class="text-[10px] font-bold text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">
                   Free
                 </span>
-                <span class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-full">
+                <span
+                  class="text-[10px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-2 py-0.5 rounded-full">
                   2-Level Curriculum
                 </span>
               </div>
@@ -716,7 +770,8 @@
             </div>
           </div>
 
-          <div class="flex items-center gap-6 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-between md:justify-end text-right">
+          <div
+            class="flex items-center gap-6 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100 w-full md:w-auto justify-between md:justify-end text-right">
             <div>
               <p class="text-xs text-slate-400 font-medium">Total Lessons</p>
               <p class="text-lg font-extrabold text-slate-900 mt-0.5" id="userDetailTotalLessons">5 Lessons</p>
@@ -730,11 +785,13 @@
 
         <!-- Lessons Curriculum Card Layout (Matching Admin Hierarchy) -->
         <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div
+            class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
             <div>
               <div class="flex items-center gap-2">
                 <h2 class="text-base font-bold text-slate-900">Lessons & Content Curriculum</h2>
-                <span class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full" id="userLessonsCountBadge">
+                <span class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full"
+                  id="userLessonsCountBadge">
                   5 Lessons
                 </span>
               </div>
@@ -745,7 +802,8 @@
 
             <button type="button" onclick="toggleExpandAllUserLessons()" id="userToggleAllBtn"
               class="px-3.5 py-2 rounded-2xl border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold text-xs transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer">
-              <svg id="userToggleAllIcon" class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg id="userToggleAllIcon" class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor"
+                stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
               </svg>
               <span id="userToggleAllText">Expand All</span>
@@ -755,576 +813,766 @@
           <!-- User Lesson Cards Container -->
           <div id="userLessonCardsContainer" class="space-y-4">
 
-      <!-- LESSON ACCORDION CARD -->
-      <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all" id="userLessonCard-101">
-        
-        <!-- Accordion Header -->
-        <div class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
-          <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-              #1
-            </span>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">✓ Completed (90%)</span>
-                <span class="text-xs text-slate-400 font-medium">⏱️ 45 mins</span>
+            <!-- LESSON ACCORDION CARD -->
+            <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all"
+              id="userLessonCard-101">
+
+              <!-- Accordion Header -->
+              <div
+                class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span
+                    class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    #1
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">✓
+                        Completed (90%)</span>
+                      <span class="text-xs text-slate-400 font-medium">⏱️ 45 mins</span>
+                    </div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Khởi động & Nền tảng cốt lõi
+                    </h3>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
+                  <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
+                  <div
+                    class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform rotate-180">
+                    ▼
+                  </div>
+                </div>
               </div>
-              <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Khởi động & Nền tảng cốt lõi</h3>
+
+              <!-- Accordion Body (4 Structured Modules) -->
+              <div class=" p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Làm quen với các mẫu câu phán
+                  đoán cơ bản và 25 từ vựng trọng tâm N3.</p>
+
+                <!-- 4 Mini Module Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+
+                  <!-- Module 1: Grammar -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                          📖 Ngữ pháp
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">2
+                          Mẫu</span>
+                      </div>
+                      <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
+                        <li class="truncate">• ~わけがない (Chắc chắn không)</li>
+                        <li class="truncate">• ~わけではない (Không hẳn là)</li>
+                      </ul>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
+                      <span>🎬 Video: 22 mins</span>
+                      <span class="font-bold">Xem →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 2: Vocabulary -->
+                  <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
+                          📝 Từ vựng
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">25
+                          Từ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">約束
+                          (やくそく)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">合格
+                          (ごうかく)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">確かめる</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">遠慮
+                          (えんりょ)</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
+                      <span>🔊 Audio phát âm</span>
+                      <span class="font-bold">Học từ →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 3: Kanji -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                          🈚 Hán tự
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">8
+                          Chữ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">約</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">束</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">格</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">確</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">認</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">練</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">習</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">試</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
+                      <span>✍️ Tập viết & Quy tắc</span>
+                      <span class="font-bold">Luyện Kanji →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 4: Quiz Practice -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                          🎯 Quiz củng cố
+                        </span>
+                        <span
+                          class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">10
+                          Câu</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
+                      <p class="text-[11px] font-bold text-emerald-950 mt-1">Điểm gần nhất: 90%</p>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
+                      <span>⏱️ 10 phút</span>
+                      <span class="font-bold text-emerald-700">Làm Quiz →</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
             </div>
+
+
+            <!-- LESSON ACCORDION CARD -->
+            <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all"
+              id="userLessonCard-102">
+
+              <!-- Accordion Header -->
+              <div
+                class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span
+                    class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    #2
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-100">⏳
+                        In Progress (65%)</span>
+                      <span class="text-xs text-slate-400 font-medium">⏱️ 50 mins</span>
+                    </div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Các cấu trúc trọng tâm & Từ
+                      vựng theo chủ đề</h3>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
+                  <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
+                  <div
+                    class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <!-- Accordion Body (4 Structured Modules) -->
+              <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Cấu trúc diễn tả nguyên nhân,
+                  kết quả và từ vựng đời sống hằng ngày.</p>
+
+                <!-- 4 Mini Module Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+
+                  <!-- Module 1: Grammar -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                          📖 Ngữ pháp
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">3
+                          Mẫu</span>
+                      </div>
+                      <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
+                        <li class="truncate">• ~おかげで / ~せいで</li>
+                        <li class="truncate">• ~によって / ~によると</li>
+                        <li class="truncate">• ~につれて</li>
+                      </ul>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
+                      <span>🎬 Video: 28 mins</span>
+                      <span class="font-bold">Xem →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 2: Vocabulary -->
+                  <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
+                          📝 Từ vựng
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">30
+                          Từ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">影響
+                          (えいきょう)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">開発
+                          (かいはつ)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">改善
+                          (かいぜん)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">増加
+                          (ぞうか)</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
+                      <span>🔊 Audio phát âm</span>
+                      <span class="font-bold">Học từ →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 3: Kanji -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                          🈚 Hán tự
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">10
+                          Chữ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">影</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">響</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">開</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">発</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">改</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">善</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">増</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">加</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">減</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">少</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
+                      <span>✍️ Tập viết & Quy tắc</span>
+                      <span class="font-bold">Luyện Kanji →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 4: Quiz Practice -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                          🎯 Quiz củng cố
+                        </span>
+                        <span
+                          class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">12
+                          Câu</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
+                      <p class="text-[11px] font-bold text-emerald-950 mt-1">Điểm gần nhất: 65%</p>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
+                      <span>⏱️ 10 phút</span>
+                      <span class="font-bold text-emerald-700">Làm Quiz →</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- LESSON ACCORDION CARD -->
+            <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all"
+              id="userLessonCard-103">
+
+              <!-- Accordion Header -->
+              <div
+                class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span
+                    class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    #3
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒
+                        Not Started</span>
+                      <span class="text-xs text-slate-400 font-medium">⏱️ 40 mins</span>
+                    </div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Ngữ cảnh ứng dụng & Bài tập
+                      phân biệt</h3>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
+                  <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
+                  <div
+                    class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <!-- Accordion Body (4 Structured Modules) -->
+              <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Phân biệt các mẫu câu dễ nhầm
+                  lẫn và bài tập thực hành đọc hiểu ngắn.</p>
+
+                <!-- 4 Mini Module Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+
+                  <!-- Module 1: Grammar -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                          📖 Ngữ pháp
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">2
+                          Mẫu</span>
+                      </div>
+                      <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
+                        <li class="truncate">• ~に違いない (Chắc chắn là)</li>
+                        <li class="truncate">• ~はずだ / ~はずがない</li>
+                      </ul>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
+                      <span>🎬 Video: 18 mins</span>
+                      <span class="font-bold">Xem →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 2: Vocabulary -->
+                  <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
+                          📝 Từ vựng
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">20
+                          Từ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">判断
+                          (はんだん)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">確信
+                          (かくしん)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">予想
+                          (よそう)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">結果
+                          (けっか)</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
+                      <span>🔊 Audio phát âm</span>
+                      <span class="font-bold">Học từ →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 3: Kanji -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                          🈚 Hán tự
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">6
+                          Chữ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">断</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">信</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">想</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">結</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">果</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">違</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
+                      <span>✍️ Tập viết & Quy tắc</span>
+                      <span class="font-bold">Luyện Kanji →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 4: Quiz Practice -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                          🎯 Quiz củng cố
+                        </span>
+                        <span
+                          class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">10
+                          Câu</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
+                      <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
+                      <span>⏱️ 10 phút</span>
+                      <span class="font-bold text-emerald-700">Làm Quiz →</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- LESSON ACCORDION CARD -->
+            <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all"
+              id="userLessonCard-104">
+
+              <!-- Accordion Header -->
+              <div
+                class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span
+                    class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    #4
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒
+                        Not Started</span>
+                      <span class="text-xs text-slate-400 font-medium">⏱️ 55 mins</span>
+                    </div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Đọc hiểu đoản văn & Ngữ pháp
+                      nâng cao</h3>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
+                  <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
+                  <div
+                    class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <!-- Accordion Body (4 Structured Modules) -->
+              <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Rèn luyện kỹ năng đọc lướt tìm
+                  ý chính và liên kết các đoạn văn bản.</p>
+
+                <!-- 4 Mini Module Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+
+                  <!-- Module 1: Grammar -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                          📖 Ngữ pháp
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">3
+                          Mẫu</span>
+                      </div>
+                      <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
+                        <li class="truncate">• ~ばかりか / ~だけでなく</li>
+                        <li class="truncate">• ~にかかわらず</li>
+                        <li class="truncate">• ~をこめて</li>
+                      </ul>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
+                      <span>🎬 Video: 30 mins</span>
+                      <span class="font-bold">Xem →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 2: Vocabulary -->
+                  <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
+                          📝 Từ vựng
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">28
+                          Từ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">文章
+                          (ぶんしょう)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">段落
+                          (だんらく)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">要点
+                          (ようてん)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">筆者
+                          (ひっしゃ)</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
+                      <span>🔊 Audio phát âm</span>
+                      <span class="font-bold">Học từ →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 3: Kanji -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                          🈚 Hán tự
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">8
+                          Chữ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">章</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">段</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">落</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">要</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">点</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">筆</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">者</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">関</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
+                      <span>✍️ Tập viết & Quy tắc</span>
+                      <span class="font-bold">Luyện Kanji →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 4: Quiz Practice -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                          🎯 Quiz củng cố
+                        </span>
+                        <span
+                          class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">15
+                          Câu</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
+                      <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
+                      <span>⏱️ 10 phút</span>
+                      <span class="font-bold text-emerald-700">Làm Quiz →</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
+
+            <!-- LESSON ACCORDION CARD -->
+            <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all"
+              id="userLessonCard-105">
+
+              <!-- Accordion Header -->
+              <div
+                class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
+                <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                  <span
+                    class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+                    #5
+                  </span>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span
+                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒
+                        Not Started</span>
+                      <span class="text-xs text-slate-400 font-medium">⏱️ 60 mins</span>
+                    </div>
+                    <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Tổng ôn tập & Mini-Test
+                      chuẩn JLPT</h3>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
+                  <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
+                  <div
+                    class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
+                    ▼
+                  </div>
+                </div>
+              </div>
+
+              <!-- Accordion Body (4 Structured Modules) -->
+              <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
+                <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Đề thi mini 30 câu bao quát
+                  toàn bộ kiến thức 4 bài học trước.</p>
+
+                <!-- 4 Mini Module Summary Cards Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+
+                  <!-- Module 1: Grammar -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
+                          📖 Ngữ pháp
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">5
+                          Mẫu</span>
+                      </div>
+                      <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
+                        <li class="truncate">• Tổng hợp ngữ pháp N3 Unit 1-4</li>
+                        <li class="truncate">• Phân tích bẫy đề thi</li>
+                      </ul>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
+                      <span>🎬 Video: 35 mins</span>
+                      <span class="font-bold">Xem →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 2: Vocabulary -->
+                  <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
+                          📝 Từ vựng
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">40
+                          Từ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">総合
+                          (そうごう)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">復習
+                          (ふくしゅう)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">模擬
+                          (もぎ)</span><span
+                          class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">本番
+                          (ほんばん)</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
+                      <span>🔊 Audio phát âm</span>
+                      <span class="font-bold">Học từ →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 3: Kanji -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
+                          🈚 Hán tự
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">12
+                          Chữ</span>
+                      </div>
+                      <div class="flex flex-wrap gap-1">
+                        <span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">総</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">合</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">復</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">習</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">模</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">擬</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">本</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">番</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">採</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">点</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">評</span><span
+                          class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">価</span>
+                      </div>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
+                      <span>✍️ Tập viết & Quy tắc</span>
+                      <span class="font-bold">Luyện Kanji →</span>
+                    </div>
+                  </div>
+
+                  <!-- Module 4: Quiz Practice -->
+                  <div
+                    class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
+                    <div>
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                          🎯 Quiz củng cố
+                        </span>
+                        <span
+                          class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">30
+                          Câu</span>
+                      </div>
+                      <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 85%</p>
+                      <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
+                    </div>
+                    <div
+                      class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
+                      <span>⏱️ 10 phút</span>
+                      <span class="font-bold text-emerald-700">Làm Quiz →</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+
           </div>
-
-          <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
-            <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
-            <div class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform rotate-180">
-              ▼
-            </div>
-          </div>
-        </div>
-
-        <!-- Accordion Body (4 Structured Modules) -->
-        <div class=" p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
-          <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Làm quen với các mẫu câu phán đoán cơ bản và 25 từ vựng trọng tâm N3.</p>
-
-          <!-- 4 Mini Module Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-            
-            <!-- Module 1: Grammar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
-                    📖 Ngữ pháp
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">2 Mẫu</span>
-                </div>
-                <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
-                  <li class="truncate">• ~わけがない (Chắc chắn không)</li><li class="truncate">• ~わけではない (Không hẳn là)</li>
-                </ul>
-              </div>
-              <div class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
-                <span>🎬 Video: 22 mins</span>
-                <span class="font-bold">Xem →</span>
-              </div>
-            </div>
-
-            <!-- Module 2: Vocabulary -->
-            <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
-                    📝 Từ vựng
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">25 Từ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">約束 (やくそく)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">合格 (ごうかく)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">確かめる</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">遠慮 (えんりょ)</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
-                <span>🔊 Audio phát âm</span>
-                <span class="font-bold">Học từ →</span>
-              </div>
-            </div>
-
-            <!-- Module 3: Kanji -->
-            <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                    🈚 Hán tự
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">8 Chữ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">約</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">束</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">格</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">確</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">認</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">練</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">習</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">試</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
-                <span>✍️ Tập viết & Quy tắc</span>
-                <span class="font-bold">Luyện Kanji →</span>
-              </div>
-            </div>
-
-            <!-- Module 4: Quiz Practice -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-                    🎯 Quiz củng cố
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">10 Câu</span>
-                </div>
-                <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
-                <p class="text-[11px] font-bold text-emerald-950 mt-1">Điểm gần nhất: 90%</p>
-              </div>
-              <div class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
-                <span>⏱️ 10 phút</span>
-                <span class="font-bold text-emerald-700">Làm Quiz →</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    
-
-      <!-- LESSON ACCORDION CARD -->
-      <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all" id="userLessonCard-102">
-        
-        <!-- Accordion Header -->
-        <div class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
-          <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-              #2
-            </span>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-100">⏳ In Progress (65%)</span>
-                <span class="text-xs text-slate-400 font-medium">⏱️ 50 mins</span>
-              </div>
-              <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Các cấu trúc trọng tâm & Từ vựng theo chủ đề</h3>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
-            <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
-            <div class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
-              ▼
-            </div>
-          </div>
-        </div>
-
-        <!-- Accordion Body (4 Structured Modules) -->
-        <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
-          <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Cấu trúc diễn tả nguyên nhân, kết quả và từ vựng đời sống hằng ngày.</p>
-
-          <!-- 4 Mini Module Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-            
-            <!-- Module 1: Grammar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
-                    📖 Ngữ pháp
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">3 Mẫu</span>
-                </div>
-                <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
-                  <li class="truncate">• ~おかげで / ~せいで</li><li class="truncate">• ~によって / ~によると</li><li class="truncate">• ~につれて</li>
-                </ul>
-              </div>
-              <div class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
-                <span>🎬 Video: 28 mins</span>
-                <span class="font-bold">Xem →</span>
-              </div>
-            </div>
-
-            <!-- Module 2: Vocabulary -->
-            <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
-                    📝 Từ vựng
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">30 Từ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">影響 (えいきょう)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">開発 (かいはつ)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">改善 (かいぜん)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">増加 (ぞうか)</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
-                <span>🔊 Audio phát âm</span>
-                <span class="font-bold">Học từ →</span>
-              </div>
-            </div>
-
-            <!-- Module 3: Kanji -->
-            <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                    🈚 Hán tự
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">10 Chữ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">影</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">響</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">開</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">発</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">改</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">善</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">増</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">加</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">減</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">少</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
-                <span>✍️ Tập viết & Quy tắc</span>
-                <span class="font-bold">Luyện Kanji →</span>
-              </div>
-            </div>
-
-            <!-- Module 4: Quiz Practice -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-                    🎯 Quiz củng cố
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">12 Câu</span>
-                </div>
-                <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
-                <p class="text-[11px] font-bold text-emerald-950 mt-1">Điểm gần nhất: 65%</p>
-              </div>
-              <div class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
-                <span>⏱️ 10 phút</span>
-                <span class="font-bold text-emerald-700">Làm Quiz →</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    
-
-      <!-- LESSON ACCORDION CARD -->
-      <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all" id="userLessonCard-103">
-        
-        <!-- Accordion Header -->
-        <div class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
-          <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-              #3
-            </span>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒 Not Started</span>
-                <span class="text-xs text-slate-400 font-medium">⏱️ 40 mins</span>
-              </div>
-              <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Ngữ cảnh ứng dụng & Bài tập phân biệt</h3>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
-            <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
-            <div class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
-              ▼
-            </div>
-          </div>
-        </div>
-
-        <!-- Accordion Body (4 Structured Modules) -->
-        <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
-          <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Phân biệt các mẫu câu dễ nhầm lẫn và bài tập thực hành đọc hiểu ngắn.</p>
-
-          <!-- 4 Mini Module Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-            
-            <!-- Module 1: Grammar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
-                    📖 Ngữ pháp
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">2 Mẫu</span>
-                </div>
-                <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
-                  <li class="truncate">• ~に違いない (Chắc chắn là)</li><li class="truncate">• ~はずだ / ~はずがない</li>
-                </ul>
-              </div>
-              <div class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
-                <span>🎬 Video: 18 mins</span>
-                <span class="font-bold">Xem →</span>
-              </div>
-            </div>
-
-            <!-- Module 2: Vocabulary -->
-            <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
-                    📝 Từ vựng
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">20 Từ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">判断 (はんだん)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">確信 (かくしん)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">予想 (よそう)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">結果 (けっか)</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
-                <span>🔊 Audio phát âm</span>
-                <span class="font-bold">Học từ →</span>
-              </div>
-            </div>
-
-            <!-- Module 3: Kanji -->
-            <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                    🈚 Hán tự
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">6 Chữ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">断</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">信</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">想</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">結</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">果</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">違</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
-                <span>✍️ Tập viết & Quy tắc</span>
-                <span class="font-bold">Luyện Kanji →</span>
-              </div>
-            </div>
-
-            <!-- Module 4: Quiz Practice -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-                    🎯 Quiz củng cố
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">10 Câu</span>
-                </div>
-                <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
-                <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
-              </div>
-              <div class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
-                <span>⏱️ 10 phút</span>
-                <span class="font-bold text-emerald-700">Làm Quiz →</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    
-
-      <!-- LESSON ACCORDION CARD -->
-      <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all" id="userLessonCard-104">
-        
-        <!-- Accordion Header -->
-        <div class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
-          <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-              #4
-            </span>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒 Not Started</span>
-                <span class="text-xs text-slate-400 font-medium">⏱️ 55 mins</span>
-              </div>
-              <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Đọc hiểu đoản văn & Ngữ pháp nâng cao</h3>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
-            <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
-            <div class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
-              ▼
-            </div>
-          </div>
-        </div>
-
-        <!-- Accordion Body (4 Structured Modules) -->
-        <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
-          <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Rèn luyện kỹ năng đọc lướt tìm ý chính và liên kết các đoạn văn bản.</p>
-
-          <!-- 4 Mini Module Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-            
-            <!-- Module 1: Grammar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
-                    📖 Ngữ pháp
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">3 Mẫu</span>
-                </div>
-                <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
-                  <li class="truncate">• ~ばかりか / ~だけでなく</li><li class="truncate">• ~にかかわらず</li><li class="truncate">• ~をこめて</li>
-                </ul>
-              </div>
-              <div class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
-                <span>🎬 Video: 30 mins</span>
-                <span class="font-bold">Xem →</span>
-              </div>
-            </div>
-
-            <!-- Module 2: Vocabulary -->
-            <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
-                    📝 Từ vựng
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">28 Từ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">文章 (ぶんしょう)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">段落 (だんらく)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">要点 (ようてん)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">筆者 (ひっしゃ)</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
-                <span>🔊 Audio phát âm</span>
-                <span class="font-bold">Học từ →</span>
-              </div>
-            </div>
-
-            <!-- Module 3: Kanji -->
-            <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                    🈚 Hán tự
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">8 Chữ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">章</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">段</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">落</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">要</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">点</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">筆</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">者</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">関</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
-                <span>✍️ Tập viết & Quy tắc</span>
-                <span class="font-bold">Luyện Kanji →</span>
-              </div>
-            </div>
-
-            <!-- Module 4: Quiz Practice -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-                    🎯 Quiz củng cố
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">15 Câu</span>
-                </div>
-                <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 80%</p>
-                <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
-              </div>
-              <div class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
-                <span>⏱️ 10 phút</span>
-                <span class="font-bold text-emerald-700">Làm Quiz →</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    
-
-      <!-- LESSON ACCORDION CARD -->
-      <div class="rounded-3xl border border-slate-200/80 bg-white overflow-hidden shadow-soft transition-all" id="userLessonCard-105">
-        
-        <!-- Accordion Header -->
-        <div class="p-4 md:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none bg-slate-50/70 hover:bg-slate-100/70 transition-colors">
-          <div class="flex items-center gap-3.5 min-w-0 flex-1">
-            <span class="w-8 h-8 rounded-xl bg-white border border-slate-200 text-slate-700 font-extrabold text-xs flex items-center justify-center shrink-0 shadow-2xs">
-              #5
-            </span>
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">🔒 Not Started</span>
-                <span class="text-xs text-slate-400 font-medium">⏱️ 60 mins</span>
-              </div>
-              <h3 class="text-sm md:text-base font-extrabold text-slate-900 truncate">Tổng ôn tập & Mini-Test chuẩn JLPT</h3>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 self-end md:self-auto shrink-0">
-            <span class="text-xs font-bold text-sky-600 hidden sm:inline">Details</span>
-            <div class="w-7 h-7 rounded-xl bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-transform ">
-              ▼
-            </div>
-          </div>
-        </div>
-
-        <!-- Accordion Body (4 Structured Modules) -->
-        <div class="hidden p-4 md:p-6 border-t border-slate-100 bg-white space-y-4">
-          <p class="text-xs md:text-sm text-slate-600 leading-relaxed font-normal">Đề thi mini 30 câu bao quát toàn bộ kiến thức 4 bài học trước.</p>
-
-          <!-- 4 Mini Module Summary Cards Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
-            
-            <!-- Module 1: Grammar -->
-            <div class="p-3.5 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-indigo-900 flex items-center gap-1.5">
-                    📖 Ngữ pháp
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-indigo-700 shadow-2xs">5 Mẫu</span>
-                </div>
-                <ul class="text-[11px] text-indigo-950 font-medium space-y-1">
-                  <li class="truncate">• Tổng hợp ngữ pháp N3 Unit 1-4</li><li class="truncate">• Phân tích bẫy đề thi</li>
-                </ul>
-              </div>
-              <div class="mt-3 pt-2 border-t border-indigo-100 text-[10px] text-indigo-700 font-semibold flex items-center justify-between">
-                <span>🎬 Video: 35 mins</span>
-                <span class="font-bold">Xem →</span>
-              </div>
-            </div>
-
-            <!-- Module 2: Vocabulary -->
-            <div class="p-3.5 rounded-2xl bg-sky-50/60 border border-sky-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-sky-900 flex items-center gap-1.5">
-                    📝 Từ vựng
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-sky-700 shadow-2xs">40 Từ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">総合 (そうごう)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">復習 (ふくしゅう)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">模擬 (もぎ)</span><span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white text-sky-800 border border-sky-100">本番 (ほんばん)</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-sky-100 text-[10px] text-sky-700 font-semibold flex items-center justify-between">
-                <span>🔊 Audio phát âm</span>
-                <span class="font-bold">Học từ →</span>
-              </div>
-            </div>
-
-            <!-- Module 3: Kanji -->
-            <div class="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-amber-900 flex items-center gap-1.5">
-                    🈚 Hán tự
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-amber-700 shadow-2xs">12 Chữ</span>
-                </div>
-                <div class="flex flex-wrap gap-1">
-                  <span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">総</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">合</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">復</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">習</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">模</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">擬</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">本</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">番</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">採</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">点</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">評</span><span class="w-6 h-6 rounded bg-white text-amber-900 font-extrabold text-xs flex items-center justify-center border border-amber-200/60 shadow-2xs">価</span>
-                </div>
-              </div>
-              <div class="mt-3 pt-2 border-t border-amber-100 text-[10px] text-amber-800 font-semibold flex items-center justify-between">
-                <span>✍️ Tập viết & Quy tắc</span>
-                <span class="font-bold">Luyện Kanji →</span>
-              </div>
-            </div>
-
-            <!-- Module 4: Quiz Practice -->
-            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100/80 flex flex-col justify-between">
-              <div>
-                <div class="flex items-center justify-between gap-2 mb-2">
-                  <span class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
-                    🎯 Quiz củng cố
-                  </span>
-                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white text-emerald-700 shadow-2xs">30 Câu</span>
-                </div>
-                <p class="text-[11px] text-emerald-800 font-medium">Điểm chuẩn qua bài: 85%</p>
-                <p class="text-[11px] text-slate-400 mt-1">Chưa làm bài test</p>
-              </div>
-              <div class="mt-3 pt-2 border-t border-emerald-100 text-[10px] text-emerald-800 font-semibold flex items-center justify-between">
-                <span>⏱️ 10 phút</span>
-                <span class="font-bold text-emerald-700">Làm Quiz →</span>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    
-        </div>
         </section>
 
       </div>
@@ -1336,7 +1584,7 @@
   <!-- ========================================== -->
   <!-- JAVASCRIPT: Source Browse & Detail View    -->
   <!-- ========================================== -->
-  
+
 </body>
 
 </html>

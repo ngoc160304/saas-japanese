@@ -1,0 +1,27 @@
+C:\Users\ACER\Workspace\full-stack-project\java\saas-japanese\fontend
+├── AGENTS.md
+├── apis
+├── app
+├── CLAUDE.md
+├── components
+├── components.json
+├── eslint.config.mjs
+├── lib
+├── next-env.d.ts
+├── next.config.ts
+├── node_modules
+├── package-lock.json
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.mjs
+├── public
+├── README.md
+├── services
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+├── types
+└── utils
+
+directory: 9 file: 14
+

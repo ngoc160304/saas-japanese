@@ -91,7 +91,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     PageRequest pageable = PageRequest.of(
         query.getPage(),
         query.getSize(),
-        Sort.by("id").ascending());
+        Sort.by("createdAt").ascending());
 
     return courseCategoryRepository
         .findAll(spec, pageable)

@@ -36,7 +36,12 @@ export default function SpeakingLayout({ children }: SpeakingLayoutProps) {
             border
             border-[#E2E8F0]
             bg-white
+<<<<<<< HEAD
             p-0
+=======
+            p-4
+            md:p-6
+>>>>>>> c222501 (Add score service and UI)
           "
         >
           {children}

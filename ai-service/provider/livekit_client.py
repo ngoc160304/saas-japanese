@@ -173,8 +173,11 @@ async def process_utterance(
         return
     
     print(f"[{participant.identity}] {text}")
+<<<<<<< HEAD
     user_data = {"type": "user_message", "text": text}
     await room.local_participant.publish_data(json.dumps(user_data).encode("utf-8"), reliable=True)
+=======
+>>>>>>> c222501 (Add score service and UI)
     
     try:
         start = time.perf_counter()
@@ -187,6 +190,11 @@ async def process_utterance(
     session.chat_history.append({"role": "user", "content": text})
     session.chat_history.append({"role": "assistant", "content": ai_reply})
     session.utterances.append({"user_audio_path": str(user_audio), "text": text, "llm_text": ai_reply,})
+<<<<<<< HEAD
+=======
+    conversation_data = {"type": "conversation", "user": text, "ai": ai_reply}
+    await room.local_participant.publish_data(json.dumps(conversation_data).encode("utf-8"), reliable=True)
+>>>>>>> c222501 (Add score service and UI)
 
     try:
         start = time.perf_counter()

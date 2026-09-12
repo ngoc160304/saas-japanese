@@ -1,7 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-
-type Status = 'active' | 'draft';
+import { Status } from '@/types/status';
 
 interface StatusBadgeProps {
   status: Status;

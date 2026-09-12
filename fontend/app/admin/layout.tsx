@@ -1,4 +1,4 @@
-import SideBar, { ISidebarItem } from '@/components/layout/sidebar/SideBar';
+import SideBar, { ISidebarItem } from '@/components/layout/management/sidebar/SideBar';
 
 const sidebarItems: ISidebarItem[] = [
   {
@@ -23,7 +23,7 @@ const sidebarItems: ISidebarItem[] = [
 
   {
     title: 'Categories (JLPT)',
-    href: '/admin/categories',
+    href: '/admin/categories-course',
     icon: (
       <svg
         className="w-5 h-5 text-slate-400 group-hover:text-slate-700"
@@ -108,7 +108,6 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
       <div className="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
         <SideBar role="Admin" title="Studify" sidebarItems={sidebarItems} />
-
         <main className="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">{children}</main>
       </div>
     </div>

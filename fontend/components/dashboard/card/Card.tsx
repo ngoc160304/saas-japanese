@@ -16,6 +16,7 @@ const Card = (props: IProp) => {
           learnerCount={item.learnerCount}
           courseStats={item.courseStats}
           isPublished={item.isPublished}
+          thumbnail={item.thumbnail}
         />
       ))}
     </div>
