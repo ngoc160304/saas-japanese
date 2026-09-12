@@ -646,6 +646,8 @@ CREATE TABLE IF NOT EXISTS `jlpt_exam_questions` (
   `jlpt_exam_part_id` BIGINT UNSIGNED NOT NULL COMMENT 'Part chứa câu hỏi',
   `question_text` TEXT NOT NULL COMMENT 'Nội dung câu hỏi',
   `passage_text` TEXT NULL DEFAULT NULL COMMENT 'Đoạn văn đọc hiểu (nếu có)',
+  `question_type` ENUM('single_choice') NOT NULL DEFAULT 'single_choice' COMMENT 'Loại câu hỏi JLPT',
+  `explanation` TEXT NULL DEFAULT NULL COMMENT 'Giải thích đáp án sau khi nộp bài',
   `points` DECIMAL(5,2) NOT NULL DEFAULT '1.00' COMMENT 'Điểm số câu hỏi',
   `sort_order` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Thứ tự câu hỏi',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -872,38 +874,118 @@ COMMENT = 'Lượt làm đề thi thử JLPT của người dùng';
 
 
 -- -----------------------------------------------------
--- Table `user_jlpt_attempt_answers`
+-- Table `user_jlpt_attempt_sessions`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `user_jlpt_attempt_answers` (
+CREATE TABLE IF NOT EXISTS `user_jlpt_attempt_sessions` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `attempt_id` BIGINT UNSIGNED NOT NULL COMMENT 'Lượt làm bài thi',
-  `jlpt_exam_question_id` BIGINT UNSIGNED NOT NULL COMMENT 'Câu hỏi được trả lời',
-  `jlpt_exam_answer_id` BIGINT UNSIGNED NULL DEFAULT NULL COMMENT 'Đáp án người dùng chọn',
-  `is_correct` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Trả lời đúng hay sai',
-  `answered_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời điểm trả lời',
+  `status` ENUM(
+    'in_progress',
+    'completed',
+    'abandoned'
+  ) NOT NULL DEFAULT 'in_progress' COMMENT 'Trạng thái lượt làm',
+  `jlpt_exam_session_id` BIGINT UNSIGNED NOT NULL COMMENT 'Session được thực hiện trong lượt thi',
+  `score` DECIMAL(6,2) NOT NULL DEFAULT '0.00' COMMENT 'Điểm đạt được của session',
+   `is_passed` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Đạt hay không',
+  `max_score` DECIMAL(6,2) NOT NULL DEFAULT '0.00' COMMENT 'Tổng điểm tối đa của session',
+  `correct_count` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Số câu trả lời đúng',
+  `total_questions` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Tổng số câu hỏi',
+  
+  `started_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Thời điểm bắt đầu session',
+  `finished_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Thời điểm hoàn thành session',
+  `duration_seconds` INT UNSIGNED NULL DEFAULT NULL COMMENT 'Thời gian thực tế làm session (giây)',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `uq_jlpt_attempt_question` (`attempt_id` ASC, `jlpt_exam_question_id` ASC),
-  INDEX `idx_jlpt_attempt_answers_question` (`jlpt_exam_question_id` ASC),
-  INDEX `idx_jlpt_attempt_answers_answer` (`jlpt_exam_answer_id` ASC),
-  CONSTRAINT `fk_jlpt_attempt_answers_answer`
-    FOREIGN KEY (`jlpt_exam_answer_id`)
-    REFERENCES `jlpt_exam_answers` (`id`)
-    ON DELETE SET NULL
-    ON UPDATE CASCADE,
-  CONSTRAINT `fk_jlpt_attempt_answers_attempt`
+  UNIQUE INDEX `uq_jlpt_attempt_session` (`attempt_id` ASC, `jlpt_exam_session_id` ASC),
+  INDEX `idx_jlpt_attempt_sessions_attempt` (`attempt_id` ASC),
+  INDEX `idx_jlpt_attempt_sessions_session` (`jlpt_exam_session_id` ASC),
+  CONSTRAINT `fk_jlpt_attempt_sessions_attempt`
     FOREIGN KEY (`attempt_id`)
     REFERENCES `user_jlpt_attempts` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
-  CONSTRAINT `fk_jlpt_attempt_answers_question`
-    FOREIGN KEY (`jlpt_exam_question_id`)
-    REFERENCES `jlpt_exam_questions` (`id`)
+  CONSTRAINT `fk_jlpt_attempt_sessions_session`
+    FOREIGN KEY (`jlpt_exam_session_id`)
+    REFERENCES `jlpt_exam_sessions` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci
-COMMENT = 'Đáp án đã chọn trong lượt làm đề thi JLPT';
+COMMENT = 'Kết quả từng session trong lượt làm đề thi JLPT';
+
+
+-- -----------------------------------------------------
+-- Table `user_jlpt_attempt_parts`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `user_jlpt_attempt_parts` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `attempt_session_id` BIGINT UNSIGNED NOT NULL COMMENT 'Session của lượt làm bài',
+  `jlpt_exam_part_id` BIGINT UNSIGNED NOT NULL COMMENT 'Part được thực hiện trong session',
+  `score` DECIMAL(6,2) NOT NULL DEFAULT '0.00' COMMENT 'Điểm đạt được của part',
+  `max_score` DECIMAL(6,2) NOT NULL DEFAULT '0.00' COMMENT 'Tổng điểm tối đa của part',
+  `correct_count` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Số câu trả lời đúng',
+  `total_questions` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Tổng số câu hỏi',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_jlpt_attempt_part` (`attempt_session_id` ASC, `jlpt_exam_part_id` ASC),
+  INDEX `idx_jlpt_attempt_parts_session` (`attempt_session_id` ASC),
+  INDEX `idx_jlpt_attempt_parts_part` (`jlpt_exam_part_id` ASC),
+  CONSTRAINT `fk_jlpt_attempt_parts_session`
+    FOREIGN KEY (`attempt_session_id`)
+    REFERENCES `user_jlpt_attempt_sessions` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_jlpt_attempt_parts_part`
+    FOREIGN KEY (`jlpt_exam_part_id`)
+    REFERENCES `jlpt_exam_parts` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci
+COMMENT = 'Kết quả từng part/mondai trong session thi JLPT';
+
+
+-- -----------------------------------------------------
+-- Table `user_jlpt_attempt_answers`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `user_jlpt_attempt_answers` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+
+  `session_attempt_id` BIGINT UNSIGNED NOT NULL COMMENT 'Session của lượt làm bài',
+  `jlpt_exam_question_id` BIGINT UNSIGNED NOT NULL COMMENT 'Câu hỏi được trả lời',
+  `jlpt_exam_answer_id` BIGINT UNSIGNED NULL DEFAULT NULL COMMENT 'Đáp án người dùng chọn',
+   `is_correct` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Trả lời đúng hay sai',
+   `answered_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời điểm trả lời',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_jlpt_session_attempt_question`
+    (`session_attempt_id`, `jlpt_exam_question_id`),
+  INDEX `idx_jlpt_attempt_answers_question`
+    (`jlpt_exam_question_id`),
+  INDEX `idx_jlpt_attempt_answers_answer`
+    (`jlpt_exam_answer_id`),
+  CONSTRAINT `fk_jlpt_attempt_answers_answer`
+    FOREIGN KEY (`jlpt_exam_answer_id`)
+    REFERENCES `jlpt_exam_answers` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_jlpt_attempt_answers_question`
+    FOREIGN KEY (`jlpt_exam_question_id`)
+    REFERENCES `jlpt_exam_questions` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_jlpt_attempt_answers_session`
+    FOREIGN KEY (`session_attempt_id`)
+    REFERENCES `user_jlpt_attempt_sessions` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+) ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_general_ci
+COMMENT = 'Đáp án đã chọn trong session thi JLPT';
 
 
 -- -----------------------------------------------------

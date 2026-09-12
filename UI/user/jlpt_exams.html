@@ -56,7 +56,76 @@
     .shadow-card {
       box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
     }
+
+    .badge {
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .badge-free {
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      background-color: #f8fafc;
+    }
+    
+    .badge-premium {
+      background-color: #fef3c7;
+      color: #d97706;
+      border: 1px solid #fde68a;
+    }
+    
+    .badge-popular {
+      background-color: #ffe4e6;
+      color: #e11d48;
+      border: 1px solid #fecdd3;
+    }
+    
+    .badge-completed {
+      background-color: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .exam-card {
+      background-color: #ffffff;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+    
+    .exam-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    }
+    
+    .exam-card.premium {
+      border: 2px solid #fbbf24;
+    }
+
+    .exam-card.premium:hover {
+      box-shadow: 0 10px 15px -3px rgba(251, 191, 36, 0.15), 0 4px 6px -2px rgba(251, 191, 36, 0.1);
+    }
+    
+    .btn-view-test {
+      transition: all 0.2s ease;
+    }
+    .btn-view-test:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
   </style>
+
   <link rel="stylesheet" href="../assets/dashboard-theme.css" />
 </head>
 
@@ -106,7 +175,8 @@
           <!-- Overview -->
           <a href="dashboard.html" data-page="dashboard"
             class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
@@ -138,7 +208,8 @@
           <!-- JLPT Practice / Mock Exams -->
           <a href="jlpt_exams.html" data-page="jlpt_exams"
             class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
@@ -149,7 +220,8 @@
           <!-- Analytics -->
           <a href="#analytics" data-page="analytics"
             class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
             </svg>
             <span>Analytics</span>
@@ -158,7 +230,8 @@
           <!-- Flashcards -->
           <a href="#flashcards" data-page="flashcards"
             class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -168,7 +241,8 @@
           <!-- Settings -->
           <a href="#settings" data-page="settings"
             class="nav-link flex items-center gap-3.5 px-4 py-3 rounded-2xl text-slate-500 hover:text-slate-900 hover:bg-slate-50 font-medium text-sm transition-all group">
-            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 text-slate-400 group-hover:text-slate-700" fill="none" stroke="currentColor"
+              stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -236,38 +310,46 @@
 
       <!-- Search & Level Filter Bar -->
       <section class="bg-white rounded-3xl p-5 md:p-6 border border-slate-100 shadow-soft mb-6">
-        
+
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
+
           <!-- Search Input -->
           <div class="relative flex-1 max-w-md">
             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+                </path>
               </svg>
             </div>
-            <input type="text" id="examSearchInput" oninput="filterExamsGallery()" placeholder="Search exams by title, level, or year..."
+            <input type="text" id="examSearchInput" oninput="filterExamsGallery()"
+              placeholder="Search exams by title, level, or year..."
               class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs md:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all" />
           </div>
 
           <!-- Level Filter Pills -->
           <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0" id="levelFilterContainer">
-            <button type="button" onclick="setLevelFilter('')" class="level-chip active px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-white shadow-2xs">
+            <button type="button" onclick="setLevelFilter('')"
+              class="level-chip active px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-900 text-white shadow-2xs">
               All Levels
             </button>
-            <button type="button" onclick="setLevelFilter('N5')" class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+            <button type="button" onclick="setLevelFilter('N5')"
+              class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
               N5
             </button>
-            <button type="button" onclick="setLevelFilter('N4')" class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+            <button type="button" onclick="setLevelFilter('N4')"
+              class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
               N4
             </button>
-            <button type="button" onclick="setLevelFilter('N3')" class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+            <button type="button" onclick="setLevelFilter('N3')"
+              class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
               N3
             </button>
-            <button type="button" onclick="setLevelFilter('N2')" class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+            <button type="button" onclick="setLevelFilter('N2')"
+              class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
               N2
             </button>
-            <button type="button" onclick="setLevelFilter('N1')" class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
+            <button type="button" onclick="setLevelFilter('N1')"
+              class="level-chip px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-slate-50 text-slate-600 hover:bg-slate-100">
               N1
             </button>
           </div>
@@ -278,551 +360,295 @@
 
       <!-- Exam Cards Grid (Matching Reference Image 1 Layout) -->
       <section>
-        <div id="examsGalleryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div id="examsGalleryGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
 
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT KOREAN PRACTICE EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-free px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">FREE</span>
+        <!-- Card 1: Standard / Unattempted -->
+        <article class="exam-card">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT KOREAN PRACTICE EXAM</span>
+              <span class="badge badge-free">FREE</span>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-slate-900 mb-3 leading-snug">JLPT N5 Korean Practice Test 1 – 2026</h3>
+            
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <span class="font-medium text-slate-700">⏱ 91 min</span>
+              <span>•</span>
+              <span>67 問題</span>
+            </div>
+
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <span class="font-mono text-slate-400">__ / 21</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <span class="font-mono text-slate-400">__ / 17</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <span class="font-mono text-slate-400">__ / 5</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <span class="font-mono text-slate-400">__ / 24</span>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=1">JLPT N5 Korean Practice Test 1 – 2026</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 91 mins</span>
-            <span>•</span>
-            <span>67 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 21</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 17</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 5</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 24</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_detail.html?id=1"
-              class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-              <span>View Exam Details</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-          
-        </div>
+          <a href="jlpt_exam_detail.html?id=1" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
 
-      </article>
-    
+        <!-- Card 2: Premium / Popular -->
+        <article class="exam-card premium">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT MOCK EXAM</span>
+              <div class="flex gap-1.5 flex-wrap justify-end">
+                <span class="badge badge-premium">★ PREMIUM</span>
+                <span class="badge badge-popular">POPULAR</span>
+              </div>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-amber-600 mb-3 leading-snug">JLPT N5 Mock Test – December 2025</h3>
+            
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <span class="font-medium text-slate-700">⏱ 91 min</span>
+              <span>•</span>
+              <span>67 問題</span>
+            </div>
 
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT MOCK EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-premium px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">★ PREMIUM</span><span class="badge-popular px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">POPULAR</span>
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <span class="font-mono text-slate-400">__ / 20</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <span class="font-mono text-slate-400">__ / 16</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <span class="font-mono text-slate-400">__ / 5</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <span class="font-mono text-slate-400">__ / 24</span>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=2">JLPT N5 Mock Test – December 2025</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 91 mins</span>
-            <span>•</span>
-            <span>67 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 21</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 17</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 5</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 24</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_detail.html?id=2"
-              class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-              <span>View Exam Details</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-          
-        </div>
+          <a href="jlpt_exam_detail.html?id=2" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
 
-      </article>
-    
+        <!-- Card 3: Completed Exam -->
+        <article class="exam-card completed">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT MOCK EXAM</span>
+              <div class="flex gap-1.5 flex-wrap justify-end">
+                <span class="badge badge-completed">✓ COMPLETED</span>
+                <span class="badge badge-free">FREE</span>
+                <span class="badge badge-popular">POPULAR</span>
+              </div>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-slate-900 mb-3 leading-snug">JLPT N5 Mock Test – July 2025</h3>
+            
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <span class="font-medium text-slate-700">⏱ 90 min</span>
+                <span>•</span>
+                <span>67 問題</span>
+              </div>
+            </div>
 
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT MOCK EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-completed px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">✓ COMPLETED</span><span class="badge-free px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">FREE</span><span class="badge-popular px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">POPULAR</span>
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-slate-700">20 / 21</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-slate-700">12 / 17</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-slate-700">3 / 5</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <div class="flex items-center gap-2">
+                  <span class="font-mono font-bold text-slate-700">17 / 24</span>
+                </div>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=3">JLPT N5 Mock Test – July 2025</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 90 mins</span>
-            <span>•</span>
-            <span>67 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-emerald-600 font-bold">20 / 21</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-emerald-600 font-bold">12 / 17</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-emerald-600 font-bold">3 / 5</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-emerald-600 font-bold">17 / 24</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_result.html?id=3"
-              class="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold text-center transition-colors">
-              📊 View Result
-            </a>
-            <a href="jlpt_exam_detail.html?id=3"
-              class="flex-1 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs">
-              🔄 Retake
-            </a>
-          
-        </div>
+          <a href="jlpt_exam_detail.html?id=3" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
 
-      </article>
-    
+        <!-- Card 4: Standard / Unattempted -->
+        <article class="exam-card">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT MOCK EXAM</span>
+              <span class="badge badge-free">FREE</span>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-slate-900 mb-3 leading-snug">JLPT N5 Mock Test – December 2012</h3>
+            
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <span class="font-medium text-slate-700">⏱ 105 min</span>
+              <span>•</span>
+              <span>91 問題</span>
+            </div>
 
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT MOCK EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-free px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">FREE</span>
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <span class="font-mono text-slate-400">__ / 33</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <span class="font-mono text-slate-400">__ / 26</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <span class="font-mono text-slate-400">__ / 6</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <span class="font-mono text-slate-400">__ / 26</span>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=4">JLPT N5 Mock Test – 2010-2011</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 105 mins</span>
-            <span>•</span>
-            <span>89 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 33</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 26</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 6</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 24</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_detail.html?id=4"
-              class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-              <span>View Exam Details</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-          
-        </div>
+          <a href="jlpt_exam_detail.html?id=4" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
 
-      </article>
-    
+        <!-- Card 5: Standard / Unattempted -->
+        <article class="exam-card">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT MOCK EXAM</span>
+              <span class="badge badge-free">FREE</span>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-slate-900 mb-3 leading-snug">JLPT N5 Mock Test – July 2013</h3>
+            
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <span class="font-medium text-slate-700">⏱ 105 min</span>
+              <span>•</span>
+              <span>85 問題</span>
+            </div>
 
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-        
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT MOCK EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-free px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">FREE</span>
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <span class="font-mono text-slate-400">__ / 30</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <span class="font-mono text-slate-400">__ / 25</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <span class="font-mono text-slate-400">__ / 6</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <span class="font-mono text-slate-400">__ / 24</span>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=5">JLPT N5 Mock Test – December 2012</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 105 mins</span>
-            <span>•</span>
-            <span>91 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 33</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 26</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 6</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 26</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_detail.html?id=5"
-              class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-              <span>View Exam Details</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-          
-        </div>
-
-      </article>
-    
-
-      <!-- EXAM CARD -->
-      <article class="exam-card-shell bg-white rounded-3xl border border-slate-200/80 p-5 shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
+          <a href="jlpt_exam_detail.html?id=5" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
         
-        <div>
-          <!-- Top Row: Category Tag & Badges -->
-          <div class="flex items-start justify-between gap-2 mb-3">
-            <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-wider line-clamp-1">
-              JLPT MOCK EXAM
-            </span>
-            <div class="flex items-center gap-1.5 shrink-0 flex-wrap justify-end">
-              <span class="badge-premium px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wide">★ PREMIUM</span>
+        <!-- Card 6: Standard / Unattempted -->
+        <article class="exam-card">
+          <div class="flex-1">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">JLPT MOCK EXAM</span>
+              <span class="badge badge-free">FREE</span>
+            </div>
+            
+            <h3 class="text-base font-extrabold text-slate-900 mb-3 leading-snug">JLPT N5 Mock Test – July 2017</h3>
+            
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-4">
+              <span class="font-medium text-slate-700">⏱ 105 min</span>
+              <span>•</span>
+              <span>85 問題</span>
+            </div>
+
+            <hr class="border-slate-100 mb-4">
+
+            <div class="space-y-2.5 mb-6 p-3 bg-slate-50 rounded-xl">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🏷 Vocabulary</span>
+                <span class="font-mono text-slate-400">__ / 30</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">✎ Grammar</span>
+                <span class="font-mono text-slate-400">__ / 25</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">📖 Reading</span>
+                <span class="font-mono text-slate-400">__ / 6</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-2 text-slate-600 font-medium">🎙 Listening</span>
+                <span class="font-mono text-slate-400">__ / 24</span>
+              </div>
             </div>
           </div>
-
-          <!-- Exam Title -->
-          <h3 class="text-sm md:text-base font-black text-slate-900 line-clamp-2 hover:text-sky-600 transition-colors">
-            <a href="jlpt_exam_detail.html?id=6">JLPT N5 Mock Test – July 2012</a>
-          </h3>
-
-          <!-- Meta Info: Level Pill, Duration, Questions -->
-          <div class="flex items-center gap-2 mt-3 text-xs text-slate-500 flex-wrap">
-            <span class="px-2 py-0.5 rounded-lg bg-slate-900 text-white font-extrabold text-[11px]">N5</span>
-            <span class="font-semibold text-slate-700">⏱️ 105 mins</span>
-            <span>•</span>
-            <span>85 Questions</span>
-          </div>
-
-          <!-- 4-Grid Breakdown: Vocabulary, Grammar, Reading, Listening -->
-          <div class="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">⬡</span>
-                  <span class="text-slate-600 font-medium truncate">Vocabulary</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 30</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">✎</span>
-                  <span class="text-slate-600 font-medium truncate">Grammar</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 25</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">📖</span>
-                  <span class="text-slate-600 font-medium truncate">Reading</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 6</span>
-                </div>
-              </div>
-            
-              <div class="p-2 rounded-xl bg-slate-50/80 border border-slate-100 flex items-center justify-between gap-1 text-[11px]">
-                <div class="flex items-center gap-1.5 min-w-0">
-                  <span class="text-xs">🎧</span>
-                  <span class="text-slate-600 font-medium truncate">Listening</span>
-                </div>
-                <div class="text-right shrink-0 font-mono text-[10px]">
-                  <span class="text-slate-400">___ / 24</span>
-                </div>
-              </div>
-            
-          </div>
-        </div>
-
-        <!-- Card Footer CTA Actions -->
-        <div class="mt-5 pt-3 border-t border-slate-100 flex items-center gap-2">
           
-            <a href="jlpt_exam_detail.html?id=6"
-              class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-sky-600 text-white text-xs font-bold text-center transition-colors shadow-xs flex items-center justify-center gap-1.5">
-              <span>View Exam Details</span>
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-          
-        </div>
+          <a href="jlpt_exam_detail.html?id=6" class="btn-view-test w-full py-3 rounded-xl bg-slate-900 text-white font-bold text-xs text-center block mt-auto shadow-sm">
+            VIEW TEST
+          </a>
+        </article>
 
-      </article>
-    
       </div>
 
-      <!-- Empty State Container -->
-        <div id="examsEmptyState" class="hidden py-16 text-center bg-white rounded-3xl border border-slate-100 p-6 shadow-soft">
-          <div class="w-16 h-16 rounded-3xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+        <!-- Empty State Container -->
+        <div id="examsEmptyState"
+          class="hidden py-16 text-center bg-white rounded-3xl border border-slate-100 p-6 shadow-soft">
+          <div
+            class="w-16 h-16 rounded-3xl bg-sky-50 text-sky-600 flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
             📚
           </div>
           <h3 class="text-base font-bold text-slate-800">No mock examinations found</h3>
-          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Try adjusting your search terms or selecting a different JLPT level filter.</p>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Try adjusting your search terms or selecting a
+            different JLPT level filter.</p>
         </div>
       </section>
 
@@ -833,8 +659,7 @@
   <!-- ========================================== -->
   <!-- JAVASCRIPT: EXAMS GALLERY DATA & RENDERER  -->
   <!-- ========================================== -->
-  
+
 </body>
 
 </html>
-
