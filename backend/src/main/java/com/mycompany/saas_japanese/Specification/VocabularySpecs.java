@@ -87,4 +87,36 @@ public class VocabularySpecs {
 
     return (root, builder) -> builder.isNull(root.get("deletedAt"));
   }
+
+  public static PredicateSpecification<Vocabulary> hasSearch(String search) {
+
+    return (root, builder) -> {
+
+      if (search == null || search.trim().isEmpty()) {
+        return null;
+      }
+
+      String keyword = "%" + search.trim().toLowerCase() + "%";
+
+      return builder.or(
+          builder.like(
+              builder.lower(root.get("word")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("reading")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("meaningVi")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("exampleSentenceJp")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("exampleSentenceVi")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("partOfSpeech")),
+              keyword));
+    };
+  }
 }

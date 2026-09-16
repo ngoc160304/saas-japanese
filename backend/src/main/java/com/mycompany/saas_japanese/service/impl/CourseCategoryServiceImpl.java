@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mycompany.saas_japanese.domain.CourseCategory;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.CourseCategoryQuery;
+import com.mycompany.saas_japanese.domain.query.VocabularyQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourseCategory;
 import com.mycompany.saas_japanese.domain.response.CourseCategoryResponse;
 import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
@@ -87,11 +88,13 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
           CourseCategorySpecs.hasName(
               query.getName()));
     }
-
+      spec = spec.and(
+          CourseCategorySpecs.hasSearch(
+              query.getSearch()));
     PageRequest pageable = PageRequest.of(
         query.getPage(),
         query.getSize(),
-        Sort.by("createdAt").ascending());
+        buildSort(query));
 
     return courseCategoryRepository
         .findAll(spec, pageable)
@@ -174,5 +177,31 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
 
     courseCategoryRepository.save(category);
   }
+
+    private Sort buildSort(CourseCategoryQuery query) {
+
+        String sortKey = query.getSortKey();
+
+        String field = switch (sortKey == null ? "" : sortKey) {
+            case "id" -> "id";
+            case "name" -> "name";
+            case "slug" -> "slug";
+            case "description" -> "description";
+            case "createdAt" -> "createdAt";
+            case "updatedAt" -> "updatedAt";
+            default -> "id";
+        };
+
+        Sort.Direction direction;
+
+        try {
+            direction = Sort.Direction.fromString(query.getSortType());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.DESC;
+        }
+
+        return Sort.by(direction, field);
+    }
+
 
 }

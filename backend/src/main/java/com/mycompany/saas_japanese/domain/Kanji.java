@@ -37,7 +37,7 @@ public class Kanji {
   @Column
   private Integer strokeCount;
 
-  @Lob
+  @Column(length = 1000)
   private String exampleWords;
 
   @Column(nullable = false, updatable = false)

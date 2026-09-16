@@ -104,13 +104,16 @@ public class CourseServiceImpl implements CourseService {
         spec = spec.and(
                 CourseSpecs.hasTitle(query.getTitle()));
 
+        spec = spec.and(
+                CourseSpecs.hasSearch(query.getSearch()));
+
         Page<Course> coursePage = courseRepository.findBy(
                 spec,
                 q -> q.page(
                         PageRequest.of(
                                 query.getPage(),
                                 query.getSize(),
-                                Sort.by("id").ascending())));
+                                buildSort(query))));
 
         return coursePage.map(course -> {
 
@@ -157,6 +160,32 @@ public class CourseServiceImpl implements CourseService {
         currentCourse.setCategory(category);
         Course updatedCourse = courseRepository.save(currentCourse);
         return courseMapper.toResponse(updatedCourse);
+    }
+
+    private Sort buildSort(CourseQuerry query) {
+
+        String sortKey = query.getSortKey();
+
+        String field = switch (sortKey == null ? "" : sortKey) {
+            case "id" -> "id";
+            case "title" -> "title";
+            case "price" -> "price";
+            case "categoryName" -> "categoryName";
+            case "createdAt" -> "createdAt";
+            case "updatedAt" -> "updatedAt";
+            case "isPublished" -> "isPublished";
+            default -> "id";
+        };
+
+        Sort.Direction direction;
+
+        try {
+            direction = Sort.Direction.fromString(query.getSortType());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.DESC;
+        }
+
+        return Sort.by(direction, field);
     }
 
 }

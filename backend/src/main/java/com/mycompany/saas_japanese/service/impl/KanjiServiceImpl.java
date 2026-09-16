@@ -2,6 +2,7 @@ package com.mycompany.saas_japanese.service.impl;
 
 import com.mycompany.saas_japanese.domain.Kanji;
 import com.mycompany.saas_japanese.domain.Lesson;
+import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.query.KanjiQuery;
 import com.mycompany.saas_japanese.domain.request.ReqKanji;
 import com.mycompany.saas_japanese.domain.response.KanjiResponse;
@@ -25,113 +26,143 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class KanjiServiceImpl implements KanjiService {
 
-  private final KanjiRepository kanjiRepository;
-  private final LessonRepository lessonRepository;
-  private final KanjiMapper kanjiMapper;
+    private final KanjiRepository kanjiRepository;
+    private final LessonRepository lessonRepository;
+    private final KanjiMapper kanjiMapper;
 
-  @Override
-  @Transactional
-  public KanjiResponse create(ReqKanji request) {
+    @Override
+    @Transactional
+    public KanjiResponse create(ReqKanji request) {
 
-    if (kanjiRepository.existsByKanjiAndDeletedAtIsNull(
-        request.getKanji().trim())) {
-      throw new IllegalArgumentException(
-          "Kanji đã tồn tại: " + request.getKanji());
+        if (kanjiRepository.existsByKanjiAndDeletedAtIsNull(
+                request.getKanji().trim())) {
+            throw new IllegalArgumentException(
+                    "Kanji đã tồn tại: " + request.getKanji());
+        }
+
+        Kanji kanji = kanjiMapper.toEntity(request);
+
+        if (request.getLessonId() != null) {
+            Lesson lesson = lessonRepository
+                    .findById(request.getLessonId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Không tìm thấy lesson: "
+                                    + request.getLessonId()));
+
+            kanji.setLesson(lesson);
+        }
+
+        return kanjiMapper.toResponse(
+                kanjiRepository.save(kanji));
     }
 
-    Kanji kanji = kanjiMapper.toEntity(request);
+    @Override
+    @Transactional(readOnly = true)
+    public KanjiResponse findById(Long id) {
 
-    if (request.getLessonId() != null) {
-      Lesson lesson = lessonRepository
-          .findById(request.getLessonId())
-          .orElseThrow(() -> new IllegalArgumentException(
-              "Không tìm thấy lesson: "
-                  + request.getLessonId()));
+        Kanji kanji = kanjiRepository
+                .findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy kanji: " + id));
 
-      kanji.setLesson(lesson);
+        return kanjiMapper.toResponse(kanji);
     }
 
-    return kanjiMapper.toResponse(
-        kanjiRepository.save(kanji));
-  }
+    @Transactional(readOnly = true)
+    public Page<KanjiResponse> findAll(KanjiQuery query) {
 
-  @Override
-  @Transactional(readOnly = true)
-  public KanjiResponse findById(Long id) {
+        PredicateSpecification<Kanji> spec = KanjiSpecs.isNotDeleted();
 
-    Kanji kanji = kanjiRepository
-        .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
-            "Không tìm thấy kanji: " + id));
+        spec = spec.and(
+                KanjiSpecs.hasKanji(query.getKanji()));
 
-    return kanjiMapper.toResponse(kanji);
-  }
+        spec = spec.and(
+                KanjiSpecs.hasMeaningVi(query.getMeaningVi()));
 
-  @Transactional(readOnly = true)
-  public Page<KanjiResponse> findAll(KanjiQuery query) {
+        spec = spec.and(
+                KanjiSpecs.hasLessonId(query.getLessonId()));
 
-    PredicateSpecification<Kanji> spec = KanjiSpecs.isNotDeleted();
+        spec = spec.and(
+                KanjiSpecs.hasSearch(query.getSearch()));
+        PageRequest pageable = PageRequest.of(
+                query.getPage(),
+                query.getSize(),
+                buildSort(query));
 
-    spec = spec.and(
-        KanjiSpecs.hasKanji(query.getKanji()));
+        return kanjiRepository.findBy(
+                spec,
+                q -> q.page(pageable)).map(kanjiMapper::toResponse);
+    }
 
-    spec = spec.and(
-        KanjiSpecs.hasMeaningVi(query.getMeaningVi()));
+    @Override
+    @Transactional
+    public KanjiResponse update(
+            Long id,
+            ReqKanji request) {
 
-    spec = spec.and(
-        KanjiSpecs.hasLessonId(query.getLessonId()));
+        Kanji kanji = kanjiRepository
+                .findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy kanji: " + id));
 
-    PageRequest pageable = PageRequest.of(
-        query.getPage(),
-        query.getSize(),
-        Sort.by(
-            Sort.Direction.ASC,
-            "id"));
+        kanjiMapper.updateEntity(
+                kanji,
+                request);
 
-    return kanjiRepository.findBy(
-        spec,
-        q -> q.page(pageable)).map(kanjiMapper::toResponse);
-  }
+        Lesson lesson = lessonRepository
+                .findById(request.getLessonId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy lesson: "
+                                + request.getLessonId()));
 
-  @Override
-  @Transactional
-  public KanjiResponse update(
-      Long id,
-      ReqKanji request) {
+        kanji.setLesson(lesson);
 
-    Kanji kanji = kanjiRepository
-        .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
-            "Không tìm thấy kanji: " + id));
+        return kanjiMapper.toResponse(
+                kanjiRepository.save(kanji));
+    }
 
-    kanjiMapper.updateEntity(
-        kanji,
-        request);
+    @Override
+    @Transactional
+    public void delete(Long id) {
 
-    Lesson lesson = lessonRepository
-        .findById(request.getLessonId())
-        .orElseThrow(() -> new IllegalArgumentException(
-            "Không tìm thấy lesson: "
-                + request.getLessonId()));
+        Kanji kanji = kanjiRepository
+                .findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Không tìm thấy kanji: " + id));
 
-    kanji.setLesson(lesson);
+        kanji.setDeletedAt(
+                java.time.Instant.now());
 
-    return kanjiMapper.toResponse(
-        kanjiRepository.save(kanji));
-  }
+        kanjiRepository.save(kanji);
+    }
 
-  @Override
-  @Transactional
-  public void delete(Long id) {
+    private Sort buildSort(KanjiQuery query) {
 
-    Kanji kanji = kanjiRepository
-        .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
-            "Không tìm thấy kanji: " + id));
+        String sortKey = query.getSortKey();
 
-    kanji.setDeletedAt(
-        java.time.Instant.now());
+        String field = switch (sortKey == null ? "" : sortKey) {
+            case "id" -> "id";
+            case "lessonId" -> "lessonId";
+            case "kanji" -> "kanji";
+            case "onyomi" -> "onyomi";
+            case "kunyomi" -> "kunyomi";
+            case "meaningVi" -> "meaningVi";
+            case "exampleWords" -> "exampleWords";
+            case "createdAt" -> "createdAt";
+            case "updatedAt" -> "updatedAt";
+            case "strokeCount" -> "strokeCount";
+            default -> "id";
+        };
 
-    kanjiRepository.save(kanji);
-  }
+        Sort.Direction direction;
+
+        try {
+            direction = Sort.Direction.fromString(query.getSortType());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.DESC;
+        }
+
+        return Sort.by(direction, field);
+    }
+
 }

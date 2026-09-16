@@ -31,10 +31,10 @@ public class Vocabulary {
   @Column(nullable = false, length = 500)
   private String meaningVi;
 
-  @Lob
+  @Column(length = 1000)
   private String exampleSentenceJp;
 
-  @Lob
+  @Column(length = 1000)
   private String exampleSentenceVi;
 
   @Column(length = 50)
