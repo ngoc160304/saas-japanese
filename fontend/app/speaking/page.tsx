@@ -71,11 +71,7 @@ const Speaking = () => {
       setResult(null);
     }
   };
-<<<<<<< HEAD
 
-=======
-  
->>>>>>> c222501 (Add score service and UI)
   const handleStartSpeaking = async (topic: Topic) => {
     setSelectedTopic(topic);
     setMessages([]);
@@ -187,7 +183,7 @@ const SessionLiveKit = ({
             const text = new TextDecoder().decode(payload);
             console.log('Received data:', text);
             const data = JSON.parse(text);
-<<<<<<< HEAD
+
             if (data.type === 'user_message') {
               setMessages((prev) => [
                 ...prev,
@@ -223,24 +219,7 @@ const SessionLiveKit = ({
                 return messages;
               });
             }
-=======
-            if (data.type !== 'conversation') {
-              return;
-            }
-            setMessages((prev) => [
-              ...prev,
-              {
-                id: `${Date.now()}-user`,
-                role: 'user',
-                message: data.user,
-              },
-              {
-                id: `${Date.now()}-ai`,
-                role: 'ai',
-                message: data.ai,
-              },
-            ]);
->>>>>>> c222501 (Add score service and UI)
+
           } catch (error) {
             console.error('Failed to parse conversation data:', error);
           }
