@@ -13,6 +13,11 @@ public class BaseQuery {
     private Integer page = 0;
 
     @Min(value = 0, message = "page phai >= 0")
-    @Max(value = 12, message = "size toi da bang 10")
-    private Integer size = 3;
+    @Max(value = 12, message = "size toi da bang 12")
+    private Integer size = 10;
+
+    private String search;
+    private String sortKey;
+
+    private String sortType = "DESC";
 }

@@ -29,4 +29,30 @@ public class LessonSpecs {
         root.get("isDeleted"),
         false);
   }
+
+   public static PredicateSpecification<Lesson> hasSearch(String search) {
+
+  return (root, builder) -> {
+
+    if (search == null || search.trim().isEmpty()) {
+      return null;
+    }
+
+    String keyword =
+        "%" + search.trim().toLowerCase() + "%";
+
+    return builder.or(
+        builder.like(
+            builder.lower(root.get("title")),
+            keyword),
+
+        builder.like(
+            builder.lower(root.get("slug")),
+            keyword),
+
+        builder.like(
+            builder.lower(root.get("grammar")),
+            keyword));
+  };
+}
 }

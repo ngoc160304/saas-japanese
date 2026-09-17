@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.Vocabulary;
+import com.mycompany.saas_japanese.domain.query.KanjiQuery;
 import com.mycompany.saas_japanese.domain.query.VocabularyQuery;
 import com.mycompany.saas_japanese.domain.request.ReqVocabulary;
 import com.mycompany.saas_japanese.domain.response.VocabularyResponse;
@@ -86,11 +87,14 @@ public class VocabularyServiceImpl implements VocabularyService {
     spec = spec.and(
         VocabularySpecs.hasLessonId(
             query.getLessonId()));
+    spec = spec.and(
+        VocabularySpecs.hasSearch(
+            query.getSearch()));
 
     PageRequest pageable = PageRequest.of(
         query.getPage(),
         query.getSize(),
-        Sort.by("id").ascending());
+        buildSort(query));
 
     return vocabularyRepository.findBy(
         spec,
@@ -165,4 +169,34 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     vocabularyRepository.save(vocabulary);
   }
+
+    private Sort buildSort(VocabularyQuery query) {
+
+        String sortKey = query.getSortKey();
+
+        String field = switch (sortKey == null ? "" : sortKey) {
+            case "id" -> "id";
+            case "lessonId" -> "lessonId";
+            case "word" -> "word";
+            case "reading" -> "reading";
+            case "meaningVi" -> "meaningVi";
+            case "exampleSentenceJp" -> "exampleSentenceJp";
+            case "exampleSentenceVi" -> "exampleSentenceVi";
+            case "partOfSpeech" -> "partOfSpeech";
+            case "createdAt" -> "createdAt";
+            case "updatedAt" -> "updatedAt";
+            default -> "id";
+        };
+
+        Sort.Direction direction;
+
+        try {
+            direction = Sort.Direction.fromString(query.getSortType());
+        } catch (IllegalArgumentException e) {
+            direction = Sort.Direction.DESC;
+        }
+
+        return Sort.by(direction, field);
+    }
+
 }

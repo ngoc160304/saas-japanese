@@ -54,4 +54,34 @@ public class KanjiSpecs {
 
     return (root, builder) -> builder.isNull(root.get("deletedAt"));
   }
+
+  public static PredicateSpecification<Kanji> hasSearch(String search) {
+
+    return (root, builder) -> {
+
+      if (search == null || search.trim().isEmpty()) {
+        return null;
+      }
+
+      String keyword = "%" + search.trim().toLowerCase() + "%";
+
+      return builder.or(
+          builder.like(
+              builder.lower(root.get("kanji")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("meaningVi")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("onyomi")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("kunyomi")),
+              keyword),
+          builder.like(
+              builder.lower(root.get("exampleWords")),
+              keyword));
+    };
+  }
+
 }
