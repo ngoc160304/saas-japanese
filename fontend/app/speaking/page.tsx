@@ -1,8 +1,8 @@
 'use client';
-import SpeakingResult from '@/components/speaking/result/SpeakingResult';
-import SpeakingLayout from '@/components/speaking/layout/SpeakingLayout';
-import Conversation from '@/components/speaking/conversation/Conversation';
-import TopicSelection, { Topic } from '@/components/speaking/topic/TopicSelection';
+import SpeakingResult from '@/features/speaking/result/SpeakingResult';
+import SpeakingLayout from '@/features/speaking/layout/SpeakingLayout';
+import Conversation from '@/features/speaking/conversation/Conversation';
+import TopicSelection, { Topic } from '@/features/speaking/topic/TopicSelection';
 import { LiveKitService } from '@/services/livekit.service';
 import {
   RoomAudioRenderer,
@@ -71,7 +71,6 @@ const Speaking = () => {
       setResult(null);
     }
   };
-
   const handleStartSpeaking = async (topic: Topic) => {
     setSelectedTopic(topic);
     setMessages([]);
@@ -183,7 +182,6 @@ const SessionLiveKit = ({
             const text = new TextDecoder().decode(payload);
             console.log('Received data:', text);
             const data = JSON.parse(text);
-
             if (data.type === 'user_message') {
               setMessages((prev) => [
                 ...prev,
@@ -219,7 +217,6 @@ const SessionLiveKit = ({
                 return messages;
               });
             }
-
           } catch (error) {
             console.error('Failed to parse conversation data:', error);
           }

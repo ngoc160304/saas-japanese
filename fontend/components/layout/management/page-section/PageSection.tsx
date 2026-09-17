@@ -14,7 +14,7 @@ export default function PageSection({ children, className }: PageSectionProps) {
         className,
       )}
     >
-      {children}
+      <div className="space-y-6">{children}</div>
     </section>
   );
 }

@@ -14,9 +14,6 @@ const SideBarItem = ({ icon, title, href }: SideBarItemProps) => {
   const pathname = usePathname();
 
   const isActive = pathname === href || pathname.startsWith(`${href}/`);
-  console.log('isActive', isActive);
-  console.log('href', href);
-  console.log('pathname', pathname);
   return (
     <Link
       href={href}
