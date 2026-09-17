@@ -5,9 +5,12 @@ import { Pencil, Trash2, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
+import { CategoryCourseDialog } from './CategoryCourseDialog';
+import { useState } from 'react';
+import { CourseCategory } from '@/apis/categories-course/categories-course.type';
 
 interface CourseActionsProps {
-  courseId: number;
+  courseCategory: CourseCategory;
   canEdit?: boolean;
   canDelete?: boolean;
   onDelete?: (id: number) => void;
@@ -15,24 +18,24 @@ interface CourseActionsProps {
 }
 
 export function CategoryCourseAction({
-  courseId,
+  courseCategory,
   canEdit = false,
   canDelete = false,
   onDelete,
   onReload,
 }: CourseActionsProps) {
   const handleDeleteByid = async () => {
-    const result = await categoryCourseAPI.deleteCategortByid(courseId + '');
-    console.log('run here 1');
-
+    await categoryCourseAPI.deleteByid(courseCategory.id + '');
     onReload();
-
-    console.log('run here 2');
   };
+  const handleEdit = () => {
+    setEditDialogOpen(true);
+  };
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   return (
     <div className="flex items-center justify-end gap-1.5">
       <Link
-        href={`/courses/${courseId}`}
+        href={`/courses/${courseCategory.id + ''}`}
         className="
             inline-flex
             h-8
@@ -54,8 +57,8 @@ export function CategoryCourseAction({
       </Link>
 
       {canEdit && (
-        <Link
-          href={`/admin/courses/${courseId}/edit`}
+        <Button
+          onClick={handleEdit}
           title="Edit"
           aria-label="Edit"
           className="
@@ -76,7 +79,7 @@ export function CategoryCourseAction({
           "
         >
           <Pencil className="h-4 w-4" />
-        </Link>
+        </Button>
       )}
 
       {canDelete && (
@@ -101,6 +104,15 @@ export function CategoryCourseAction({
         >
           <Trash2 className="h-4 w-4" />
         </Button>
+      )}
+      {canEdit && (
+        <CategoryCourseDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          mode="edit"
+          category={courseCategory}
+          onReload={onReload}
+        />
       )}
     </div>
   );

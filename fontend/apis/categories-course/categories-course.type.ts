@@ -12,5 +12,22 @@ export interface CourseCategory {
   createdAt: string;
   updatedAt: string;
 }
+export interface ReqCreateCourseCategory {
+  name: string;
+  description?: string;
+  mediaId?: number;
+}
+
+export interface CourseCategoryResponse {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string | null;
+  mediaId?: number | null;
+  mediaUrl?: string | null;
+  createdAt: string; // ISO Date String
+  courseCount?: number;
+  updatedAt: string; // ISO Date String
+}
 
 export type GetCoursesResponse = ApiResponse<PageResponse<CourseCategory>>;

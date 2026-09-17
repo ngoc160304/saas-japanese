@@ -10,6 +10,8 @@ import {
 } from '@/components/ui/table';
 import { CategoryCourseAction } from './CategoryCourseActions';
 import { CourseCategory } from '@/apis/categories-course/categories-course.type';
+import { IsLoading } from '@/components/common/loading/IsLoading';
+import { useState } from 'react';
 
 interface CourseTableProps {
   courseCategories: CourseCategory[];
@@ -17,6 +19,7 @@ interface CourseTableProps {
   canDelete?: boolean;
   onDelete?: (id: number) => void;
   onReload: () => void;
+  isLoading?: boolean;
 }
 
 export function CourseCategoriesTable({
@@ -25,6 +28,7 @@ export function CourseCategoriesTable({
   canDelete = false,
   onDelete,
   onReload,
+  isLoading,
 }: CourseTableProps) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-100">
@@ -37,12 +41,11 @@ export function CourseCategoriesTable({
             <TableHead className="text-right text-slate-700 font-semibold">Actions</TableHead>
           </TableRow>
         </TableHeader>
-
         <TableBody>
           {courseCategories.map((item) => (
             <TableRow key={item.id} className="border-b border-slate-100 hover:bg-slate-50/70">
               <TableCell className="align-middle">
-                <div className="flex min-w-[220px] items-center gap-3">
+                <div className="flex min-w-55 items-center gap-3">
                   <img
                     src={item.mediaUrl}
                     alt={item.name}
@@ -71,7 +74,7 @@ export function CourseCategoriesTable({
 
               <TableCell className="whitespace-nowrap text-right align-middle">
                 <CategoryCourseAction
-                  courseId={item.id}
+                  courseCategory={item}
                   canEdit={canEdit}
                   canDelete={canDelete}
                   onDelete={onDelete}
