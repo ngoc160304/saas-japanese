@@ -1,28 +1,26 @@
 package com.mycompany.saas_japanese.service;
 
-import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.request.ReqForgotPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqLoginDTO;
 import com.mycompany.saas_japanese.domain.request.ReqOtpDTO;
+import com.mycompany.saas_japanese.domain.request.ReqRegisterDTO;
 import com.mycompany.saas_japanese.domain.request.ReqResetPasswordDTO;
-import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
-
-import jakarta.servlet.http.HttpServletResponse;
+import com.mycompany.saas_japanese.domain.response.ResRegisterDTO;
 
 public interface AuthService {
-  User register(User user);
+  ResRegisterDTO register(ReqRegisterDTO request);
 
-  String verifyUser(ReqOtpDTO otp);
+  String verifyUser(ReqOtpDTO request);
 
-  ResLoginDTO login(ReqLoginDTO reqLoginDTO);
+  AuthTokens login(ReqLoginDTO request);
 
-  void logout(HttpServletResponse response);
+  void logout(String refreshToken);
 
-  void forgotPassword(ReqForgotPasswordDTO req);
+  AuthTokens refreshToken(String refreshToken);
 
-  void resetPassword(ReqResetPasswordDTO req);
+  void forgotPassword(ReqForgotPasswordDTO request);
 
-  void verifyResetOtp(ReqOtpDTO req);
+  void resetPassword(ReqResetPasswordDTO request);
 
-  ResLoginDTO refreshToken(String refreshToken);
+  void verifyResetOtp(ReqOtpDTO request);
 }

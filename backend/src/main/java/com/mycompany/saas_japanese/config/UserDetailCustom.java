@@ -1,38 +1,27 @@
 package com.mycompany.saas_japanese.config;
 
-import java.util.Collections;
+import java.util.Locale;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-// import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.mycompany.saas_japanese.service.UserService;
-import com.mycompany.saas_japanese.util.error.BadRequestException;
+import com.mycompany.saas_japanese.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 
 @Component("userDetailsService")
+@RequiredArgsConstructor
 public class UserDetailCustom implements UserDetailsService {
-  UserService userService;
-
-  public UserDetailCustom(UserService userService) {
-    this.userService = userService;
-  }
+  private final UserRepository userRepository;
 
   @Override
-  public UserDetails loadUserByUsername(String username) throws BadRequestException {
-    com.mycompany.saas_japanese.domain.User user = this.userService.getUserByEmail(username);
-    if (user == null) {
-      throw new BadRequestException("username/password khong hop le !");
-    }
-    if (!user.isVerified()) {
-      throw new BadRequestException("Please verify your email before login");
-    }
-    return new User(
-        user.getEmail(),
-        user.getPassword(),
-        Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")));
+  public UserDetails loadUserByUsername(String email) {
+    com.mycompany.saas_japanese.domain.User user = userRepository
+        .findByEmail(email.trim().toLowerCase(Locale.ROOT))
+        .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
+    // Check status after the password in AuthService to avoid disclosing account state.
+    return User.withUsername(user.getEmail()).password(user.getPassword()).authorities("ROLE_USER").build();
   }
-
 }
