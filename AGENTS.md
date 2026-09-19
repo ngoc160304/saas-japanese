@@ -20,7 +20,7 @@ Nếu yêu cầu của người dùng xung đột với file này, ưu tiên yê
 
 - backend/: Spring Boot application.
 - fontend/: Next.js application. Tên thư mục fontend là tên hiện tại, không tự ý đổi.
-- UI/: chỉ dùng làm tài liệu tham khảo giao diện.
+- UI/: nguồn giao diện chuẩn để triển khai và chia component cho fontend/. Khi có file HTML tương ứng, phải đọc và bám theo file đó.
 - database_schema.md: tài liệu tham khảo database.
 - fe_design_guidline.md: quy chuẩn thiết kế frontend.
 
@@ -45,12 +45,13 @@ Khi làm trong fontend/, phải đọc thêm fontend/AGENTS.md. Rule gần file 
 1. Đọc AGENTS.md áp dụng cho file mục tiêu.
 2. Xác định phạm vi backend, frontend hoặc cross-stack.
 3. Đọc implementation liên quan, file lân cận, type/DTO, test và config cần thiết.
-4. Tìm pattern tương tự đã tồn tại để tái sử dụng.
-5. Nêu assumption nếu yêu cầu chưa rõ nhưng vẫn có thể triển khai an toàn.
-6. Sửa đúng phạm vi; không cleanup hoặc refactor ngoài yêu cầu.
-7. Chạy kiểm tra hẹp trước, sau đó chạy kiểm tra cấp application nếu phù hợp.
-8. Review diff để tìm secret, generated file, debug code và thay đổi ngoài phạm vi.
-9. Báo cáo file đã đổi, kiểm tra đã chạy và phần chưa thể xác minh.
+4. Nếu task làm giao diện frontend, tìm và đọc file HTML tương ứng trong UI/ trước khi chia layout hoặc component.
+5. Tìm pattern tương tự đã tồn tại để tái sử dụng.
+6. Nêu assumption nếu yêu cầu chưa rõ nhưng vẫn có thể triển khai an toàn.
+7. Sửa đúng phạm vi; không cleanup hoặc refactor ngoài yêu cầu.
+8. Chạy kiểm tra hẹp trước, sau đó chạy kiểm tra cấp application nếu phù hợp.
+9. Review diff để tìm secret, generated file, debug code và thay đổi ngoài phạm vi.
+10. Báo cáo file đã đổi, kiểm tra đã chạy và phần chưa thể xác minh.
 
 Không được tuyên bố test/build đã pass nếu chưa thực sự chạy.
 
@@ -188,6 +189,43 @@ Repository có thể chứa nhiều lockfile. Mặc định dùng pnpm và chỉ
 
 Page phải mỏng: compose feature, không chứa raw Axios call hoặc toàn bộ CRUD logic.
 
+### UI-first workflow và chia component
+
+UI/ là nguồn thiết kế đầu vào cho fontend/, không phải production code và không được copy nguyên file HTML vào Next.js.
+
+Khi tạo hoặc sửa một trang có thiết kế trong UI/:
+
+1. Tìm file HTML khớp nhất theo domain và vai trò trang. Ví dụ trang quản lý course category phải ưu tiên UI/admin/admin_category.html.
+2. Đọc toàn bộ cấu trúc trang liên quan: layout, section, toolbar, filter, table, action, dialog/form, trạng thái và responsive behavior.
+3. Đối chiếu fe_design_guidline.md để lấy màu sắc, typography, spacing và visual convention.
+4. Đối chiếu component/hook hiện có trong fontend/ trước khi tạo component mới.
+5. Lập component map rồi mới code. Phân tách theo trách nhiệm và khả năng tái sử dụng, không theo từng div nhỏ.
+6. Chuyển HTML tĩnh thành component React/Next.js có type rõ ràng và dữ liệu thật từ API.
+7. Giữ thiết kế gần file HTML nhưng phải thích nghi với kiến trúc, accessibility, responsive và state thực tế của ứng dụng.
+
+Quy tắc phân loại component:
+
+- app/: chỉ compose page, đọc route/search params và đặt boundary cần thiết.
+- features/<domain>/: section, table, action, dialog/form và logic UI riêng domain.
+- components/common/: component dùng lại được ở nhiều domain như toolbar, pagination, stat card hoặc upload input.
+- components/ui/: primitive tổng quát theo shadcn/base-ui, không chứa business rule.
+- hooks/: logic generic thật sự dùng được cho nhiều domain.
+- apis/: API call và contract; không đặt API call trực tiếp trong component trình bày.
+
+Ưu tiên componentization cấp senior:
+
+- Mỗi component có một trách nhiệm rõ.
+- Tách data/orchestration khỏi presentational UI khi việc đó làm code dễ test và tái sử dụng hơn.
+- Dùng composition và typed props thay vì copy/paste markup.
+- Không over-engineer component chỉ được dùng một lần nếu việc tách không tăng độ rõ ràng.
+- Không tạo abstraction generic khi mới chỉ có một use case hoặc các domain có contract khác nhau.
+- Component dùng chung không được phụ thuộc vào type hoặc API của một domain cụ thể.
+- Dialog create/update có thể dùng chung khi schema và hành vi đủ giống nhau; mode và initial data phải được type an toàn.
+- Table phải tách column/action/state hợp lý, nhưng không chia mỗi cell thành component nếu không có logic hoặc reuse.
+- Không hy sinh giao diện gốc trong UI/ chỉ để ép dùng component cũ; mở rộng component cũ nếu thay đổi vẫn giữ contract rõ ràng.
+
+Nếu không có file HTML tương ứng trong UI/, dùng component và design convention gần nhất trong fontend/ cùng fe_design_guidline.md. Không tự tạo một visual language khác.
+
 ### Data, API và state
 
 - Dùng Axios instance đã cấu hình; không tạo client trùng lặp.
@@ -212,7 +250,7 @@ Page phải mỏng: compose feature, không chứa raw Axios call hoặc toàn b
 - Ưu tiên reuse component/hook hiện có trước khi tạo mới.
 - Domain component nằm trong feature; component generic không được chứa business rule riêng domain.
 - Dùng Server Component mặc định; chỉ thêm use client khi thực sự cần state, effect, handler, browser API hoặc client library.
-- Theo fe_design_guidline.md và UI/ khi task yêu cầu bám giao diện mẫu.
+- Khi UI/ có file HTML tương ứng, phải bám giao diện đó; không chờ người dùng nhắc lại. Dùng fe_design_guidline.md để chuẩn hóa chi tiết thiết kế.
 - Giữ accessibility: label, semantic element, keyboard, focus, alt và ARIA phù hợp.
 - Kiểm tra responsive ít nhất ở mobile và desktop.
 - Không sửa .next/, next-env.d.ts, tsconfig.tsbuildinfo hoặc generated output.
@@ -225,6 +263,8 @@ Page phải mỏng: compose feature, không chứa raw Axios call hoặc toàn b
 - Form validation và API error hiển thị hợp lý.
 - Query invalidation/cache behavior đúng.
 - Không duplicate API client, hook hoặc component đã có.
+- Trang khớp file HTML tương ứng trong UI/ về hierarchy, section chính và hành vi; mọi khác biệt có chủ đích phải được báo cáo.
+- Component được chia đúng phạm vi domain/shared, không copy/paste và không over-engineer.
 - pnpm lint và pnpm build đã chạy khi phù hợp; nếu không chạy được phải nêu lý do.
 
 ## 8. Database và cross-stack
