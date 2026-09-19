@@ -1,5 +1,6 @@
 import BrandLogo from './BrandLogo';
 import SideBarItem from './SideBarItem';
+import { LogoutButton } from '@/features/auth/components/LogoutButton';
 
 export interface ISidebarItem {
   icon: React.ReactNode;
@@ -35,6 +36,7 @@ const SideBar = (props: IProp) => {
           })}
         </nav>
       </div>
+      <LogoutButton />
     </aside>
   );
 };
