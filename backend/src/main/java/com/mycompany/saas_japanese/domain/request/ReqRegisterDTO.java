@@ -12,17 +12,22 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ReqLoginDTO {
+public class ReqRegisterDTO {
+  @NotBlank
+  @Size(max = 150)
+  private String fullName;
+
   @NotBlank
   @Email
   @Size(max = 254)
   private String email;
 
   @NotBlank
-  @Size(max = 72)
+  @Size(min = 8, max = 72)
   private String password;
 
-  private boolean rememberMe;
+  @Size(max = 20)
+  private String phone;
 
   @JsonIgnore
   @AssertTrue(message = "Password must not exceed 72 UTF-8 bytes")

@@ -1,149 +1,136 @@
 package com.mycompany.saas_japanese.controller;
 
-import com.mycompany.saas_japanese.repository.OtpRepository;
-import com.mycompany.saas_japanese.service.impl.UserServiceImpl;
 import java.time.Duration;
+import java.time.Instant;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.request.ReqForgotPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqLoginDTO;
 import com.mycompany.saas_japanese.domain.request.ReqOtpDTO;
+import com.mycompany.saas_japanese.domain.request.ReqRegisterDTO;
 import com.mycompany.saas_japanese.domain.request.ReqResetPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateProfileDTO;
 import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
+import com.mycompany.saas_japanese.domain.response.ResRegisterDTO;
 import com.mycompany.saas_japanese.domain.response.UserProfileResponseDTO;
 import com.mycompany.saas_japanese.service.AuthService;
-import com.mycompany.saas_japanese.service.impl.OtpServiceImpl;
+import com.mycompany.saas_japanese.service.AuthTokens;
+import com.mycompany.saas_japanese.service.UserService;
 import com.mycompany.saas_japanese.util.anotation.ApiMessage;
-import com.mycompany.saas_japanese.util.error.BadRequestException;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import kong.unirest.HttpStatus;
-import jakarta.servlet.http.Cookie;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-  private final UserServiceImpl userServiceImpl;
-  private final OtpRepository otpRepository;
+  private static final String COOKIE_NAME = "refresh_token";
+  private static final String COOKIE_PATH = "/api/v1/auth";
   private final AuthService authService;
+  private final UserService userService;
+  private final boolean secureCookie;
 
-  AuthController(AuthService authService, OtpRepository otpRepository, UserServiceImpl userServiceImpl) {
+  public AuthController(AuthService authService, UserService userService,
+      @Value("${AUTH_COOKIE_SECURE:true}") boolean secureCookie) {
     this.authService = authService;
-    this.otpRepository = otpRepository;
-    this.userServiceImpl = userServiceImpl;
+    this.userService = userService;
+    this.secureCookie = secureCookie;
+  }
+
+  @GetMapping("/csrf")
+  public ResponseEntity<Map<String, String>> csrf(CsrfToken token) {
+    return ResponseEntity.ok().header(HttpHeaders.CACHE_CONTROL, "no-store")
+        .body(Map.of("token", token.getToken(), "headerName", token.getHeaderName()));
   }
 
   @PostMapping("/register")
   @ApiMessage("register")
-  public ResponseEntity<User> createdNewCourses(@RequestBody User postUser) {
-    User user = this.authService.register(postUser);
-    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+  public ResponseEntity<ResRegisterDTO> register(@Valid @RequestBody ReqRegisterDTO request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
   }
 
   @PostMapping("/login")
   @ApiMessage("login")
-  public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO postUser) {
-    ResLoginDTO res = this.authService.login(postUser);
-    ResponseCookie resCookies = ResponseCookie.from("refresh_token",
-        res.getRefreshToken())
-        .httpOnly(true)
-        .secure(true) // chi duoc su dung voi https thay vi http
-        .path("/") // cho phep moi api (/***)
-        .maxAge(
-            Duration.ofDays(7))
-        // .domain("example.com") // domain nao duoc su dung
-        .build();
-    return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.SET_COOKIE, resCookies.toString()).body(res);
-  }
-
-  @PostMapping("/verify-user")
-  @ApiMessage("verify user")
-  public ResponseEntity<String> verifyUser(@RequestBody ReqOtpDTO req) {
-    return ResponseEntity.ok(authService.verifyUser(req));
-
-  }
-
-  @PostMapping("/logout")
-  @ApiMessage("logout")
-  public ResponseEntity<String> logout(HttpServletResponse response) {
-    authService.logout(response);
-    return ResponseEntity.ok("Logout success");
-  }
-
-  @PostMapping("/forgot-password")
-  @ApiMessage("forgot Password")
-  public ResponseEntity<String> forgotPassword(@Valid @RequestBody ReqForgotPasswordDTO req) {
-    authService.forgotPassword(req);
-    return ResponseEntity.ok("Send otp success");
-  }
-
-  @PostMapping("/verify-reset-otp")
-  @ApiMessage("verifyResetOtp")
-  public ResponseEntity<String> verifyResetOtp(
-      @RequestBody ReqOtpDTO req) {
-    authService.verifyResetOtp(req);
-    return ResponseEntity.ok("OTP verified");
-  }
-
-  @PostMapping("/reset-password")
-  @ApiMessage("reset password")
-  public ResponseEntity<String> resetPassword(
-      @Valid @RequestBody ReqResetPasswordDTO req) {
-    authService.resetPassword(req);
-    return ResponseEntity.ok("Reset password success");
+  public ResponseEntity<ResLoginDTO> login(@Valid @RequestBody ReqLoginDTO request) {
+    return tokenResponse(authService.login(request));
   }
 
   @PostMapping("/refresh-token")
   @ApiMessage("refresh token")
-  public ResponseEntity<ResLoginDTO> refreshToken(HttpServletRequest request) {
+  public ResponseEntity<ResLoginDTO> refreshToken(
+      @CookieValue(name = COOKIE_NAME, required = false) String refreshToken) {
+    return tokenResponse(authService.refreshToken(refreshToken));
+  }
 
-    String refreshToken = null;
-    if (request.getCookies() != null) {
-      for (Cookie cookie : request.getCookies()) {
-        if ("refresh_token".equals(cookie.getName())) {
-          refreshToken = cookie.getValue();
-          break;
-        }
-      }
-    }
-    if (refreshToken == null) {
-      throw new BadRequestException("Refresh token not found");
-    }
-    ResLoginDTO res = authService.refreshToken(refreshToken);
-    ResponseCookie cookie = ResponseCookie.from("refresh_token",
-        res.getRefreshToken())
-        .httpOnly(true)
-        .secure(true)
-        .path("/")
-        .maxAge(Duration.ofDays(7))
-        .build();
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(@CookieValue(name = COOKIE_NAME, required = false) String refreshToken) {
+    authService.logout(refreshToken);
+    return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE,
+        cookie("", COOKIE_PATH).maxAge(Duration.ZERO).build().toString(),
+        cookie("", "/").maxAge(Duration.ZERO).build().toString())
+        .header(HttpHeaders.CACHE_CONTROL, "no-store").build();
+  }
 
-    return ResponseEntity.ok().header(org.springframework.http.HttpHeaders.SET_COOKIE, cookie.toString()).body(res);
+  @PostMapping("/verify-user")
+  @ApiMessage("verify user")
+  public ResponseEntity<String> verifyUser(@Valid @RequestBody ReqOtpDTO request) {
+    return ResponseEntity.ok(authService.verifyUser(request));
+  }
+
+  @PostMapping("/forgot-password")
+  public ResponseEntity<String> forgotPassword(@Valid @RequestBody ReqForgotPasswordDTO request) {
+    authService.forgotPassword(request);
+    return ResponseEntity.ok("Send otp success");
+  }
+
+  @PostMapping("/verify-reset-otp")
+  public ResponseEntity<String> verifyResetOtp(@Valid @RequestBody ReqOtpDTO request) {
+    authService.verifyResetOtp(request);
+    return ResponseEntity.ok("OTP verified");
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<String> resetPassword(@Valid @RequestBody ReqResetPasswordDTO request) {
+    authService.resetPassword(request);
+    return ResponseEntity.ok("Reset password success");
   }
 
   @GetMapping("/myProfile")
   @ApiMessage("get my profile")
   public ResponseEntity<UserProfileResponseDTO> getMyProfile() {
-    return ResponseEntity.ok(userServiceImpl.getMyProfile());
+    return ResponseEntity.ok(userService.getMyProfile());
   }
 
   @PostMapping("/updateProfile")
   @ApiMessage("update profile")
-  public ResponseEntity<UserProfileResponseDTO> updateProfile(
-      @Valid @RequestBody ReqUpdateProfileDTO request) {
-    return ResponseEntity.ok(userServiceImpl.updateMyProfile(request));
+  public ResponseEntity<UserProfileResponseDTO> updateProfile(@Valid @RequestBody ReqUpdateProfileDTO request) {
+    return ResponseEntity.ok(userService.updateMyProfile(request));
   }
 
+  private ResponseEntity<ResLoginDTO> tokenResponse(AuthTokens tokens) {
+    ResponseCookie.ResponseCookieBuilder builder = cookie(tokens.refreshToken(), COOKIE_PATH);
+    if (tokens.persistent()) {
+      builder.maxAge(Math.max(0, Duration.between(Instant.now(), tokens.refreshExpiresAt()).getSeconds()));
+    }
+    return ResponseEntity.ok()
+        .header(HttpHeaders.SET_COOKIE, builder.build().toString(),
+            cookie("", "/").maxAge(Duration.ZERO).build().toString())
+        .header(HttpHeaders.CACHE_CONTROL, "no-store")
+        .body(tokens.response());
+  }
+
+  private ResponseCookie.ResponseCookieBuilder cookie(String value, String path) {
+    return ResponseCookie.from(COOKIE_NAME, value).httpOnly(true).secure(secureCookie).sameSite("Lax").path(path);
+  }
 }

@@ -39,3 +39,5 @@ out/
 /src/main/resources/certs
 .env
 **/**.md
+
+AUTHENTICAtiON.txt

@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-// import org.springframework.stereotype.Service;
+import com.mycompany.saas_japanese.util.error.ServiceUnavailableException;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
@@ -55,17 +55,11 @@ public class BrevoProvider {
       if (response.getStatus() == 201 || response.getStatus() == 200) {
         return "Gửi OTP thành công!";
       } else {
-        System.err.println("Response Status: " + response.getStatus());
-        System.err.println("Response Body: " + response.getBody());
-        System.err.println("Response API KEY: " + apiKey);
-
-        return "Thất bại: " + response.getBody();
+        throw new ServiceUnavailableException("Email delivery failed");
       }
 
     } catch (Exception e) {
-      e.printStackTrace();
-      System.err.println("no no no no no 2");
-      return "Lỗi: " + e.getMessage();
+      throw new ServiceUnavailableException("Email delivery failed");
     }
   }
 }
