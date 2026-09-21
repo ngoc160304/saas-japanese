@@ -3,14 +3,14 @@ import { API_VERSION } from '@/utils/constant';
 import { GetCoursesResponse, ReqCreateCourseCategory } from './categories-course.type';
 import { QueryParams } from '@/types/query';
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/${API_VERSION}`;
-console.log(API_URL);
-const getCategoriesCourse = async ({ page, size }: QueryParams) => {
+const getCategoriesCourse = async ({ page, size = 10, search }: QueryParams) => {
   const response = await authorizeAxiosIntance.get<GetCoursesResponse>(
     `${API_URL}/course-categories`,
     {
       params: {
         page: page - 1,
-        size,
+        size: Math.min(12, Math.max(1, size)),
+        search: search?.trim() || undefined,
       },
     },
   );
@@ -37,14 +37,9 @@ const update = async (id: string | number, data: ReqCreateCourseCategory) => {
   }
 };
 
-const deleteByid = async (id: string) => {
-  try {
-    const response = await authorizeAxiosIntance.delete(`${API_URL}/course-categories/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching categories course:', error);
-    throw error;
-  }
+const deleteByid = async (id: string | number) => {
+  const response = await authorizeAxiosIntance.delete(`${API_URL}/course-categories/${id}`);
+  return response.data;
 };
 
 export const categoryCourseAPI = {

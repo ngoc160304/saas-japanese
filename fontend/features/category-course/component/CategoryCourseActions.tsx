@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Pencil, Trash2, Eye } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
 import { CategoryCourseDialog } from './CategoryCourseDialog';
 import { useState } from 'react';
 import { CourseCategory } from '@/apis/categories-course/categories-course.type';
@@ -13,7 +12,7 @@ interface CourseActionsProps {
   courseCategory: CourseCategory;
   canEdit?: boolean;
   canDelete?: boolean;
-  onDelete?: (id: number) => void;
+  onDelete?: (category: CourseCategory) => void;
   onReload: () => void;
 }
 
@@ -24,10 +23,6 @@ export function CategoryCourseAction({
   onDelete,
   onReload,
 }: CourseActionsProps) {
-  const handleDeleteByid = async () => {
-    await categoryCourseAPI.deleteByid(courseCategory.id + '');
-    onReload();
-  };
   const handleEdit = () => {
     setEditDialogOpen(true);
   };
@@ -89,7 +84,7 @@ export function CategoryCourseAction({
           variant="outline"
           title="Delete"
           aria-label="Delete"
-          onClick={handleDeleteByid}
+          onClick={() => onDelete?.(courseCategory)}
           className="
             h-8
             w-8
