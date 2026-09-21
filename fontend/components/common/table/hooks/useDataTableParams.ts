@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 interface UseDataTableParamsOptions {
   defaultPage?: number;
   defaultSize?: number;
+  maxSize?: number;
   searchParam?: string;
   pageParam?: string;
   sizeParam?: string;
@@ -13,6 +14,7 @@ interface UseDataTableParamsOptions {
 export function useDataTableParams({
   defaultPage = 1,
   defaultSize = 10,
+  maxSize = Number.MAX_SAFE_INTEGER,
   searchParam = 'search',
   pageParam = 'page',
   sizeParam = 'size',
@@ -24,10 +26,13 @@ export function useDataTableParams({
   const search = searchParams.get(searchParam) ?? '';
 
   const pageValue = Number(searchParams.get(pageParam));
-  const page = Number.isInteger(pageValue) && pageValue > 0 ? pageValue : defaultPage;
+  const page = Number.isSafeInteger(pageValue) && pageValue > 0 ? pageValue : defaultPage;
 
   const sizeValue = Number(searchParams.get(sizeParam));
-  const size = Number.isInteger(sizeValue) && sizeValue > 0 ? sizeValue : defaultSize;
+  const size = Math.min(
+    Number.isSafeInteger(sizeValue) && sizeValue > 0 ? sizeValue : defaultSize,
+    maxSize,
+  );
 
   const updateParams = (updates: Record<string, string | number | null>) => {
     const params = new URLSearchParams(searchParams.toString());
