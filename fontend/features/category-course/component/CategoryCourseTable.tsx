@@ -10,16 +10,13 @@ import {
 } from '@/components/ui/table';
 import { CategoryCourseAction } from './CategoryCourseActions';
 import { CourseCategory } from '@/apis/categories-course/categories-course.type';
-import { IsLoading } from '@/components/common/loading/IsLoading';
-import { useState } from 'react';
 
 interface CourseTableProps {
   courseCategories: CourseCategory[];
   canEdit?: boolean;
   canDelete?: boolean;
-  onDelete?: (id: number) => void;
+  onDelete?: (category: CourseCategory) => void;
   onReload: () => void;
-  isLoading?: boolean;
 }
 
 export function CourseCategoriesTable({
@@ -28,7 +25,6 @@ export function CourseCategoriesTable({
   canDelete = false,
   onDelete,
   onReload,
-  isLoading,
 }: CourseTableProps) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-100">
@@ -42,6 +38,13 @@ export function CourseCategoriesTable({
           </TableRow>
         </TableHeader>
         <TableBody>
+          {courseCategories.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={4} className="py-12 text-center text-slate-500">
+                Không tìm thấy danh mục. Hãy thử từ khóa khác hoặc đặt lại tìm kiếm.
+              </TableCell>
+            </TableRow>
+          )}
           {courseCategories.map((item) => (
             <TableRow key={item.id} className="border-b border-slate-100 hover:bg-slate-50/70">
               <TableCell className="align-middle">

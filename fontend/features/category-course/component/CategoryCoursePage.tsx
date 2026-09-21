@@ -1,6 +1,10 @@
 'use client';
 
 import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
+import type { CourseCategory } from '@/apis/categories-course/categories-course.type';
+import { getApiErrorMessage } from '@/lib/api-error';
+import { Button } from '@/components/ui/button';
+import { CategoryCourseDeleteDialog } from './CategoryCourseDeleteDialog';
 
 import { CreateButton } from '@/components/common/button/CreateButton';
 import { DataTablePagination } from '@/components/common/table/DataTablePagination';
@@ -21,6 +25,11 @@ const CategoryCoursePage = () => {
   const {
     data: categories,
     isLoading,
+    isFetching,
+    isPlaceholderData,
+    isError,
+    error,
+    page,
     refetch,
 
     search,
@@ -35,15 +44,20 @@ const CategoryCoursePage = () => {
     defaultSize: 10,
   });
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [deleteCategory, setDeleteCategory] = useState<CourseCategory | null>(null);
+  const handleDeleted = () => {
+    if (categories && categories.data.content.length <= 1 && page > 1) {
+      setPage(page - 1);
+    }
+  };
   return (
     <>
       <Header
         title="Course"
         description="Quản lý các khóa học tiếng Nhật theo cấp độ JLPT (N5 - N1), lộ trình bài học và trạng thái xuất bản."
-        children={
-          <CreateButton label="Create Course" handleClick={() => setCreateDialogOpen(true)} />
-        }
-      />
+      >
+        <CreateButton label="Create Course" handleClick={() => setCreateDialogOpen(true)} />
+      </Header>
 
       <StatCard
         items={[
@@ -82,7 +96,7 @@ const CategoryCoursePage = () => {
         <DataTableToolbar
           searchValue={search}
           onSearchChange={setSearch}
-          searchPlaceholder="Search course..."
+          searchPlaceholder="Search category..."
           onReset={reset}
         >
           <DataTableFilter
@@ -103,29 +117,43 @@ const CategoryCoursePage = () => {
           />
         </DataTableToolbar>
         {isLoading && <IsLoading />}
+        {isFetching && !isLoading && <p role="status">Đang cập nhật danh sách…</p>}
+        {isError && (
+          <div role="alert" className="my-4 text-sm text-rose-600">
+            <p>{getApiErrorMessage(error)}</p>
+            <Button variant="outline" onClick={() => void refetch()}>
+              Thử lại
+            </Button>
+          </div>
+        )}
 
         {categories && (
           <CourseCategoriesTable
             courseCategories={categories.data.content}
             canEdit
-            canDelete
-            onDelete={(id) => {
-              console.log('delete course:', id);
-            }}
+            canDelete={!isPlaceholderData && !isFetching && !isError}
+            onDelete={setDeleteCategory}
             onReload={refetch}
-
-            isLoading={isLoading}
           />
         )}
 
-        {categories && (
+        {categories && categories.data.totalPages > 0 && (
           <DataTablePagination
             page={categories.data.pageable.pageNumber + 1}
             totalPages={categories.data.totalPages}
-            onPageChange={setPage}
+            onPageChange={(nextPage) => {
+              if (!isPlaceholderData) setPage(nextPage);
+            }}
           />
         )}
       </PageSection>
+      {deleteCategory && (
+        <CategoryCourseDeleteDialog
+          category={deleteCategory}
+          onClose={() => setDeleteCategory(null)}
+          onDeleted={handleDeleted}
+        />
+      )}
       <CategoryCourseDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
