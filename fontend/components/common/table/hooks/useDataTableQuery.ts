@@ -11,6 +11,7 @@ interface UseDataTableQueryOptions<TData> {
 
   defaultPage?: number;
   defaultSize?: number;
+  maxSize?: number;
 
   searchParam?: string;
   pageParam?: string;
@@ -25,6 +26,7 @@ export function useDataTableQuery<TData>({
 
   defaultPage = 1,
   defaultSize = 10,
+  maxSize,
 
   searchParam = 'search',
   pageParam = 'page',
@@ -35,6 +37,7 @@ export function useDataTableQuery<TData>({
   const params = useDataTableParams({
     defaultPage,
     defaultSize,
+    maxSize,
     searchParam,
     pageParam,
     sizeParam,

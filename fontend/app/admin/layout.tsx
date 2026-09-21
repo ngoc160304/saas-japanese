@@ -110,7 +110,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       <div className="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">
         <div className="min-h-screen flex flex-col xl:flex-row bg-[#f3f6fa]">
           <SideBar role="Admin" title="Studify" sidebarItems={sidebarItems} />
-          <main className="flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">{children}</main>
+          <main className="min-w-0 flex-1 p-4 md:p-6 lg:p-7 overflow-y-auto max-w-full">{children}</main>
         </div>
       </div>
     </AuthGuard>
