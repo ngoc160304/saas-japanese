@@ -51,7 +51,7 @@ public class LessonController {
 
   @PutMapping("/{id}")
   public ResponseEntity<LessonResponse> updateLesson(
-      @PathVariable Long id,
+      @PathVariable("id") Long id,
       @RequestBody ReqUpdateLesson request) {
     LessonResponse lesson = lessonService.updateLesson(id, request);
 

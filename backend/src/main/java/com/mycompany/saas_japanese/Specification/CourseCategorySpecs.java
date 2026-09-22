@@ -2,8 +2,6 @@ package com.mycompany.saas_japanese.specification;
 
 import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.data.jpa.domain.Specification;
-
-import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.CourseCategory;
 
 public class CourseCategorySpecs {

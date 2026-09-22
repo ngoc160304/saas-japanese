@@ -36,219 +36,219 @@ import lombok.experimental.FieldDefaults;
 @Transactional
 public class LessonServiceImpl implements LessonService {
 
-    LessonRepository lessonRepository;
+        LessonRepository lessonRepository;
 
-    CourseRepository courseRepository;
+        CourseRepository courseRepository;
 
-    MediaRepository mediaRepository;
+        MediaRepository mediaRepository;
 
-    LessonMapper lessonMapper;
+        LessonMapper lessonMapper;
 
-    @Override
-    public LessonResponse createLesson(
-            ReqCreateLesson request) {
+        @Override
+        public LessonResponse createLesson(
+                        ReqCreateLesson request) {
 
-        Course course = courseRepository
-                .findByIdAndIsDeletedFalse(
-                        request.getCourseId())
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Course không tồn tại"));
+                Course course = courseRepository
+                                .findByIdAndIsDeletedFalse(
+                                                request.getCourseId())
+                                .orElseThrow(
+                                                () -> new NotFoundException(
+                                                                "Course không tồn tại"));
 
-        Lesson lesson = new Lesson();
+                Lesson lesson = new Lesson();
 
-        lesson.setCourse(course);
+                lesson.setCourse(course);
 
-        lesson.setTitle(
-                request.getTitle().trim());
+                lesson.setTitle(
+                                request.getTitle().trim());
 
-        lesson.setSlug(
-                SlugUtil.toSlug(
-                        lesson.getTitle()));
+                lesson.setSlug(
+                                SlugUtil.toSlug(
+                                                lesson.getTitle()));
 
-        lesson.setGrammar(
-                request.getGrammar());
+                lesson.setGrammar(
+                                request.getGrammar());
 
-        lesson.setDurationMinutes(
-                request.getDurationMinutes());
+                lesson.setDurationMinutes(
+                                request.getDurationMinutes());
 
-        lesson.setIsPublished(
-                request.getIsPublished() != null
-                        ? request.getIsPublished()
-                        : false);
+                lesson.setIsPublished(
+                                request.getIsPublished() != null
+                                                ? request.getIsPublished()
+                                                : false);
 
-        lesson.setIsDeleted(false);
+                lesson.setIsDeleted(false);
 
-        if (request.getVideoMediaId() != null) {
+                if (request.getVideoMediaId() != null) {
 
-            Media media = mediaRepository
-                    .findByIdAndIsDeletedFalse(
-                            request.getVideoMediaId())
-                    .orElseThrow(
-                            () -> new NotFoundException(
-                                    "Video Media không tồn tại"));
+                        Media media = mediaRepository
+                                        .findByIdAndIsDeletedFalse(
+                                                        request.getVideoMediaId())
+                                        .orElseThrow(
+                                                        () -> new NotFoundException(
+                                                                        "Video Media không tồn tại"));
 
-            lesson.setVideoMedia(media);
+                        lesson.setVideoMedia(media);
+                }
+
+                Lesson savedLesson = lessonRepository.save(lesson);
+
+                return lessonMapper.toResponse(
+                                savedLesson);
         }
 
-        Lesson savedLesson = lessonRepository.save(lesson);
+        @Override
+        @Transactional(Transactional.TxType.SUPPORTS)
+        public LessonResponse fetchLessonById(
+                        Long id) {
 
-        return lessonMapper.toResponse(
-                savedLesson);
-    }
+                Lesson lesson = lessonRepository
+                                .findByIdAndIsDeletedFalse(id)
+                                .orElseThrow(
+                                                () -> new NotFoundException(
+                                                                "Lesson không tồn tại"));
 
-    @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public LessonResponse fetchLessonById(
-            Long id) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        return lessonMapper.toResponse(
-                lesson);
-    }
-
-    @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public Page<LessonResponse> fetchAllLesson(
-            LessonQuery query) {
-
-        PredicateSpecification<Lesson> spec = LessonSpecs.isNotDeleted();
-
-        if (query.getTitle() != null
-                && !query.getTitle().trim().isEmpty()) {
-
-            spec = spec.and(
-                    LessonSpecs.hasTitle(
-                            query.getTitle().trim()));
+                return lessonMapper.toResponse(
+                                lesson);
         }
 
-        if (query.getCourseId() != null) {
+        @Override
+        @Transactional(Transactional.TxType.SUPPORTS)
+        public Page<LessonResponse> fetchAllLesson(
+                        LessonQuery query) {
 
-            spec = spec.and(
-                    LessonSpecs.hasCourseId(
-                            query.getCourseId()));
+                PredicateSpecification<Lesson> spec = LessonSpecs.isNotDeleted();
+
+                if (query.getTitle() != null
+                                && !query.getTitle().trim().isEmpty()) {
+
+                        spec = spec.and(
+                                        LessonSpecs.hasTitle(
+                                                        query.getTitle().trim()));
+                }
+
+                if (query.getCourseId() != null) {
+
+                        spec = spec.and(
+                                        LessonSpecs.hasCourseId(
+                                                        query.getCourseId()));
+                }
+
+                spec = spec.and(
+                                LessonSpecs.hasSearch(
+                                                query.getSearch()));
+                Page<Lesson> lessonPage = lessonRepository.findBy(
+                                spec,
+                                q -> q.page(
+                                                PageRequest.of(
+                                                                query.getPage(),
+                                                                query.getSize(),
+                                                                buildSort(query))));
+
+                return lessonPage.map(
+                                lessonMapper::toResponse);
         }
 
-        spec = spec.and(
-                LessonSpecs.hasSearch(
-                        query.getSearch()));
-        Page<Lesson> lessonPage = lessonRepository.findBy(
-                spec,
-                q -> q.page(
-                        PageRequest.of(
-                                query.getPage(),
-                                query.getSize(),
-                                buildSort(query))));
+        @Override
+        public LessonResponse updateLesson(
+                        Long id,
+                        ReqUpdateLesson request) {
 
-        return lessonPage.map(
-                lessonMapper::toResponse);
-    }
+                Lesson lesson = lessonRepository
+                                .findByIdAndIsDeletedFalse(id)
+                                .orElseThrow(
+                                                () -> new NotFoundException(
+                                                                "Lesson không tồn tại"));
 
-    @Override
-    public LessonResponse updateLesson(
-            Long id,
-            ReqUpdateLesson request) {
+                lesson.setTitle(
+                                request.getTitle().trim());
 
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
+                lesson.setSlug(
+                                SlugUtil.toSlug(
+                                                lesson.getTitle()));
 
-        lesson.setTitle(
-                request.getTitle().trim());
+                lesson.setGrammar(
+                                request.getGrammar());
 
-        lesson.setSlug(
-                SlugUtil.toSlug(
-                        lesson.getTitle()));
+                lesson.setDurationMinutes(
+                                request.getDurationMinutes());
 
-        lesson.setGrammar(
-                request.getGrammar());
+                lesson.setIsPublished(
+                                request.getIsPublished());
 
-        lesson.setDurationMinutes(
-                request.getDurationMinutes());
+                if (request.getVideoMediaId() != null && request.getVideoMediaId() != lesson.getVideoMedia().getId()) {
 
-        lesson.setIsPublished(
-                request.getIsPublished());
+                        Media media = mediaRepository
+                                        .findByIdAndIsDeletedFalse(
+                                                        request.getVideoMediaId())
+                                        .orElseThrow(
+                                                        () -> new NotFoundException(
+                                                                        "Video Media không tồn tại"));
+                        if (media.getIsUsed()) {
+                                throw new BadRequestException("Tài nguyên đã được sử dụng !");
+                        }
+                        lesson.setVideoMedia(media);
+                }
 
-        if (request.getVideoMediaId() != null && request.getVideoMediaId() != lesson.getVideoMedia().getId()) {
+                Lesson updatedLesson = lessonRepository.save(lesson);
 
-            Media media = mediaRepository
-                    .findByIdAndIsDeletedFalse(
-                            request.getVideoMediaId())
-                    .orElseThrow(
-                            () -> new NotFoundException(
-                                    "Video Media không tồn tại"));
-            if (media.getIsUsed()) {
-                throw new BadRequestException("Tài nguyên đã được sử dụng !");
-            }
-            lesson.setVideoMedia(media);
+                return lessonMapper.toResponse(
+                                updatedLesson);
         }
 
-        Lesson updatedLesson = lessonRepository.save(lesson);
+        @Override
+        public void deleteLesson(
+                        Long id) {
 
-        return lessonMapper.toResponse(
-                updatedLesson);
-    }
+                Lesson lesson = lessonRepository
+                                .findByIdAndIsDeletedFalse(id)
+                                .orElseThrow(
+                                                () -> new NotFoundException(
+                                                                "Lesson không tồn tại"));
 
-    @Override
-    public void deleteLesson(
-            Long id) {
+                lesson.setIsDeleted(true);
 
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
+                lesson.setDeletedAt(
+                                Instant.now());
 
-        lesson.setIsDeleted(true);
-
-        lesson.setDeletedAt(
-                Instant.now());
-
-        lessonRepository.save(lesson);
-    }
-
-    @Override
-    public void deleteByCourseId(
-            long courseId) {
-
-        // TODO:
-        // Xử lý soft delete toàn bộ lesson
-        // và các content liên quan của lesson.
-    }
-
-    private Sort buildSort(LessonQuery query) {
-
-        String sortKey = query.getSortKey();
-
-        String field = switch (sortKey == null ? "" : sortKey) {
-            case "id" -> "id";
-            case "courseId" -> "courseId";
-            case "title" -> "title";
-            case "slug" -> "slug";
-            case "grammar" -> "grammar";
-            case "durationMinutes" -> "durationMinutes";
-            case "isPublished" -> "isPublished";
-            case "createdAt" -> "createdAt";
-            case "updatedAt" -> "updatedAt";
-            default -> "id";
-        };
-
-        Sort.Direction direction;
-
-        try {
-            direction = Sort.Direction.fromString(
-                    query.getSortType());
-        } catch (IllegalArgumentException e) {
-            direction = Sort.Direction.DESC;
+                lessonRepository.save(lesson);
         }
 
-        return Sort.by(direction, field);
-    }
+        @Override
+        public void deleteByCourseId(
+                        long courseId) {
+
+                // TODO:
+                // Xử lý soft delete toàn bộ lesson
+                // và các content liên quan của lesson.
+        }
+
+        private Sort buildSort(LessonQuery query) {
+
+                String sortKey = query.getSortKey();
+
+                String field = switch (sortKey == null ? "" : sortKey) {
+                        case "id" -> "id";
+                        case "courseId" -> "courseId";
+                        case "title" -> "title";
+                        case "slug" -> "slug";
+                        case "grammar" -> "grammar";
+                        case "durationMinutes" -> "durationMinutes";
+                        case "isPublished" -> "isPublished";
+                        case "createdAt" -> "createdAt";
+                        case "updatedAt" -> "updatedAt";
+                        default -> "id";
+                };
+
+                Sort.Direction direction;
+
+                try {
+                        direction = Sort.Direction.fromString(
+                                        query.getSortType());
+                } catch (IllegalArgumentException e) {
+                        direction = Sort.Direction.DESC;
+                }
+
+                return Sort.by(direction, field);
+        }
 }
