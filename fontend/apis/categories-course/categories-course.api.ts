@@ -1,50 +1,49 @@
-import authorizeAxiosIntance from '@/lib/authorize-axios';
-import { API_VERSION } from '@/utils/constant';
-import { GetCoursesResponse, ReqCreateCourseCategory } from './categories-course.type';
-import { QueryParams } from '@/types/query';
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/${API_VERSION}`;
-const getCategoriesCourse = async ({ page, size = 10, search }: QueryParams) => {
-  const response = await authorizeAxiosIntance.get<GetCoursesResponse>(
-    `${API_URL}/course-categories`,
-    {
-      params: {
-        page: page - 1,
-        size: Math.min(12, Math.max(1, size)),
-        search: search?.trim() || undefined,
-      },
-    },
-  );
+import authorizeAxiosInstance from '@/lib/authorize-axios';
+import type { ApiResponse } from '@/types/api';
+import type { QueryParams } from '@/types/query';
+import type {
+  CourseCategoryResponse,
+  CourseCategoryDetail,
+  GetCoursesResponse,
+  ReqCreateCourseCategory,
+} from './categories-course.type';
 
+const getCategoriesCourse = async ({ page, size = 10, search }: QueryParams) => {
+  const response = await authorizeAxiosInstance.get<GetCoursesResponse>('/course-categories', {
+    params: {
+      page: page - 1,
+      size: Math.min(12, Math.max(1, size)),
+      search: search?.trim() || undefined,
+    },
+  });
   return response.data;
 };
-
+const getById = async (id: number) => {
+  const response = await authorizeAxiosInstance.get<ApiResponse<CourseCategoryDetail>>(
+    `/course-categories/${id}`,
+  );
+  return response.data.data;
+};
 const create = async (data: ReqCreateCourseCategory) => {
-  try {
-    const response = await authorizeAxiosIntance.post(`${API_URL}/course-categories`, data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching categories course:', error);
-    throw error;
-  }
+  const response = await authorizeAxiosInstance.post<ApiResponse<CourseCategoryResponse>>(
+    '/course-categories',
+    data,
+    { localErrorHandling: true },
+  );
+  return response.data.data;
 };
 const update = async (id: string | number, data: ReqCreateCourseCategory) => {
-  try {
-    const response = await authorizeAxiosIntance.put(`${API_URL}/course-categories/${id}`, data);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching categories course:', error);
-    throw error;
-  }
+  const response = await authorizeAxiosInstance.put<ApiResponse<CourseCategoryResponse>>(
+    `/course-categories/${id}`,
+    data,
+    { localErrorHandling: true },
+  );
+  return response.data.data;
 };
-
 const deleteByid = async (id: string | number) => {
-  const response = await authorizeAxiosIntance.delete(`${API_URL}/course-categories/${id}`);
+  const response = await authorizeAxiosInstance.delete(`/course-categories/${id}`, {
+    localErrorHandling: true,
+  });
   return response.data;
 };
-
-export const categoryCourseAPI = {
-  getCategoriesCourse,
-  deleteByid,
-  create,
-  update,
-};
+export const categoryCourseAPI = { getCategoriesCourse, getById, create, update, deleteByid };

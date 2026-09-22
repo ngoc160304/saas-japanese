@@ -31,7 +31,10 @@ export function DataTableFilter({
   return (
     <Select
       items={options}
-      // onValueChange={onChange}
+      value={value}
+      onValueChange={(next) => {
+        if (next !== null) onChange?.(next);
+      }}
     >
       <SelectTrigger
         className={[
@@ -55,7 +58,7 @@ export function DataTableFilter({
           .filter(Boolean)
           .join(' ')}
       >
-        <SelectValue placeholder={options[0].label} />
+        <SelectValue placeholder={placeholder === 'ALL' ? options[0]?.label : placeholder} />
       </SelectTrigger>
 
       <SelectContent alignItemWithTrigger={false} className="bg-white">

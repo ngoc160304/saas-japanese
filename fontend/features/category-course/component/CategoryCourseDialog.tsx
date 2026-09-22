@@ -1,146 +1,85 @@
 'use client';
-
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-
-import { CategoryCourseForm } from './CategoryCourseForm';
-
+import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
+import type { CourseCategoryResponse } from '@/apis/categories-course/categories-course.type';
 import { useCrudCreate } from '@/hooks/crud/useCrudCreate';
 import { useCrudUpdate } from '@/hooks/crud/useCrudUpdate';
+import { getApiErrorMessage } from '@/lib/api-error';
+import { CategoryCourseForm } from './CategoryCourseForm';
+import type { CategoryCourseFormValues } from '../schemas/category-course.schema';
 
-import { categoryCourseAPI } from '@/apis/categories-course/categories-course.api';
-import {
-  CourseCategoryResponse,
-  ReqCreateCourseCategory,
-} from '@/apis/categories-course/categories-course.type';
-import { CategoryCourseFormValues } from '../schemas/category-course.schema';
-import { useState } from 'react';
-import { GetMediaResponse } from '@/apis/upload/upload.type';
-
-interface CategoryCourseDialogProps {
+interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-
   mode: 'create' | 'edit';
-
   category?: CourseCategoryResponse | null;
-  onReload: () => void;
 }
-
-const emptyValues: CategoryCourseFormValues = {
-  name: '',
-  description: '',
-  mediaId: undefined,
-};
-
-export function CategoryCourseDialog({
-  open,
-  onOpenChange,
-  mode,
-  category,
-  onReload,
-}: CategoryCourseDialogProps) {
-  const isEdit = mode === 'edit';
-  const [uploadedMedia, setUploadedMedia] = useState<GetMediaResponse | null>(null);
-  const createMutation = useCrudCreate<ReqCreateCourseCategory, CourseCategoryResponse>({
+export function CategoryCourseDialog(props: Props) {
+  // A fresh form/mutation instance on every open also clears uploads and validation.
+  return (
+    <Dialog open={props.open} onOpenChange={props.onOpenChange}>
+      <DialogContent>{props.open && <CategoryCourseDialogForm {...props} />}</DialogContent>
+    </Dialog>
+  );
+}
+function CategoryCourseDialogForm({ mode, category, onOpenChange }: Props) {
+  const submitting = useRef(false);
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  const create = useCrudCreate({
     queryKey: ['categories-course'],
     mutationFn: categoryCourseAPI.create,
   });
-
-  const updateMutation = useCrudUpdate<ReqCreateCourseCategory, CourseCategoryResponse>({
+  const update = useCrudUpdate({
     queryKey: ['categories-course'],
     mutationFn: categoryCourseAPI.update,
   });
-
-  const mutation = isEdit ? updateMutation : createMutation;
-
-  const defaultValues: CategoryCourseFormValues =
-    isEdit && category
-      ? {
-          name: category.name,
-          description: category.description ?? '',
-          mediaId: category.mediaId ?? undefined,
-        }
-      : emptyValues;
-
-  const handleSubmit = (data: CategoryCourseFormValues) => {
-    if (isEdit) {
-      if (!category) return;
-
-      updateMutation.mutate(
-        {
-          id: category.id,
-          data: data as ReqCreateCourseCategory,
-        },
-        {
-          onSuccess: () => {
-            onOpenChange(false);
-          },
-        },
-      );
-
-      return;
+  const mutation = mode === 'edit' ? update : create;
+  const submit = async (data: CategoryCourseFormValues) => {
+    if (submitting.current) return;
+    submitting.current = true;
+    try {
+      if (mode === 'edit' && category) await update.mutateAsync({ id: category.id, data });
+      else await create.mutateAsync(data);
+      toast.success(mode === 'edit' ? 'Cập nhật category thành công.' : 'Tạo category thành công.');
+      if (mounted.current) onOpenChange(false);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
+    } finally {
+      submitting.current = false;
     }
-    console.log('uploadedMedia :', uploadedMedia);
-    const dataUpdate: ReqCreateCourseCategory = {
-      ...data,
-      mediaId: uploadedMedia?.data?.id,
-    };
-
-    createMutation.mutate(dataUpdate, {
-      onSuccess: () => {
-        onReload();
-        onOpenChange(false);
-        console.log('tao moi thanh cong');
-      },
-    });
   };
-
-  const handleOpenChange = (value: boolean) => {
-    if (mutation.isPending) {
-      return;
-    }
-
-    onOpenChange(value);
-  };
-
   return (
-    <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent className="w-[calc(100vw-32px)]! max-w-240! overflow-hidden border-slate-200 bg-white p-0">
-        <AlertDialogHeader className="px-6 pt-6 pb-5">
-          <AlertDialogTitle className="text-xl font-semibold text-slate-900">
-            {isEdit ? 'Edit Course Category' : 'Add Course Category'}
-          </AlertDialogTitle>
-
-          <AlertDialogDescription className="text-sm leading-5 text-slate-500">
-            {isEdit
-              ? 'Update the course category information.'
-              : 'Create a new category for your Japanese courses.'}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-
-        <CategoryCourseForm
-          defaultValues={defaultValues}
-          initialImageUrl={category?.mediaUrl ?? null}
-          submitLabel={isEdit ? 'Save Changes' : 'Create Category'}
-          submittingLabel={isEdit ? 'Saving...' : 'Creating...'}
-          onSubmit={handleSubmit}
-          isSubmitting={mutation.isPending}
-          setUploadedMedia={setUploadedMedia}
-          uploadedMedia={uploadedMedia}
-        />
-
-        <AlertDialogFooter className="absolute bottom-0 left-0">
-          <AlertDialogCancel className="hidden" />
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <>
+      <div className="space-y-2 px-6 pb-5 pt-6 pr-12">
+        <DialogTitle className="text-xl font-semibold">
+          {mode === 'edit' ? 'Cập nhật danh mục' : 'Tạo danh mục'}
+        </DialogTitle>
+        <DialogDescription className="text-sm text-slate-500">
+          Thông tin danh mục khóa học tiếng Nhật.
+        </DialogDescription>
+      </div>
+      <CategoryCourseForm
+        defaultValues={{
+          name: category?.name ?? '',
+          description: category?.description ?? '',
+          mediaId: category?.mediaId ?? undefined,
+        }}
+        initialImageUrl={category?.mediaUrl}
+        onSubmit={submit}
+        onCancel={() => onOpenChange(false)}
+        submitLabel={mode === 'edit' ? 'Lưu thay đổi' : 'Tạo danh mục'}
+        submittingLabel="Đang lưu…"
+        isSubmitting={mutation.isPending}
+        error={mutation.isError ? getApiErrorMessage(mutation.error) : null}
+      />
+    </>
   );
 }

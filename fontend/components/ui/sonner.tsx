@@ -13,7 +13,7 @@ export function Toaster(props: ToasterProps) {
   return (
     <Sonner
       theme="light"
-      position="bottom-right"
+      position="top-right"
       richColors
       closeButton
       icons={{

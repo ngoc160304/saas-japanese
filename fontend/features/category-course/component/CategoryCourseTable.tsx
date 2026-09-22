@@ -8,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { CourseThumbnail } from '@/features/course/component/CourseThumbnail';
 import { CategoryCourseAction } from './CategoryCourseActions';
 import { CourseCategory } from '@/apis/categories-course/categories-course.type';
 
@@ -15,16 +16,14 @@ interface CourseTableProps {
   courseCategories: CourseCategory[];
   canEdit?: boolean;
   canDelete?: boolean;
-  onDelete?: (category: CourseCategory) => void;
-  onReload: () => void;
+  onDeleted?: () => void;
 }
 
 export function CourseCategoriesTable({
   courseCategories,
   canEdit = false,
   canDelete = false,
-  onDelete,
-  onReload,
+  onDeleted,
 }: CourseTableProps) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-slate-100">
@@ -49,13 +48,7 @@ export function CourseCategoriesTable({
             <TableRow key={item.id} className="border-b border-slate-100 hover:bg-slate-50/70">
               <TableCell className="align-middle">
                 <div className="flex min-w-55 items-center gap-3">
-                  <img
-                    src={item.mediaUrl}
-                    alt={item.name}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 shrink-0 rounded-xl border border-slate-100 bg-slate-50 object-contain p-1"
-                  />
+                  <CourseThumbnail src={item.mediaUrl} title={item.name} />
 
                   <span className="line-clamp-1 text-xs font-bold text-slate-900 md:text-sm">
                     {item.name}
@@ -80,8 +73,7 @@ export function CourseCategoriesTable({
                   courseCategory={item}
                   canEdit={canEdit}
                   canDelete={canDelete}
-                  onDelete={onDelete}
-                  onReload={onReload}
+                  onDeleted={onDeleted}
                 />
               </TableCell>
             </TableRow>

@@ -10,6 +10,7 @@ public class CourseMapper {
     public CourseResponse toResponse(Course course) {
         CourseResponse response = new CourseResponse();
         response.setId(course.getId());
+        response.setCreatedAt(course.getCreatedAt());
         response.setTitle(course.getTitle());
         response.setSlug(course.getSlug());
         response.setDescription(course.getDescription());
