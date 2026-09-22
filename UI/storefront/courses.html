@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khóa học - StudyJLPT</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --color-brand-navy: #2B4C7E;
+      --color-brand-blue: #2F80ED;
+      --color-bg-light: #F4F6F9;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft {
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+    }
+    /* Simple hide class for JS filtering */
+    .hide-course {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 1. Header (Copied from index.html) -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded bg-brand-navy flex items-center justify-center text-white font-bold transition-transform group-hover:scale-105">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-800">
+            Study<span class="text-brand-blue">JLPT</span>
+          </span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Trang chủ</a>
+          <!-- Active State -->
+          <a href="courses.html" class="text-sm font-semibold text-brand-navy border-b-2 border-brand-navy py-7">Khóa học</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Thi thử JLPT</a>
+        </nav>
+
+        <!-- Auth -->
+        <div class="hidden md:flex items-center gap-4">
+          <a href="#" class="text-sm font-medium text-slate-600 hover:text-brand-navy transition-colors">Đăng nhập</a>
+          <a href="#" class="px-5 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-sm focus:ring-2 focus:ring-blue-300 focus:outline-none">
+            Đăng ký miễn phí
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-500 hover:text-slate-800 focus:outline-none" aria-label="Toggle menu">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Nav -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
+      <div class="px-4 py-4 space-y-4">
+        <a href="index.html" class="block text-sm font-medium text-slate-600">Trang chủ</a>
+        <a href="courses.html" class="block text-sm font-semibold text-brand-navy">Khóa học</a>
+        <a href="#" class="block text-sm font-medium text-slate-600">Thi thử JLPT</a>
+        <div class="pt-4 border-t border-slate-100 space-y-3">
+           <a href="#" class="block w-full text-center text-sm font-medium text-slate-600 py-2">Đăng nhập</a>
+           <a href="#" class="block w-full text-center px-4 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold">Đăng ký miễn phí</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow bg-bg-light pb-20">
+    
+    <!-- 2. Page Hero -->
+    <section class="bg-white border-b border-slate-200 pt-8 pb-12">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex text-sm text-slate-500 mb-4" aria-label="Breadcrumb">
+          <ol class="flex items-center space-x-2">
+            <li><a href="index.html" class="hover:text-brand-navy transition-colors">Trang chủ</a></li>
+            <li><svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></li>
+            <li class="font-semibold text-slate-800" aria-current="page">Khóa học</li>
+          </ol>
+        </nav>
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800 tracking-tight mb-3">Khám phá khóa học JLPT</h1>
+        <p class="text-slate-500 text-sm md:text-base max-w-2xl">Lựa chọn khóa học phù hợp với trình độ hiện tại của bạn. Chúng tôi cung cấp các chương trình đào tạo từ cơ bản đến nâng cao.</p>
+      </div>
+    </section>
+
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
+      
+      <!-- 3. Search & Filter Bar -->
+      <section class="bg-white p-4 sm:p-5 rounded-2xl shadow-soft border border-slate-200 mb-8 flex flex-col lg:flex-row gap-4 items-center justify-between">
+        
+        <!-- Search -->
+        <div class="relative w-full lg:w-1/3 shrink-0">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </div>
+          <input type="text" id="searchInput" class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg leading-5 bg-slate-50 placeholder-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-brand-blue focus:border-brand-blue sm:text-sm transition-colors" placeholder="Tìm kiếm tên khóa học..." aria-label="Tìm kiếm khóa học" />
+        </div>
+        
+        <!-- Filters (Level & Price) -->
+        <div class="flex flex-wrap md:flex-nowrap items-center w-full lg:w-auto gap-3">
+          <div class="w-full sm:w-auto">
+            <label for="levelFilter" class="sr-only">Lọc theo cấp độ</label>
+            <select id="levelFilter" class="w-full sm:w-36 block py-2.5 pl-3 pr-8 border border-slate-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue text-slate-700 font-medium cursor-pointer">
+              <option value="all">Tất cả cấp độ</option>
+              <option value="N5">N5 - Sơ cấp 1</option>
+              <option value="N4">N4 - Sơ cấp 2</option>
+              <option value="N3">N3 - Trung cấp</option>
+              <option value="N2">N2 - Tiền cao cấp</option>
+              <option value="N1">N1 - Cao cấp</option>
+            </select>
+          </div>
+          
+          <div class="w-full sm:w-auto">
+            <label for="priceFilter" class="sr-only">Lọc theo giá</label>
+            <select id="priceFilter" class="w-full sm:w-36 block py-2.5 pl-3 pr-8 border border-slate-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue text-slate-700 font-medium cursor-pointer">
+              <option value="all">Mọi mức giá</option>
+              <option value="free">Miễn phí</option>
+              <option value="paid">Trả phí</option>
+            </select>
+          </div>
+          
+          <div class="hidden sm:block w-px h-8 bg-slate-200 mx-1"></div>
+          
+          <!-- Sort -->
+          <div class="w-full sm:w-auto">
+            <label for="sortOrder" class="sr-only">Sắp xếp</label>
+            <select id="sortOrder" class="w-full sm:w-44 block py-2.5 pl-3 pr-8 border border-slate-200 bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue text-slate-700 font-medium cursor-pointer">
+              <option value="popular">Phổ biến nhất</option>
+              <option value="newest">Mới nhất</option>
+              <option value="price-asc">Giá: Thấp đến cao</option>
+              <option value="price-desc">Giá: Cao đến thấp</option>
+            </select>
+          </div>
+
+          <button id="resetBtn" class="w-full sm:w-auto px-4 py-2.5 text-sm font-semibold text-slate-500 hover:text-brand-navy hover:bg-slate-100 rounded-lg transition-colors flex items-center justify-center gap-1">
+             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+             Reset
+          </button>
+        </div>
+      </section>
+
+      <!-- 4. Results Header -->
+      <div class="flex items-center justify-between mb-6">
+        <p class="text-sm text-slate-600 font-medium">Hiển thị <span id="courseCount" class="font-bold text-slate-800">9</span> khóa học</p>
+      </div>
+
+      <!-- 5. Course Grid -->
+      <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        
+        <!-- Mock Course 1 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N5 Nền tảng tiếng Nhật" data-level="N5" data-price="0" data-popular="90" data-new="1">
+          <div class="h-40 bg-emerald-50 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N5</span>
+             <span class="absolute top-3 right-3 bg-emerald-500 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm">Miễn phí</span>
+             <div class="text-4xl text-emerald-200 font-black tracking-widest">N5</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N5 Nền tảng tiếng Nhật nhập môn</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Làm quen với bảng chữ cái Hiragana, Katakana và các mẫu câu cơ bản nhất.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 15 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 10h 30m</span>
+                <span class="flex items-center gap-1 text-amber-500"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 17.27l4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08l4.15-2.5z"/></svg> 4.9 (2k+)</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div class="text-base font-extrabold text-emerald-600">0 đ</div>
+             </div>
+             <a href="course-detail.html?id=1" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 2 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N5 Từ vựng và Kanji cơ bản" data-level="N5" data-price="299000" data-popular="70" data-new="2">
+          <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N5</span>
+             <div class="text-4xl text-slate-300 font-black tracking-widest">N5</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N5 Từ vựng và Kanji cơ bản</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Trọn bộ từ vựng và 100 chữ Kanji đầu tiên cần thiết cho kỳ thi N5.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 20 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 15h 00m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-slate-400 line-through">450.000 đ</span>
+                  <span class="text-base font-extrabold text-slate-800">299.000 đ</span>
+                </div>
+             </div>
+             <a href="course-detail.html?id=2" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 3 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N4 Giao tiếp và ngữ pháp" data-level="N4" data-price="350000" data-popular="75" data-new="3">
+          <div class="h-40 bg-indigo-50 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N4</span>
+             <div class="text-4xl text-indigo-200 font-black tracking-widest">N4</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N4 Giao tiếp và ngữ pháp ứng dụng</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Rèn luyện kỹ năng hội thoại hàng ngày kết hợp các mẫu ngữ pháp N4.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 30 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 22h 15m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">350.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=3" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 4 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N4 Luyện thi tổng hợp" data-level="N4" data-price="399000" data-popular="80" data-new="4">
+          <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N4</span>
+             <div class="text-4xl text-slate-300 font-black tracking-widest">N4</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N4 Luyện thi tổng hợp JLPT</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Khóa luyện đề chuyên sâu bám sát cấu trúc thi N4 mới nhất.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 25 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 18h 45m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">399.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=4" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 5 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N3 Chinh phục ngữ pháp" data-level="N3" data-price="499000" data-popular="95" data-new="5">
+          <div class="h-40 bg-blue-50 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N3</span>
+             <span class="absolute top-3 right-3 bg-rose-500 text-white px-2 py-1 rounded text-[10px] font-bold shadow-sm">Bán chạy</span>
+             <div class="text-4xl text-blue-200 font-black tracking-widest">N3</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N3 Chinh phục ngữ pháp toàn diện</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Hệ thống hóa toàn bộ ngữ pháp N3, phân biệt các mẫu câu dễ nhầm lẫn.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 45 Bài học</span>
+                <span class="flex items-center gap-1 text-amber-500"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 17.27l4.15 2.51c.76.46 1.69-.22 1.49-1.08l-1.1-4.72 3.67-3.18c.67-.58.31-1.68-.57-1.75l-4.83-.41-1.89-4.46c-.34-.81-1.5-.81-1.84 0L9.19 8.63l-4.83.41c-.88.07-1.24 1.17-.57 1.75l3.67 3.18-1.1 4.72c-.2.86.73 1.54 1.49 1.08l4.15-2.5z"/></svg> 4.8 (1.5k+)</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">499.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=5" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 6 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N3 Từ vựng và đọc hiểu" data-level="N3" data-price="499000" data-popular="85" data-new="6">
+          <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N3</span>
+             <div class="text-4xl text-slate-300 font-black tracking-widest">N3</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N3 Từ vựng và Đọc hiểu</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Chiến thuật làm bài đọc hiểu nhanh và ghi nhớ từ vựng qua ngữ cảnh.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 40 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 30h 00m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <div class="flex flex-col">
+                  <span class="text-[10px] text-slate-400 line-through">650.000 đ</span>
+                  <span class="text-base font-extrabold text-slate-800">499.000 đ</span>
+                </div>
+             </div>
+             <a href="course-detail.html?id=6" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 7 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N2 Luyện đề chuyên sâu" data-level="N2" data-price="699000" data-popular="88" data-new="7">
+          <div class="h-40 bg-purple-50 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N2</span>
+             <div class="text-4xl text-purple-200 font-black tracking-widest">N2</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N2 Luyện Đề Chuyên Sâu</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Giải chi tiết 20 đề thi sát thực tế, tổng hợp bẫy thường gặp trong JLPT N2.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 50 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 45h 30m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">699.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=7" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+        <!-- Mock Course 8 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N1 Đọc hiểu học thuật" data-level="N1" data-price="899000" data-popular="60" data-new="8">
+          <div class="h-40 bg-slate-800 flex items-center justify-center border-b border-slate-700 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N1</span>
+             <div class="text-4xl text-slate-600 font-black tracking-widest">N1</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N1 Đọc Hiểu Học Thuật Cao Cấp</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Xử lý các bài báo, bài luận xã hội, triết lý dài đặc trưng của cấp độ N1.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 40 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 50h 00m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">899.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=8" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+        
+        <!-- Mock Course 9 -->
+        <article class="course-card flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow h-full" 
+                 data-title="N2 Đột phá ngữ pháp" data-level="N2" data-price="650000" data-popular="82" data-new="9">
+          <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+             <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N2</span>
+             <div class="text-4xl text-slate-300 font-black tracking-widest">N2</div>
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+             <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">N2 Đột Phá Ngữ Pháp</h3>
+             <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Nắm trọn hơn 150 mẫu ngữ pháp phức tạp thường xuyên xuất hiện trong bài thi N2.</p>
+             <div class="flex flex-wrap gap-x-4 gap-y-2 mb-4 text-[11px] font-medium text-slate-500">
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> 40 Bài học</span>
+                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> 35h 00m</span>
+             </div>
+             <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+                <span class="text-base font-extrabold text-slate-800">650.000 đ</span>
+             </div>
+             <a href="course-detail.html?id=9" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">Xem chi tiết</a>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- 6. Empty State -->
+      <div id="emptyState" class="hidden text-center py-16 bg-white border border-slate-200 rounded-2xl mb-12">
+        <div class="w-16 h-16 mx-auto bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-4">
+           <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        </div>
+        <h3 class="text-base font-bold text-slate-800 mb-2">Không tìm thấy khóa học</h3>
+        <p class="text-sm text-slate-500 mb-6">Không có khóa học nào khớp với bộ lọc tìm kiếm của bạn.</p>
+        <button id="emptyResetBtn" class="inline-flex px-6 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-slate-200 focus:outline-none">
+          Xóa bộ lọc
+        </button>
+      </div>
+
+      <!-- 7. Pagination -->
+      <div id="paginationBlock" class="flex justify-center mb-12">
+        <nav class="inline-flex items-center gap-1" aria-label="Phân trang">
+          <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 bg-white cursor-not-allowed" disabled aria-label="Trang trước">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+          </button>
+          <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-brand-blue bg-brand-blue text-white font-semibold text-sm shadow-sm" aria-current="page">1</button>
+          <button class="hidden sm:flex w-9 h-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 font-semibold text-sm transition-colors">2</button>
+          <button class="w-9 h-9 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 font-semibold text-sm transition-colors" aria-label="Trang tiếp theo">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+          </button>
+        </nav>
+      </div>
+
+    </div>
+
+    <!-- 8. Footer CTA -->
+    <section class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+      <div class="bg-brand-navy rounded-2xl p-8 sm:p-12 text-center text-white relative overflow-hidden shadow-soft">
+        <div class="absolute -top-24 -right-24 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10">
+           <h2 class="text-xl sm:text-2xl font-bold mb-3">Chưa biết mình đang ở trình độ nào?</h2>
+           <p class="text-sm text-slate-300 mb-8 max-w-lg mx-auto leading-relaxed">Làm bài test đánh giá năng lực hoàn toàn miễn phí của chúng tôi để chọn được khóa học phù hợp nhất với bạn.</p>
+           <a href="#" class="inline-block px-8 py-3 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none">
+             Thi thử xác định trình độ
+           </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 9. Footer (Copied from index.html) -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-12 text-slate-400 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 rounded bg-brand-navy flex items-center justify-center text-white">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg>
+            </div>
+            <span class="text-lg font-extrabold text-white">StudyJLPT</span>
+          </div>
+          <p class="text-xs leading-relaxed">Nền tảng giáo dục đồng hành cùng bạn trên con đường chinh phục tiếng Nhật.</p>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Khóa học</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N1</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N2</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N3</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N4</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N5</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Tài nguyên</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Thi thử JLPT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Blog học tập</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Từ điển Grammar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Công ty</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Về chúng tôi</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Liên hệ</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Điều khoản</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Bảo mật</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-800 text-center text-xs">
+        © 2026 StudyJLPT. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Mock JS Interactivity -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mobile menu toggle
+      const btn = document.getElementById('mobile-menu-btn');
+      const menu = document.getElementById('mobile-menu');
+      btn.addEventListener('click', () => {
+        menu.classList.toggle('hidden');
+      });
+
+      // Filter and Sort Logic
+      const searchInput = document.getElementById('searchInput');
+      const levelFilter = document.getElementById('levelFilter');
+      const priceFilter = document.getElementById('priceFilter');
+      const sortOrder = document.getElementById('sortOrder');
+      const resetBtn = document.getElementById('resetBtn');
+      const emptyResetBtn = document.getElementById('emptyResetBtn');
+      
+      const courseGrid = document.getElementById('courseGrid');
+      const courseCountEl = document.getElementById('courseCount');
+      const emptyState = document.getElementById('emptyState');
+      const paginationBlock = document.getElementById('paginationBlock');
+      const cards = Array.from(document.querySelectorAll('.course-card'));
+
+      function renderCourses() {
+        const query = searchInput.value.toLowerCase().trim();
+        const level = levelFilter.value;
+        const price = priceFilter.value;
+        const sort = sortOrder.value;
+
+        let visibleCount = 0;
+        let visibleCards = [];
+
+        cards.forEach(card => {
+          const title = card.getAttribute('data-title').toLowerCase();
+          const cardLevel = card.getAttribute('data-level');
+          const cardPrice = parseInt(card.getAttribute('data-price'), 10);
+          
+          // Conditions
+          const matchQuery = title.includes(query);
+          const matchLevel = level === 'all' || cardLevel === level;
+          const matchPrice = price === 'all' 
+                           || (price === 'free' && cardPrice === 0) 
+                           || (price === 'paid' && cardPrice > 0);
+
+          if (matchQuery && matchLevel && matchPrice) {
+            card.classList.remove('hide-course');
+            visibleCount++;
+            visibleCards.push(card);
+          } else {
+            card.classList.add('hide-course');
+          }
+        });
+
+        // Sorting visible cards
+        visibleCards.sort((a, b) => {
+          const priceA = parseInt(a.getAttribute('data-price'), 10);
+          const priceB = parseInt(b.getAttribute('data-price'), 10);
+          const popA = parseInt(a.getAttribute('data-popular'), 10);
+          const popB = parseInt(b.getAttribute('data-popular'), 10);
+          const newA = parseInt(a.getAttribute('data-new'), 10);
+          const newB = parseInt(b.getAttribute('data-new'), 10);
+
+          if (sort === 'price-asc') return priceA - priceB;
+          if (sort === 'price-desc') return priceB - priceA;
+          if (sort === 'newest') return newA - newB; // Smaller is newer in our mock data
+          if (sort === 'popular') return popB - popA; // Higher is more popular
+          return 0;
+        });
+
+        // Re-append to DOM for sorting
+        visibleCards.forEach(card => courseGrid.appendChild(card));
+
+        // Update UI
+        courseCountEl.textContent = visibleCount;
+        
+        if (visibleCount === 0) {
+          courseGrid.classList.add('hidden');
+          emptyState.classList.remove('hidden');
+          paginationBlock.classList.add('hidden');
+        } else {
+          courseGrid.classList.remove('hidden');
+          emptyState.classList.add('hidden');
+          paginationBlock.classList.remove('hidden');
+        }
+      }
+
+      function resetFilters() {
+        searchInput.value = '';
+        levelFilter.value = 'all';
+        priceFilter.value = 'all';
+        sortOrder.value = 'popular';
+        renderCourses();
+      }
+
+      // Event Listeners
+      searchInput.addEventListener('input', renderCourses);
+      levelFilter.addEventListener('change', renderCourses);
+      priceFilter.addEventListener('change', renderCourses);
+      sortOrder.addEventListener('change', renderCourses);
+      resetBtn.addEventListener('click', resetFilters);
+      emptyResetBtn.addEventListener('click', resetFilters);
+    });
+  </script>
+</body>
+</html>

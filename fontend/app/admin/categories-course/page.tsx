@@ -1,9 +1,11 @@
-'use client';
-
+import { Suspense } from 'react';
+import { IsLoading } from '@/components/common/loading/IsLoading';
 import CategoryCoursePage from '@/features/category-course/component/CategoryCoursePage';
 
-const Page = () => {
-  return <CategoryCoursePage />;
-};
-
-export default Page;
+export default function Page() {
+  return (
+    <Suspense fallback={<IsLoading />}>
+      <CategoryCoursePage />
+    </Suspense>
+  );
+}

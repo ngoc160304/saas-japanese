@@ -169,7 +169,6 @@ test('last-row deletion returns to previous page, but never before page one', ()
     };
     for (const [path, name] of [
       ['@/components/ui/button', 'Button'],
-      ['./CategoryCourseDeleteDialog', 'CategoryCourseDeleteDialog'],
       ['./CategoryCourseDialog', 'CategoryCourseDialog'],
       ['@/components/common/button/CreateButton', 'CreateButton'],
       ['@/components/common/table/DataTablePagination', 'DataTablePagination'],
@@ -183,52 +182,60 @@ test('last-row deletion returns to previous page, but never before page one', ()
     mocks['@/components/layout/management/page-section/PageSection'] = 'PageSection';
     mocks['@/components/layout/management/header/Header'] = 'Header';
     const Page = load('features/category-course/component/CategoryCoursePage.tsx', mocks).default;
-    find(Page(), 'CategoryCourseDeleteDialog').props.onDeleted();
+    find(Page(), 'CourseCategoriesTable').props.onDeleted();
     assert.equal(nextPage, expected);
   }
 });
 
-function dialogHarness(mutateAsync, pending = false) {
+function popoverHarness(onConfirm) {
   const events = [];
-  const names = [
-    'AlertDialog',
-    'AlertDialogAction',
-    'AlertDialogCancel',
-    'AlertDialogContent',
-    'AlertDialogDescription',
-    'AlertDialogFooter',
-    'AlertDialogHeader',
-    'AlertDialogTitle',
-  ];
-  const { CategoryCourseDeleteDialog } = load(
-    'features/category-course/component/CategoryCourseDeleteDialog.tsx',
-    {
-      react: { useRef: () => ({ current: false }) },
-      'lucide-react': { Trash2: 'Trash2' },
-      sonner: {
-        toast: { success: () => events.push('success'), error: () => events.push('error') },
+  let stateIndex = 0;
+  const { DeleteConfirmPopover } = load('components/common/DeleteConfirmPopover.tsx', {
+    react: {
+      useRef: () => ({ current: false }),
+      useState: (initial) => {
+        const index = stateIndex++;
+        return [
+          initial,
+          (value) => {
+            if (index === 0) events.push(value ? 'open' : 'close');
+          },
+        ];
       },
-      '@/apis/categories-course/categories-course.api': {
-        categoryCourseAPI: { deleteByid: () => {} },
-      },
-      '@/components/ui/alert-dialog': Object.fromEntries(names.map((name) => [name, name])),
-      '@/hooks/crud/useCrudDelete': { useCrudDelete: () => ({ mutateAsync, isPending: pending }) },
-      '@/lib/api-error': { getApiErrorMessage: () => 'Request failed' },
     },
-  );
-  const tree = CategoryCourseDeleteDialog({
-    category: { id: 7, name: 'Kanji' },
-    onClose: () => events.push('close'),
-    onDeleted: () => events.push('deleted'),
+    'lucide-react': { LoaderCircle: 'LoaderCircle' },
+    '@/components/ui/button': { Button: 'Button' },
+    '@/components/ui/popover': Object.fromEntries(
+      ['Popover', 'PopoverContent', 'PopoverDescription', 'PopoverTitle', 'PopoverTrigger'].map(
+        (name) => [name, name],
+      ),
+    ),
   });
-  return { tree, events, confirm: find(tree, 'AlertDialogAction').props.onClick };
+  const tree = DeleteConfirmPopover({
+    trigger: 'Trigger',
+    title: 'Delete?',
+    description: 'Warning',
+    onConfirm,
+    errorMessage: () => {
+      events.push('error');
+      return 'Failed';
+    },
+  });
+  function confirmButton(node) {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'Button' && node.props.variant === 'destructive') return node;
+    for (const child of [node.props?.children].flat(Infinity)) {
+      const result = confirmButton(child);
+      if (result) return result;
+    }
+  }
+  return { tree, events, confirm: confirmButton(tree).props.onClick };
 }
 
-test('opening/cancelling does not delete; confirmation prevents duplicate requests and closes on success', async () => {
+test('popconfirm prevents duplicate submissions and dismissal while pending, closes on success', async () => {
   let calls = 0;
   let finish;
-  const h = dialogHarness(async (id) => {
-    assert.equal(id, 7);
+  const h = popoverHarness(async () => {
     calls++;
     await new Promise((resolvePromise) => {
       finish = resolvePromise;
@@ -245,19 +252,40 @@ test('opening/cancelling does not delete; confirmation prevents duplicate reques
   assert.deepEqual(h.events, []);
   finish();
   await first;
-  assert.deepEqual(h.events, ['success', 'close', 'deleted']);
+  assert.deepEqual(h.events, ['close']);
 });
 
-test('failed deletion stays open, allows retry; pending disables both buttons', async () => {
+test('popconfirm keeps failed request open and allows retry', async () => {
   let attempts = 0;
-  const h = dialogHarness(async () => {
+  const h = popoverHarness(async () => {
     if (++attempts === 1) throw new Error('failure');
   });
   await h.confirm();
   assert.deepEqual(h.events, ['error']);
   await h.confirm();
-  assert.deepEqual(h.events, ['error', 'success', 'close', 'deleted']);
-  const { tree } = dialogHarness(async () => {}, true);
-  assert.equal(find(tree, 'AlertDialogAction').props.disabled, true);
-  assert.equal(find(tree, 'AlertDialogCancel').props.disabled, true);
+  assert.deepEqual(h.events, ['error', 'close']);
+});
+
+test('category detail and course filters use existing REST endpoints', async () => {
+  let sent;
+  const { courseAPI } = load('apis/courses/courses.api.ts', {
+    '@/lib/authorize-axios': {
+      get: async (url, config) => {
+        sent = { url, ...config };
+        return { data: {} };
+      },
+    },
+  });
+  await courseAPI.getCourses({
+    categoryId: 7,
+    page: 2,
+    size: 5,
+    search: 'kanji',
+    published: false,
+    pricing: 'free',
+  });
+  assert.deepEqual(sent, {
+    url: '/courses',
+    params: { categoryId: 7, page: 1, size: 5, search: 'kanji', published: false, pricing: 'free' },
+  });
 });

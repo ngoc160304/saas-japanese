@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { IMAGE_TYPE, MAX_IMAGE_SIZE } from '@/utils/constant';
 import { useUploadImage } from '../hooks/useUploadImage';
 
-import type { GetMediaResponse } from '@/apis/upload/upload.type';
+import { getApiErrorMessage } from '@/lib/api-error';
 import { CategoryCourseFormValues, categoryCourseSchema } from '../schemas/category-course.schema';
 
 interface CategoryCourseFormProps {
@@ -26,8 +26,8 @@ interface CategoryCourseFormProps {
   isSubmitting?: boolean;
 
   initialImageUrl?: string | null;
-  setUploadedMedia: (data: GetMediaResponse | null) => void;
-  uploadedMedia: GetMediaResponse | null;
+  onCancel: () => void;
+  error: string | null;
 }
 
 export function CategoryCourseForm({
@@ -37,8 +37,8 @@ export function CategoryCourseForm({
   onSubmit,
   isSubmitting = false,
   initialImageUrl,
-  setUploadedMedia,
-  uploadedMedia,
+  onCancel,
+  error,
 }: CategoryCourseFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,11 +46,11 @@ export function CategoryCourseForm({
   const [imagePreview, setImagePreview] = useState<string | null>(initialImageUrl ?? null);
 
   const uploadImageMutation = useUploadImage();
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors },
   } = useForm<CategoryCourseFormValues>({
@@ -58,52 +58,38 @@ export function CategoryCourseForm({
     defaultValues,
   });
 
-  useEffect(() => {
-    reset(defaultValues);
-    setImage(null);
-    setUploadedMedia(null);
-    setImagePreview(initialImageUrl ?? null);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, [defaultValues, initialImageUrl, reset]);
-
-  useEffect(() => {
-    if (!image) {
-      return;
-    }
-
-    const objectUrl = URL.createObjectURL(image);
-
-    setImagePreview(objectUrl);
-
-    return () => {
-      URL.revokeObjectURL(objectUrl);
-    };
-  }, [image]);
+  useEffect(
+    () => () => {
+      if (imagePreview?.startsWith('blob:')) URL.revokeObjectURL(imagePreview);
+    },
+    [imagePreview],
+  );
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file) return;
+    if (!file || uploadImageMutation.isPending || isSubmitting) return;
+    setImageError(null);
 
     if (!IMAGE_TYPE.includes(file.type)) {
+      setImageError('Chỉ hỗ trợ PNG, JPG hoặc WebP.');
       event.target.value = '';
       return;
     }
 
     if (file.size > MAX_IMAGE_SIZE) {
+      setImageError('Ảnh không được vượt quá 5MB.');
       event.target.value = '';
       return;
     }
 
+    event.target.value = '';
     setImage(file);
-    setUploadedMedia(null);
+    setImagePreview(URL.createObjectURL(file));
 
     uploadImageMutation.mutate(file, {
       onSuccess: (media) => {
-        setUploadedMedia(media);
+        setImageError(null);
 
         setValue('mediaId', media.data.id, {
           shouldValidate: true,
@@ -111,10 +97,10 @@ export function CategoryCourseForm({
         });
       },
 
-      onError: () => {
+      onError: (error) => {
+        setImageError(getApiErrorMessage(error));
         setImage(null);
         setImagePreview(initialImageUrl ?? null);
-        setUploadedMedia(null);
 
         setValue('mediaId', defaultValues.mediaId);
       },
@@ -123,13 +109,14 @@ export function CategoryCourseForm({
 
   const handleRemoveImage = () => {
     setImage(null);
-    setUploadedMedia(null);
+    setImageError(null);
+    uploadImageMutation.reset();
 
-    setValue('mediaId', undefined, {
+    setValue('mediaId', null, {
       shouldDirty: true,
     });
 
-    setImagePreview(initialImageUrl ?? null);
+    setImagePreview(null);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -137,7 +124,7 @@ export function CategoryCourseForm({
   };
 
   const handleFormSubmit = (data: CategoryCourseFormValues) => {
-    onSubmit(data);
+    if (!isSubmitting && !uploadImageMutation.isPending) onSubmit(data);
   };
 
   return (
@@ -184,7 +171,7 @@ export function CategoryCourseForm({
         <div className="space-y-2">
           <label className="text-sm font-medium text-slate-700">Cover Image</label>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row">
             <div className="relative h-32 w-48 shrink-0 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
               {imagePreview ? (
                 <>
@@ -225,7 +212,7 @@ export function CategoryCourseForm({
                 type="file"
                 accept="image/png,image/jpeg,image/webp"
                 onChange={handleImageChange}
-                disabled={isSubmitting}
+                disabled={isSubmitting || uploadImageMutation.isPending}
                 className="hidden"
                 id="category-image"
               />
@@ -244,7 +231,7 @@ export function CategoryCourseForm({
 
               {image && <p className="max-w-full truncate text-xs text-slate-600">{image.name}</p>}
 
-              {uploadedMedia && (
+              {uploadImageMutation.isSuccess && (
                 <p className="text-xs text-emerald-600">Image uploaded successfully.</p>
               )}
             </div>
@@ -252,12 +239,25 @@ export function CategoryCourseForm({
         </div>
       </div>
 
+      {imageError && (
+        <p role="alert" className="px-6 pb-4 text-sm text-rose-600">
+          {imageError}
+        </p>
+      )}
+      {error && (
+        <p role="alert" className="px-6 pb-4 text-sm text-rose-600">
+          {error}
+        </p>
+      )}
       <div className="border-t border-slate-100 px-6 pt-4 pb-6">
         <div className="flex justify-end gap-2">
+          <Button type="button" variant="outline" className="border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900" onClick={onCancel}>
+            Hủy
+          </Button>
           <Button
             type="submit"
             disabled={isSubmitting || uploadImageMutation.isPending}
-            className="bg-slate-900 text-white hover:bg-slate-800"
+            className="border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900"
           >
             {isSubmitting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
 

@@ -56,7 +56,15 @@ export function getApiError(error: unknown): ApiError {
         ? 'Vui lòng kiểm tra các trường thông tin.'
         : data.message === 'Invalid or expired verification code'
           ? 'Mã xác thực không đúng hoặc đã hết hạn.'
-          : 'Thông tin không hợp lệ. Vui lòng kiểm tra và thử lại.';
+          : data.message.trim() || 'Thông tin không hợp lệ. Vui lòng kiểm tra và thử lại.';
+  }
+  if (
+    (status === 404 || status === 409) &&
+    isRecord(data) &&
+    typeof data.message === 'string' &&
+    data.message.trim()
+  ) {
+    message = data.message;
   }
   return { status, message, fieldErrors };
 }

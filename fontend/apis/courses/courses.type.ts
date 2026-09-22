@@ -12,11 +12,13 @@ export interface Course {
   price: number | null;
   // Keep the spelling used by CourseResponse.java.
   thumnailURL: string | null;
-  // The current mapper does not populate this field.
   createdAt: string | null;
 }
 
 export interface CourseQuery {
+  categoryId?: number;
+  published?: boolean;
+  pricing?: 'free' | 'paid';
   search: string;
   page: number;
   size: number;

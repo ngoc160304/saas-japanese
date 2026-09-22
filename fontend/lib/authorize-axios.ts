@@ -4,6 +4,12 @@ import type { AuthSession } from '@/apis/auth/auth.type';
 import { getApiErrorMessage } from '@/lib/api-error';
 import { API_VERSION } from '@/utils/constant';
 
+declare module 'axios' {
+  interface AxiosRequestConfig {
+    localErrorHandling?: boolean;
+  }
+}
+
 interface RetryConfig extends InternalAxiosRequestConfig {
   _authRetry?: boolean;
   _authRevision?: number;
@@ -124,7 +130,7 @@ authorizeAxiosInstance.interceptors.response.use(
         return Promise.reject(error);
       return authorizeAxiosInstance(config);
     }
-    if (!error.response || error.response.status >= 500)
+    if (!config.localErrorHandling && (!error.response || error.response.status >= 500))
       bindings?.onSystemError(getApiErrorMessage(error));
     return Promise.reject(error);
   },

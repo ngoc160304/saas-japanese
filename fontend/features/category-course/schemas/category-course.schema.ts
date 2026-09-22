@@ -13,7 +13,7 @@ export const categoryCourseSchema = z.object({
     .max(2000, 'Description must not exceed 2000 characters')
     .optional(),
 
-  mediaId: z.number().optional(),
+  mediaId: z.number().nullable().optional(),
 });
 
 export type CategoryCourseFormValues = z.infer<typeof categoryCourseSchema>;

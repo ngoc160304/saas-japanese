@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyJLPT - Nền tảng luyện thi tiếng Nhật toàn diện</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --color-brand-navy: #2B4C7E;
+      --color-brand-blue: #2F80ED;
+      --color-bg-light: #F4F6F9;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft {
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- 1. Header -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo -->
+        <a href="#" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded bg-brand-navy flex items-center justify-center text-white font-bold transition-transform group-hover:scale-105">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg>
+          </div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-800">
+            Study<span class="text-brand-blue">JLPT</span>
+          </span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="#" class="text-sm font-semibold text-brand-navy">Trang chủ</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Khóa học</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Thi thử JLPT</a>
+        </nav>
+
+        <!-- Auth -->
+        <div class="hidden md:flex items-center gap-4">
+          <a href="#" class="text-sm font-medium text-slate-600 hover:text-brand-navy transition-colors">Đăng nhập</a>
+          <a href="#" class="px-5 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-sm focus:ring-2 focus:ring-blue-300 focus:outline-none">
+            Đăng ký miễn phí
+          </a>
+        </div>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-500 hover:text-slate-800 focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Nav -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
+      <div class="px-4 py-4 space-y-4">
+        <a href="#" class="block text-sm font-semibold text-brand-navy">Trang chủ</a>
+        <a href="#" class="block text-sm font-medium text-slate-600">Khóa học</a>
+        <a href="#" class="block text-sm font-medium text-slate-600">Thi thử JLPT</a>
+        <div class="pt-4 border-t border-slate-100 space-y-3">
+           <a href="#" class="block w-full text-center text-sm font-medium text-slate-600 py-2">Đăng nhập</a>
+           <a href="#" class="block w-full text-center px-4 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold">Đăng ký miễn phí</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow">
+    
+    <!-- 2. Hero Section -->
+    <section class="bg-bg-light relative overflow-hidden py-16 md:py-24">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center gap-12">
+        <div class="md:w-1/2 text-center md:text-left">
+          <h1 class="text-4xl md:text-5xl font-extrabold text-slate-800 leading-[1.2] mb-6">
+            Chinh phục tiếng Nhật.<br/>
+            Sẵn sàng cho kỳ thi <span class="text-brand-blue">JLPT</span>.
+          </h1>
+          <p class="text-base md:text-lg text-slate-500 mb-8 max-w-xl mx-auto md:mx-0 leading-relaxed">
+            Hệ thống học tập chuyên sâu với lộ trình cá nhân hóa từ N5 đến N1. Cung cấp bài giảng, bài tập ngữ pháp, Hán tự và các đề thi thử bám sát thực tế.
+          </p>
+          <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
+            <a href="#courses" class="w-full sm:w-auto px-6 py-3.5 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm focus:ring-2 focus:ring-slate-400 focus:outline-none text-center">
+              Khám phá khóa học
+            </a>
+            <a href="#mock-exam" class="w-full sm:w-auto px-6 py-3.5 rounded-lg bg-white border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors focus:ring-2 focus:ring-slate-200 focus:outline-none text-center">
+              Thi thử miễn phí
+            </a>
+          </div>
+        </div>
+        <div class="md:w-1/2 w-full flex justify-center md:justify-end">
+          <div class="relative w-full max-w-md aspect-[4/3] bg-white rounded-2xl shadow-soft border border-slate-200 p-2 overflow-hidden flex items-center justify-center">
+             <!-- Minimalist UI representation instead of stock photo -->
+             <div class="w-full h-full bg-slate-50 rounded-xl border border-slate-100 flex flex-col p-6 relative">
+                <div class="w-3/4 h-6 bg-slate-200 rounded mb-4"></div>
+                <div class="w-full h-2 bg-slate-200 rounded mb-2"></div>
+                <div class="w-5/6 h-2 bg-slate-200 rounded mb-8"></div>
+                
+                <div class="flex-1 border-2 border-dashed border-slate-200 rounded-lg flex items-center justify-center text-slate-400 text-xl font-bold tracking-widest bg-white">
+                  あ • い • う • え • お
+                </div>
+                
+                <div class="absolute bottom-6 right-6 w-16 h-16 bg-brand-blue text-white rounded-full shadow-lg flex items-center justify-center text-2xl font-bold">N3</div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Social Proof -->
+    <section class="py-12 border-b border-slate-100 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-slate-100">
+          <div>
+            <div class="text-3xl font-extrabold text-brand-navy mb-1">15,000+</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Học viên</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-brand-navy mb-1">2,000+</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Bài học</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-brand-navy mb-1">50+</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Đề thi JLPT</div>
+          </div>
+          <div>
+            <div class="text-3xl font-extrabold text-brand-navy mb-1">4.9/5</div>
+            <div class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Đánh giá trung bình</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. JLPT Levels -->
+    <section class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-2xl font-bold text-slate-800 mb-3">Lộ trình học phù hợp mọi trình độ</h2>
+          <p class="text-slate-500 text-sm max-w-2xl mx-auto">Chương trình học được thiết kế phân cấp rõ ràng theo chuẩn JLPT, giúp bạn từng bước đạt mục tiêu.</p>
+        </div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="p-6 rounded-2xl border border-slate-200 hover:border-brand-blue hover:shadow-soft transition-all text-center group cursor-pointer bg-slate-50 hover:bg-white">
+             <div class="w-12 h-12 mx-auto bg-white border border-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg mb-3 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">N5</div>
+             <h3 class="text-sm font-semibold text-slate-800 mb-1">Sơ cấp 1</h3>
+             <p class="text-xs text-slate-500">Nền tảng bảng chữ cái & ngữ pháp cơ bản.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-slate-200 hover:border-brand-blue hover:shadow-soft transition-all text-center group cursor-pointer bg-slate-50 hover:bg-white">
+             <div class="w-12 h-12 mx-auto bg-white border border-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg mb-3 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">N4</div>
+             <h3 class="text-sm font-semibold text-slate-800 mb-1">Sơ cấp 2</h3>
+             <p class="text-xs text-slate-500">Giao tiếp thực tế và ngữ pháp nâng cao.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-slate-200 hover:border-brand-blue hover:shadow-soft transition-all text-center group cursor-pointer bg-slate-50 hover:bg-white">
+             <div class="w-12 h-12 mx-auto bg-white border border-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg mb-3 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">N3</div>
+             <h3 class="text-sm font-semibold text-slate-800 mb-1">Trung cấp</h3>
+             <p class="text-xs text-slate-500">Mở rộng vốn từ và đọc hiểu văn bản dài.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-slate-200 hover:border-brand-blue hover:shadow-soft transition-all text-center group cursor-pointer bg-slate-50 hover:bg-white">
+             <div class="w-12 h-12 mx-auto bg-white border border-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg mb-3 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">N2</div>
+             <h3 class="text-sm font-semibold text-slate-800 mb-1">Tiền cao cấp</h3>
+             <p class="text-xs text-slate-500">Ngữ pháp học thuật và nghe hiểu chuyên sâu.</p>
+          </div>
+          <div class="p-6 rounded-2xl border border-slate-200 hover:border-brand-blue hover:shadow-soft transition-all text-center group cursor-pointer bg-slate-50 hover:bg-white">
+             <div class="w-12 h-12 mx-auto bg-white border border-slate-200 text-slate-700 rounded-full flex items-center justify-center font-bold text-lg mb-3 group-hover:bg-brand-blue group-hover:text-white group-hover:border-brand-blue transition-colors">N1</div>
+             <h3 class="text-sm font-semibold text-slate-800 mb-1">Cao cấp</h3>
+             <p class="text-xs text-slate-500">Thành thạo như người bản xứ.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Key Benefits -->
+    <section class="py-20 bg-bg-light">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-2 gap-16 items-center">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-8">Tại sao chọn StudyJLPT?</h2>
+            
+            <div class="space-y-6">
+              <div class="flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-brand-blue shadow-sm">
+                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-1">Lộ trình học rõ ràng</h3>
+                  <p class="text-xs text-slate-500 leading-relaxed">Không còn mông lung khi bắt đầu. Mỗi cấp độ được chia thành các bài học nhỏ, giúp bạn dễ dàng tiếp thu mỗi ngày.</p>
+                </div>
+              </div>
+              
+              <div class="flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-brand-blue shadow-sm">
+                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-1">Nội dung có hệ thống</h3>
+                  <p class="text-xs text-slate-500 leading-relaxed">Tích hợp đầy đủ Từ vựng, Kanji, Ngữ pháp và các Quiz luyện tập ngắn sau mỗi bài, tối ưu hóa việc ghi nhớ.</p>
+                </div>
+              </div>
+
+              <div class="flex gap-4">
+                <div class="shrink-0 w-10 h-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-brand-blue shadow-sm">
+                   <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                </div>
+                <div>
+                  <h3 class="text-sm font-bold text-slate-800 mb-1">Theo dõi tiến độ</h3>
+                  <p class="text-xs text-slate-500 leading-relaxed">Dashboard trực quan hiển thị chi tiết phần trăm hoàn thành khóa học, giúp bạn duy trì động lực học tập.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          
+          <!-- Abstract representation -->
+          <div class="bg-white p-6 rounded-2xl shadow-soft border border-slate-200 relative">
+             <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+                <span class="text-sm font-bold text-slate-800">Tiến độ học tập</span>
+                <span class="text-xs font-medium text-brand-blue">65% Hoàn thành</span>
+             </div>
+             <div class="space-y-4">
+               <div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-600">Từ vựng</span><span class="font-medium">80%</span></div>
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full"><div class="w-[80%] h-full bg-brand-blue rounded-full"></div></div>
+               </div>
+               <div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-600">Kanji</span><span class="font-medium">45%</span></div>
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full"><div class="w-[45%] h-full bg-amber-400 rounded-full"></div></div>
+               </div>
+               <div>
+                  <div class="flex justify-between text-xs mb-1"><span class="text-slate-600">Ngữ pháp</span><span class="font-medium">60%</span></div>
+                  <div class="w-full h-1.5 bg-slate-100 rounded-full"><div class="w-[60%] h-full bg-emerald-500 rounded-full"></div></div>
+               </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Featured Courses -->
+    <section id="courses" class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Khóa học nổi bật</h2>
+            <p class="text-slate-500 text-sm">Tuyển chọn các khóa học được yêu thích nhất.</p>
+          </div>
+          <a href="#" class="text-sm font-medium text-brand-blue hover:text-blue-700 transition-colors">Xem tất cả khóa học &rarr;</a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          <!-- Card 1 -->
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow flex flex-col h-full">
+            <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+               <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N3</span>
+               <div class="text-4xl text-slate-300 font-black tracking-widest">N3</div>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+               <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">Tiếng Nhật Trung Cấp N3 Toàn Diện</h3>
+               <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Chương trình chuẩn hóa kiến thức ngữ pháp, đọc hiểu và luyện nghe chuẩn bị cho kỳ thi N3.</p>
+               <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                  <div class="text-xs text-slate-500">55 Bài học</div>
+                  <div class="text-sm font-bold text-slate-800">499.000 đ</div>
+               </div>
+               <a href="#" class="mt-4 block w-full text-center py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">
+                  Xem chi tiết
+               </a>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow flex flex-col h-full">
+            <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+               <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N2</span>
+               <div class="text-4xl text-slate-300 font-black tracking-widest">N2</div>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+               <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">Luyện Thi Tiền Cao Cấp N2</h3>
+               <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Khóa học tập trung phân tích cấu trúc phức tạp, từ vựng nâng cao và kỹ năng làm bài.</p>
+               <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                  <div class="text-xs text-slate-500">45 Bài học</div>
+                  <div class="text-sm font-bold text-slate-800">699.000 đ</div>
+               </div>
+               <a href="#" class="mt-4 block w-full text-center py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">
+                  Xem chi tiết
+               </a>
+            </div>
+          </div>
+
+          <!-- Card 3 -->
+          <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-soft transition-shadow flex flex-col h-full">
+            <div class="h-40 bg-slate-100 flex items-center justify-center border-b border-slate-100 relative">
+               <span class="absolute top-3 left-3 bg-white px-2 py-1 rounded text-[10px] font-bold text-slate-700 border border-slate-200">N5</span>
+               <div class="text-4xl text-slate-300 font-black tracking-widest">N5</div>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+               <h3 class="text-sm font-bold text-slate-800 mb-2 line-clamp-2">Sơ Cấp N5 Dành Cho Người Mới Bắt Đầu</h3>
+               <p class="text-xs text-slate-500 mb-4 line-clamp-2 flex-grow">Khóa học nền tảng miễn phí giúp bạn làm quen với tiếng Nhật từ con số 0.</p>
+               <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+                  <div class="text-xs text-slate-500">25 Bài học</div>
+                  <div class="text-sm font-bold text-emerald-600">Miễn phí</div>
+               </div>
+               <a href="#" class="mt-4 block w-full text-center py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 transition-colors">
+                  Xem chi tiết
+               </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Mock Exam Area -->
+    <section id="mock-exam" class="py-20 bg-slate-800 text-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row items-center gap-12">
+          <div class="md:w-1/2">
+             <h2 class="text-2xl font-bold mb-4">Mô phỏng kỳ thi JLPT thực tế</h2>
+             <p class="text-sm text-slate-300 mb-6 leading-relaxed">Khác với các bài quiz nhỏ trong khóa học, hệ thống thi thử của chúng tôi cung cấp bài thi toàn thời gian với cấu trúc chuẩn, giới hạn thời gian thực và tự động chấm điểm để bạn đánh giá chính xác năng lực trước kỳ thi thật.</p>
+             <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm text-slate-300">
+                   <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                   Cấu trúc đề chuẩn hóa theo từng năm.
+                </li>
+                <li class="flex items-center gap-3 text-sm text-slate-300">
+                   <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                   Phân tích chi tiết điểm yếu sau khi nộp bài.
+                </li>
+                <li class="flex items-center gap-3 text-sm text-slate-300">
+                   <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                   File audio nghe hiểu chất lượng cao.
+                </li>
+             </ul>
+             <a href="#" class="inline-block px-6 py-3 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-500 transition-colors">
+               Bắt đầu thi thử ngay
+             </a>
+          </div>
+          <div class="md:w-1/2 w-full">
+             <div class="bg-slate-700 rounded-2xl p-6 border border-slate-600 shadow-xl">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-600">
+                   <div>
+                     <div class="text-xs font-semibold text-slate-400 mb-1">JLPT N3 Mock Exam</div>
+                     <div class="text-sm font-bold text-white">Choukai (Nghe hiểu)</div>
+                   </div>
+                   <div class="text-right">
+                     <div class="text-xs text-slate-400 mb-1">Thời gian còn lại</div>
+                     <div class="text-sm font-mono font-bold text-amber-400">35:12</div>
+                   </div>
+                </div>
+                <div class="space-y-4">
+                   <div class="flex items-start gap-4">
+                      <div class="w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center text-xs font-bold text-slate-300 shrink-0">1</div>
+                      <div class="w-full h-4 bg-slate-600 rounded"></div>
+                   </div>
+                   <div class="pl-10 space-y-2">
+                      <div class="flex items-center gap-2 p-2 rounded border border-brand-blue bg-blue-900/30 text-white text-xs"><div class="w-3 h-3 rounded-full bg-brand-blue"></div> Đáp án 1</div>
+                      <div class="flex items-center gap-2 p-2 rounded border border-slate-600 text-slate-400 text-xs"><div class="w-3 h-3 rounded-full border border-slate-500"></div> Đáp án 2</div>
+                      <div class="flex items-center gap-2 p-2 rounded border border-slate-600 text-slate-400 text-xs"><div class="w-3 h-3 rounded-full border border-slate-500"></div> Đáp án 3</div>
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Testimonials -->
+    <section class="py-20 bg-bg-light">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-slate-800 text-center mb-12">Học viên nói gì về chúng tôi</h2>
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-2xl border border-slate-200">
+             <p class="text-sm text-slate-600 mb-6 italic leading-relaxed">"Giao diện gọn gàng, nội dung đi thẳng vào trọng tâm. Mình học N3 trên này và pass với điểm số rất tốt, đặc biệt là phần đọc hiểu."</p>
+             <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs">M</div>
+                <div>
+                   <h4 class="text-sm font-bold text-slate-800">Minh Anh</h4>
+                   <p class="text-[10px] text-slate-500">Đã đậu N3 - T12/2025</p>
+                </div>
+             </div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl border border-slate-200">
+             <p class="text-sm text-slate-600 mb-6 italic leading-relaxed">"Chức năng thi thử rất giống với form đề thật. Canh được thời gian giúp mình không bị hoảng khi đi thi chính thức."</p>
+             <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs">T</div>
+                <div>
+                   <h4 class="text-sm font-bold text-slate-800">Trần Tuấn</h4>
+                   <p class="text-[10px] text-slate-500">Đã đậu N2 - T07/2025</p>
+                </div>
+             </div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 hidden lg:block">
+             <p class="text-sm text-slate-600 mb-6 italic leading-relaxed">"Khoá N5 miễn phí siêu chất lượng. Các giải thích ngữ pháp tiếng Việt rất dễ hiểu cho người mới bắt đầu như mình."</p>
+             <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs">L</div>
+                <div>
+                   <h4 class="text-sm font-bold text-slate-800">Lan Phương</h4>
+                   <p class="text-[10px] text-slate-500">Đang học N4</p>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Final CTA -->
+    <section class="py-20 bg-white text-center">
+      <div class="max-w-3xl mx-auto px-4">
+        <h2 class="text-3xl font-extrabold text-slate-800 mb-4">Sẵn sàng để bắt đầu?</h2>
+        <p class="text-sm text-slate-500 mb-8">Tạo tài khoản miễn phí và trải nghiệm ngay nền tảng học tiếng Nhật chuyên nghiệp.</p>
+        <a href="#" class="inline-block px-8 py-3.5 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-sm focus:ring-2 focus:ring-blue-300 focus:outline-none">
+          Đăng ký ngay bây giờ
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 10. Footer -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-12 text-slate-400">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 rounded bg-brand-navy flex items-center justify-center text-white">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg>
+            </div>
+            <span class="text-lg font-extrabold text-white">StudyJLPT</span>
+          </div>
+          <p class="text-xs leading-relaxed">Nền tảng giáo dục đồng hành cùng bạn trên con đường chinh phục tiếng Nhật.</p>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Khóa học</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N1</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N2</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N3</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N4</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N5</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Tài nguyên</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Thi thử JLPT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Blog học tập</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Từ điển Grammar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Công ty</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Về chúng tôi</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Liên hệ</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Điều khoản</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Bảo mật</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-800 text-center text-xs">
+        © 2026 StudyJLPT. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Simple inline JS for mobile menu
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => {
+      menu.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html>

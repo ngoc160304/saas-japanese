@@ -17,11 +17,14 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
 import java.util.Optional;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.mycompany.saas_japanese.repository.ParentCount;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.PredicateSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +50,8 @@ public class CourseServiceImpl implements CourseService {
     @Override
     @Transactional
     public Course handleCreateCourse(ReqCreateCourse requestCourse) {
-        CourseCategory courseCategory = courseCategoryRepository.findById(requestCourse.getCategoryId())
+        CourseCategory courseCategory = courseCategoryRepository
+                .findByIdAndIsDeletedFalse(requestCourse.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
         Course course = new Course();
         if (requestCourse.getThumbnailId() != null) {
@@ -99,7 +103,14 @@ public class CourseServiceImpl implements CourseService {
     @Transactional(readOnly = true)
     public Page<CourseResponse> fetchAllCourse(CourseQuerry query) {
 
-        PredicateSpecification<Course> spec = (root, builder) -> null;
+        if (query.getCategoryId() != null) {
+            courseCategoryRepository.findByIdAndIsDeletedFalse(query.getCategoryId())
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy danh mục khóa học"));
+        }
+        Specification<Course> spec = Specification.where(CourseSpecs.isNotDeleted())
+            .and(CourseSpecs.hasCategory(query.getCategoryId()))
+            .and(CourseSpecs.hasPublished(query.getPublished()))
+            .and(CourseSpecs.hasPricing(query.getPricing()));
 
         spec = spec.and(
                 CourseSpecs.hasTitle(query.getTitle()));
@@ -107,13 +118,11 @@ public class CourseServiceImpl implements CourseService {
         spec = spec.and(
                 CourseSpecs.hasSearch(query.getSearch()));
 
-        Page<Course> coursePage = courseRepository.findBy(
-                spec,
-                q -> q.page(
-                        PageRequest.of(
-                                query.getPage(),
-                                query.getSize(),
-                                buildSort(query))));
+        Page<Course> coursePage = courseRepository.findAll(spec,
+            PageRequest.of(query.getPage(), query.getSize(), buildSort(query)));
+        Map<Long, Long> counts = coursePage.isEmpty() ? Map.of() : lessonRepository
+            .countByCourseIds(coursePage.stream().map(Course::getId).toList()).stream()
+            .collect(Collectors.toMap(ParentCount::getParentId, ParentCount::getTotal));
 
         return coursePage.map(course -> {
 
@@ -124,8 +133,7 @@ public class CourseServiceImpl implements CourseService {
                             ? course.getCategory().getName()
                             : null);
 
-            long lessonCount = lessonRepository.countByCourseIdAndIsDeletedFalse(
-                    course.getId());
+            long lessonCount = counts.getOrDefault(course.getId(), 0L);
 
             response.setLessonCount(lessonCount);
 
@@ -170,7 +178,7 @@ public class CourseServiceImpl implements CourseService {
             case "id" -> "id";
             case "title" -> "title";
             case "price" -> "price";
-            case "categoryName" -> "categoryName";
+            case "categoryName" -> "category.name";
             case "createdAt" -> "createdAt";
             case "updatedAt" -> "updatedAt";
             case "isPublished" -> "isPublished";
