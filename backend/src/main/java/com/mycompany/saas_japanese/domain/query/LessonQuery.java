@@ -8,4 +8,10 @@ public class LessonQuery extends BaseQuery {
   private Long courseId;
 
   private String title;
+
+  @Override
+  @jakarta.validation.constraints.Min(1)
+  public Integer getSize() {
+    return super.getSize();
+  }
 }

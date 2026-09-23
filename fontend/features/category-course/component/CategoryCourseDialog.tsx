@@ -20,7 +20,9 @@ export function CategoryCourseDialog(props: Props) {
   // A fresh form/mutation instance on every open also clears uploads and validation.
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
-      <DialogContent>{props.open && <CategoryCourseDialogForm {...props} />}</DialogContent>
+      <DialogContent className="w-[calc(100%-2rem)] max-w-2xl gap-0 overflow-hidden rounded-2xl border border-slate-100 bg-white p-0 text-slate-900 shadow-2xl sm:max-w-2xl">
+        {props.open && <CategoryCourseDialogForm {...props} />}
+      </DialogContent>
     </Dialog>
   );
 }

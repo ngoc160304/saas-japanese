@@ -16,6 +16,7 @@ export interface Course {
 }
 
 export interface CourseQuery {
+  title?: string;
   categoryId?: number;
   published?: boolean;
   pricing?: 'free' | 'paid';
@@ -25,3 +26,23 @@ export interface CourseQuery {
 }
 
 export type GetCoursesResponse = ApiResponse<PageResponse<Course>>;
+
+export interface CreateCourseRequest {
+  title: string;
+  categoryId: number;
+  description: string;
+  thumbnailId: number | null;
+  isPublished: boolean;
+  price: number;
+}
+
+export interface UpdateCourseRequest {
+  title: string;
+  categoryId: number;
+  description: string;
+  published: boolean;
+  thumbnailId: number | null;
+  levelId: number;
+}
+
+export type CourseResponse = ApiResponse<Course>;

@@ -68,6 +68,8 @@ public class SecurityConfiguration {
                                 "/api/v1/auth/verify-user", "/api/v1/auth/refresh-token", "/api/v1/auth/logout")
                         .permitAll()
                         .requestMatchers("/api/v1/auth/myProfile", "/api/v1/auth/updateProfile").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/lessons").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/**").authenticated()
                         // User has no persisted admin role yet. Do not manufacture administrative
                         // authority.
                         .requestMatchers(HttpMethod.POST, "/api/v1/**").permitAll()

@@ -1,17 +1,31 @@
+import Link from 'next/link';
+import { Eye, Pencil } from 'lucide-react';
 import type { Course } from '@/apis/courses/courses.type';
+import { CourseDeleteDialog } from './CourseDeleteDialog';
 
-export function CourseActions({ course }: { course: Course }) {
+export function CourseActions({ course, manage = false }: { course: Course; manage?: boolean }) {
   return (
-    <details className="max-w-64 whitespace-normal text-left text-xs">
-      <summary className="cursor-pointer rounded-xl bg-slate-900 px-3 py-2 font-semibold text-white hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500">
-        Xem thông tin<span className="sr-only">: {course.title}</span>
-      </summary>
-      <div className="mt-2 space-y-2 break-words rounded-xl border border-slate-100 bg-slate-50 p-3">
-        <p className="font-semibold">{course.title}</p>
-        <p>ID: {course.id}</p>
-        <p>Slug: {course.slug || '—'}</p>
-        <p>{course.description || 'Chưa có mô tả'}</p>
-      </div>
-    </details>
+    <div className="flex items-start gap-1.5 whitespace-nowrap">
+      <Link
+        href={`/admin/courses/${course.id}`}
+        title="Xem danh sách bài học"
+        aria-label={`Xem danh sách bài học của ${course.title}`}
+        className="inline-flex size-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-900 text-white hover:border-sky-600 hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500"
+      >
+        <Eye className="size-4" aria-hidden="true" />
+      </Link>
+      {manage && (
+        <>
+          <Link
+            href={`/admin/courses/${course.id}/edit`}
+            aria-label={`Sửa ${course.title}`}
+            className="inline-flex size-8 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 hover:bg-sky-50 hover:text-sky-700 focus-visible:outline-2 focus-visible:outline-sky-500"
+          >
+            <Pencil className="size-4" aria-hidden="true" />
+          </Link>
+          <CourseDeleteDialog course={course} />
+        </>
+      )}
+    </div>
   );
 }

@@ -31,6 +31,7 @@ export function CategoryCourseAction({
           variant="outline"
           size="icon"
           className={actionButtonClassName}
+          nativeButton={false}
           render={<Link href={`/admin/categories-course/${courseCategory.id}`} />}
           aria-label={`Xem ${courseCategory.name}`}
         >

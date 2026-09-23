@@ -1,10 +1,14 @@
 'use client';
 
+import Link from 'next/link';
+import { Plus } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { courseAPI } from '@/apis/courses/courses.api';
 import { IsLoading } from '@/components/common/loading/IsLoading';
 import { StatCard } from '@/components/common/stats/StatCard';
 import { DataTablePagination } from '@/components/common/table/DataTablePagination';
 import { DataTableToolbar } from '@/components/common/table/DataTableToolbar';
+import { DataTableFilter } from '@/components/common/table/search-bar/DataTableFilters';
 import { useDataTableQuery } from '@/components/common/table/hooks/useDataTableQuery';
 import Header from '@/components/layout/management/header/Header';
 import PageSection from '@/components/layout/management/page-section/PageSection';
@@ -12,9 +16,14 @@ import { Button } from '@/components/ui/button';
 import { CourseTable } from './CourseTable';
 
 export function CoursePage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const status = searchParams.get('status') ?? 'ALL';
+  const publishedFilter = status === 'published' ? true : status === 'draft' ? false : undefined;
   const query = useDataTableQuery({
-    queryKey: ['courses'],
-    queryFn: courseAPI.getCourses,
+    queryKey: ['courses', { published: publishedFilter }],
+    queryFn: (params) => courseAPI.getCourses({ ...params, published: publishedFilter }),
     defaultPage: 1,
     defaultSize: 10,
     maxSize: 12,
@@ -33,7 +42,12 @@ export function CoursePage() {
       <Header
         title="Courses Management"
         description="Quản lý khóa học tiếng Nhật, danh mục, số bài học và trạng thái xuất bản."
-      />
+      >
+        <Link href="/admin/courses/create" className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500 md:text-sm">
+          <Plus className="size-4" aria-hidden="true" />
+          Tạo khóa học
+        </Link>
+      </Header>
       <StatCard
         items={[
           {
@@ -66,8 +80,23 @@ export function CoursePage() {
           searchValue={query.search}
           onSearchChange={query.setSearch}
           searchPlaceholder="Tìm kiếm khóa học..."
-          onReset={query.reset}
+          onReset={() => router.replace(pathname, { scroll: false })}
         >
+          <DataTableFilter
+            value={status}
+            onChange={(value) => {
+              const next = new URLSearchParams(searchParams.toString());
+              if (value === 'ALL') next.delete('status');
+              else next.set('status', value);
+              next.set('page', '1');
+              router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+            }}
+            options={[
+              { label: 'Tất cả trạng thái', value: 'ALL' },
+              { label: 'Đã xuất bản', value: 'published' },
+              { label: 'Bản nháp', value: 'draft' },
+            ]}
+          />
           <label className="flex items-center gap-2 text-xs text-slate-600">
             Số dòng
             <select
@@ -108,7 +137,7 @@ export function CoursePage() {
                   ? 'Trang này không có khóa học.'
                   : 'Không có khóa học phù hợp.'}
               </p>
-              <Button variant="outline" onClick={query.reset}>
+              <Button variant="outline" onClick={() => router.replace(pathname, { scroll: false })}>
                 Về trang đầu và đặt lại tìm kiếm
               </Button>
             </div>

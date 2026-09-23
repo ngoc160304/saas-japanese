@@ -88,7 +88,11 @@ public class LessonServiceImpl implements LessonService {
                             () -> new NotFoundException(
                                     "Video Media không tồn tại"));
 
+            if (Boolean.TRUE.equals(media.getIsUsed())) {
+                throw new BadRequestException("Tài nguyên đã được sử dụng !");
+            }
             lesson.setVideoMedia(media);
+            media.setIsUsed(true);
         }
 
         Lesson savedLesson = lessonRepository.save(lesson);
@@ -206,11 +210,7 @@ public class LessonServiceImpl implements LessonService {
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
 
-        lesson.setIsDeleted(true);
-
-        lesson.setDeletedAt(
-                Instant.now());
-
+        softDelete(lesson, Instant.now());
         lessonRepository.save(lesson);
     }
 
@@ -218,9 +218,21 @@ public class LessonServiceImpl implements LessonService {
     public void deleteByCourseId(
             long courseId) {
 
-        // TODO:
-        // Xử lý soft delete toàn bộ lesson
-        // và các content liên quan của lesson.
+        courseRepository.findByIdAndIsDeletedFalse(courseId)
+                .orElseThrow(() -> new NotFoundException("Course không tồn tại"));
+        var lessons = lessonRepository.findAllByCourseIdAndIsDeletedFalse(courseId);
+        Instant deletedAt = Instant.now();
+        lessons.forEach(lesson -> softDelete(lesson, deletedAt));
+        lessonRepository.saveAll(lessons);
+    }
+
+    private void softDelete(Lesson lesson, Instant deletedAt) {
+        lesson.setIsDeleted(true);
+        lesson.setDeletedAt(deletedAt);
+        if (lesson.getVideoMedia() != null) {
+            lesson.getVideoMedia().setIsUsed(false);
+            lesson.setVideoMedia(null);
+        }
     }
 
     private Sort buildSort(LessonQuery query) {
