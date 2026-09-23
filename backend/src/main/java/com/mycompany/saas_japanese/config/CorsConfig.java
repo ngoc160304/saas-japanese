@@ -1,28 +1,28 @@
 package com.mycompany.saas_japanese.config;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class CorsConfig {
   @Bean
-  public CorsConfigurationSource corsConfigurationSource() {
+  public UrlBasedCorsConfigurationSource corsConfigurationSource(
+      @Value("${AUTH_ALLOWED_ORIGINS:http://localhost:3000}") String origins) {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList("http://example.com", "http://localhost:5173",
-        "http://localhost:4173", "http://localhost:3000"));
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Allowed methods
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "x-no-retry"));
+    configuration.setAllowedOrigins(Arrays.stream(origins.split(",")).map(String::trim)
+        .filter(origin -> !origin.isEmpty()).toList());
+    configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "X-XSRF-TOKEN", "x-no-retry"));
     configuration.setAllowCredentials(true);
     configuration.setMaxAge(3600L);
-    // How long the response from a pre-flight request can be cached by clients
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", configuration); // Apply this configuration to all paths
+    source.registerCorsConfiguration("/**", configuration);
     return source;
   }
-
 }

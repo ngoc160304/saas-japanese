@@ -33,6 +33,10 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
     HttpServletResponse servletResponse = ((ServletServerHttpResponse) response).getServletResponse();
     int status = servletResponse.getStatus();
 
+    if (status == 204 || body == null) {
+      return body;
+    }
+
     RestResponse<Object> res = new RestResponse<>();
     res.setStatusCode(status);
     if (body instanceof String) {

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payment Successful - Studify JLPT</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme { --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft { box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02); }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+  
+  <div class="max-w-md w-full bg-white p-8 sm:p-10 rounded-[2rem] border border-slate-100 shadow-soft text-center relative overflow-hidden">
+    
+    <!-- Success Decoration -->
+    <div class="absolute top-0 left-0 w-full h-2 bg-emerald-500"></div>
+    
+    <div class="w-20 h-20 mx-auto bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+      <svg class="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+    </div>
+    
+    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mb-2 tracking-tight">Payment Successful!</h1>
+    <p class="text-sm font-medium text-slate-500 mb-8">Thank you for your purchase. Your payment has been processed successfully.</p>
+    
+    <div class="bg-slate-50 rounded-2xl p-5 mb-8 border border-slate-100 text-left">
+       <div class="flex items-center justify-between mb-3 text-sm">
+         <span class="font-medium text-slate-500">Order ID:</span>
+         <span class="font-bold text-slate-900">#ORD-987654</span>
+       </div>
+       <div class="flex items-center justify-between mb-3 text-sm">
+         <span class="font-medium text-slate-500">Date:</span>
+         <span class="font-bold text-slate-900">Sep 22, 2026</span>
+       </div>
+       <div class="flex items-center justify-between text-sm pt-3 border-t border-slate-200">
+         <span class="font-medium text-slate-500">Amount Paid:</span>
+         <span class="font-black text-slate-900 text-lg">1.198.000 đ</span>
+       </div>
+    </div>
+    
+    <div class="space-y-3">
+      <a href="../user/dashboard.html" class="w-full py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold text-sm shadow-md transition-all flex justify-center items-center gap-2">
+        Go to Dashboard to Start Learning
+      </a>
+      <a href="order-detail.html" class="w-full py-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-2xl font-bold text-sm transition-all flex justify-center items-center">
+        View Order Details
+      </a>
+    </div>
+
+    <div class="mt-8 text-[11px] font-medium text-slate-400">
+      A confirmation email has been sent to your registered address.
+    </div>
+  </div>
+
+</body>
+</html>

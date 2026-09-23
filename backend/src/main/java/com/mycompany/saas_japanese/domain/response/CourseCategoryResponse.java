@@ -2,7 +2,9 @@ package com.mycompany.saas_japanese.domain.response;
 
 import java.time.Instant;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Builder;
 
 @Getter
 @Setter
@@ -24,6 +26,8 @@ public class CourseCategoryResponse {
   private Instant createdAt;
 
   private Long courseCount;
+
+  private Long lessonCount;
 
   private Instant updatedAt;
 }

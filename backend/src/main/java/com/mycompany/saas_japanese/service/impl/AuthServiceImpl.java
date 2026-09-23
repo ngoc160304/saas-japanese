@@ -1,233 +1,131 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.security.SecureRandom;
-import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mycompany.saas_japanese.domain.Otp;
 import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.request.ReqForgotPasswordDTO;
 import com.mycompany.saas_japanese.domain.request.ReqLoginDTO;
 import com.mycompany.saas_japanese.domain.request.ReqOtpDTO;
+import com.mycompany.saas_japanese.domain.request.ReqRegisterDTO;
 import com.mycompany.saas_japanese.domain.request.ReqResetPasswordDTO;
-import com.mycompany.saas_japanese.domain.response.ResLoginDTO;
+import com.mycompany.saas_japanese.domain.response.ResRegisterDTO;
 import com.mycompany.saas_japanese.provider.BrevoProvider;
+import com.mycompany.saas_japanese.repository.OtpRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthService;
-import com.mycompany.saas_japanese.service.OtpService;
+import com.mycompany.saas_japanese.service.AuthTokenService;
+import com.mycompany.saas_japanese.service.AuthTokens;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
-import org.springframework.security.core.userdetails.UserDetailsService;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
+import com.mycompany.saas_japanese.util.error.ConflictException;
+import com.mycompany.saas_japanese.util.error.ForbiddenException;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
 @Service
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
+  private static final SecureRandom RANDOM = new SecureRandom();
   private final UserRepository userRepository;
-  private final OtpService otpService;
+  private final OtpRepository otpRepository;
   private final PasswordEncoder passwordEncoder;
   private final BrevoProvider brevoProvider;
-  private final AuthenticationManagerBuilder authenticationManagerBuilder;
-  private final JwtEncoder jwtEncoder;
-  private final JwtDecoder jwtDecoder;
-  private final UserDetailsService userDetailsService;
-
-  private static final SecureRandom RANDOM = new SecureRandom();
+  private final AuthenticationManager authenticationManager;
+  private final AuthTokenService tokens;
 
   @Override
-  public User register(User user) {
-    User existUser = userRepository.findByEmail(user.getEmail()).orElse(null);
-    if (existUser != null && !existUser.isActive()) {
-      throw new BadRequestException("Forbidden");
+  @Transactional
+  public ResRegisterDTO register(ReqRegisterDTO request) {
+    String email = normalizeEmail(request.getEmail());
+    if (userRepository.existsByEmail(email)) {
+      throw new ConflictException("Email is already registered");
     }
-    if (existUser != null && existUser.isVerified()) {
-      throw new BadRequestException("Email already exists");
-    } else if (existUser != null && !existUser.isVerified()) {
-      String otp = String.format("%06d", RANDOM.nextInt(1_000_000));
-      Otp newOtp = new Otp();
-      newOtp.setEmail(existUser.getEmail());
-      newOtp.setOtp((otp));
-      otpService.save(newOtp);
-      brevoProvider.sendOtpEmail(existUser.getEmail(), existUser.getUsername(), otp);
-      return existUser;
-    } else {
-      user.setPassword(passwordEncoder.encode(user.getPassword()));
-      user.setUsername(user.getEmail().substring(0, user.getEmail().indexOf("@")));
-      User newUser = userRepository.save(user);
-      String otp = String.format("%06d", RANDOM.nextInt(1_000_000));
-      Otp newOtp = new Otp();
-      newOtp.setEmail(newUser.getEmail());
-      newOtp.setOtp((otp));
-      otpService.save(newOtp);
-      brevoProvider.sendOtpEmail(newUser.getEmail(), newUser.getUsername(), otp);
-      return newUser;
-    }
-
+    User user = new User();
+    user.setEmail(email);
+    user.setUsername(request.getFullName().trim());
+    user.setPhone(request.getPhone());
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setActive(true);
+    user.setVerified(false);
+    userRepository.save(user);
+    String code = String.format(Locale.ROOT, "%06d", RANDOM.nextInt(1_000_000));
+    Otp otp = new Otp();
+    otp.setEmail(email);
+    otp.setOtp(code);
+    otpRepository.save(otp);
+    brevoProvider.sendOtpEmail(email, user.getUsername(), code);
+    return new ResRegisterDTO(email, "VERIFY_EMAIL");
   }
 
   @Override
-  public String verifyUser(ReqOtpDTO req) {
-
-    Otp latestOtp = validateOtp(req.getEmail(), req.getOtp());
-    User user = userRepository.findByEmail(req.getEmail())
-        .orElseThrow(() -> new BadRequestException("User not found"));
+  @Transactional
+  public String verifyUser(ReqOtpDTO request) {
+    String email = normalizeEmail(request.getEmail());
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new BadRequestException("Invalid verification request"));
+    if (!user.isActive() || user.isVerified()) {
+      throw new BadRequestException("Invalid verification request");
+    }
+    Otp otp = otpRepository.findFirstByEmailOrderByCreatedAtDesc(email);
+    if (otp == null || otp.isUsed() || otp.getExpiredAt() == null
+        || !otp.getExpiredAt().isAfter(Instant.now()) || !otp.getOtp().equals(request.getOtp())) {
+      throw new BadRequestException("Invalid or expired verification code");
+    }
     user.setVerified(true);
-    user.setActive(true);
     userRepository.save(user);
-    latestOtp.setUsed(true);
-    otpService.save(latestOtp);
+    otp.setUsed(true);
+    otpRepository.save(otp);
     return "Verify success";
   }
 
-  private Otp validateOtp(String email, String otpInput) {
-
-    Otp latestOtp = otpService.getLatestOtp(email);
-
-    if (latestOtp == null) {
-      throw new BadRequestException("OTP không tồn tại");
-    }
-    if (latestOtp.isUsed()) {
-      throw new BadRequestException("OTP đã được sử dụng");
-    }
-    if (latestOtp.getExpiredAt() != null &&
-        latestOtp.getExpiredAt().isBefore(Instant.now())) {
-      throw new BadRequestException("OTP đã hết hạn");
-    }
-    if (!latestOtp.getOtp().equals(otpInput)) {
-      throw new BadRequestException("OTP không đúng");
-    }
-    return latestOtp;
-  }
-
   @Override
-  public ResLoginDTO login(ReqLoginDTO reqLoginDTO) {
-    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-        reqLoginDTO.getEmail(), reqLoginDTO.getPassword());
-
-    // xác thực người dùng => cần viết hàm loadUserByUsername
-    Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-    User user = userRepository
-        .findByEmail(userDetails.getUsername())
-        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    // if (!user.isVerified()) {
-    // throw new BadRequestException("Please verify your email before login");
-    // }
-
-    String accessToken = this.generateToken(userDetails, Duration.ofMinutes(30).getSeconds(),
-        userDetails.getUsername());
-    String refreshToken = this.generateToken(userDetails, Duration.ofDays(7).getSeconds(), userDetails.getUsername());
-    ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-        user.getEmail(),
-        user.getUsername(),
-        user.getId());
-
-    ResLoginDTO response = new ResLoginDTO();
-    response.setAccessToken(accessToken);
-    response.setRefreshToken(refreshToken);
-    response.setUser(userLogin);
-
-    return response;
-  }
-
-  public String generateToken(UserDetails userDetails, long expiration, String authentication) {
-    Instant now = Instant.now();
-    Instant validity = now.plus(expiration, ChronoUnit.SECONDS);
-    List<String> listAuthority = new ArrayList<String>();
-    listAuthority.add("ROLE_USER_CREATE");
-    listAuthority.add("ROLE_USER_UPDATE");
-    JwtClaimsSet claims = JwtClaimsSet.builder()
-        .issuedAt(now)
-        .expiresAt(validity)
-        .subject(authentication)
-        .claim("user",
-            userDetails)
-        .claim("permission", listAuthority)
-        .build();
-
-    return jwtEncoder.encode(
-        JwtEncoderParameters.from(claims))
-        .getTokenValue();
-  }
-
-  @Override
-  public void logout(HttpServletResponse response) {
-    Cookie cookie = new Cookie("refresh_token", null);
-    cookie.setHttpOnly(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(0);
-    response.addCookie((cookie));
-  }
-
-  @Override
-  public void forgotPassword(ReqForgotPasswordDTO req) {
-    User user = userRepository.findByEmail(req.getEmail())
-        .orElseThrow(() -> new BadRequestException("Email không tồn tại"));
-    String otp = String.format("%06d", RANDOM.nextInt(1_000_000));
-    Otp newOtp = new Otp();
-    newOtp.setEmail(user.getEmail());
-    newOtp.setOtp((otp));
-    otpService.save(newOtp);
-    brevoProvider.sendOtpEmail(user.getEmail(), user.getUsername(), otp);
-  }
-
-  @Override
-  public void resetPassword(ReqResetPasswordDTO req) {
-    User user = userRepository.findByEmail(req.getEmail())
-        .orElseThrow(() -> new BadRequestException("Email không tồn tại"));
-    user.setPassword(passwordEncoder.encode(req.getNewPassword()));
-    userRepository.save(user);
-  }
-
-  @Override
-  public void verifyResetOtp(ReqOtpDTO req) {
-    Otp latestOtp = validateOtp(req.getEmail(), req.getOtp());
-    latestOtp.setUsed(true);
-    otpService.save(latestOtp);
-  }
-
-  @Override
-  public ResLoginDTO refreshToken(String refreshToken) {
-    // decode refresh token
-    Jwt jwt = jwtDecoder.decode(refreshToken);
-    String email = jwt.getSubject();
+  public AuthTokens login(ReqLoginDTO request) {
+    String email = normalizeEmail(request.getEmail());
+    authenticationManager.authenticate(
+        UsernamePasswordAuthenticationToken.unauthenticated(email, request.getPassword()));
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new BadRequestException("User not found"));
-    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-    String newAccessToken = generateToken(userDetails, Duration.ofMinutes(30).getSeconds(), user.getEmail());
-    String newRefreshToken = generateToken(userDetails, Duration.ofDays(7).getSeconds(), user.getEmail());
-    ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(
-        user.getEmail(),
-        user.getUsername(),
-        user.getId());
-    ResLoginDTO response = new ResLoginDTO();
-    response.setAccessToken(newAccessToken);
-    response.setRefreshToken(newRefreshToken);
-    response.setUser(userLogin);
-    return response;
+        .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+    if (!user.isActive() || !user.isVerified()) {
+      throw new ForbiddenException("Account is inactive or email is not verified");
+    }
+    return tokens.create(user, request.isRememberMe());
+  }
+
+  @Override
+  public AuthTokens refreshToken(String refreshToken) {
+    return tokens.refresh(refreshToken);
+  }
+
+  @Override
+  public void logout(String refreshToken) {
+    tokens.revoke(refreshToken);
+  }
+
+  // Recovery is fail-closed until a purpose-bound, single-use reset grant is implemented.
+  @Override
+  public void forgotPassword(ReqForgotPasswordDTO request) {
+    throw new ForbiddenException("Password recovery is unavailable");
+  }
+
+  @Override
+  public void verifyResetOtp(ReqOtpDTO request) {
+    throw new ForbiddenException("Password recovery is unavailable");
+  }
+
+  @Override
+  public void resetPassword(ReqResetPasswordDTO request) {
+    throw new ForbiddenException("Password recovery is unavailable");
+  }
+
+  private String normalizeEmail(String email) {
+    return email.trim().toLowerCase(Locale.ROOT);
   }
 }

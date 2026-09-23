@@ -2,18 +2,14 @@ import prettierConfig from 'eslint-config-prettier';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
-import importPlugin from 'eslint-plugin-import';
 import unusedImports from 'eslint-plugin-unused-imports';
-import reactHooks from 'eslint-plugin-react-hooks';
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
     plugins: {
-      import: importPlugin,
       'unused-imports': unusedImports,
-      'react-hooks': reactHooks,
     },
 
     rules: {
@@ -52,12 +48,12 @@ const eslintConfig = defineConfig([
   prettierConfig,
 
   globalIgnores([
-    // '.next/**',
-    // 'out/**',
-    // 'build/**',
-    // 'coverage/**',
-    // 'node_modules/**',
-    // 'next-env.d.ts',
+    '.next/**',
+    'out/**',
+    'build/**',
+    'coverage/**',
+    'node_modules/**',
+    'next-env.d.ts',
   ]),
 ]);
 

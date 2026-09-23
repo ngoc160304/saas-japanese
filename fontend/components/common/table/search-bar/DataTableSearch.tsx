@@ -24,7 +24,8 @@ export function DataTableSearch({
 
       <Input
         value={value}
-        // onChange={(event) => onChange(event.target.value)}
+        onChange={(event) => onChange?.(event.target.value)}
+        aria-label={placeholder}
         placeholder={placeholder}
         className="
           h-10

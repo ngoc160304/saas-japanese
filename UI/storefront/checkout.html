@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout - Studify JLPT</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme { --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft { box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02); }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen flex flex-col">
+  <!-- Simplified Navbar for Checkout -->
+  <header class="bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg></div>
+          <span class="text-2xl font-extrabold tracking-tight text-slate-900">Studify</span>
+        </a>
+        <div class="flex items-center gap-2 text-slate-500 text-sm font-bold">
+          <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          Secure Checkout
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex flex-col lg:flex-row gap-8">
+    
+    <!-- Left: Payment Info -->
+    <div class="lg:w-2/3">
+      <h1 class="text-2xl font-black text-slate-900 mb-6">Payment Method</h1>
+      
+      <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden p-6 mb-6">
+        
+        <div class="space-y-4">
+          <!-- Option 1: Credit Card -->
+          <label class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors gap-4">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="payment" class="w-5 h-5 text-sky-600 focus:ring-sky-600 border-slate-300" checked>
+              <div>
+                <span class="font-bold text-slate-900 block text-sm">Credit or Debit Card</span>
+                <span class="text-xs text-slate-500 font-medium">Safe money transfer using your bank account</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-10 h-6 bg-slate-100 rounded flex items-center justify-center text-[10px] font-black text-blue-800">VISA</div>
+              <div class="w-10 h-6 bg-slate-100 rounded flex items-center justify-center text-[10px] font-black text-rose-600">MC</div>
+            </div>
+          </label>
+
+          <!-- Mock Card Form -->
+          <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Card Number</label>
+              <input type="text" placeholder="0000 0000 0000 0000" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" value="4111 1111 1111 1111">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">Expiry Date</label>
+                <input type="text" placeholder="MM/YY" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" value="12/28">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">CVC</label>
+                <input type="text" placeholder="123" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" value="123">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Name on Card</label>
+              <input type="text" placeholder="JANE DOE" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500" value="NGUYEN VAN A">
+            </div>
+          </div>
+
+          <!-- Option 2: Bank Transfer -->
+          <label class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors gap-4">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="payment" class="w-5 h-5 text-sky-600 focus:ring-sky-600 border-slate-300">
+              <div>
+                <span class="font-bold text-slate-900 block text-sm">Bank Transfer / QR Code</span>
+                <span class="text-xs text-slate-500 font-medium">Chuyển khoản trực tiếp</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-10 h-6 bg-slate-100 rounded flex items-center justify-center text-[10px] font-black text-emerald-600">QR</div>
+            </div>
+          </label>
+          
+          <!-- Option 3: MoMo -->
+          <label class="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-slate-200 rounded-2xl cursor-pointer hover:bg-slate-50 transition-colors gap-4">
+            <div class="flex items-center gap-4">
+              <input type="radio" name="payment" class="w-5 h-5 text-sky-600 focus:ring-sky-600 border-slate-300">
+              <div>
+                <span class="font-bold text-slate-900 block text-sm">MoMo E-Wallet</span>
+                <span class="text-xs text-slate-500 font-medium">Thanh toán qua ví MoMo</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <div class="w-10 h-6 bg-pink-100 rounded flex items-center justify-center text-[10px] font-black text-pink-600">MoMo</div>
+            </div>
+          </label>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Order Summary -->
+    <div class="lg:w-1/3">
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-soft sticky top-28">
+        <h2 class="text-lg font-black text-slate-900 mb-6">Summary</h2>
+        
+        <!-- Items mini list -->
+        <div class="space-y-4 mb-6 pb-6 border-b border-slate-100">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-bold text-slate-900 line-clamp-2">Tiếng Nhật Trung Cấp N3 Soumatome</p>
+            </div>
+            <span class="text-sm font-bold text-slate-500 shrink-0">499.000 đ</span>
+          </div>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-sm font-bold text-slate-900 line-clamp-2">Luyện Đề Thi Thử Toàn Diện N2 Master</p>
+            </div>
+            <span class="text-sm font-bold text-slate-500 shrink-0">699.000 đ</span>
+          </div>
+        </div>
+
+        <div class="space-y-4 mb-6">
+          <div class="flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Subtotal</span>
+            <span class="font-bold text-slate-900">1.198.000 đ</span>
+          </div>
+          <div class="flex items-center justify-between text-sm">
+            <span class="font-medium text-slate-500">Tax</span>
+            <span class="font-bold text-slate-900">0 đ</span>
+          </div>
+        </div>
+        
+        <div class="border-t border-slate-100 pt-4 mb-8">
+          <div class="flex items-center justify-between">
+            <span class="text-base font-bold text-slate-900">Total</span>
+            <span class="text-2xl font-black text-slate-900">1.198.000 đ</span>
+          </div>
+        </div>
+
+        <p class="text-[11px] text-slate-500 font-medium mb-4 text-center">By completing your purchase you agree to our <a href="#" class="text-sky-600 hover:underline">Terms of Service</a>.</p>
+
+        <a href="payment-result.html" class="w-full py-4 bg-sky-600 hover:bg-sky-500 text-white rounded-2xl font-bold text-sm shadow-md shadow-sky-500/20 transition-all flex justify-center items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          Complete Payment
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-100 mt-auto py-8">
+    <div class="max-w-7xl mx-auto px-4 text-center text-[11px] text-slate-400 font-medium">
+      © 2026 Studify JLPT. Secure checkout.
+    </div>
+  </footer>
+</body>
+</html>

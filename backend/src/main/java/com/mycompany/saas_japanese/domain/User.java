@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.domain;
 
 import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,6 +23,7 @@ public class User {
   private Long id;
   private String username;
   private String email;
+  @JsonIgnore
   private String password;
   private String avatarUrl;
   private String phone;

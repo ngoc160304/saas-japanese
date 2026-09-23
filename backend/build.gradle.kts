@@ -69,13 +69,13 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
 
-
 	implementation("com.cloudinary:cloudinary-http5:2.0.0")
 
 	implementation("io.github.cdimascio:dotenv-java:3.2.0")
 	runtimeOnly("com.mysql:mysql-connector-j")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
+	testRuntimeOnly("com.h2database:h2")
 }
 
 tasks.withType<Test> {

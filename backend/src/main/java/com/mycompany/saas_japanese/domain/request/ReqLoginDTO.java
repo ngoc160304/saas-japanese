@@ -1,24 +1,32 @@
 package com.mycompany.saas_japanese.domain.request;
 
+import java.nio.charset.StandardCharsets;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-// import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class ReqLoginDTO {
-  @NotBlank(message = "Email không được để trống")
-  @Email(message = "Email không đúng định dạng")
+  @NotBlank
+  @Email
+  @Size(max = 254)
   private String email;
 
-  @NotBlank(message = "Password không được để trống")
-  @Size(min = 6, message = "Password tối thiểu 6 ký tự")
-  // @Pattern(regexp =
-  // "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&^#()_+\\-=])[A-Za-z\\d@$!%*?&^#()_+\\-=]{8,}$",
-  // message = "Password phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và
-  // ký tự đặc biệt")
+  @NotBlank
+  @Size(max = 72)
   private String password;
+
+  private boolean rememberMe;
+
+  @JsonIgnore
+  @AssertTrue(message = "Password must not exceed 72 UTF-8 bytes")
+  public boolean isPasswordWithinByteLimit() {
+    return password == null || password.getBytes(StandardCharsets.UTF_8).length <= 72;
+  }
 }
