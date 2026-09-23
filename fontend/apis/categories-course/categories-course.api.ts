@@ -1,19 +1,29 @@
 import authorizeAxiosInstance from '@/lib/authorize-axios';
 import type { ApiResponse } from '@/types/api';
-import type { QueryParams } from '@/types/query';
 import type {
   CourseCategoryResponse,
   CourseCategoryDetail,
+  GetCourseCategoriesParams,
   GetCoursesResponse,
   ReqCreateCourseCategory,
 } from './categories-course.type';
 
-const getCategoriesCourse = async ({ page, size = 10, search }: QueryParams) => {
+const getCategoriesCourse = async ({
+  page,
+  size = 10,
+  search,
+  name,
+  sortKey,
+  sortType,
+}: GetCourseCategoriesParams) => {
   const response = await authorizeAxiosInstance.get<GetCoursesResponse>('/course-categories', {
     params: {
       page: page - 1,
       size: Math.min(12, Math.max(1, size)),
       search: search?.trim() || undefined,
+      ...(name?.trim() ? { name: name.trim() } : {}),
+      ...(sortKey ? { sortKey } : {}),
+      ...(sortType ? { sortType } : {}),
     },
   });
   return response.data;

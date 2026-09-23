@@ -17,17 +17,20 @@ export function CategoryCourseDetailPage({ id }: { id: number }) {
     queryFn: () => categoryCourseAPI.getById(id),
     retry: false,
   });
-  if (query.isLoading) return <IsLoading />;
+  if (query.isLoading) return <IsLoading className="min-h-64 rounded-3xl bg-white" size={28} />;
   if (query.isError || !query.data)
     return (
-      <div role="alert" className="space-y-4 rounded-3xl bg-white p-6 text-sm">
-        <p className="text-rose-600">{getApiErrorMessage(query.error)}</p>
-        <Button variant="outline" onClick={() => void query.refetch()}>
-          Thử lại
-        </Button>
-        <Link className="ml-4 text-sky-600" href="/admin/categories-course">
-          Về danh sách
-        </Link>
+      <div role="alert" className="rounded-3xl border border-slate-100 bg-white p-6 shadow-soft">
+        <h1 className="text-lg font-bold text-slate-900">Không thể tải danh mục</h1>
+        <p className="mt-2 text-sm text-rose-600">{getApiErrorMessage(query.error)}</p>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Button variant="outline" disabled={query.isFetching} onClick={() => void query.refetch()}>
+            Thử lại
+          </Button>
+          <Link className="text-sm font-semibold text-sky-700 hover:underline" href="/admin/categories-course">
+            Về danh sách danh mục
+          </Link>
+        </div>
       </div>
     );
   return (

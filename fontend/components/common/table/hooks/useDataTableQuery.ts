@@ -9,6 +9,9 @@ interface UseDataTableQueryOptions<TData> {
 
   queryFn: (params: { search: string; page: number; size: number }) => Promise<TData>;
 
+  searchValue?: string;
+  onSearchChange?: (value: string) => void;
+
   defaultPage?: number;
   defaultSize?: number;
   maxSize?: number;
@@ -23,6 +26,8 @@ interface UseDataTableQueryOptions<TData> {
 export function useDataTableQuery<TData>({
   queryKey,
   queryFn,
+  searchValue,
+  onSearchChange,
 
   defaultPage = 1,
   defaultSize = 10,
@@ -42,12 +47,29 @@ export function useDataTableQuery<TData>({
     pageParam,
     sizeParam,
   });
+  const hasControlledSearch = searchValue !== undefined;
+  const search = hasControlledSearch ? searchValue : params.search;
+
+  const setSearch = (value: string) => {
+    if (!hasControlledSearch) {
+      params.setSearch(value);
+      return;
+    }
+
+    onSearchChange?.(value);
+    if (params.page !== defaultPage) params.setPage(defaultPage);
+  };
+
+  const reset = () => {
+    if (hasControlledSearch) onSearchChange?.('');
+    params.reset();
+  };
 
   const query = useQuery({
     queryKey: [
       ...queryKey,
       {
-        search: params.search,
+        search,
         page: params.page,
         size: params.size,
       },
@@ -55,7 +77,7 @@ export function useDataTableQuery<TData>({
 
     queryFn: () =>
       queryFn({
-        search: params.search,
+        search,
         page: params.page,
         size: params.size,
       }),
@@ -69,5 +91,8 @@ export function useDataTableQuery<TData>({
     ...query,
 
     ...params,
+    search,
+    setSearch,
+    reset,
   };
 }

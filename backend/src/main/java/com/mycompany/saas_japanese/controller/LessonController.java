@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.mycompany.saas_japanese.domain.Lesson;
+import jakarta.validation.Valid;
 import com.mycompany.saas_japanese.domain.query.LessonQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateLesson;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLesson;
@@ -25,7 +25,7 @@ public class LessonController {
 
   @PostMapping
   public ResponseEntity<LessonResponse> createLesson(
-      @RequestBody ReqCreateLesson request) {
+      @Valid @RequestBody ReqCreateLesson request) {
     LessonResponse lesson = lessonService.createLesson(request);
 
     return ResponseEntity
@@ -43,7 +43,7 @@ public class LessonController {
 
   @GetMapping
   public ResponseEntity<Page<LessonResponse>> fetchAllLesson(
-      LessonQuery query) {
+      @Valid LessonQuery query) {
     Page<LessonResponse> lessons = lessonService.fetchAllLesson(query);
 
     return ResponseEntity.ok(lessons);
