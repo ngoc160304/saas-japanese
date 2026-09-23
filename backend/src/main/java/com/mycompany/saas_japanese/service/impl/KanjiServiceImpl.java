@@ -2,7 +2,6 @@ package com.mycompany.saas_japanese.service.impl;
 
 import com.mycompany.saas_japanese.domain.Kanji;
 import com.mycompany.saas_japanese.domain.Lesson;
-import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.query.KanjiQuery;
 import com.mycompany.saas_japanese.domain.request.ReqKanji;
 import com.mycompany.saas_japanese.domain.response.KanjiResponse;
@@ -18,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.PredicateSpecification;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
