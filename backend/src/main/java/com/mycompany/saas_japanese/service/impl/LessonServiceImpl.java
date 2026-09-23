@@ -88,14 +88,21 @@ public class LessonServiceImpl implements LessonService {
                                                         () -> new NotFoundException(
                                                                         "Video Media không tồn tại"));
 
-                        lesson.setVideoMedia(media);
-                }
-
-                Lesson savedLesson = lessonRepository.save(lesson);
-
-                return lessonMapper.toResponse(
-                                savedLesson);
+            if (Boolean.TRUE.equals(media.getIsUsed())) {
+                throw new BadRequestException("Tài nguyên đã được sử dụng !");
+            }
+            lesson.setVideoMedia(media);
+            media.setIsUsed(true);
         }
+
+        Lesson savedLesson = lessonRepository.save(lesson);
+
+        return lessonMapper.toResponse(
+                savedLesson);
+    }
+
+             
+        
 
         @Override
         @Transactional(Transactional.TxType.SUPPORTS)
@@ -196,23 +203,36 @@ public class LessonServiceImpl implements LessonService {
                                 updatedLesson);
         }
 
-        @Override
-        public void deleteLesson(
-                        Long id) {
+     
 
-                Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
-                                .orElseThrow(
-                                                () -> new NotFoundException(
-                                                                "Lesson không tồn tại"));
+@Override
+public void deleteLesson(Long id) {
 
-                lesson.setIsDeleted(true);
+        Lesson lesson = lessonRepository
+                        .findByIdAndIsDeletedFalse(id)
+                        .orElseThrow(
+                                        () -> new NotFoundException(
+                                                        "Lesson không tồn tại"));
 
-                lesson.setDeletedAt(
-                                Instant.now());
+        softDelete(lesson, Instant.now());
 
-                lessonRepository.save(lesson);
+        lessonRepository.save(lesson);
+}
+
+private void softDelete(Lesson lesson, Instant deletedAt) {
+
+        lesson.setIsDeleted(true);
+
+        lesson.setDeletedAt(deletedAt);
+
+        if (lesson.getVideoMedia() != null) {
+
+                lesson.getVideoMedia().setIsUsed(false);
+
+                lesson.setVideoMedia(null);
         }
+}
+    
 
         @Override
         public void deleteByCourseId(

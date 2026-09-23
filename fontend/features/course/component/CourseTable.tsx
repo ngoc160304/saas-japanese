@@ -18,20 +18,13 @@ export function CourseTable({ courses }: { courses: Course[] }) {
       <Table aria-label="Danh sách khóa học">
         <TableHeader className="bg-slate-50">
           <TableRow>
-            {[
-              'Khóa học',
-              'Mô tả',
-              'Danh mục',
-              'Bài học',
-              'Giá',
-              'Ngày tạo',
-              'Trạng thái',
-              'Thao tác',
-            ].map((label) => (
-              <TableHead key={label} className="px-4 text-xs font-semibold text-slate-500">
-                {label}
-              </TableHead>
-            ))}
+            {['Khóa học', 'Danh mục', 'Bài học', 'Giá', 'Ngày tạo', 'Trạng thái', 'Thao tác'].map(
+              (label) => (
+                <TableHead key={label} className="px-4 text-xs font-semibold text-slate-500">
+                  {label}
+                </TableHead>
+              ),
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -45,11 +38,6 @@ export function CourseTable({ courses }: { courses: Course[] }) {
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="px-4 text-slate-500">
-                <p className="line-clamp-2 w-52 whitespace-normal">
-                  {course.description || 'Chưa có mô tả'}
-                </p>
-              </TableCell>
               <TableCell className="px-4">{course.categoryName || 'Chưa phân loại'}</TableCell>
               <TableCell className="px-4">{course.lessonCount ?? '—'}</TableCell>
               <TableCell className="px-4 font-semibold">
@@ -62,7 +50,7 @@ export function CourseTable({ courses }: { courses: Course[] }) {
                 <CourseStatusBadge published={course.published} />
               </TableCell>
               <TableCell className="px-4">
-                <CourseActions course={course} />
+                <CourseActions course={course} manage />
               </TableCell>
             </TableRow>
           ))}
