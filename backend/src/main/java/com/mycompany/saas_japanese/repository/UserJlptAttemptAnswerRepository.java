@@ -1,7 +1,9 @@
 package com.mycompany.saas_japanese.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,7 @@ public interface UserJlptAttemptAnswerRepository
     Optional<UserJlptAttemptAnswer> findBySessionAttempt_IdAndJlptExamQuestion_Id(
             Long sessionAttemptId,
             Long questionId);
+
+    @EntityGraph(attributePaths = {"sessionAttempt", "jlptExamQuestion", "jlptExamAnswer"})
+    List<UserJlptAttemptAnswer> findBySessionAttemptAttemptId(Long attemptId);
 }
