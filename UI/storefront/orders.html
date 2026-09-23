@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders - Studify JLPT</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme { --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft { box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02); }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen flex flex-col">
+  <!-- Top Navbar (Logged In State) -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg></div>
+          <span class="text-2xl font-extrabold tracking-tight text-slate-900">Studify</span>
+        </a>
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Home</a>
+          <a href="courses.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Courses</a>
+          <a href="../user/dashboard.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">My Dashboard</a>
+        </nav>
+        <div class="flex items-center gap-6">
+          <a href="cart.html" class="relative text-slate-500 hover:text-slate-900" title="View Cart">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          </a>
+          <!-- User Avatar -->
+          <div class="flex items-center gap-3 cursor-pointer">
+             <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar">
+             </div>
+             <div class="hidden sm:block text-left">
+                <p class="text-xs font-bold text-slate-900 leading-tight">Student Name</p>
+                <p class="text-[10px] font-medium text-slate-500">Free Plan</p>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Header -->
+  <div class="bg-white border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 class="text-3xl font-black text-slate-900 tracking-tight">Order History</h1>
+      <p class="mt-2 text-slate-500 text-sm font-medium">View and manage your past purchases.</p>
+    </div>
+  </div>
+
+  <!-- Main Content Area -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+      <!-- Desktop Table (hidden on mobile) -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-100">
+              <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Order ID</th>
+              <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+              <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Total</th>
+              <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+              <th class="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="py-4 px-6 text-sm font-bold text-slate-900">#ORD-987654</td>
+              <td class="py-4 px-6 text-sm font-medium text-slate-600">Sep 22, 2026</td>
+              <td class="py-4 px-6 text-sm font-black text-slate-900">1.198.000 đ</td>
+              <td class="py-4 px-6">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  Completed
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <a href="order-detail.html" class="text-sm font-bold text-sky-600 hover:text-sky-800 transition-colors">View Details</a>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="py-4 px-6 text-sm font-bold text-slate-900">#ORD-123456</td>
+              <td class="py-4 px-6 text-sm font-medium text-slate-600">Aug 15, 2026</td>
+              <td class="py-4 px-6 text-sm font-black text-slate-900">350.000 đ</td>
+              <td class="py-4 px-6">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  Completed
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <a href="order-detail.html" class="text-sm font-bold text-sky-600 hover:text-sky-800 transition-colors">View Details</a>
+              </td>
+            </tr>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="py-4 px-6 text-sm font-bold text-slate-900">#ORD-654321</td>
+              <td class="py-4 px-6 text-sm font-medium text-slate-600">Jul 10, 2026</td>
+              <td class="py-4 px-6 text-sm font-black text-slate-900">499.000 đ</td>
+              <td class="py-4 px-6">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-100">
+                  Pending
+                </span>
+              </td>
+              <td class="py-4 px-6 text-right">
+                <a href="order-detail.html" class="text-sm font-bold text-sky-600 hover:text-sky-800 transition-colors">View Details</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Mobile List -->
+      <div class="md:hidden divide-y divide-slate-100">
+         <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between">
+               <span class="text-sm font-bold text-slate-900">#ORD-987654</span>
+               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Completed</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-slate-500">
+               <span>Sep 22, 2026</span>
+               <span class="font-black text-slate-900 text-sm">1.198.000 đ</span>
+            </div>
+            <a href="order-detail.html" class="block w-full text-center py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50">View Details</a>
+         </div>
+         
+         <div class="p-4 space-y-3">
+            <div class="flex items-center justify-between">
+               <span class="text-sm font-bold text-slate-900">#ORD-123456</span>
+               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">Completed</span>
+            </div>
+            <div class="flex items-center justify-between text-xs text-slate-500">
+               <span>Aug 15, 2026</span>
+               <span class="font-black text-slate-900 text-sm">350.000 đ</span>
+            </div>
+            <a href="order-detail.html" class="block w-full text-center py-2 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-50">View Details</a>
+         </div>
+      </div>
+      
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-100 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-[11px] text-slate-400 font-medium">© 2026 Studify JLPT. All rights reserved.</p>
+        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-400">
+           <a href="#" class="hover:text-slate-800">Privacy</a>
+           <a href="#" class="hover:text-slate-800">Terms</a>
+           <a href="#" class="hover:text-slate-800">Cookies</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

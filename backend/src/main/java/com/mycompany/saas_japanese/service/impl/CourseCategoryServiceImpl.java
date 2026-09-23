@@ -1,6 +1,11 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.time.Instant;
+import java.util.Objects;
+import java.util.Map;
+import java.util.stream.Collectors;
+import com.mycompany.saas_japanese.repository.LessonRepository;
+import com.mycompany.saas_japanese.repository.ParentCount;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mycompany.saas_japanese.domain.CourseCategory;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.CourseCategoryQuery;
-import com.mycompany.saas_japanese.domain.query.VocabularyQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourseCategory;
 import com.mycompany.saas_japanese.domain.response.CourseCategoryResponse;
 import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
@@ -40,12 +44,13 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
   private final CourseCategoryMapper courseCategoryMapper;
 
   private final CourseRepository courseRepository;
+  private final LessonRepository lessonRepository;
 
   @Override
   @Transactional
   public CourseCategoryResponse create(ReqCreateCourseCategory request) {
 
-    String slug = SlugUtil.toSlug(request.getName());
+    String slug = uniqueSlug(request.getName(), 0L);
 
     Media media = null;
 
@@ -96,20 +101,15 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         query.getSize(),
         buildSort(query));
 
-    return courseCategoryRepository
-        .findAll(spec, pageable)
-        .map(category -> {
-
-          CourseCategoryResponse response = courseCategoryMapper.toResponse(category);
-
-          long courseCount = courseRepository
-              .countByCategoryIdAndIsDeletedFalse(
-                  category.getId());
-
-          response.setCourseCount(courseCount);
-
-          return response;
-        });
+    Page<CourseCategory> categories = courseCategoryRepository.findAll(spec, pageable);
+    Map<Long, Long> counts = categories.isEmpty() ? Map.of() : courseRepository
+        .countByCategoryIds(categories.stream().map(CourseCategory::getId).toList()).stream()
+        .collect(Collectors.toMap(ParentCount::getParentId, ParentCount::getTotal));
+    return categories.map(category -> {
+      CourseCategoryResponse response = courseCategoryMapper.toResponse(category);
+      response.setCourseCount(counts.getOrDefault(category.getId(), 0L));
+      return response;
+    });
   }
 
   @Override
@@ -121,7 +121,10 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy danh mục khóa học"));
 
-    return courseCategoryMapper.toResponse(category);
+    CourseCategoryResponse response = courseCategoryMapper.toResponse(category);
+    response.setCourseCount(courseRepository.countByCategoryIdAndIsDeletedFalse(id));
+    response.setLessonCount(lessonRepository.countByCourseCategoryIdAndCourseIsDeletedFalseAndIsDeletedFalse(id));
+    return response;
   }
 
   @Override
@@ -135,27 +138,28 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy danh mục khóa học"));
 
-    String newSlug = SlugUtil.toSlug(request.getName());
+    String newSlug = uniqueSlug(request.getName(), id);
 
     category.setName(request.getName().trim());
     category.setSlug(newSlug);
     category.setDescription(request.getDescription());
 
-    if (request.getMediaId() != null) {
-
-      if (category.getMedia().getId() != request.getMediaId()) {
-
-        Media media = mediaRepository
-            .findByIdAndIsDeletedFalse(
-                request.getMediaId())
-            .orElseThrow(() -> new NotFoundException(
-                "Media không tồn tại"));
-        if (media.getIsUsed()) {
+    Media oldMedia = category.getMedia();
+    Long oldMediaId = oldMedia == null ? null : oldMedia.getId();
+    if (request.isMediaProvided() && !Objects.equals(oldMediaId, request.getMediaId())) {
+      Media media = null;
+      if (request.getMediaId() != null) {
+        media = mediaRepository.findByIdAndIsDeletedFalse(request.getMediaId())
+            .orElseThrow(() -> new NotFoundException("Media không tồn tại"));
+        if (Boolean.TRUE.equals(media.getIsUsed())) {
           throw new BadRequestException("Media đã được sử dụng !");
         }
         media.setIsUsed(true);
-        category.setMedia(media);
       }
+      if (oldMedia != null) {
+        oldMedia.setIsUsed(false);
+      }
+      category.setMedia(media);
     }
 
     CourseCategory saved = courseCategoryRepository.save(category);
@@ -172,11 +176,27 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy danh mục khóa học"));
 
+    if (courseRepository.existsByCategoryIdAndIsDeletedFalse(id)) {
+      throw new BadRequestException("Không thể xóa danh mục đang có khóa học. Hãy chuyển hoặc xóa khóa học trước.");
+    }
+    if (category.getMedia() != null) {
+      category.getMedia().setIsUsed(false);
+    }
     category.setIsDeleted(true);
     category.setDeletedAt(Instant.now());
 
     courseCategoryRepository.save(category);
   }
+
+    private String uniqueSlug(String name, Long id) {
+      String base = SlugUtil.toSlug(name);
+      String slug = base;
+      int suffix = 2;
+      while (courseCategoryRepository.existsBySlugAndIdNot(slug, id)) {
+        slug = base + "-" + suffix++;
+      }
+      return slug;
+    }
 
     private Sort buildSort(CourseCategoryQuery query) {
 

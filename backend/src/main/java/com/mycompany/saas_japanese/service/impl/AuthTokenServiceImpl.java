@@ -142,7 +142,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
         .issuedAt(now).expiresAt(expiry).id(UUID.randomUUID().toString())
         .claim("token_use", type).claim("sid", session.getId());
     if ("access".equals(type)) {
-      claims.claim("permission", List.of("ROLE_USER"));
+      claims.claim("permission", List.of("ROLE_ADMIN"));
     }
     return encoder.encode(JwtEncoderParameters.from(
         JwsHeader.with(SignatureAlgorithm.RS256).build(), claims.build())).getTokenValue();

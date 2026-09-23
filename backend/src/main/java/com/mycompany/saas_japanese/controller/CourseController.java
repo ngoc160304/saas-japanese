@@ -11,7 +11,7 @@ import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
-import com.mycompany.saas_japanese.service.impl.CourseServiceImpl;
+import com.mycompany.saas_japanese.service.CourseService;
 import com.mycompany.saas_japanese.service.mapper.CourseMapper;
 
 import org.springframework.data.domain.Page;
@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 public class CourseController {
 
-    private final CourseServiceImpl courseServiceImpl;
+    private final CourseService courseServiceImpl;
     private final CourseMapper courseMapper;
 
-    CourseController(CourseServiceImpl courseServiceImpl, CourseMapper courseMapper) {
+    CourseController(CourseService courseServiceImpl, CourseMapper courseMapper) {
         this.courseServiceImpl = courseServiceImpl;
         this.courseMapper = courseMapper;
     }

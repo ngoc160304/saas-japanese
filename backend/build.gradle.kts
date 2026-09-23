@@ -69,7 +69,6 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
 
-
 	implementation("com.cloudinary:cloudinary-http5:2.0.0")
 
 	implementation("io.github.cdimascio:dotenv-java:3.2.0")

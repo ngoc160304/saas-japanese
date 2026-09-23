@@ -1,5 +1,4 @@
-import type { StatCardItemProps } from './StatCardItem';
-import { StatCardItem } from './StatCardItem';
+import { StatCardItem, type StatCardItemProps } from './StatCardItem';
 
 interface StatCardProps {
   items: StatCardItemProps[];

@@ -34,7 +34,7 @@ export function DataTableToolbar({
       <div className="flex flex-wrap items-center gap-2.5">
         {children}
 
-        {showReset && <DataTableReset />}
+        {showReset && <DataTableReset onReset={onReset} />}
       </div>
     </div>
   );

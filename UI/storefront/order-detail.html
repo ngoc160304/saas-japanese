@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Details - Studify JLPT</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme { --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      background-color: #f4f6f9;
+      color: #1e293b;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shadow-soft { box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02); }
+  </style>
+  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
+</head>
+
+<body class="min-h-screen flex flex-col">
+  <!-- Top Navbar -->
+  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        <a href="index.html" class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg></div>
+          <span class="text-2xl font-extrabold tracking-tight text-slate-900">Studify</span>
+        </a>
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Home</a>
+          <a href="courses.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Courses</a>
+          <a href="../user/dashboard.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">My Dashboard</a>
+        </nav>
+        <div class="flex items-center gap-6">
+          <a href="cart.html" class="relative text-slate-500 hover:text-slate-900">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          </a>
+          <div class="flex items-center gap-3 cursor-pointer">
+             <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
+                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar">
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex text-sm font-medium text-slate-500 mb-6" aria-label="Breadcrumb">
+      <ol class="flex items-center space-x-2">
+        <li><a href="orders.html" class="hover:text-slate-900">My Orders</a></li>
+        <li><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></li>
+        <li class="text-slate-900" aria-current="page">Order #ORD-987654</li>
+      </ol>
+    </nav>
+
+    <!-- Header Card -->
+    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6 md:p-8 mb-8">
+       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+         <div>
+            <div class="flex items-center gap-3 mb-2">
+               <h1 class="text-2xl font-black text-slate-900">Order #ORD-987654</h1>
+               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  Completed
+               </span>
+            </div>
+            <p class="text-sm font-medium text-slate-500">Placed on September 22, 2026</p>
+         </div>
+         <div class="flex gap-3">
+            <a href="../user/dashboard.html" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all text-center">
+               Go to Dashboard
+            </a>
+            <button class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+               Invoice
+            </button>
+         </div>
+       </div>
+    </div>
+
+    <!-- Details Grid -->
+    <div class="grid md:grid-cols-3 gap-8">
+       
+       <!-- Left: Items & Summary -->
+       <div class="md:col-span-2 space-y-8">
+          <!-- Items -->
+          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
+             <div class="px-6 py-5 border-b border-slate-100">
+                <h2 class="text-base font-bold text-slate-900">Order Items (2)</h2>
+             </div>
+             
+             <!-- Item 1 -->
+             <div class="p-6 border-b border-slate-100 flex items-center gap-4">
+               <div class="shrink-0 relative w-20 h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden">
+                 <img src="../assets/images/book_3d.jpg" alt="Thumbnail" class="w-12 h-12 object-contain" />
+               </div>
+               <div class="flex-grow">
+                 <a href="course-detail.html" class="text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1 mb-1">
+                   Tiếng Nhật Trung Cấp N3 Soumatome
+                 </a>
+                 <p class="text-[11px] text-slate-500 font-medium">JLPT N3 • By Tanaka Taro</p>
+               </div>
+               <div class="text-sm font-black text-slate-900 whitespace-nowrap">499.000 đ</div>
+             </div>
+
+             <!-- Item 2 -->
+             <div class="p-6 flex items-center gap-4">
+               <div class="shrink-0 relative w-20 h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden">
+                 <img src="../assets/images/book_3d.jpg" alt="Thumbnail" class="w-12 h-12 object-contain filter hue-rotate-15" />
+               </div>
+               <div class="flex-grow">
+                 <a href="course-detail.html" class="text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1 mb-1">
+                   Luyện Đề Thi Thử Toàn Diện N2 Master
+                 </a>
+                 <p class="text-[11px] text-slate-500 font-medium">JLPT N2 • By Tanaka Taro</p>
+               </div>
+               <div class="text-sm font-black text-slate-900 whitespace-nowrap">699.000 đ</div>
+             </div>
+          </div>
+       </div>
+
+       <!-- Right: Payment Info & Summary -->
+       <div class="space-y-8">
+          
+          <!-- Summary -->
+          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6">
+             <h2 class="text-base font-bold text-slate-900 mb-5">Order Summary</h2>
+             <div class="space-y-3 mb-5">
+               <div class="flex justify-between text-sm">
+                 <span class="text-slate-500">Subtotal</span>
+                 <span class="font-bold text-slate-900">1.198.000 đ</span>
+               </div>
+               <div class="flex justify-between text-sm">
+                 <span class="text-slate-500">Tax</span>
+                 <span class="font-bold text-slate-900">0 đ</span>
+               </div>
+             </div>
+             <div class="pt-4 border-t border-slate-100 flex justify-between">
+               <span class="font-bold text-slate-900">Total</span>
+               <span class="font-black text-slate-900 text-lg">1.198.000 đ</span>
+             </div>
+          </div>
+
+          <!-- Payment Info -->
+          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6">
+             <h2 class="text-base font-bold text-slate-900 mb-4">Payment Information</h2>
+             <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div class="w-10 h-6 bg-white border border-slate-200 rounded flex items-center justify-center text-[10px] font-black text-blue-800 shadow-sm">VISA</div>
+                <div>
+                   <p class="text-xs font-bold text-slate-900">Ending in 1111</p>
+                   <p class="text-[10px] text-slate-500">Credit Card</p>
+                </div>
+             </div>
+          </div>
+
+       </div>
+
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-100 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <p class="text-[11px] text-slate-400 font-medium">© 2026 Studify JLPT. All rights reserved.</p>
+        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-400">
+           <a href="#" class="hover:text-slate-800">Support</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

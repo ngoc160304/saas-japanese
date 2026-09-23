@@ -17,4 +17,13 @@ public class ReqCreateCourseCategory {
   private String description;
 
   private Long mediaId;
+
+  @com.fasterxml.jackson.annotation.JsonIgnore
+  @lombok.Setter(lombok.AccessLevel.NONE)
+  private boolean mediaProvided;
+
+  public void setMediaId(Long mediaId) {
+    this.mediaId = mediaId;
+    this.mediaProvided = true;
+  }
 }
