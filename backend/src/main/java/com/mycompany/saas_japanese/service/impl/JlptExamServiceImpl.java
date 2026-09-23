@@ -305,10 +305,8 @@ public class JlptExamServiceImpl implements JlptExamService {
                                                         StartJlptAttemptResponse.QuestionResponse
                                                                         .builder()
                                                                         .questionId(question.getId())
-                                                                        .questionOrder(
-                                                                                        question.getSortOrder())
-                                                                        .questionText(
-                                                                                        question.getQuestionText())
+                                                                        .questionOrder(question.getSortOrder())
+                                                                        .questionText(question.getQuestionText())
                                                                         .answers(answerResponses)
                                                                         .build());
                                 }
@@ -327,13 +325,10 @@ public class JlptExamServiceImpl implements JlptExamService {
                         sessionResponses.add(
                                         StartJlptAttemptResponse.AttemptSessionResponse
                                                         .builder()
-                                                        .attemptSessionId(
-                                                                        attemptSession.getId())
+                                                        .attemptSessionId(attemptSession.getId())
                                                         .sessionId(examSession.getId())
-                                                        .sessionTitle(
-                                                                        examSession.getName())
-                                                        .sessionOrder(
-                                                                        examSession.getSortOrder())
+                                                        .sessionTitle(examSession.getName())
+                                                        .sessionOrder(examSession.getSortOrder())
                                                         .parts(partResponses)
                                                         .build());
                 }
