@@ -1,7 +1,6 @@
 package com.mycompany.saas_japanese.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.saas_japanese.domain.response.CartResponse;
@@ -27,29 +26,24 @@ public class CartController {
 
     @PostMapping("/add/{courseId}")
     public ResponseEntity<CartResponse> addToCart(
-        @PathVariable("courseId") Long courseId,
-        @RequestParam("userId") Long userId) {
+        @PathVariable("courseId") Long courseId) {
 
-        return ResponseEntity.ok(
-            cartService.addToCart(userId, courseId));
+        return ResponseEntity.ok(cartService.addToCart(courseId));
     }
     
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<String> deleteCartItem(
-      @PathVariable("cartItemId") Long cartItemId,
-      @RequestParam("userId") Long userid) {
+      @PathVariable("cartItemId") Long cartItemId) {
 
-        cartService.deleteCartItem(userid, cartItemId);
+        cartService.deleteCartItem(cartItemId);
 
-    return ResponseEntity.ok("Xóa thành công");
+        return ResponseEntity.ok("Xóa thành công");
   }
 
   @GetMapping
-  public ResponseEntity<CartResponse> getDetailCart(
-        @RequestParam("userId") Long userId) {
+  public ResponseEntity<CartResponse> getDetailCart() {
 
-    return ResponseEntity.ok(
-            cartService.getDetailCart(userId));
+    return ResponseEntity.ok(cartService.getDetailCart());
 }
 
 

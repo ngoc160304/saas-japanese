@@ -10,10 +10,10 @@ import com.mycompany.saas_japanese.domain.response.OrderResponse;
 @Service 
 public interface OrderService {
 
-    OrderResponse createOrder(Long userid, ReqCreateOrder request);
+    OrderResponse createOrder(ReqCreateOrder request);
 
-    List<OrderResponse> getMyOrders(Long userId);
+    List<OrderResponse> getMyOrders();
 
-    OrderResponse getDetail(Long userId, Long orderId);
+    OrderResponse getDetail(Long orderId);
     
 }

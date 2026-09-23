@@ -17,6 +17,7 @@ import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.CartService;
 import com.mycompany.saas_japanese.service.mapper.CartMapper;
+import com.mycompany.saas_japanese.util.SecurityUtil;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
@@ -45,19 +46,9 @@ public class CartServiceImpl implements CartService{
 
 
     @Override
-    public CartResponse addToCart(Long userId, Long courseId){
-        // String email = SecurityUtil
-        //     .getCurrentUserLogin()
-        //     .orElseThrow(
-        //         () -> new BadRequestException(
-        //             "Người dùng chưa đăng nhập"));
+    public CartResponse addToCart(Long courseId){
 
-        User user = userRepository
-            // .findByEmail(email)
-            .findById(userId)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
+        User user = getCurrentUser();
         
         Course course = courseRepository
             .findByIdAndIsDeletedFalse(courseId)
@@ -84,7 +75,7 @@ public class CartServiceImpl implements CartService{
                 "Bạn đã đăng ký course này");}
                 
         Cart cart = cartRepository
-            .findByUserId(userId)
+            .findByUserId(user.getId())
             .orElseGet(()-> {
                 Cart newCart = new Cart();
                 newCart.setUser(user);
@@ -112,10 +103,12 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override 
-    public void deleteCartItem(Long userId, Long Id){
-        
+    public void deleteCartItem(Long Id){
+
+        User user = getCurrentUser();
+
         CartItem cartItem = cartItemRepository
-            .findByIdAndCartUserId(Id,userId)
+            .findByIdAndCartUserId(Id,user.getId())
             .orElseThrow(()->new NotFoundException(
                 "Không tìm thấy sản phẩm trong giỏ hàng"));
             
@@ -124,15 +117,12 @@ public class CartServiceImpl implements CartService{
 
     @Override
     @Transactional(Transactional.TxType.SUPPORTS)
-    public CartResponse getDetailCart(Long userId){
-        userRepository
-            .findById(userId)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
+    public CartResponse getDetailCart(){
+        
+        User user = getCurrentUser();
 
         Cart cart = cartRepository
-            .findByUserId(userId)
+            .findByUserId(user.getId())
             .orElse(null);
 
         if(cart == null){
@@ -149,5 +139,20 @@ public class CartServiceImpl implements CartService{
             .findByCartId(cart.getId());
 
         return cartMapper.toResponse(cart, cartItems);
+    }
+
+    private User getCurrentUser() {
+
+        String email = SecurityUtil
+                .getCurrentUserLogin()
+                .orElseThrow(
+                        () -> new BadRequestException(
+                                "Người dùng chưa đăng nhập"));
+
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                "Người dùng không tồn tại"));
     }
 }

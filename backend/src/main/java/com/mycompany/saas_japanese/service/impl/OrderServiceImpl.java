@@ -21,6 +21,7 @@ import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.OrderService;
 import com.mycompany.saas_japanese.service.SePayService;
 import com.mycompany.saas_japanese.service.mapper.OrderMapper;
+import com.mycompany.saas_japanese.util.SecurityUtil;
 import com.mycompany.saas_japanese.util.constant.OrderStatusEnum;
 import com.mycompany.saas_japanese.util.constant.PaymentMethodEnum;
 import com.mycompany.saas_japanese.util.constant.PaymentStatusEnum;
@@ -51,13 +52,9 @@ public class OrderServiceImpl implements OrderService{
 
     @Override 
     @Transactional
-    public OrderResponse createOrder(Long userId, ReqCreateOrder request){
+    public OrderResponse createOrder(ReqCreateOrder request){
         
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
+        User user = getCurrentUser();
 
         List<CartItem> cartItems = cartItemRepository.findAllById(
             request.getCartItemIds());
@@ -146,14 +143,11 @@ public class OrderServiceImpl implements OrderService{
     
     @Override
     @Transactional(readOnly = true)
-    public List<OrderResponse> getMyOrders(Long userId){
+    public List<OrderResponse> getMyOrders(){
 
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
-        List<Order> orders = orderRepository.findByUserId(userId);
+        User user = getCurrentUser();
+
+        List<Order> orders = orderRepository.findByUserId(user.getId());
 
         return orders.stream()
                 .map(order -> {
@@ -167,10 +161,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     @Transactional(readOnly = true)
-    public OrderResponse getDetail(Long userId, Long orderId){
+    public OrderResponse getDetail(Long orderId){
+
+        User user = getCurrentUser();
 
         Order order =orderRepository
-            .findByIdAndUserId(orderId,userId)
+            .findByIdAndUserId(orderId,user.getId())
             .orElseThrow(() ->new NotFoundException(
                  "Không tìm thấy đơn hàng"));
 
@@ -179,4 +175,19 @@ public class OrderServiceImpl implements OrderService{
 
         return orderMapper.toResponse(order, orderItems);
     }
+
+    private User getCurrentUser() {
+
+    String email = SecurityUtil
+            .getCurrentUserLogin()
+            .orElseThrow(
+                    () -> new BadRequestException(
+                            "Người dùng chưa đăng nhập"));
+
+    return userRepository
+            .findByEmail(email)
+            .orElseThrow(
+                    () -> new NotFoundException(
+                            "Người dùng không tồn tại"));
+}
 }

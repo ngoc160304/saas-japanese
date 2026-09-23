@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.saas_japanese.domain.request.ReqCreateOrder;
@@ -29,24 +28,21 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
-            @RequestParam("userId") Long userId,
             @Valid @RequestBody ReqCreateOrder request) {
 
-        return ResponseEntity.ok(orderService.createOrder(userId,request));
+        return ResponseEntity.ok(orderService.createOrder(request));
     }
 
     @GetMapping("/my-orders")
-    public ResponseEntity<List<OrderResponse>> getMyOrders(
-            @RequestParam("userId") Long userId) {
+    public ResponseEntity<List<OrderResponse>> getMyOrders() {
 
-        return ResponseEntity.ok(orderService.getMyOrders(userId));
+        return ResponseEntity.ok(orderService.getMyOrders());
     }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderResponse> getDetail(
-            @PathVariable("orderId") Long orderId,
-            @RequestParam("userId") Long userId) {
+            @PathVariable("orderId") Long orderId) {
 
-        return ResponseEntity.ok(orderService.getDetail(userId,orderId));
+        return ResponseEntity.ok(orderService.getDetail(orderId));
     }
 }

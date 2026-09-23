@@ -2,7 +2,6 @@ package com.mycompany.saas_japanese.service.impl;
 
 import com.mycompany.saas_japanese.service.CartService;
 import java.math.BigDecimal;
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +19,7 @@ import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.CourseEnrollmentService;
 import com.mycompany.saas_japanese.service.mapper.CourseEnrollmentMapper;
 import com.mycompany.saas_japanese.specification.CourseEnrolmentSpecs;
+import com.mycompany.saas_japanese.util.SecurityUtil;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
@@ -47,19 +47,9 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
 
 
     @Override
-    public CourseEnrollmentResponse enroll(Long userId,Long courseId){
-        // String email = SecurityUtil
-        //     .getCurrentUserLogin()
-        //     .orElseThrow(
-        //         () -> new BadRequestException(
-        //             "Người dùng chưa đăng nhập"));
+    public CourseEnrollmentResponse enroll(Long courseId){
 
-        User user = userRepository
-            // .findByEmail(email)
-            .findById(userId)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
+        User user = getCurrentUser();
         
         Course course = courseRepository
             .findByIdAndIsDeletedFalse(courseId)
@@ -94,7 +84,7 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
 
             return courseEnrollmentMapper.toResponse(saveEnrollment);
         }else{
-            cartService.addToCart(userId, courseId);
+            cartService.addToCart(courseId);
             return null;
         }
     }
@@ -136,25 +126,12 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
     }
 
     @Override
-    @Transactional(Transactional.TxType.SUPPORTS)
-    public Page<CourseEnrollmentResponse> getMyCourses(Long userid, CourseEnrollmentQuery query){
+    @Transactional
+    public Page<CourseEnrollmentResponse> getMyCourses(CourseEnrollmentQuery query){
 
-        // String email = SecurityUtil
-        //     .getCurrentUserLogin()
-        //     .orElseThrow(
-        //         () -> new BadRequestException(
-        //             "Người dùng chưa đăng nhập"));
-
-        User user = userRepository
-            // .findByEmail(email)
-            .findById(userid)
-            .orElseThrow(
-                () -> new NotFoundException(
-                    "Người dùng không tồn tại"));
+        User user = getCurrentUser();
         PredicateSpecification<CourseEnrollment> spec = CourseEnrolmentSpecs.hasUserId(user.getId());
-        // List<CourseEnrollment> enrollments = courseEnrollmentRepository
-        //         .findByUserId(user.getId());
-        
+
         if (query.getCourseTitle() != null && !query.getCourseTitle().trim().isEmpty()) {
             spec = spec.and(
                 CourseEnrolmentSpecs.hasCourseTitle(
@@ -170,5 +147,20 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
                     query.getSize())));
 
         return enrollmentPage.map(courseEnrollmentMapper::toResponse);
+    }
+
+    private User getCurrentUser() {
+
+        String email = SecurityUtil
+                .getCurrentUserLogin()
+                .orElseThrow(
+                        () -> new BadRequestException(
+                                "Người dùng chưa đăng nhập"));
+
+        return userRepository
+                .findByEmail(email)
+                .orElseThrow(
+                        () -> new NotFoundException(
+                                "Người dùng không tồn tại"));
     }
 }

@@ -1,7 +1,6 @@
 package com.mycompany.saas_japanese.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.saas_japanese.domain.query.CourseEnrollmentQuery;
@@ -11,7 +10,6 @@ import com.mycompany.saas_japanese.service.CourseEnrollmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -31,19 +29,17 @@ public class CourseEnrollmentController {
 
     @PostMapping("/{courseId}/enroll")
     public ResponseEntity<CourseEnrollmentResponse> courseEnroll(
-        @PathVariable("courseId") Long courseId,
-        @RequestParam("userId") Long userId) {
+        @PathVariable("courseId") Long courseId) {
 
-        return ResponseEntity.ok(courseEnrollmentService.enroll(userId, courseId));
+        return ResponseEntity.ok(courseEnrollmentService.enroll(courseId));
 
     }
     
     @GetMapping("/my-courses")
     public ResponseEntity<Page<CourseEnrollmentResponse>> getMyCourses(
-        @RequestParam("userId") Long userId,
         CourseEnrollmentQuery query){
 
-        Page<CourseEnrollmentResponse> myCourses = courseEnrollmentService.getMyCourses(userId, query);
+        Page<CourseEnrollmentResponse> myCourses = courseEnrollmentService.getMyCourses(query);
 
         return ResponseEntity.ok(myCourses);
     }
