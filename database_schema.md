@@ -21,21 +21,7 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 
 ---
 
--- Table `jlpt_levels`
-
----
-
-CREATE TABLE IF NOT EXISTS `jlpt_levels` (
-`id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-`code` ENUM('N5', 'N4', 'N3', 'N2', 'N1') NOT NULL COMMENT 'Mã cấp độ JLPT',
-`name` VARCHAR(50) NOT NULL COMMENT 'Tên hiển thị cấp độ',
-`description` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Mô tả cấp độ',
-PRIMARY KEY (`id`),
-UNIQUE INDEX `uq_jlpt_levels_code` (`code` ASC))
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_general_ci
-COMMENT = 'Danh sách các cấp độ JLPT N5-N1';
+-- -----------------------------------------------------
 
 ---
 
@@ -126,33 +112,26 @@ COMMENT = 'Giỏ hàng của người dùng';
 ---
 
 CREATE TABLE IF NOT EXISTS `courses` (
-`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-`jlpt_level_id` TINYINT UNSIGNED NOT NULL COMMENT 'Cấp độ JLPT của khóa học',
-`title` VARCHAR(200) NOT NULL COMMENT 'Tên khóa học',
-`slug` VARCHAR(220) NOT NULL COMMENT 'Slug URL',
-`description` TEXT NULL DEFAULT NULL COMMENT 'Mô tả khóa học',
-`price` DECIMAL(12,2) NOT NULL DEFAULT 0,
-`is_published` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Đã xuất bản hay chưa',
-`sort_order` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Thứ tự hiển thị',
-`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-`deleted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Soft delete',
-`thumbnail_media_id` BIGINT UNSIGNED NULL DEFAULT NULL,
-PRIMARY KEY (`id`),
-UNIQUE INDEX `uq_courses_slug` (`slug` ASC),
-INDEX `idx_courses_jlpt_level` (`jlpt_level_id` ASC),
-INDEX `idx_courses_published` (`is_published` ASC),
-INDEX `fk_courses_thumbnail_media` (`thumbnail_media_id` ASC),
-CONSTRAINT `fk_courses_jlpt_level`
-FOREIGN KEY (`jlpt_level_id`)
-REFERENCES `jlpt_levels` (`id`)
-ON DELETE RESTRICT
-ON UPDATE CASCADE,
-CONSTRAINT `fk_courses_thumbnail_media`
-FOREIGN KEY (`thumbnail_media_id`)
-REFERENCES `media` (`id`)
-ON DELETE SET NULL
-ON UPDATE CASCADE)
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(200) NOT NULL COMMENT 'Tên khóa học',
+  `slug` VARCHAR(220) NOT NULL COMMENT 'Slug URL',
+  `description` TEXT NULL DEFAULT NULL COMMENT 'Mô tả khóa học',
+  `price` DECIMAL(12,2) NOT NULL DEFAULT 0,
+  `is_published` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Đã xuất bản hay chưa',
+  `sort_order` INT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Thứ tự hiển thị',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Soft delete',
+  `thumbnail_media_id` BIGINT UNSIGNED NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `uq_courses_slug` (`slug` ASC),
+  INDEX `idx_courses_published` (`is_published` ASC),
+  INDEX `fk_courses_thumbnail_media` (`thumbnail_media_id` ASC),
+  CONSTRAINT `fk_courses_thumbnail_media`
+    FOREIGN KEY (`thumbnail_media_id`)
+    REFERENCES `media` (`id`)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci
@@ -624,22 +603,19 @@ COMMENT = 'Các lựa chọn của câu hỏi quiz';
 ---
 
 CREATE TABLE IF NOT EXISTS `jlpt_exams` (
-`id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-`jlpt_level_id` TINYINT UNSIGNED NOT NULL COMMENT 'Cấp độ JLPT của đề thi',
-`title` VARCHAR(200) NOT NULL COMMENT 'Tên đề thi thử',
-`description` VARCHAR(500) NULL DEFAULT NULL COMMENT 'Mô tả đề thi',
-`total_time_minutes` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Tổng thời gian thi (phút)',
-`is_published` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Đã xuất bản hay chưa',
-`created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-`updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-`deleted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Soft delete',
-PRIMARY KEY (`id`),
-INDEX `idx_jlpt_exams_level` (`jlpt_level_id` ASC),
-CONSTRAINT `fk_jlpt_exams_level`
-FOREIGN KEY (`jlpt_level_id`)
-REFERENCES `jlpt_levels` (`id`)
-ON DELETE RESTRICT
-ON UPDATE CASCADE)
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+`level` ENUM('N5', 'N4', 'N3', 'N2', 'N1')
+  NOT NULL COMMENT 'Cấp độ JLPT của đề thi',  
+  `title` VARCHAR(200) NOT NULL COMMENT 'Tên đề thi thử',
+  `description` VARCHAR(500) NULL DEFAULT NULL COMMENT 'Mô tả đề thi',
+  `total_time_minutes` SMALLINT UNSIGNED NOT NULL DEFAULT '0' COMMENT 'Tổng thời gian thi (phút)',
+  `is_published` TINYINT(1) NOT NULL DEFAULT '0' COMMENT 'Đã xuất bản hay chưa',
+  `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `deleted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'Soft delete',
+  PRIMARY KEY (`id`),
+  INDEX `idx_jlpt_exams_level` (`level`)
+)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_general_ci
