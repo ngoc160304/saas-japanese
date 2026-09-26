@@ -1,4 +1,4 @@
-package com.mycompany.saas_japanese.domain.request;
+package com.mycompany.saas_japanese_webhook.dto;
 
 import java.math.BigDecimal;
 
