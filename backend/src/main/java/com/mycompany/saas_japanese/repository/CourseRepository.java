@@ -29,4 +29,7 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
   @Query("select c.category.id as parentId, count(c) as total from Course c "
       + "where c.isDeleted = false and c.category.id in :ids group by c.category.id")
   List<ParentCount> countByCategoryIds(@Param("ids") List<Long> ids);
+
+  @EntityGraph(attributePaths = {"category", "thumbnailMedia"})
+  Optional<Course> findByIdAndIsDeletedFalseAndIsPublishedTrue(Long id);
 }

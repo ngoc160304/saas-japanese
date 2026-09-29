@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 import com.mycompany.saas_japanese.repository.ParentCount;
 
@@ -34,6 +35,7 @@ import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
+import com.mycompany.saas_japanese.domain.response.ClientCourseResponse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
 @Service
@@ -45,7 +47,6 @@ public class CourseServiceImpl implements CourseService {
     private final MediaRepository mediaRepository;
     private final CourseCategoryRepository courseCategoryRepository;
     private final LessonRepository lessonRepository;
-    private final LessonServiceImpl lessonServiceImpl;
 
     @Override
     @Transactional
@@ -196,4 +197,95 @@ public class CourseServiceImpl implements CourseService {
         return Sort.by(direction, field);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ClientCourseResponse> fetchAllClientCourses(CourseQuerry query) {
+
+        if (query.getCategoryId() != null) {
+            courseCategoryRepository.findByIdAndIsDeletedFalse(query.getCategoryId())
+                    .orElseThrow(() ->
+                            new NotFoundException("Không tìm thấy danh mục khóa học"));
+        }
+
+        Specification<Course> spec = Specification
+                .where(CourseSpecs.isNotDeleted())
+                .and(CourseSpecs.hasCategory(query.getCategoryId()))
+                .and(CourseSpecs.hasPricing(query.getPricing()))
+                .and(CourseSpecs.hasTitle(query.getTitle()))
+                .and(CourseSpecs.hasSearch(query.getSearch()));
+
+        spec = spec.and(CourseSpecs.hasPublished(true));
+
+        Page<Course> coursePage = courseRepository.findAll(
+                spec,
+                PageRequest.of(
+                        query.getPage(),
+                        query.getSize(),
+                        buildSort(query)
+                )
+        );
+
+        Map<Long, Long> counts = coursePage.isEmpty()
+                ? Map.of()
+                : lessonRepository
+                        .countByCourseIds(
+                                coursePage.stream()
+                                        .map(Course::getId)
+                                        .toList()
+                        )
+                        .stream()
+                        .collect(Collectors.toMap(
+                                ParentCount::getParentId,
+                                ParentCount::getTotal
+                        ));
+
+        return coursePage.map(course -> {
+
+            ClientCourseResponse response =
+                    courseMapper.toClientResponse(course);
+
+            response.setCategoryName(
+                    course.getCategory() != null
+                            ? course.getCategory().getName()
+                            : null
+            );
+
+            response.setLessonCount(
+                    counts.getOrDefault(course.getId(), 0L)
+            );
+
+            return response;
+        });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ClientCourseResponse fetchClientCourseById(Long id) {
+
+        Course course = courseRepository
+                .findByIdAndIsDeletedFalseAndIsPublishedTrue(id)
+                .orElseThrow(() ->
+                        new NotFoundException("Chương trình học không tồn tại"));
+
+        ClientCourseResponse response =
+                courseMapper.toClientResponse(course);
+
+        Long lessonCount = lessonRepository
+                .countByCourseIds(List.of(course.getId()))
+                .stream()
+                .findFirst()
+                .map(ParentCount::getTotal)
+                .orElse(0L);
+
+        response.setCategoryName(
+                course.getCategory() != null
+                        ? course.getCategory().getName()
+                        : null
+        );
+
+        response.setLessonCount(lessonCount);
+
+        return response;
+    }
 }

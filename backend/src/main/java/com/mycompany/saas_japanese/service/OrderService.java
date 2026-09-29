@@ -2,8 +2,10 @@ package com.mycompany.saas_japanese.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import com.mycompany.saas_japanese.domain.query.OrderQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateOrder;
 import com.mycompany.saas_japanese.domain.response.OrderResponse;
 
@@ -16,4 +18,5 @@ public interface OrderService {
 
     OrderResponse getDetail(Long orderId);
     
+    Page<OrderResponse> getAllOrders(OrderQuery query);
 }
