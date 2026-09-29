@@ -79,6 +79,17 @@ try {
   let refreshes = 0;
   let logins = 0;
   let registrations = 0;
+  let delayNextRefresh = false;
+  let failNextLogout = false;
+  let cartItems = [
+    {
+      id: 30,
+      courseId: 12,
+      courseTitle: 'Tiếng Nhật giao tiếp cho người mới',
+      price: 5615,
+      thumbnailUrl: null,
+    },
+  ];
   const errors = [];
   listeners.set('Runtime.consoleAPICalled', (event) => {
     if (
@@ -107,7 +118,7 @@ try {
           name: 'Access-Control-Allow-Headers',
           value: 'Content-Type, Authorization, X-XSRF-TOKEN',
         },
-        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
+        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, DELETE, OPTIONS' },
       ];
       const session = {
         access_token: `browser-test-access-${refreshes}`,
@@ -128,6 +139,10 @@ try {
           assert.equal(request.headers['X-XSRF-TOKEN'], 'browser-test-csrf');
         if (url.pathname.endsWith('/refresh-token')) {
           refreshes++;
+          if (delayNextRefresh) {
+            delayNextRefresh = false;
+            await delay(300);
+          }
           if (authenticated) body = { data: session };
           else status = 401;
         } else if (url.pathname.endsWith('/register')) {
@@ -153,12 +168,32 @@ try {
             });
           } else status = 401;
         } else if (url.pathname.endsWith('/logout')) {
-          authenticated = false;
-          status = 204;
-          headers.push({
-            name: 'Set-Cookie',
-            value: 'refresh_token=; HttpOnly; Path=/api/v1/auth; Max-Age=0; SameSite=Lax',
-          });
+          if (failNextLogout) {
+            failNextLogout = false;
+            status = 500;
+          } else {
+            authenticated = false;
+            status = 204;
+            headers.push({
+              name: 'Set-Cookie',
+              value: 'refresh_token=; HttpOnly; Path=/api/v1/auth; Max-Age=0; SameSite=Lax',
+            });
+          }
+        } else if (url.pathname.endsWith('/cart') && request.method === 'GET') {
+          if (authenticated)
+            body = {
+              data: {
+                id: 3,
+                items: cartItems,
+                totalAmount: cartItems.reduce((total, item) => total + item.price, 0),
+              },
+            };
+          else status = 401;
+        } else if (/\/cart\/items\/\d+$/.test(url.pathname) && request.method === 'DELETE') {
+          if (authenticated) {
+            cartItems = [];
+            body = 'Xóa thành công';
+          } else status = 401;
         } else if (authenticated)
           body = { data: { content: [], pageable: { pageNumber: 0 }, totalPages: 0 } };
         else status = 401;
@@ -210,6 +245,33 @@ try {
     await writeFile(join(profile, name + '.png'), Buffer.from(result.data, 'base64'));
   };
 
+  await navigate('/');
+  await waitFor('document.querySelector(\'header a[href="/login"]\') !== null');
+  assert.equal(
+    await evaluate('document.querySelector(\'button[aria-label="Thông báo"]\') === null'),
+    true,
+  );
+  await screenshot('storefront-guest-desktop', 1440, 1000);
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await evaluate('document.querySelector(\'button[aria-label="Mở menu"]\').click()');
+  await waitFor('document.querySelector(\'button[aria-label="Đóng menu"]\') !== null');
+  await screenshot('storefront-guest-mobile', 390, 844);
+  assert.equal(
+    await evaluate(
+      'document.querySelector(\'#storefront-mobile-menu a[href="/login"]\').textContent',
+    ),
+    'Đăng nhập',
+  );
+  await evaluate(
+    'document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))',
+  );
+  await waitFor('document.querySelector(\'button[aria-label="Mở menu"]\') !== null');
+
   await navigate('/login');
   await waitFor(
     'document.querySelector("form fieldset") && !document.querySelector("form fieldset").disabled',
@@ -255,17 +317,96 @@ try {
     'location.pathname === "/admin/categories-course" && document.body.innerText.includes("Đăng xuất")',
   );
   assert.equal(logins, 2);
+
+  await navigate('/');
+  await waitFor('document.querySelector(\'button[aria-label="Thông báo"]\') !== null');
+  assert.equal(
+    await evaluate('document.querySelector(\'header a[href="/login"]\') === null'),
+    true,
+  );
+  await evaluate('document.querySelector(\'button[aria-label="Thông báo"]\').click()');
+  await waitFor('document.body.innerText.includes("Chưa có thông báo")');
+  await evaluate(
+    'document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))',
+  );
+  await evaluate('document.querySelector(\'button[aria-label^="Mở menu tài khoản"]\').click()');
+  await waitFor('document.body.innerText.includes("student@example.test")');
+  await screenshot('storefront-authenticated-desktop', 1440, 1000);
+
+  await waitFor('document.querySelector(\'a[aria-label="Giỏ hàng, 1 khóa học"]\') !== null');
+  await navigate('/cart');
+  await waitFor('document.body.innerText.includes("Tiếng Nhật giao tiếp cho người mới")');
+  await screenshot('cart-filled-desktop', 1440, 1000);
+  await screenshot('cart-filled-mobile', 390, 844);
+  await evaluate('document.querySelector(\'button[aria-label^="Xóa Tiếng Nhật"]\').click()');
+  await waitFor('document.body.innerText.includes("Giỏ hàng của bạn đang trống")');
+  assert.equal(
+    await evaluate('document.querySelector(\'a[aria-label="Giỏ hàng, 1 khóa học"]\') === null'),
+    true,
+  );
+  await screenshot('cart-empty-mobile', 390, 844);
+  await navigate('/');
+  await waitFor('document.querySelector(\'button[aria-label="Thông báo"]\') !== null');
+
   const beforeReload = refreshes;
+  delayNextRefresh = true;
   await send('Page.reload');
-  await waitFor('document.body.innerText.includes("Đăng xuất")');
+  await waitFor(
+    'document.querySelector(\'[aria-label="Đang kiểm tra phiên đăng nhập"]\') !== null',
+  );
+  assert.equal(
+    await evaluate('document.querySelector(\'header a[href="/login"]\') === null'),
+    true,
+  );
+  await waitFor('document.querySelector(\'button[aria-label="Thông báo"]\') !== null');
   assert.equal(refreshes, beforeReload + 1);
   assert.equal(
     await evaluate('Object.keys(localStorage).length + Object.keys(sessionStorage).length'),
     0,
   );
   assert.equal(await evaluate('document.cookie.includes("refresh_token")'), false);
+
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 390,
+    height: 844,
+    deviceScaleFactor: 1,
+    mobile: true,
+  });
+  await evaluate('document.querySelector(\'button[aria-label="Mở menu"]\').click()');
+  await waitFor(
+    'document.querySelector(\'#storefront-mobile-menu button[aria-label="Thông báo"]\') !== null',
+  );
+  await screenshot('storefront-authenticated-mobile', 390, 844);
+  assert.equal(
+    await evaluate(
+      'document.querySelector(\'#storefront-mobile-menu\').innerText.includes("Student")',
+    ),
+    true,
+  );
+  await evaluate(
+    'document.querySelector("main").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))',
+  );
+  await waitFor('document.querySelector(\'button[aria-label="Mở menu"]\') !== null');
+
+  await send('Emulation.setDeviceMetricsOverride', {
+    width: 1440,
+    height: 1000,
+    deviceScaleFactor: 1,
+    mobile: false,
+  });
+  failNextLogout = true;
+  await evaluate('document.querySelector(\'button[aria-label^="Mở menu tài khoản"]\').click()');
   await evaluate(
     '[...document.querySelectorAll("button")].find(button => button.textContent.includes("Đăng xuất")).click()',
+  );
+  await waitFor('document.querySelector("[data-sonner-toast][data-type=error]") !== null');
+  assert.equal(authenticated, true);
+  assert.equal(
+    await evaluate('document.querySelector(\'header a[href="/login"]\') !== null'),
+    true,
+  );
+  await evaluate(
+    '[...document.querySelectorAll("[data-sonner-toast] button")].find(button => button.textContent.includes("Thử lại")).click()',
   );
   await waitFor('location.pathname === "/login" && document.getElementById("login-password")');
   assert.equal(authenticated, false);
@@ -273,7 +414,7 @@ try {
   await waitFor('location.pathname === "/login"');
   assert.deepEqual(errors, []);
   process.stdout.write(
-    `Browser auth passed: responsive layouts, validation, register → OTP → login, return URL, reload bootstrap, logout, protected route, no token storage.\nScreenshots: ${profile}\n`,
+    `Browser auth/cart passed: storefront guest/auth/mobile states, cart filled/empty/removal states, notification/account popovers, refresh bootstrap, failed logout retry, register → OTP → login, protected route, and no token storage.\nScreenshots: ${profile}\n`,
   );
 } finally {
   socket?.close();
