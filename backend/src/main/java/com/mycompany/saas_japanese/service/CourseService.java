@@ -6,6 +6,7 @@ import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
+import com.mycompany.saas_japanese.domain.response.ClientCourseResponse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
 public interface CourseService {
@@ -19,5 +20,9 @@ public interface CourseService {
     Page<CourseResponse> fetchAllCourse(CourseQuerry query);
 
     CourseResponse updateCourse(Long id, ReqUpdateCourse course);
+
+    Page<ClientCourseResponse> fetchAllClientCourses(CourseQuerry query);
+
+    ClientCourseResponse fetchClientCourseById(Long id);
 
 }

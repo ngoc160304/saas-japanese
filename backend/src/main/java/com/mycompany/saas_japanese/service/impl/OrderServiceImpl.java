@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.PredicateSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +17,7 @@ import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.Order;
 import com.mycompany.saas_japanese.domain.OrderItem;
 import com.mycompany.saas_japanese.domain.User;
+import com.mycompany.saas_japanese.domain.query.OrderQuery;
 import com.mycompany.saas_japanese.domain.request.ReqCreateOrder;
 import com.mycompany.saas_japanese.domain.response.OrderResponse;
 import com.mycompany.saas_japanese.repository.CartItemRepository;
@@ -21,6 +27,7 @@ import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.OrderService;
 import com.mycompany.saas_japanese.service.SePayService;
 import com.mycompany.saas_japanese.service.mapper.OrderMapper;
+import com.mycompany.saas_japanese.specification.OrderSpecs;
 import com.mycompany.saas_japanese.util.SecurityUtil;
 import com.mycompany.saas_japanese.util.constant.OrderStatusEnum;
 import com.mycompany.saas_japanese.util.constant.PaymentMethodEnum;
@@ -190,4 +197,50 @@ public class OrderServiceImpl implements OrderService{
                     () -> new NotFoundException(
                             "Người dùng không tồn tại"));
 }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<OrderResponse> getAllOrders(OrderQuery query) {
+
+        Specification<Order> spec = Specification
+                .where(OrderSpecs.hasStatus(query.getStatus()))
+                .and(OrderSpecs.hasPaymentStatus(query.getPaymentStatus()))
+                .and(OrderSpecs.hasPaymentMethod(query.getPaymentMethod()))
+                .and(OrderSpecs.hasSearch(query.getSearch()));
+
+        Page<Order> orderPage = orderRepository.findAll(
+                spec,
+                PageRequest.of(
+                        query.getPage(),
+                        query.getSize(),
+                        buildSort(query)
+                )
+        );
+
+        return orderPage.map(order -> {
+            List<OrderItem> orderItems =
+                    orderItemRepository.findByOrderId(order.getId());
+
+            return orderMapper.toResponse(order, orderItems);
+        });
+    }
+
+    private Sort buildSort(OrderQuery query) {
+
+        String sortKey = query.getSortKey();
+
+        if (sortKey == null || sortKey.isBlank()) {
+            return Sort.by(
+                    Sort.Direction.DESC,
+                    "createdAt"
+            );
+        }
+
+        Sort.Direction direction =
+                "ASC".equalsIgnoreCase(query.getSortType())
+                        ? Sort.Direction.ASC
+                        : Sort.Direction.DESC;
+
+        return Sort.by(direction, sortKey);
+    }
 }
