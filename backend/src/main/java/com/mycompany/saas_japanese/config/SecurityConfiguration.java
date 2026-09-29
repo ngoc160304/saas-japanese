@@ -76,12 +76,10 @@ public class SecurityConfiguration {
                                                 .permitAll()
                                                 .requestMatchers("/api/v1/auth/myProfile", "/api/v1/auth/updateProfile")
                                                 .authenticated()
+                                                .requestMatchers("/api/v1/admin/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/lessons").permitAll()
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/**")
                                                 .permitAll()
-                                                // User has no persisted admin role yet. Do not manufacture
-                                                // administrative
-                                                // authority.
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/**").permitAll()
                                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/**").permitAll()

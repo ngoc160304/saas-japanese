@@ -48,6 +48,8 @@ public class JlptExam {
     @Column(nullable = false)
     private Instant updatedAt;
 
+    private Instant deletedAt;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean isDeleted = false;

@@ -22,6 +22,7 @@ public class UserDetailCustom implements UserDetailsService {
         .findByEmail(email.trim().toLowerCase(Locale.ROOT))
         .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
     // Check status after the password in AuthService to avoid disclosing account state.
-    return User.withUsername(user.getEmail()).password(user.getPassword()).authorities("ROLE_USER").build();
+    String authority = "ROLE_" + user.getRole().name().toUpperCase();
+    return User.withUsername(user.getEmail()).password(user.getPassword()).authorities(authority).build();
   }
 }

@@ -119,6 +119,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
         .flatMap(session -> users.findById(session.getUserId()))
         .filter(user -> user.isActive() && user.isVerified())
         .filter(user -> Objects.equals(user.getEmail(), jwt.getSubject()))
+        .filter(user -> List.of(authority(user)).equals(jwt.getClaimAsStringList("permission")))
         .isPresent();
   }
 
@@ -142,10 +143,14 @@ public class AuthTokenServiceImpl implements AuthTokenService {
         .issuedAt(now).expiresAt(expiry).id(UUID.randomUUID().toString())
         .claim("token_use", type).claim("sid", session.getId());
     if ("access".equals(type)) {
-      claims.claim("permission", List.of("ROLE_ADMIN"));
+      claims.claim("permission", List.of(authority(user)));
     }
     return encoder.encode(JwtEncoderParameters.from(
         JwsHeader.with(SignatureAlgorithm.RS256).build(), claims.build())).getTokenValue();
+  }
+
+  private String authority(User user) {
+    return "ROLE_" + user.getRole().name().toUpperCase();
   }
 
   private Jwt decodeRefresh(String token) {

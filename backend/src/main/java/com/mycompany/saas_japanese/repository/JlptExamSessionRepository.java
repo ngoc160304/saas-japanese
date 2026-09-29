@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.repository;
 
 import java.util.List;
+import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -15,4 +16,7 @@ public interface JlptExamSessionRepository
                 
     
        List<JlptExamSession> findByJlptExam_IdOrderBySortOrderAsc(Long examId);
+
+       List<JlptExamSession> findByJlptExam_IdInOrderByJlptExam_IdAscSortOrderAsc(
+               Collection<Long> examIds);
 }

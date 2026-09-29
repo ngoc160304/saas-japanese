@@ -47,6 +47,7 @@ import com.mycompany.saas_japanese.repository.OtpRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthTokenService;
 import com.mycompany.saas_japanese.service.AuthTokens;
+import com.mycompany.saas_japanese.util.constant.UserRoleEnum;
 import com.mycompany.saas_japanese.util.error.ServiceUnavailableException;
 import jakarta.servlet.http.Cookie;
 import tools.jackson.databind.json.JsonMapper;
@@ -177,9 +178,22 @@ class AuthIntegrationTest extends AuthTestSupport {
     assertThat(cookie.getDomain()).isNull();
     assertThat(cookie.getMaxAge()).isPositive().isLessThanOrEqualTo(30 * 24 * 60 * 60);
     String access = JSON.readTree(result.getResponse().getContentAsString()).at("/data/access_token").asText();
-    assertThat(accessDecoder.decode(access).getClaims()).doesNotContainKeys("password", "user", "refreshToken");
+    var claims = accessDecoder.decode(access).getClaims();
+    assertThat(claims).doesNotContainKeys("password", "user", "refreshToken");
+    assertThat(claims.get("permission")).isEqualTo(List.of("ROLE_STUDENT"));
     assertThat(refreshDecoder.decode(cookie.getValue()).getClaimAsString("token_use")).isEqualTo("refresh");
     assertThat(sessions.findAll().get(0).getRefreshTokenHash()).hasSize(64).isNotEqualTo(cookie.getValue());
+  }
+
+  @Test
+  void accessTokenUsesPersistedAdminRole() throws Exception {
+    user.setRole(UserRoleEnum.admin);
+    users.save(user);
+    MvcResult result = login(EMAIL, PASSWORD, false).andExpect(status().isOk()).andReturn();
+    String access = JSON.readTree(result.getResponse().getContentAsString())
+        .at("/data/access_token").asText();
+    assertThat(accessDecoder.decode(access).getClaimAsStringList("permission"))
+        .containsExactly("ROLE_ADMIN");
   }
 
   @Test
@@ -216,7 +230,7 @@ class AuthIntegrationTest extends AuthTestSupport {
     AuthTokens issued = tokens.create(user, false);
     mvc.perform(get("/api/v1/auth/myProfile").header("Authorization", "Bearer " + issued.response().accessToken()))
         .andExpect(status().isOk()).andExpect(jsonPath("$.data.email").value(EMAIL));
-    mvc.perform(post("/api/v1/course-categories").header("Authorization",
+    mvc.perform(post("/api/v1/admin/jlpt-exams").header("Authorization",
         "Bearer " + issued.response().accessToken()).contentType(MediaType.APPLICATION_JSON).content("{}"))
         .andExpect(status().isForbidden()).andExpect(jsonPath("$.status").value(403));
   }
