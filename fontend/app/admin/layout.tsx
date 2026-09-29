@@ -1,7 +1,13 @@
 import SideBar, { ISidebarItem } from '@/components/layout/management/sidebar/SideBar';
 import { AuthGuard } from '@/features/auth/components/AuthGuard';
+import { ShoppingBag } from 'lucide-react';
 
 const sidebarItems: ISidebarItem[] = [
+  {
+    title: 'Đơn hàng',
+    href: '/admin/orders',
+    icon: <ShoppingBag className="h-5 w-5" aria-hidden="true" />,
+  },
   {
     title: 'Student Portal',
     href: '/student/dashboard',
