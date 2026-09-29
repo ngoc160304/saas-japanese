@@ -1,6 +1,8 @@
 package com.mycompany.saas_japanese.repository;
 
 import java.util.Optional;
+import java.util.Collection;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,15 @@ import jakarta.persistence.LockModeType;
 @Repository
 public interface UserJlptAttemptRepository
         extends JpaRepository<UserJlptAttempt, Long> {
+
+    boolean existsByJlptExam_Id(Long examId);
+
+    @Query("""
+            SELECT DISTINCT attempt.jlptExam.id
+            FROM UserJlptAttempt attempt
+            WHERE attempt.jlptExam.id IN :examIds
+            """)
+    Set<Long> findAttemptedExamIds(@Param("examIds") Collection<Long> examIds);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<UserJlptAttempt> findByIdAndUser_Id(

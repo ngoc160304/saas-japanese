@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import com.mycompany.saas_japanese.domain.JlptExamSession;
 import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.UserJlptAttemptPart;
@@ -89,6 +90,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Exam không tồn tại"));
+                requirePublished(jlptExam);
                 return jlptExamMapper.toResponse(
                                 jlptExam);
         }
@@ -106,6 +108,7 @@ public class JlptExamServiceImpl implements JlptExamService {
 
                 spec = spec.and(
                                 JlptExamSpecs.hasSearch(query.getSearch()));
+                spec = spec.and(JlptExamSpecs.isPublishedAndActive());
                 PageRequest pageable = PageRequest.of(
                                 query.getPage(),
                                 query.getSize(),
@@ -125,6 +128,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Exam không tồn tại"));
+                requirePublished(jlptExam);
 
                 List<JlptExamSessionResponse> sessions = jlptExam.getSessions()
                                 .stream()
@@ -162,6 +166,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Exam không tồn tại"));
+                requirePublished(exam);
 
                 JlptExamSession session = exam.getSessions()
                                 .stream()
@@ -211,11 +216,14 @@ public class JlptExamServiceImpl implements JlptExamService {
                                         "sessionId must be null when mode = full");
                 }
 
-                JlptExam exam = jlptExamRepository.findById(examId)
-                                .orElseThrow(() -> new RuntimeException("JLPT exam not found"));
+                JlptExam exam = jlptExamRepository.findByIdAndIsDeletedFalse(examId)
+                                .orElseThrow(() -> new NotFoundException("JLPT exam not found"));
+                requirePublished(exam);
 
-                User user = userRepository.findById(request.getUserId())
-                                .orElseThrow(() -> new RuntimeException("User not found"));
+                User user = getCurrentUser();
+                if (!Objects.equals(user.getId(), request.getUserId())) {
+                        throw new ForbiddenException("Cannot start an attempt for another user");
+                }
 
                 List<JlptExamSession> sessions;
 
@@ -947,6 +955,12 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .orElseThrow(() -> new BadRequestException("Unauthenticated"));
                 return userRepository.findByEmail(currentUserEmail)
                                 .orElseThrow(() -> new BadRequestException("User not found"));
+        }
+
+        private void requirePublished(JlptExam exam) {
+                if (!Boolean.TRUE.equals(exam.getIsPublished())) {
+                        throw new NotFoundException("JLPT exam not found");
+                }
         }
 
         private int calculateDurationSeconds(Instant startedAt, Instant finishedAt) {

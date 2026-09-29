@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.repository;
 
 import java.util.List;
+import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,16 @@ public interface JlptExamQuestionRepository
             Long examPartId);
 
     long countByJlptExamPart_Id(Long partId);
+
+    @Query("""
+            SELECT question
+            FROM JlptExamQuestion question
+            JOIN FETCH question.jlptExamPart part
+            WHERE part.id IN :partIds
+            ORDER BY part.sortOrder, question.sortOrder
+            """)
+    List<JlptExamQuestion> findAdminQuestionsByPartIds(
+            @Param("partIds") Collection<Long> partIds);
 
     @Query("""
             SELECT question

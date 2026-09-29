@@ -49,8 +49,13 @@ public class GlobalException {
     return error(HttpStatus.NOT_FOUND, exception.getMessage());
   }
 
-  @ExceptionHandler({ConflictException.class, DataIntegrityViolationException.class})
-  public ResponseEntity<ErrorResponse> conflict(Exception exception) {
+  @ExceptionHandler(ConflictException.class)
+  public ResponseEntity<ErrorResponse> conflict(ConflictException exception) {
+    return error(HttpStatus.CONFLICT, exception.getMessage());
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ErrorResponse> dataConflict(DataIntegrityViolationException exception) {
     return error(HttpStatus.CONFLICT, "Resource already exists or conflicts with current data");
   }
 

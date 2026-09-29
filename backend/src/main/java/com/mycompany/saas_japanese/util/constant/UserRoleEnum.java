@@ -1,7 +1,6 @@
 package com.mycompany.saas_japanese.util.constant;
 
-public enum FileTypeEnum {
-  IMAGE,
-  AUDIO,
-  VIDEO,
+public enum UserRoleEnum {
+  admin,
+  student
 }

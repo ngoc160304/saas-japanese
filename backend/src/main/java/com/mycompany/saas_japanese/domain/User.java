@@ -2,8 +2,11 @@ package com.mycompany.saas_japanese.domain;
 
 import java.time.Instant;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.mycompany.saas_japanese.util.constant.UserRoleEnum;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +30,8 @@ public class User {
   private String password;
   private String avatarUrl;
   private String phone;
+  @Enumerated(EnumType.STRING)
+  private UserRoleEnum role = UserRoleEnum.admin;
   private boolean isActive;
   private boolean isVerified;
   private Instant createdAt;
@@ -34,6 +39,9 @@ public class User {
 
   @PrePersist
   public void handleBeforeCreate() {
+    if (role == null) {
+      role = UserRoleEnum.admin;
+    }
     this.createdAt = Instant.now();
   }
 
