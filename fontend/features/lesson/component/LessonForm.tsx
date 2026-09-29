@@ -11,13 +11,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { getApiError } from '@/lib/api-error';
 import { lessonSchema, type LessonFormValues } from '../schemas/lesson.schema';
 
+interface LessonFormProps {
+  course: Course;
+  initialValues?: LessonFormValues;
+  submitLabel?: string;
+  submittingLabel?: string;
+  onSubmit: (values: LessonFormValues) => Promise<void>;
+}
+
 export function LessonForm({
   course,
+  initialValues,
+  submitLabel = 'Tạo bài học',
+  submittingLabel = 'Đang lưu…',
   onSubmit,
-}: {
-  course: Course;
-  onSubmit: (values: LessonFormValues) => Promise<void>;
-}) {
+}: LessonFormProps) {
   const {
     register,
     handleSubmit,
@@ -25,7 +33,12 @@ export function LessonForm({
     formState: { errors, isSubmitting },
   } = useForm<LessonFormValues>({
     resolver: zodResolver(lessonSchema),
-    defaultValues: { title: '', durationMinutes: 45, isPublished: false, grammar: '' },
+    defaultValues: initialValues ?? {
+      title: '',
+      durationMinutes: 45,
+      isPublished: false,
+      grammar: '',
+    },
   });
   const submit = handleSubmit(async (values) => {
     try {
@@ -39,13 +52,14 @@ export function LessonForm({
     }
   });
   const inputClass =
-    'h-12 rounded-2xl border-slate-200 bg-slate-50 px-4 text-sm focus-visible:ring-sky-500';
+    'h-12 rounded-2xl border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 focus-visible:ring-sky-500';
   const backHref = `/admin/courses/${course.id}`;
+
   return (
     <div className="mx-auto w-full max-w-4xl rounded-3xl border border-slate-100 bg-white p-6 shadow-soft md:p-8 lg:p-10">
       <form id="lesson-form" noValidate className="space-y-6" onSubmit={submit}>
         <div className="rounded-2xl border border-sky-100 bg-sky-50/80 p-4">
-          <p className="text-xs text-slate-500">Khóa học</p>
+          <p className="text-xs font-semibold text-slate-600">Khóa học</p>
           <p className="mt-1 text-sm font-bold text-slate-900">{course.title}</p>
         </div>
         <div>
@@ -125,7 +139,7 @@ export function LessonForm({
             rows={3}
             disabled={isSubmitting}
             placeholder="Giới thiệu mục tiêu bài học hoặc kiến thức trọng tâm..."
-            className="rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-sm"
+            className="rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800"
             {...register('grammar')}
           />
           {errors.grammar && <p className="mt-1 text-xs text-rose-600">{errors.grammar.message}</p>}
@@ -138,7 +152,7 @@ export function LessonForm({
         <div className="flex flex-col-reverse justify-between gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center">
           <Link
             href={backHref}
-            className="rounded-2xl border border-slate-200 px-5 py-2.5 text-center text-xs font-bold text-slate-600 hover:bg-slate-50"
+            className="rounded-2xl border border-slate-300 px-5 py-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50"
           >
             Hủy
           </Link>
@@ -148,7 +162,7 @@ export function LessonForm({
             className="h-auto rounded-2xl bg-slate-900 px-6 py-3 text-xs font-bold text-white hover:bg-sky-600"
           >
             {isSubmitting && <LoaderCircle className="size-4 animate-spin" />}
-            {isSubmitting ? 'Đang lưu…' : 'Tạo bài học'}
+            {isSubmitting ? submittingLabel : submitLabel}
           </Button>
         </div>
       </form>

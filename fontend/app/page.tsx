@@ -1,32 +1,19 @@
-'use client';
-// import Image from "next/image";
+import type { Metadata } from 'next';
+import { StorefrontFooter } from '@/components/layout/storefront/StorefrontFooter';
+import { StorefrontHeader } from '@/components/layout/storefront/StorefrontHeader';
+import { HomePage } from '@/features/home/components/HomePage';
 
-import { useState } from 'react';
+export const metadata: Metadata = {
+  title: 'StudyJLPT - Nền tảng luyện thi tiếng Nhật toàn diện',
+  description: 'Học tiếng Nhật từ N5 đến N1 với lộ trình rõ ràng, khóa học chuyên sâu và đề thi thử JLPT.',
+};
 
-export default function Home() {
-  const [test, setTest] = useState<number>(10);
+export default function Page() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 p-6">
-      <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900 p-8 shadow-xl">
-        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-pink-500">
-          <span className="text-xl font-bold text-white">N</span>
-        </div>
-
-        <h1 className="text-3xl font-bold tracking-tight text-white">
-          Tailwind is working! {test}
-        </h1>
-
-        <p className="mt-3 text-sm leading-6 text-slate-400">
-          Đây là component Next.js sử dụng Tailwind CSS để styling.
-        </p>
-
-        <button
-          type="button"
-          className="mt-6 w-full rounded-xl bg-pink-500 px-4 py-3 font-medium text-white transition hover:bg-pink-600 active:scale-[0.98]"
-        >
-          Test Tailwind
-        </button>
-      </div>
-    </main>
+    <div className="flex min-h-screen flex-col bg-white font-storefront text-slate-800">
+      <StorefrontHeader />
+      <HomePage />
+      <StorefrontFooter />
+    </div>
   );
 }

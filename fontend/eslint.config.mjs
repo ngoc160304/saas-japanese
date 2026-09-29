@@ -53,6 +53,7 @@ const eslintConfig = defineConfig([
     'build/**',
     'coverage/**',
     'node_modules/**',
+    'public/tinymce/**',
     'next-env.d.ts',
   ]),
 ]);
