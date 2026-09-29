@@ -15,36 +15,33 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-
-@RestController 
-@RequestMapping ("/cart")
-@FieldDefaults (level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor 
+@RestController
+@RequestMapping("/cart")
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class CartController {
-    
-    CartService cartService;
 
-    @PostMapping("/add/{courseId}")
-    public ResponseEntity<CartResponse> addToCart(
-        @PathVariable("courseId") Long courseId) {
+  CartService cartService;
 
-        return ResponseEntity.ok(cartService.addToCart(courseId));
-    }
-    
-    @DeleteMapping("/items/{cartItemId}")
-    public ResponseEntity<String> deleteCartItem(
+  @PostMapping("/add/{courseId}")
+  public ResponseEntity<CartResponse> addToCart(
+      @PathVariable("courseId") Long courseId) {
+
+    return ResponseEntity.ok(cartService.addToCart(courseId));
+  }
+
+  @DeleteMapping("/items/{cartItemId}")
+  public ResponseEntity<String> deleteCartItem(
       @PathVariable("cartItemId") Long cartItemId) {
 
-        cartService.deleteCartItem(cartItemId);
+    cartService.deleteCartItem(cartItemId);
 
-        return ResponseEntity.ok("Xóa thành công");
+    return ResponseEntity.ok("Xóa thành công");
   }
 
   @GetMapping
   public ResponseEntity<CartResponse> getDetailCart() {
-
     return ResponseEntity.ok(cartService.getDetailCart());
-}
-
+  }
 
 }
