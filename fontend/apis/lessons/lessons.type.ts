@@ -28,4 +28,15 @@ export interface LessonQuery {
   page: number;
   size: number;
   search?: string;
+  sortKey?: 'id';
+  sortType?: 'ASC' | 'DESC';
+}
+
+export interface UpdateLessonRequest {
+  title: string;
+  courseId: number;
+  slug: string;
+  grammar: string | null;
+  durationMinutes: number;
+  isPublished: boolean;
 }

@@ -2,11 +2,25 @@
 
 import { useState } from 'react';
 import { BookOpen } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-export function CourseThumbnail({ src, title }: { src: string | null; title: string }) {
+export function CourseThumbnail({
+  src,
+  title,
+  className,
+}: {
+  src: string | null;
+  title: string;
+  className?: string;
+}) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   return (
-    <div className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50 text-slate-400">
+    <div
+      className={cn(
+        'flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-slate-50 text-slate-400',
+        className,
+      )}
+    >
       {src && src !== failedSrc ? (
         // Backend media URLs are remote and do not require the Next image optimizer.
         // eslint-disable-next-line @next/next/no-img-element

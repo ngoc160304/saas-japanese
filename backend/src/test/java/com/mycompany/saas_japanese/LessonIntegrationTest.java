@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -146,6 +147,42 @@ class LessonIntegrationTest extends AuthTestSupport {
         var replacement = service.createLesson(request);
         entityManager.flush();
         assertThat(replacement.getVideoMediaId()).isEqualTo(video.getId());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void detailAndCourseListMapVideoMediaAfterRepositoryAccess() throws Exception {
+        Course course = course("Read contract");
+        Long categoryId = course.getCategory().getId();
+        Media video = media.save(Media.builder().fileName("read-video").publicId("lesson-read-video")
+            .secureUrl("https://example.test/read-video").fileType(FileTypeEnum.VIDEO).isUsed(true).build());
+        Lesson lesson = lessons.save(Lesson.builder().course(course).title("Readable lesson")
+            .slug("readable-lesson").videoMedia(video).build());
+
+        try {
+            mvc.perform(get("/api/v1/lessons/{id}", lesson.getId()).with(jwt()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(lesson.getId()))
+                .andExpect(jsonPath("$.data.courseId").value(course.getId()))
+                .andExpect(jsonPath("$.data.videoMediaId").value(video.getId()))
+                .andExpect(jsonPath("$.data.videoUrl").value(video.getSecureUrl()));
+
+            mvc.perform(get("/api/v1/lessons").with(jwt())
+                    .param("courseId", course.getId().toString())
+                    .param("page", "0")
+                    .param("size", "12"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.totalElements").value(1))
+                .andExpect(jsonPath("$.data.content[0].id").value(lesson.getId()))
+                .andExpect(jsonPath("$.data.content[0].courseId").value(course.getId()))
+                .andExpect(jsonPath("$.data.content[0].videoMediaId").value(video.getId()))
+                .andExpect(jsonPath("$.data.content[0].videoUrl").value(video.getSecureUrl()));
+        } finally {
+            lessons.deleteById(lesson.getId());
+            media.deleteById(video.getId());
+            courses.deleteById(course.getId());
+            categories.deleteById(categoryId);
+        }
     }
 
     @Test

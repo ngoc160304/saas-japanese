@@ -6,6 +6,8 @@ import java.util.Map;
 
 import jakarta.validation.ConstraintViolationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,8 @@ import com.mycompany.saas_japanese.domain.response.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalException {
+  private static final Logger LOGGER = LoggerFactory.getLogger(GlobalException.class);
+
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ErrorResponse> badRequest(BadRequestException exception) {
     return error(HttpStatus.BAD_REQUEST, exception.getMessage());
@@ -86,6 +90,7 @@ public class GlobalException {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> unexpected(Exception exception) {
+    LOGGER.error("Unhandled request exception", exception);
     return error(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
   }
 

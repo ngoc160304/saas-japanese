@@ -26,6 +26,7 @@ export function LessonCreatePage({ courseId }: { courseId: number }) {
   });
   const creation = useCrudCreate({ queryKey: ['lessons', courseId], mutationFn: lessonAPI.create });
   const backHref = `/admin/courses/${courseId}`;
+
   const submit = async (values: LessonFormValues) => {
     if (submitting.current) return;
     submitting.current = true;
@@ -41,6 +42,7 @@ export function LessonCreatePage({ courseId }: { courseId: number }) {
       throw error;
     }
   };
+
   if (courseQuery.isPending) return <IsLoading className="min-h-64" />;
   if (courseQuery.isError || !courseQuery.data)
     return (
@@ -49,11 +51,12 @@ export function LessonCreatePage({ courseId }: { courseId: number }) {
         <Button variant="outline" onClick={() => void courseQuery.refetch()}>
           Thử lại
         </Button>
-        <Link href={backHref} className="ml-4 text-sky-700">
+        <Link href={backHref} className="ml-4 font-semibold text-sky-700 hover:underline">
           Quay lại khóa học
         </Link>
       </div>
     );
+
   return (
     <div className="min-w-0 max-w-full">
       <Header
@@ -61,30 +64,15 @@ export function LessonCreatePage({ courseId }: { courseId: number }) {
         description="Khởi tạo thông tin bài học cho khóa học hiện tại."
         showProfile={false}
         breadcrumbs={
-          <nav className="mb-1 flex flex-wrap gap-2 text-xs text-slate-500">
-            <Link href="/admin/courses">Courses</Link>
+          <nav className="mb-1 flex flex-wrap gap-2 text-xs font-semibold text-slate-600">
+            <Link href="/admin/courses">Khóa học</Link>
             <span>/</span>
             <Link href={backHref}>{courseQuery.data.title}</Link>
             <span>/</span>
-            <span>Create Lesson</span>
+            <span className="text-slate-900">Tạo bài học</span>
           </nav>
         }
-      >
-        <Link
-          href={backHref}
-          className="rounded-2xl border border-slate-200 px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50"
-        >
-          Hủy
-        </Link>
-        <Button
-          type="submit"
-          form="lesson-form"
-          disabled={creation.isPending}
-          className="rounded-2xl bg-slate-900 text-white hover:bg-sky-600"
-        >
-          {creation.isPending ? 'Đang lưu…' : 'Tạo bài học'}
-        </Button>
-      </Header>
+      />
       <LessonForm course={courseQuery.data} onSubmit={submit} />
     </div>
   );

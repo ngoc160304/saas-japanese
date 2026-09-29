@@ -3,7 +3,14 @@ package com.mycompany.saas_japanese.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import com.mycompany.saas_japanese.domain.query.LessonQuery;
@@ -35,7 +42,7 @@ public class LessonController {
 
   @GetMapping("/{id}")
   public ResponseEntity<LessonResponse> fetchLessonById(
-      @PathVariable Long id) {
+      @PathVariable("id") Long id) {
     LessonResponse lesson = lessonService.fetchLessonById(id);
 
     return ResponseEntity.ok(lesson);
@@ -60,7 +67,7 @@ public class LessonController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteLesson(
-      @PathVariable Long id) {
+      @PathVariable("id") Long id) {
     lessonService.deleteLesson(id);
 
     return ResponseEntity.ok("Xóa thành công");
@@ -68,7 +75,7 @@ public class LessonController {
 
   @DeleteMapping("/course/{courseId}")
   public ResponseEntity<String> deleteByCourseId(
-      @PathVariable Long courseId) {
+      @PathVariable("courseId") Long courseId) {
     lessonService.deleteByCourseId(courseId);
 
     return ResponseEntity.ok("Xóa thành công !");

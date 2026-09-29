@@ -1,6 +1,10 @@
 'use client';
 
-import { keepPreviousData, useQuery, type QueryKey } from '@tanstack/react-query';
+import {
+  keepPreviousData as keepPreviousQueryData,
+  useQuery,
+  type QueryKey,
+} from '@tanstack/react-query';
 
 import { useDataTableParams } from './useDataTableParams';
 
@@ -21,6 +25,7 @@ interface UseDataTableQueryOptions<TData> {
   sizeParam?: string;
 
   enabled?: boolean;
+  preservePreviousData?: boolean;
 }
 
 export function useDataTableQuery<TData>({
@@ -38,6 +43,7 @@ export function useDataTableQuery<TData>({
   sizeParam = 'size',
 
   enabled = true,
+  preservePreviousData = true,
 }: UseDataTableQueryOptions<TData>) {
   const params = useDataTableParams({
     defaultPage,
@@ -82,7 +88,7 @@ export function useDataTableQuery<TData>({
         size: params.size,
       }),
 
-    placeholderData: keepPreviousData,
+    placeholderData: preservePreviousData ? keepPreviousQueryData : undefined,
 
     enabled,
   });
