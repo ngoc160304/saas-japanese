@@ -26,3 +26,18 @@ export interface ClientCoursesQuery {
 }
 
 export type GetClientCoursesResponse = ApiResponse<PageResponse<ClientCourse>>;
+
+export interface ClientCourseDetail extends ClientCourse {
+  updatedAt: string;
+  totalDurationMinutes: number;
+}
+
+export interface ClientCourseLesson {
+  id: number;
+  title: string;
+  slug: string;
+  durationMinutes: number | null;
+}
+
+export type GetClientCourseResponse = ApiResponse<ClientCourseDetail>;
+export type GetClientCourseLessonsResponse = ApiResponse<ClientCourseLesson[]>;

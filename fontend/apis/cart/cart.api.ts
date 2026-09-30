@@ -1,5 +1,5 @@
 import authorizeAxiosInstance from '@/lib/authorize-axios';
-import type { GetCartResponse } from './cart.type';
+import type { AddCourseToCartVariables, GetCartResponse } from './cart.type';
 
 async function getCurrent() {
   const response = await authorizeAxiosInstance.get<GetCartResponse>('/cart', {
@@ -19,4 +19,15 @@ export const cartQueryKeys = {
   detail: ['cart', 'detail'] as const,
 };
 
-export const cartAPI = { getCurrent, deleteItem };
+async function addCourse({ courseId }: AddCourseToCartVariables) {
+  const response = await authorizeAxiosInstance.post<GetCartResponse>(
+    `/cart/add/${courseId}`,
+    undefined,
+    {
+      localErrorHandling: true,
+    },
+  );
+  return response.data.data;
+}
+
+export const cartAPI = { getCurrent, deleteItem, addCourse };

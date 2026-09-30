@@ -15,3 +15,7 @@ export interface Cart {
 }
 
 export type GetCartResponse = ApiResponse<Cart>;
+
+export interface AddCourseToCartVariables {
+  courseId: number;
+}

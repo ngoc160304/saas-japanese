@@ -66,14 +66,129 @@ test('course card title, thumbnail, and detail action use the actual course ID',
   }
 });
 
-test('mock detail data uses stable unique IDs for accordion and list rendering', () => {
-  const { MOCK_COURSE_DETAIL } = load('features/client-course-detail/course-detail.mock.ts');
-  const moduleIds = MOCK_COURSE_DETAIL.syllabus.modules.map((module) => module.id);
-  const lessonIds = MOCK_COURSE_DETAIL.syllabus.modules.flatMap((module) =>
-    module.lessons.map((lesson) => lesson.id),
+test('public APIs use selected IDs, unwrap data, and pass cancellation/local error handling', async () => {
+  const requests = [];
+  let refreshWaits = 0;
+  const course = {
+    ...createCourse(42),
+    updatedAt: '2026-10-01T00:00:00Z',
+    totalDurationMinutes: 30,
+  };
+  const lessons = [{ id: 901, title: 'Lesson', slug: 'lesson', durationMinutes: null }];
+  const { clientCoursesAPI, clientCoursesQueryKeys } = load('apis/courses/client-courses.api.ts', {
+    '@/lib/authorize-axios': {
+      __esModule: true,
+      default: {
+        get: async (url, options) => {
+          requests.push({ url, options });
+          return { data: { data: url.endsWith('/lessons') ? lessons : course } };
+        },
+      },
+      waitForSessionRefresh: async () => {
+        refreshWaits++;
+      },
+    },
+  });
+  const { signal } = new AbortController();
+  assert.equal(await clientCoursesAPI.getDetail(42, signal), course);
+  assert.equal(await clientCoursesAPI.getLessons(42, signal), lessons);
+  assert.equal(refreshWaits, 2);
+  assert.deepEqual(
+    requests.map(({ url }) => url),
+    ['/client/courses/42', '/client/courses/42/lessons'],
   );
+  for (const { options } of requests) {
+    assert.equal(options.signal, signal);
+    assert.equal(options.localErrorHandling, true);
+  }
+  assert.notDeepEqual(clientCoursesQueryKeys.detail(7), clientCoursesQueryKeys.detail(42));
+  assert.notDeepEqual(clientCoursesQueryKeys.lessons(7), clientCoursesQueryKeys.lessons(42));
+});
 
-  assert.equal(new Set(moduleIds).size, moduleIds.length);
-  assert.equal(new Set(lessonIds).size, lessonIds.length);
-  assert.equal(MOCK_COURSE_DETAIL.syllabus.modules[0].id, 'module-grammar-foundations');
+test('addCourse POSTs the course ID without a body and returns the shared cart contract', async () => {
+  const requests = [];
+  const cart = { id: 5, items: [{ id: 99, courseId: 42 }], totalAmount: 499000 };
+  const { cartAPI, cartQueryKeys } = load('apis/cart/cart.api.ts', {
+    '@/lib/authorize-axios': {
+      __esModule: true,
+      default: {
+        post: async (...args) => {
+          requests.push(args);
+          return { data: { data: cart } };
+        },
+      },
+    },
+  });
+  assert.equal(await cartAPI.addCourse({ courseId: 42 }), cart);
+  assert.deepEqual(requests, [['/cart/add/42', undefined, { localErrorHandling: true }]]);
+  assert.deepEqual(cartQueryKeys.detail, ['cart', 'detail']);
+});
+
+test('syllabus renders actual lesson order, null/zero durations, and no fabricated modules', () => {
+  const { CourseSyllabus } = load('features/client-course-detail/components/CourseSyllabus.tsx');
+  const html = renderToStaticMarkup(
+    React.createElement(CourseSyllabus, {
+      lessons: [
+        { id: 901, title: 'First actual lesson', slug: 'one', durationMinutes: null },
+        { id: 904, title: 'Second actual lesson', slug: 'two', durationMinutes: 0 },
+      ],
+      loading: false,
+      error: null,
+      retrying: false,
+      onRetry() {},
+      lessonCount: 2,
+      totalDurationMinutes: 0,
+    }),
+  );
+  assert.ok(html.indexOf('First actual lesson') < html.indexOf('Second actual lesson'));
+  assert.match(html, /Chưa có thời lượng/);
+  assert.match(html, /0 phút/);
+  assert.doesNotMatch(html, /Chương 1|Học thử|videoUrl/);
+});
+
+test('syllabus supports loading, empty and retry states', () => {
+  const { CourseSyllabus } = load('features/client-course-detail/components/CourseSyllabus.tsx');
+  const props = {
+    lessons: [],
+    loading: false,
+    error: null,
+    retrying: false,
+    onRetry() {},
+    lessonCount: 0,
+    totalDurationMinutes: 0,
+  };
+  assert.match(
+    renderToStaticMarkup(React.createElement(CourseSyllabus, props)),
+    /Chưa có bài học công khai/,
+  );
+  assert.match(
+    renderToStaticMarkup(React.createElement(CourseSyllabus, { ...props, loading: true })),
+    /role="status"/,
+  );
+  assert.match(
+    renderToStaticMarkup(React.createElement(CourseSyllabus, { ...props, error: 'Network error' })),
+    /Thử lại danh sách bài học/,
+  );
+});
+
+test('purchase card exposes accessible pending state and keeps buy-now unavailable', () => {
+  const { CoursePurchaseCard } = load(
+    'features/client-course-detail/components/CoursePurchaseCard.tsx',
+    {
+      '@/features/course/component/CourseThumbnail': { CourseThumbnail },
+      '@/features/course/utils/course-format': { formatCoursePrice: (value) => `${value} đ` },
+    },
+  );
+  const html = renderToStaticMarkup(
+    React.createElement(CoursePurchaseCard, {
+      course: createCourse(42),
+      onAddToCart() {},
+      adding: true,
+      addDisabled: true,
+    }),
+  );
+  assert.match(html, /Đang thêm…/);
+  assert.match(html, /aria-busy="true"/);
+  assert.equal((html.match(/disabled=""/g) ?? []).length, 2);
+  assert.doesNotMatch(html, /Cam kết hoàn tiền|Ưu đãi|not connected|chưa được kết nối/);
 });
