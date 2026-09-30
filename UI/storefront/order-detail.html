@@ -1,182 +1,509 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-50">
+<html lang="vi" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Order Details - Studify JLPT</title>
-  
+  <title>Chi tiết đơn hàng #ORD-987654 - StudyJLPT</title>
+
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
 
+  <!-- Tailwind CSS -->
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 
   <style type="text/tailwindcss">
-    @theme { --font-sans: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+    @theme {
+      --font-sans: 'Plus Jakarta Sans', sans-serif;
+      --color-brand-navy: #2B4C7E;
+      --color-brand-blue: #2F80ED;
+      --color-bg-light: #F4F6F9;
+    }
     body {
-      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      background-color: #f4f6f9;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #ffffff;
       color: #1e293b;
       -webkit-font-smoothing: antialiased;
     }
-    .shadow-soft { box-shadow: 0 2px 14px -2px rgba(15, 23, 42, 0.04), 0 1px 4px -1px rgba(15, 23, 42, 0.02); }
+    .shadow-soft {
+      box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+    }
   </style>
-  <link rel="stylesheet" href="../assets/dashboard-theme.css" />
 </head>
 
-<body class="min-h-screen flex flex-col">
-  <!-- Top Navbar -->
-  <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<body class="min-h-screen flex flex-col bg-bg-light">
+
+  <!-- 1. Header (Consistent with index.html, courses.html & cart.html) -->
+  <header class="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-20">
-        <a href="index.html" class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center text-white"><svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" /></svg></div>
-          <span class="text-2xl font-extrabold tracking-tight text-slate-900">Studify</span>
-        </a>
-        <nav class="hidden md:flex items-center space-x-8">
-          <a href="index.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Home</a>
-          <a href="courses.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">Courses</a>
-          <a href="../user/dashboard.html" class="text-sm font-bold text-slate-500 hover:text-slate-900">My Dashboard</a>
-        </nav>
-        <div class="flex items-center gap-6">
-          <a href="cart.html" class="relative text-slate-500 hover:text-slate-900">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-          </a>
-          <div class="flex items-center gap-3 cursor-pointer">
-             <div class="w-10 h-10 rounded-full bg-slate-200 border-2 border-white shadow-sm overflow-hidden">
-                <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar">
-             </div>
+
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2 group">
+          <div
+            class="w-8 h-8 rounded bg-brand-navy flex items-center justify-center text-white font-bold transition-transform group-hover:scale-105">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+            </svg>
           </div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-800">
+            Study<span class="text-brand-blue">JLPT</span>
+          </span>
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-8">
+          <a href="index.html" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Trang
+            chủ</a>
+          <a href="courses.html" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Khóa
+            học</a>
+          <a href="#" class="text-sm font-medium text-slate-500 hover:text-brand-navy transition-colors">Thi thử
+            JLPT</a>
+          <a href="orders.html" class="text-sm font-semibold text-brand-navy border-b-2 border-brand-navy py-7">Đơn
+            hàng</a>
+        </nav>
+
+        <!-- Auth & Cart -->
+        <div class="hidden md:flex items-center gap-5">
+          <!-- Cart Icon -->
+          <a href="cart.html" class="relative p-2 text-slate-500 hover:text-brand-navy transition-colors"
+            title="Giỏ hàng" aria-label="Giỏ hàng">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </a>
+
+          <!-- User Avatar Profile -->
+          <div class="flex items-center gap-3 pl-2 border-l border-slate-200">
+            <div
+              class="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 overflow-hidden flex items-center justify-center shrink-0">
+              <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix&backgroundColor=e2e8f0" alt="Avatar"
+                class="w-full h-full object-cover">
+            </div>
+            <div class="text-left">
+              <p class="text-xs font-bold text-slate-800 leading-tight">Học viên</p>
+              <a href="../user/dashboard.html"
+                class="text-[11px] font-medium text-slate-500 hover:text-brand-blue">Trang cá nhân</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Controls (Cart + Menu Toggle) -->
+        <div class="flex items-center gap-1 md:hidden">
+          <a href="cart.html" class="p-2 text-slate-600 hover:text-brand-navy focus:outline-none" aria-label="Giỏ hàng">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </a>
+          <button id="mobile-menu-btn" class="p-2 text-slate-500 hover:text-slate-800 focus:outline-none"
+            aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
+
   </header>
 
-  <main class="flex-grow max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
-    
-    <!-- Breadcrumb -->
-    <nav class="flex text-sm font-medium text-slate-500 mb-6" aria-label="Breadcrumb">
-      <ol class="flex items-center space-x-2">
-        <li><a href="orders.html" class="hover:text-slate-900">My Orders</a></li>
-        <li><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></li>
-        <li class="text-slate-900" aria-current="page">Order #ORD-987654</li>
-      </ol>
-    </nav>
+  <!-- 2. Page Header / Breadcrumb -->
+  <section class="bg-white border-b border-slate-200 pt-7 pb-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-    <!-- Header Card -->
-    <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6 md:p-8 mb-8">
-       <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-         <div>
-            <div class="flex items-center gap-3 mb-2">
-               <h1 class="text-2xl font-black text-slate-900">Order #ORD-987654</h1>
-               <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-100">
-                  Completed
-               </span>
-            </div>
-            <p class="text-sm font-medium text-slate-500">Placed on September 22, 2026</p>
-         </div>
-         <div class="flex gap-3">
-            <a href="../user/dashboard.html" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all text-center">
-               Go to Dashboard
-            </a>
-            <button class="px-5 py-2.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
-               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-               Invoice
-            </button>
-         </div>
-       </div>
+      <!-- Breadcrumb -->
+      <nav class="flex text-sm text-slate-500 mb-4" aria-label="Breadcrumb">
+        <ol class="flex items-center space-x-2">
+          <li><a href="index.html" class="hover:text-brand-navy transition-colors">Trang chủ</a></li>
+          <li><svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg></li>
+          <li><a href="orders.html" class="hover:text-brand-navy transition-colors">Đơn hàng</a></li>
+          <li><svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg></li>
+          <li class="font-semibold text-slate-800" aria-current="page">#ORD-987654</li>
+        </ol>
+      </nav>
+
+      <!-- Order Top Summary -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex flex-wrap items-center gap-3">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">
+              Đơn hàng #ORD-987654
+            </h1>
+            <span id="order-status-badge"
+              class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Đã thanh toán
+            </span>
+          </div>
+          <p class="mt-1.5 text-sm text-slate-500">
+            Đặt ngày 22/09/2026
+          </p>
+        </div>
+
+        <!-- Primary Top Actions -->
+        <div class="flex items-center gap-3">
+          <a href="orders.html"
+            class="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-xs">
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            Quay lại đơn hàng
+          </a>
+          <a id="header-primary-action" href="../user/dashboard.html"
+            class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-slate-800 transition-colors shadow-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+            </svg>
+            Vào học
+          </a>
+        </div>
+      </div>
+
     </div>
+  </section>
 
-    <!-- Details Grid -->
-    <div class="grid md:grid-cols-3 gap-8">
-       
-       <!-- Left: Items & Summary -->
-       <div class="md:col-span-2 space-y-8">
-          <!-- Items -->
-          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft overflow-hidden">
-             <div class="px-6 py-5 border-b border-slate-100">
-                <h2 class="text-base font-bold text-slate-900">Order Items (2)</h2>
-             </div>
-             
-             <!-- Item 1 -->
-             <div class="p-6 border-b border-slate-100 flex items-center gap-4">
-               <div class="shrink-0 relative w-20 h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden">
-                 <img src="../assets/images/book_3d.jpg" alt="Thumbnail" class="w-12 h-12 object-contain" />
-               </div>
-               <div class="flex-grow">
-                 <a href="course-detail.html" class="text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1 mb-1">
-                   Tiếng Nhật Trung Cấp N3 Soumatome
-                 </a>
-                 <p class="text-[11px] text-slate-500 font-medium">JLPT N3 • By Tanaka Taro</p>
-               </div>
-               <div class="text-sm font-black text-slate-900 whitespace-nowrap">499.000 đ</div>
-             </div>
+  <!-- 3. Main Detail Content -->
+  <main class="flex-grow pb-16 pt-8">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-             <!-- Item 2 -->
-             <div class="p-6 flex items-center gap-4">
-               <div class="shrink-0 relative w-20 h-16 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden">
-                 <img src="../assets/images/book_3d.jpg" alt="Thumbnail" class="w-12 h-12 object-contain filter hue-rotate-15" />
-               </div>
-               <div class="flex-grow">
-                 <a href="course-detail.html" class="text-sm font-bold text-slate-900 hover:text-sky-600 transition-colors line-clamp-1 mb-1">
-                   Luyện Đề Thi Thử Toàn Diện N2 Master
-                 </a>
-                 <p class="text-[11px] text-slate-500 font-medium">JLPT N2 • By Tanaka Taro</p>
-               </div>
-               <div class="text-sm font-black text-slate-900 whitespace-nowrap">699.000 đ</div>
-             </div>
-          </div>
-       </div>
+      <div class="flex flex-col lg:flex-row gap-8 items-start">
 
-       <!-- Right: Payment Info & Summary -->
-       <div class="space-y-8">
-          
-          <!-- Summary -->
-          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6">
-             <h2 class="text-base font-bold text-slate-900 mb-5">Order Summary</h2>
-             <div class="space-y-3 mb-5">
-               <div class="flex justify-between text-sm">
-                 <span class="text-slate-500">Subtotal</span>
-                 <span class="font-bold text-slate-900">1.198.000 đ</span>
-               </div>
-               <div class="flex justify-between text-sm">
-                 <span class="text-slate-500">Tax</span>
-                 <span class="font-bold text-slate-900">0 đ</span>
-               </div>
-             </div>
-             <div class="pt-4 border-t border-slate-100 flex justify-between">
-               <span class="font-bold text-slate-900">Total</span>
-               <span class="font-black text-slate-900 text-lg">1.198.000 đ</span>
-             </div>
-          </div>
+        <!-- Left: Purchased Courses (2/3) -->
+        <div class="lg:w-2/3 w-full space-y-6">
 
-          <!-- Payment Info -->
-          <div class="bg-white rounded-3xl border border-slate-100 shadow-soft p-6">
-             <h2 class="text-base font-bold text-slate-900 mb-4">Payment Information</h2>
-             <div class="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <div class="w-10 h-6 bg-white border border-slate-200 rounded flex items-center justify-center text-[10px] font-black text-blue-800 shadow-sm">VISA</div>
-                <div>
-                   <p class="text-xs font-bold text-slate-900">Ending in 1111</p>
-                   <p class="text-[10px] text-slate-500">Credit Card</p>
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-soft overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+              <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide">Khóa học đã mua</h2>
+              <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">2 khóa
+                học</span>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+
+              <!-- Item 1 -->
+              <div
+                class="p-5 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-5 items-start sm:items-center justify-between">
+                <div class="flex items-start sm:items-center gap-4 flex-grow min-w-0">
+
+                  <!-- Thumbnail Fallback (consistent with cart.html) -->
+                  <div
+                    class="relative w-20 h-16 sm:w-24 sm:h-18 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0 overflow-hidden"
+                    title="Hình ảnh khóa học">
+                    <span
+                      class="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-slate-200 select-none pointer-events-none"
+                      aria-hidden="true">日本語</span>
+                    <div
+                      class="relative z-10 w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-brand-navy shadow-xs">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Details -->
+                  <div class="min-w-0">
+                    <a href="course-detail.html"
+                      class="text-sm sm:text-base font-bold text-slate-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug">
+                      Tiếng Nhật Trung Cấp N3 Soumatome
+                    </a>
+                  </div>
                 </div>
-             </div>
+
+                <!-- Price -->
+                <div class="sm:text-right shrink-0 w-full sm:w-auto pl-24 sm:pl-0">
+                  <span class="text-base sm:text-lg font-bold text-slate-900">499.000 đ</span>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div
+                class="p-5 sm:p-6 flex flex-col sm:flex-row gap-4 sm:gap-5 items-start sm:items-center justify-between">
+                <div class="flex items-start sm:items-center gap-4 flex-grow min-w-0">
+
+                  <!-- Thumbnail Fallback (consistent with cart.html) -->
+                  <div
+                    class="relative w-20 h-16 sm:w-24 sm:h-18 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center shrink-0 overflow-hidden"
+                    title="Hình ảnh khóa học">
+                    <span
+                      class="absolute inset-0 flex items-center justify-center text-2xl sm:text-3xl font-extrabold text-slate-200 select-none pointer-events-none"
+                      aria-hidden="true">日本語</span>
+                    <div
+                      class="relative z-10 w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-brand-navy shadow-xs">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.75" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  <!-- Details -->
+                  <div class="min-w-0">
+                    <a href="course-detail.html"
+                      class="text-sm sm:text-base font-bold text-slate-800 hover:text-brand-blue transition-colors line-clamp-2 leading-snug">
+                      Luyện Đề Thi Thử Toàn Diện N2 Master
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Price -->
+                <div class="sm:text-right shrink-0 w-full sm:w-auto pl-24 sm:pl-0">
+                  <span class="text-base sm:text-lg font-bold text-slate-900">699.000 đ</span>
+                </div>
+              </div>
+
+            </div>
           </div>
 
-       </div>
+          <!-- Quick Return Link for Mobile -->
+          <div class="sm:hidden">
+            <a href="orders.html"
+              class="w-full inline-flex items-center justify-center gap-2 py-3 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-semibold hover:bg-slate-50 transition-colors">
+              <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              Quay lại danh sách đơn hàng
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Right: Summary & Payment Info (1/3) -->
+        <div class="lg:w-1/3 w-full space-y-6">
+
+          <!-- Order Summary Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-soft p-5 sm:p-6">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">
+              Tóm tắt đơn hàng
+            </h2>
+
+            <div class="space-y-3 text-sm pb-4 border-b border-slate-100">
+              <div class="flex justify-between text-slate-600">
+                <span>Tạm tính (2 khóa học)</span>
+                <span class="font-medium text-slate-800">1.198.000 đ</span>
+              </div>
+            </div>
+
+            <div class="pt-4 flex justify-between items-baseline mb-6">
+              <span class="text-sm font-semibold text-slate-800">Tổng thanh toán</span>
+              <span class="text-xl font-extrabold text-brand-navy">1.198.000 đ</span>
+            </div>
+
+            <!-- Action Button -->
+            <a id="summary-action-btn" href="../user/dashboard.html"
+              class="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm focus:ring-2 focus:ring-slate-400 focus:outline-none">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+              </svg>
+              <span>Vào học ngay</span>
+            </a>
+          </div>
+
+          <!-- Payment Information Card -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-soft p-5 sm:p-6">
+            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wide mb-4">
+              Thông tin thanh toán
+            </h2>
+
+            <div class="space-y-3.5 text-sm">
+              <div class="flex justify-between items-center text-slate-600">
+                <span class="text-xs sm:text-sm">Phương thức thanh toán</span>
+                <span class="font-medium text-slate-800 text-xs sm:text-sm">Thanh toán trực tuyến</span>
+              </div>
+
+              <div class="flex justify-between items-center text-slate-600">
+                <span class="text-xs sm:text-sm">Trạng thái</span>
+                <span id="payment-status-badge"
+                  class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Thành công
+                </span>
+              </div>
+
+              <div class="flex justify-between items-center text-slate-600">
+                <span class="text-xs sm:text-sm">Thời gian</span>
+                <span class="text-xs sm:text-sm text-slate-700">22/09/2026 14:32</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Presentation Demo (For reviewers to view both 'Đã thanh toán' and 'Chờ thanh toán') -->
+          <div class="p-4 rounded-xl border border-dashed border-slate-200 bg-white/60 text-xs text-slate-500">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-semibold text-slate-600">Mô phỏng trạng thái đơn:</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-status-completed" type="button"
+                class="py-1.5 px-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-center hover:bg-emerald-100 transition-colors">
+                ✓ Đã thanh toán
+              </button>
+              <button id="btn-status-pending" type="button"
+                class="py-1.5 px-2 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 font-medium text-center hover:bg-slate-200 transition-colors">
+                ⏳ Chờ thanh toán
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   </main>
 
-  <footer class="bg-white border-t border-slate-100 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-        <p class="text-[11px] text-slate-400 font-medium">© 2026 Studify JLPT. All rights reserved.</p>
-        <div class="flex items-center gap-4 text-[11px] font-medium text-slate-400">
-           <a href="#" class="hover:text-slate-800">Support</a>
+  <!-- 4. Footer (Exact match with index.html, courses.html & cart.html) -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-12 text-slate-400 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-6 h-6 rounded bg-brand-navy flex items-center justify-center text-white">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M12 2L14.4 9.6L22 12L14.4 14.4L12 22L9.6 14.4L2 12L9.6 9.6L12 2Z" />
+              </svg>
+            </div>
+            <span class="text-lg font-extrabold text-white">StudyJLPT</span>
+          </div>
+          <p class="text-xs leading-relaxed">Nền tảng giáo dục đồng hành cùng bạn trên con đường chinh phục tiếng Nhật.
+          </p>
         </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Khóa học</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N1</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N2</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N3</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N4</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">JLPT N5</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Tài nguyên</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Thi thử JLPT</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Blog học tập</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Từ điển Grammar</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="text-white text-sm font-bold mb-4">Công ty</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="#" class="hover:text-white transition-colors">Về chúng tôi</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Liên hệ</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Điều khoản</a></li>
+            <li><a href="#" class="hover:text-white transition-colors">Bảo mật</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="pt-8 border-t border-slate-800 text-center text-xs">
+        © 2026 StudyJLPT. All rights reserved.
       </div>
     </div>
   </footer>
+
+  <!-- Mock JS Interactions -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Mobile menu toggle
+      const mobileBtn = document.getElementById('mobile-menu-btn');
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileBtn && mobileMenu) {
+        mobileBtn.addEventListener('click', () => {
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+
+      // Status switcher for visual demonstration
+      const btnCompleted = document.getElementById('btn-status-completed');
+      const btnPending = document.getElementById('btn-status-pending');
+      const orderBadge = document.getElementById('order-status-badge');
+      const paymentBadge = document.getElementById('payment-status-badge');
+      const headerAction = document.getElementById('header-primary-action');
+      const summaryAction = document.getElementById('summary-action-btn');
+
+      if (btnCompleted && btnPending) {
+        btnCompleted.addEventListener('click', () => {
+          btnCompleted.className = 'py-1.5 px-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-center hover:bg-emerald-100 transition-colors';
+          btnPending.className = 'py-1.5 px-2 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 font-medium text-center hover:bg-slate-200 transition-colors';
+
+          if (orderBadge) {
+            orderBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80';
+            orderBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Đã thanh toán';
+          }
+          if (paymentBadge) {
+            paymentBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80';
+            paymentBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Thành công';
+          }
+          if (headerAction) {
+            headerAction.className = 'inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-slate-800 transition-colors shadow-xs';
+            headerAction.innerHTML = `
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+              </svg>
+              Vào học
+            `;
+            headerAction.href = '../user/dashboard.html';
+          }
+          if (summaryAction) {
+            summaryAction.className = 'w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-brand-navy text-white text-sm font-semibold hover:bg-slate-800 transition-colors shadow-sm focus:ring-2 focus:ring-slate-400 focus:outline-none';
+            summaryAction.innerHTML = `
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342" />
+              </svg>
+              <span>Vào học ngay</span>
+            `;
+            summaryAction.href = '../user/dashboard.html';
+          }
+        });
+
+        btnPending.addEventListener('click', () => {
+          btnPending.className = 'py-1.5 px-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 font-semibold text-center hover:bg-amber-100 transition-colors';
+          btnCompleted.className = 'py-1.5 px-2 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 font-medium text-center hover:bg-slate-200 transition-colors';
+
+          if (orderBadge) {
+            orderBadge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80';
+            orderBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Chờ thanh toán';
+          }
+          if (paymentBadge) {
+            paymentBadge.className = 'inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80';
+            paymentBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>Chờ xử lý';
+          }
+          if (headerAction) {
+            headerAction.className = 'inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-xs';
+            headerAction.innerHTML = `
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 002.25 19.5z" />
+              </svg>
+              Thanh toán ngay
+            `;
+            headerAction.href = 'checkout.html';
+          }
+          if (summaryAction) {
+            summaryAction.className = 'w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-brand-blue text-white text-sm font-semibold hover:bg-blue-600 transition-colors shadow-sm focus:ring-2 focus:ring-blue-300 focus:outline-none';
+            summaryAction.innerHTML = `
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 002.25 19.5z" />
+              </svg>
+              <span>Thanh toán ngay</span>
+            `;
+            summaryAction.href = 'checkout.html';
+          }
+        });
+      }
+    });
+  </script>
 </body>
+
 </html>
