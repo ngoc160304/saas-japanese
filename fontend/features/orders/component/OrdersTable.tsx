@@ -7,7 +7,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import type { OrderListItem } from '../types/order';
+import type { Order } from '@/apis/orders/orders.type';
 import {
   orderCurrency,
   orderDate,
@@ -16,11 +16,15 @@ import {
   paymentStatuses,
 } from '../utils/order-list';
 
+const orderStatusLabels: Record<string, { label: string; className: string }> = orderStatuses;
+const paymentStatusLabels: Record<string, { label: string; className: string }> = paymentStatuses;
+const paymentMethodLabels: Record<string, string> = paymentMethods;
+
 export function OrdersTable({
   orders,
   onReset,
 }: {
-  orders: readonly OrderListItem[];
+  orders: readonly Order[];
   onReset: () => void;
 }) {
   return (
@@ -40,7 +44,7 @@ export function OrdersTable({
             <TableRow>
               {[
                 'Mã đơn hàng',
-                'Người đặt hàng',
+                'Khóa học',
                 'Tổng tiền',
                 'Trạng thái đơn',
                 'Phương thức thanh toán',
@@ -61,30 +65,36 @@ export function OrdersTable({
             {orders.map((order) => (
               <TableRow key={order.id} className="h-16 border-slate-100 hover:bg-slate-50/70">
                 <TableCell className="px-4 font-semibold text-slate-900">
-                  {order.order_number}
+                  {order.orderNumber}
                 </TableCell>
-                <TableCell className="px-4">{order.customer_name}</TableCell>
+                <TableCell className="px-4">
+                  {order.items.length
+                    ? order.items.map((item) => item.courseTitle).join(', ')
+                    : '—'}
+                </TableCell>
                 <TableCell className="px-4 text-right font-semibold tabular-nums">
-                  {orderCurrency.format(order.total_amount)}
+                  {orderCurrency.format(order.totalAmount)}
                 </TableCell>
                 <TableCell className="px-4">
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${orderStatuses[order.status].className}`}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${orderStatusLabels[order.status.toLowerCase()]?.className ?? 'bg-slate-100 text-slate-700'}`}
                   >
-                    {orderStatuses[order.status].label}
+                    {orderStatusLabels[order.status.toLowerCase()]?.label ?? order.status}
                   </span>
                 </TableCell>
-                <TableCell className="px-4">{paymentMethods[order.payment_method]}</TableCell>
+                <TableCell className="px-4">
+                  {paymentMethodLabels[order.paymentMethod] ?? order.paymentMethod}
+                </TableCell>
                 <TableCell className="px-4">
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentStatuses[order.payment_status].className}`}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentStatusLabels[order.paymentStatus]?.className ?? 'bg-slate-100 text-slate-700'}`}
                   >
-                    {paymentStatuses[order.payment_status].label}
+                    {paymentStatusLabels[order.paymentStatus]?.label ?? order.paymentStatus}
                   </span>
                 </TableCell>
                 <TableCell className="px-4 text-slate-500">
-                  <time dateTime={order.created_at}>
-                    {orderDate.format(new Date(order.created_at))}
+                  <time dateTime={order.createdAt}>
+                    {orderDate.format(new Date(order.createdAt))}
                   </time>
                 </TableCell>
               </TableRow>

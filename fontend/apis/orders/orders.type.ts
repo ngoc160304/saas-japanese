@@ -1,4 +1,5 @@
 import type { ApiResponse } from '@/types/api';
+import type { PageResponse } from '@/types/pagination';
 
 export const BANK_TRANSFER_PAYMENT_METHOD = 'BANK_TRANSFER' as const;
 
@@ -32,3 +33,15 @@ export interface Order {
 }
 
 export type CreateOrderResponse = ApiResponse<Order>;
+
+export interface AdminOrderQuery {
+  page: number;
+  size: number;
+  search?: string;
+  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  paymentStatus?: 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
+  sortKey?: 'createdAt';
+  sortType?: 'ASC' | 'DESC';
+}
+
+export type GetAdminOrdersResponse = ApiResponse<PageResponse<Order>>;
