@@ -17,16 +17,18 @@ export function GrammarPointCard({ point, index }: { point: GrammarPoint; index:
           <GrammarPointDialog point={point} />
           <Button
             type="button"
+            disabled
             variant="outline"
             size="icon-sm"
-            aria-label={`Delete Grammar: ${point.title}`}
-            title="Delete Grammar"
+            aria-label={`Delete Grammar: ${point.title} (unavailable)`}
+            title="Delete Grammar — unavailable in this preview"
             className="rounded-lg border-slate-200 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600"
           >
             <X className="size-3.5" aria-hidden="true" />
           </Button>
         </div>
       </div>
+      <p className="mb-2 text-right text-[10px] text-slate-500">Delete unavailable</p>
       <div className="rounded-xl border border-slate-100 bg-slate-50 p-3.5 text-xs leading-relaxed font-normal whitespace-pre-line text-slate-600">
         {point.explanation}
       </div>

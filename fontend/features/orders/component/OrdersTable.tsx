@@ -1,3 +1,6 @@
+import type { Order } from '@/apis/orders/orders.type';
+import { IsLoading } from '@/components/common/loading/IsLoading';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -6,23 +9,29 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import type { OrderListItem } from '../types/order';
 import {
+  getOrderStatusMeta,
+  getPaymentMethodLabel,
+  getPaymentStatusMeta,
   orderCurrency,
   orderDate,
-  orderStatuses,
-  paymentMethods,
-  paymentStatuses,
 } from '../utils/order-list';
+
+interface OrdersTableProps {
+  orders: readonly Order[];
+  onReset: () => void;
+  isLoading?: boolean;
+  error?: string | null;
+  onRetry?: () => void;
+}
 
 export function OrdersTable({
   orders,
   onReset,
-}: {
-  orders: readonly OrderListItem[];
-  onReset: () => void;
-}) {
+  isLoading = false,
+  error,
+  onRetry,
+}: OrdersTableProps) {
   return (
     <div>
       <p className="mb-3 text-xs text-slate-500">
@@ -40,7 +49,7 @@ export function OrdersTable({
             <TableRow>
               {[
                 'Mã đơn hàng',
-                'Người đặt hàng',
+                'Khóa học',
                 'Tổng tiền',
                 'Trạng thái đơn',
                 'Phương thức thanh toán',
@@ -57,51 +66,94 @@ export function OrdersTable({
               ))}
             </TableRow>
           </TableHeader>
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id} className="h-16 border-slate-100 hover:bg-slate-50/70">
-                <TableCell className="px-4 font-semibold text-slate-900">
-                  {order.order_number}
-                </TableCell>
-                <TableCell className="px-4">{order.customer_name}</TableCell>
-                <TableCell className="px-4 text-right font-semibold tabular-nums">
-                  {orderCurrency.format(order.total_amount)}
-                </TableCell>
-                <TableCell className="px-4">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${orderStatuses[order.status].className}`}
-                  >
-                    {orderStatuses[order.status].label}
-                  </span>
-                </TableCell>
-                <TableCell className="px-4">{paymentMethods[order.payment_method]}</TableCell>
-                <TableCell className="px-4">
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentStatuses[order.payment_status].className}`}
-                  >
-                    {paymentStatuses[order.payment_status].label}
-                  </span>
-                </TableCell>
-                <TableCell className="px-4 text-slate-500">
-                  <time dateTime={order.created_at}>
-                    {orderDate.format(new Date(order.created_at))}
-                  </time>
+          <TableBody aria-busy={isLoading}>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-44">
+                  <IsLoading size={28} />
                 </TableCell>
               </TableRow>
-            ))}
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-44 text-center">
+                  <div role="alert" className="space-y-3 text-sm text-rose-600">
+                    <p>{error}</p>
+                    <Button type="button" variant="outline" onClick={onRetry}>
+                      Thử lại
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : orders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="h-44 text-center">
+                  <div role="status">
+                    <p className="text-sm font-semibold text-slate-800">
+                      Không tìm thấy đơn hàng phù hợp
+                    </p>
+                    <p className="mb-4 mt-1 text-xs text-slate-500">
+                      Thử từ khóa khác hoặc xóa bộ lọc để xem tất cả đơn hàng.
+                    </p>
+                    <Button type="button" variant="outline" onClick={onReset}>
+                      Xóa bộ lọc
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ) : (
+              orders.map((order) => {
+                const orderStatus = getOrderStatusMeta(order.status);
+                const paymentStatus = getPaymentStatusMeta(order.paymentStatus);
+
+                return (
+                  <TableRow key={order.id} className="h-16 border-slate-100 hover:bg-slate-50/70">
+                    <TableCell className="px-4 font-semibold text-slate-900">
+                      {order.orderNumber}
+                    </TableCell>
+                    <TableCell className="px-4">
+                      {order.items.length > 0 ? (
+                        <ul className="min-w-56 space-y-1">
+                          {order.items.map((item) => (
+                            <li key={item.id} className="leading-5 text-slate-700">
+                              {item.courseTitle}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-slate-400">Chưa có thông tin khóa học</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="px-4 text-right font-semibold tabular-nums">
+                      {orderCurrency.format(order.totalAmount)}
+                    </TableCell>
+                    <TableCell className="px-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${orderStatus.className}`}
+                      >
+                        {orderStatus.label}
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-4">
+                      {getPaymentMethodLabel(order.paymentMethod)}
+                    </TableCell>
+                    <TableCell className="px-4">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${paymentStatus.className}`}
+                      >
+                        {paymentStatus.label}
+                      </span>
+                    </TableCell>
+                    <TableCell className="px-4 text-slate-500">
+                      <time dateTime={order.createdAt}>
+                        {orderDate.format(new Date(order.createdAt))}
+                      </time>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            )}
           </TableBody>
         </Table>
-        {orders.length === 0 && (
-          <div className="px-4 py-12 text-center" role="status">
-            <p className="text-sm font-semibold text-slate-800">Không tìm thấy đơn hàng phù hợp</p>
-            <p className="mb-4 mt-1 text-xs text-slate-500">
-              Thử từ khóa khác hoặc xóa bộ lọc để xem tất cả đơn hàng.
-            </p>
-            <Button variant="outline" onClick={onReset}>
-              Xóa bộ lọc
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,26 +1,29 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent } from 'react';
-import { BookOpen, Video } from 'lucide-react';
+import { useRef, type KeyboardEvent } from 'react';
+import { BookOpen, CircleCheck, Video } from 'lucide-react';
 import type { GrammarLectureVideo, GrammarPoint } from '../types/grammar';
 import type { VocabularyItem } from '../types/vocabulary';
 import { GrammarSection } from './grammar/GrammarSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
 
-type ContentTab = 'grammar' | 'vocabulary';
+export type LessonContentTab = 'grammar' | 'vocabulary';
 
 interface LessonContentTabsProps {
+  activeTab: LessonContentTab;
+  onTabChange: (tab: LessonContentTab) => void;
   video: GrammarLectureVideo;
   grammarPoints: readonly GrammarPoint[];
   vocabularyItems: readonly VocabularyItem[];
 }
 
 export function LessonContentTabs({
+  activeTab,
+  onTabChange,
   video,
   grammarPoints,
   vocabularyItems,
 }: LessonContentTabsProps) {
-  const [activeTab, setActiveTab] = useState<ContentTab>('grammar');
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabs = [
     {
@@ -48,7 +51,7 @@ export function LessonContentTabs({
     if (nextIndex === undefined) return;
 
     event.preventDefault();
-    setActiveTab(tabs[nextIndex].id);
+    onTabChange(tabs[nextIndex].id);
     tabRefs.current[nextIndex]?.focus();
   }
 
@@ -75,7 +78,7 @@ export function LessonContentTabs({
               aria-selected={isActive}
               aria-controls={`lesson-content-panel-${tab.id}`}
               tabIndex={isActive ? 0 : -1}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => onTabChange(tab.id)}
               onKeyDown={(event) => handleTabKeyDown(event, index)}
               className={`flex shrink-0 items-center gap-2 rounded-2xl border px-4 py-2.5 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 ${
                 isActive
@@ -91,6 +94,29 @@ export function LessonContentTabs({
             </button>
           );
         })}
+        {(['Kanji', 'Quiz'] as const).map((label) => (
+          <button
+            key={label}
+            type="button"
+            role="tab"
+            aria-selected={false}
+            disabled
+            className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-400"
+          >
+            {label === 'Kanji' ? (
+              <span
+                aria-hidden="true"
+                className="flex size-4 items-center justify-center rounded bg-emerald-100 text-[11px] font-black text-emerald-800"
+              >
+                漢
+              </span>
+            ) : (
+              <CircleCheck aria-hidden="true" className="size-4" />
+            )}
+            {label}
+            <span className="text-[10px] font-medium">Unavailable</span>
+          </button>
+        ))}
       </div>
 
       <div

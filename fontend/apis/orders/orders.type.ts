@@ -1,10 +1,16 @@
 import type { ApiResponse } from '@/types/api';
+import type { PageResponse } from '@/types/pagination';
+import type { QueryParams } from '@/types/query';
 
 export const BANK_TRANSFER_PAYMENT_METHOD = 'BANK_TRANSFER' as const;
 
+export type OrderStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+export type PaymentStatus = 'PENDING' | 'SUCCESS' | 'FAILED' | 'REFUNDED';
+export type PaymentMethod = typeof BANK_TRANSFER_PAYMENT_METHOD;
+
 export interface CreateOrderRequest {
   cartItemIds: number[];
-  paymentMethod: typeof BANK_TRANSFER_PAYMENT_METHOD;
+  paymentMethod: PaymentMethod;
 }
 
 export interface OrderItem {
@@ -21,9 +27,9 @@ export interface Order {
   orderNumber: string;
   items: OrderItem[];
   totalAmount: number;
-  status: string;
-  paymentStatus: string;
-  paymentMethod: typeof BANK_TRANSFER_PAYMENT_METHOD;
+  status: OrderStatus;
+  paymentStatus: PaymentStatus;
+  paymentMethod: PaymentMethod;
   createdAt: string;
   confirmedAt: string | null;
   paidAt: string | null;
@@ -32,3 +38,12 @@ export interface Order {
 }
 
 export type CreateOrderResponse = ApiResponse<Order>;
+
+export interface GetAdminOrdersParams extends QueryParams {
+  status?: OrderStatus;
+  paymentStatus?: PaymentStatus;
+  sortKey: 'createdAt';
+  sortType: 'DESC';
+}
+
+export type GetAdminOrdersResponse = ApiResponse<PageResponse<Order>>;
