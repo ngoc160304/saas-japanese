@@ -27,8 +27,6 @@ public class OrderController {
     public ResponseEntity<Page<OrderResponse>> getAllOrders(
             @Valid OrderQuery query) {
 
-        return ResponseEntity.ok(
-                orderService.getAllOrders(query)
-        );
+        return ResponseEntity.ok(orderService.getAllOrders(query));
     }
 }

@@ -1,12 +1,32 @@
 'use client';
 
+import { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { cartAPI, cartQueryKeys } from '@/apis/cart/cart.api';
+import { ordersAPI } from '@/apis/orders/orders.api';
+import { BANK_TRANSFER_PAYMENT_METHOD, type Order } from '@/apis/orders/orders.type';
 import { getApiErrorMessage } from '@/lib/api-error';
-import { CartContent } from './CartContent';
+import {
+  getCartItemsTotal,
+  getSelectedCartItems,
+  haveSameCartItemIds,
+  reconcileSelectedCartItemIds,
+} from '@/features/cart/utils/cart-selection';
+import {
+  getSePayCheckoutData,
+  SePayCheckoutError,
+  submitSePayCheckout,
+  type SePayCheckoutData,
+} from '@/features/cart/utils/sepay-checkout';
+import { CartContent, type CartCheckoutStatus } from './CartContent';
+
+interface RetainedCheckout {
+  cartItemIds: number[];
+  data: SePayCheckoutData;
+}
 
 function CartPageHeader({ subtitle }: { subtitle: string }) {
   return (
@@ -86,6 +106,9 @@ function EmptyCart() {
 
 export function CartPage() {
   const queryClient = useQueryClient();
+  const checkoutLockRef = useRef(false);
+  const [checkoutStatus, setCheckoutStatus] = useState<CartCheckoutStatus>('idle');
+  const [retainedCheckout, setRetainedCheckout] = useState<RetainedCheckout | null>(null);
   const cartQuery = useQuery({
     queryKey: cartQueryKeys.detail,
     queryFn: cartAPI.getCurrent,
@@ -99,6 +122,103 @@ export function CartPage() {
     },
     onError: (error) => toast.error(getApiErrorMessage(error)),
   });
+  const orderCreation = useMutation({ mutationFn: ordersAPI.create });
+
+  const cartItems = cartQuery.data?.items;
+  const [selectionState, setSelectionState] = useState<{
+    cartItems: typeof cartItems;
+    selectedCartItemIds: number[];
+  }>(() => ({ cartItems, selectedCartItemIds: [] }));
+  const reconciledSelectedCartItemIds = reconcileSelectedCartItemIds(
+    selectionState.selectedCartItemIds,
+    cartItems ?? [],
+  );
+  if (selectionState.cartItems !== cartItems) {
+    setSelectionState({ cartItems, selectedCartItemIds: reconciledSelectedCartItemIds });
+  }
+  const selectedCartItemIds =
+    selectionState.cartItems === cartItems
+      ? selectionState.selectedCartItemIds
+      : reconciledSelectedCartItemIds;
+
+  const selectedItems = useMemo(
+    () => getSelectedCartItems(cartItems ?? [], selectedCartItemIds),
+    [cartItems, selectedCartItemIds],
+  );
+  const currentSelectedCartItemIds = useMemo(
+    () => selectedItems.map((item) => item.id),
+    [selectedItems],
+  );
+  const selectedTotal = useMemo(() => getCartItemsTotal(selectedItems), [selectedItems]);
+  const checkoutBusy = checkoutStatus !== 'idle';
+
+  function changeItemSelection(cartItemId: number, selected: boolean) {
+    if (checkoutLockRef.current || !cartItems?.some((item) => item.id === cartItemId)) return;
+    setSelectionState((current) => {
+      const reconciled = reconcileSelectedCartItemIds(current.selectedCartItemIds, cartItems);
+      if (selected)
+        return {
+          cartItems,
+          selectedCartItemIds: reconciled.includes(cartItemId)
+            ? reconciled
+            : [...reconciled, cartItemId],
+        };
+      return {
+        cartItems,
+        selectedCartItemIds: reconciled.filter((id) => id !== cartItemId),
+      };
+    });
+  }
+
+  function changeAllSelections(selected: boolean) {
+    if (checkoutLockRef.current || !cartItems) return;
+    setSelectionState({
+      cartItems,
+      selectedCartItemIds: selected ? cartItems.map((item) => item.id) : [],
+    });
+  }
+
+  function removeCartItem(cartItemId: number) {
+    if (checkoutLockRef.current || deletion.isPending) return;
+    deletion.mutate(cartItemId);
+  }
+
+  async function waitForCheckoutStatusPaint() {
+    await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
+  }
+
+  async function checkout() {
+    if (checkoutLockRef.current || deletion.isPending || currentSelectedCartItemIds.length === 0)
+      return;
+
+    checkoutLockRef.current = true;
+    const cartItemIds = [...currentSelectedCartItemIds];
+    const reusableCheckout =
+      retainedCheckout && haveSameCartItemIds(retainedCheckout.cartItemIds, cartItemIds)
+        ? retainedCheckout.data
+        : null;
+    setCheckoutStatus(reusableCheckout ? 'submitting-payment' : 'creating-order');
+
+    try {
+      let checkoutData = reusableCheckout;
+      if (!checkoutData) {
+        const order: Order = await orderCreation.mutateAsync({
+          cartItemIds,
+          paymentMethod: BANK_TRANSFER_PAYMENT_METHOD,
+        });
+        checkoutData = getSePayCheckoutData(order);
+        setRetainedCheckout({ cartItemIds, data: checkoutData });
+      }
+
+      setCheckoutStatus('submitting-payment');
+      await waitForCheckoutStatusPaint();
+      submitSePayCheckout(checkoutData);
+    } catch (error) {
+      toast.error(error instanceof SePayCheckoutError ? error.message : getApiErrorMessage(error));
+      setCheckoutStatus('idle');
+      checkoutLockRef.current = false;
+    }
+  }
 
   const count = cartQuery.data?.items.length;
   const subtitle = cartQuery.isPending
@@ -135,7 +255,17 @@ export function CartPage() {
           <CartContent
             cart={cartQuery.data}
             pendingItemId={deletion.isPending ? (deletion.variables ?? null) : null}
-            onRemove={(cartItemId) => deletion.mutate(cartItemId)}
+            selectedCartItemIds={currentSelectedCartItemIds}
+            selectedTotal={selectedTotal}
+            checkoutStatus={checkoutStatus}
+            checkoutDisabled={
+              currentSelectedCartItemIds.length === 0 || deletion.isPending || checkoutBusy
+            }
+            selectionLocked={checkoutBusy}
+            onItemSelectionChange={changeItemSelection}
+            onSelectAllChange={changeAllSelections}
+            onCheckout={() => void checkout()}
+            onRemove={removeCartItem}
           />
         )}
       </div>
