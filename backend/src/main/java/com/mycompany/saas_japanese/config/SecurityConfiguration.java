@@ -74,6 +74,7 @@ public class SecurityConfiguration {
                                                                 "/api/v1/auth/verify-user",
                                                                 "/api/v1/auth/refresh-token", "/api/v1/auth/logout")
                                                 .permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/v1/client/**").permitAll()
                                                 .requestMatchers("/api/v1/auth/myProfile", "/api/v1/auth/updateProfile")
                                                 .authenticated()
                                                 .requestMatchers("/api/v1/admin/**").permitAll()
