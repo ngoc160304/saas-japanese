@@ -3,53 +3,9 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { clientCoursesAPI, clientCoursesQueryKeys } from '@/apis/courses/client-courses.api';
-import type { ClientCourse } from '@/apis/courses/client-courses.type';
-import { CourseThumbnail } from '@/features/course/component/CourseThumbnail';
-import { formatCoursePrice } from '@/features/course/utils/course-format';
+import { CourseCard } from '@/features/client-course/components/CourseCard';
 
 const featuredCoursesParams = { page: 0, size: 3 } as const;
-
-interface FeaturedCourseCardProps {
-  course: ClientCourse;
-}
-
-function FeaturedCourseCard({ course }: FeaturedCourseCardProps) {
-  const isFree = course.price === 0;
-
-  return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)]">
-      <div className="relative h-40 bg-slate-100">
-        <CourseThumbnail
-          src={course.thumnailURL}
-          title={course.title}
-          className="h-40 w-full rounded-none border-0 border-b border-slate-100"
-        />
-        <span className="absolute top-3 left-3 max-w-[calc(100%-1.5rem)] truncate rounded border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-700 shadow-sm">
-          {course.categoryName ?? 'Chưa phân loại'}
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <h3 className="mb-2 line-clamp-2 text-sm font-bold text-slate-800">{course.title}</h3>
-        <p className="mb-4 line-clamp-2 flex-1 text-xs text-slate-500">
-          {course.description ?? 'Chưa có mô tả cho khóa học này.'}
-        </p>
-        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-4">
-          <span className="text-xs text-slate-500">{course.lessonCount} Bài học</span>
-          <span className={`text-sm font-bold ${isFree ? 'text-emerald-600' : 'text-slate-800'}`}>
-            {isFree ? 'Miễn phí' : formatCoursePrice(course.price)}
-          </span>
-        </div>
-        <Link
-          href="/register"
-          className="mt-4 block w-full rounded-lg border border-slate-200 bg-slate-50 py-2 text-center text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
-          aria-label={`Đăng ký để xem chi tiết ${course.title}`}
-        >
-          Xem chi tiết
-        </Link>
-      </div>
-    </article>
-  );
-}
 
 function FeaturedCoursesSkeleton() {
   return (
@@ -87,7 +43,7 @@ function FeaturedCoursesSkeleton() {
 export function FeaturedCoursesSection() {
   const coursesQuery = useQuery({
     queryKey: clientCoursesQueryKeys.list(featuredCoursesParams),
-    queryFn: () => clientCoursesAPI.getClientCourses(featuredCoursesParams),
+    queryFn: ({ signal }) => clientCoursesAPI.getClientCourses(featuredCoursesParams, signal),
     retry: false,
   });
 
@@ -102,7 +58,7 @@ export function FeaturedCoursesSection() {
             <p className="text-sm text-slate-500">Tuyển chọn các khóa học được yêu thích nhất.</p>
           </div>
           <Link
-            href="#levels"
+            href="/courses"
             className="text-sm font-medium text-brand-blue transition-colors hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
           >
             Xem tất cả khóa học →
@@ -137,7 +93,7 @@ export function FeaturedCoursesSection() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {coursesQuery.data.content.map((course) => (
-              <FeaturedCourseCard key={course.id} course={course} />
+              <CourseCard key={course.id} course={course} variant="featured" />
             ))}
           </div>
         )}

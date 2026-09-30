@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.mycompany.saas_japanese.repository.ParentCount;
+import com.mycompany.saas_japanese.repository.PublicLessonStatistics;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -36,6 +37,8 @@ import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
 import com.mycompany.saas_japanese.domain.response.ClientCourseResponse;
+import com.mycompany.saas_japanese.domain.response.ClientCourseDetailResponse;
+import com.mycompany.saas_japanese.domain.response.ClientLessonResponse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
 @Service
@@ -229,7 +232,7 @@ public class CourseServiceImpl implements CourseService {
         Map<Long, Long> counts = coursePage.isEmpty()
                 ? Map.of()
                 : lessonRepository
-                        .countByCourseIds(
+                        .findPublicStatisticsByCourseIds(
                                 coursePage.stream()
                                         .map(Course::getId)
                                         .toList()
@@ -261,31 +264,27 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     @Transactional(readOnly = true)
-    public ClientCourseResponse fetchClientCourseById(Long id) {
-
-        Course course = courseRepository
-                .findByIdAndIsDeletedFalseAndIsPublishedTrue(id)
-                .orElseThrow(() ->
-                        new NotFoundException("Chương trình học không tồn tại"));
-
-        ClientCourseResponse response =
-                courseMapper.toClientResponse(course);
-
-        Long lessonCount = lessonRepository
-                .countByCourseIds(List.of(course.getId()))
+    public ClientCourseDetailResponse fetchClientCourseById(Long id) {
+        Course course = requirePublicCourse(id);
+        ClientCourseDetailResponse response = courseMapper.toClientDetailResponse(course);
+        Optional<PublicLessonStatistics> statistics = lessonRepository
+                .findPublicStatisticsByCourseIds(List.of(course.getId()))
                 .stream()
-                .findFirst()
-                .map(ParentCount::getTotal)
-                .orElse(0L);
-
-        response.setCategoryName(
-                course.getCategory() != null
-                        ? course.getCategory().getName()
-                        : null
-        );
-
-        response.setLessonCount(lessonCount);
-
+                .findFirst();
+        response.setLessonCount(statistics.map(PublicLessonStatistics::getTotal).orElse(0L));
+        response.setTotalDurationMinutes(statistics.map(PublicLessonStatistics::getTotalDurationMinutes).orElse(0L));
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ClientLessonResponse> fetchClientCourseLessons(Long courseId) {
+        Course course = requirePublicCourse(courseId);
+        return lessonRepository.findPublicLessonsByCourseId(course.getId());
+    }
+
+    private Course requirePublicCourse(Long id) {
+        return courseRepository.findByIdAndIsDeletedFalseAndIsPublishedTrue(id)
+                .orElseThrow(() -> new NotFoundException("Chương trình học không tồn tại"));
     }
 }

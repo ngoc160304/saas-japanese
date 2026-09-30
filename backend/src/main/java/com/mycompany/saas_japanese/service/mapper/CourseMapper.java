@@ -3,6 +3,7 @@ package com.mycompany.saas_japanese.service.mapper;
 import org.springframework.stereotype.Component;
 
 import com.mycompany.saas_japanese.domain.Course;
+import com.mycompany.saas_japanese.domain.response.ClientCourseDetailResponse;
 import com.mycompany.saas_japanese.domain.response.ClientCourseResponse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
@@ -23,9 +24,20 @@ public class CourseMapper {
         return response;
     }
 
-     public ClientCourseResponse toClientResponse(Course course) {
+    public ClientCourseResponse toClientResponse(Course course) {
         ClientCourseResponse response = new ClientCourseResponse();
+        mapClientFields(course, response);
+        return response;
+    }
 
+    public ClientCourseDetailResponse toClientDetailResponse(Course course) {
+        ClientCourseDetailResponse response = new ClientCourseDetailResponse();
+        mapClientFields(course, response);
+        response.setUpdatedAt(course.getUpdatedAt());
+        return response;
+    }
+
+    private void mapClientFields(Course course, ClientCourseResponse response) {
         response.setId(course.getId());
         response.setTitle(course.getTitle());
         response.setSlug(course.getSlug());
@@ -43,7 +55,5 @@ public class CourseMapper {
                         ? course.getThumbnailMedia().getSecureUrl()
                         : null
         );
-
-        return response;
     }
 }

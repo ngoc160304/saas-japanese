@@ -4,7 +4,11 @@ import { StorefrontAuthActions } from './StorefrontAuthActions';
 import { StorefrontCartLink } from './StorefrontCartLink';
 import { StorefrontLogo } from './StorefrontLogo';
 
-export function StorefrontHeader({ activePage = 'home' }: { activePage?: 'home' | 'cart' }) {
+export function StorefrontHeader({
+  activePage = 'home',
+}: {
+  activePage?: 'home' | 'courses' | 'cart';
+}) {
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur-sm">
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -19,8 +23,9 @@ export function StorefrontHeader({ activePage = 'home' }: { activePage?: 'home' 
               Trang chủ
             </Link>
             <Link
-              href="/#courses"
-              className="text-sm font-medium text-slate-500 transition-colors hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+              href="/courses"
+              aria-current={activePage === 'courses' ? 'page' : undefined}
+              className={`text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${activePage === 'courses' ? 'border-b-2 border-brand-navy py-7 font-semibold text-brand-navy' : 'font-medium text-slate-500 transition-colors hover:text-brand-navy'}`}
             >
               Khóa học
             </Link>

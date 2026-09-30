@@ -21,6 +21,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.mycompany.saas_japanese.domain.response.ErrorResponse;
 
@@ -68,7 +69,8 @@ public class GlobalException {
     return ResponseEntity.badRequest().body(new ErrorResponse(400, "Validation failed", fields, Instant.now()));
   }
 
-  @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class})
+  @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class,
+      MethodArgumentTypeMismatchException.class})
   public ResponseEntity<ErrorResponse> invalidRequest(Exception exception) {
     return error(HttpStatus.BAD_REQUEST, "Invalid request");
   }

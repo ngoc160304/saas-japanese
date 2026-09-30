@@ -1,5 +1,7 @@
 package com.mycompany.saas_japanese.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.mycompany.saas_japanese.domain.Course;
@@ -7,6 +9,8 @@ import com.mycompany.saas_japanese.domain.query.CourseQuerry;
 import com.mycompany.saas_japanese.domain.request.ReqCreateCourse;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateCourse;
 import com.mycompany.saas_japanese.domain.response.ClientCourseResponse;
+import com.mycompany.saas_japanese.domain.response.ClientCourseDetailResponse;
+import com.mycompany.saas_japanese.domain.response.ClientLessonResponse;
 import com.mycompany.saas_japanese.domain.response.CourseResponse;
 
 public interface CourseService {
@@ -23,6 +27,8 @@ public interface CourseService {
 
     Page<ClientCourseResponse> fetchAllClientCourses(CourseQuerry query);
 
-    ClientCourseResponse fetchClientCourseById(Long id);
+    ClientCourseDetailResponse fetchClientCourseById(Long id);
+
+    List<ClientLessonResponse> fetchClientCourseLessons(Long courseId);
 
 }
