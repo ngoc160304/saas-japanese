@@ -1,11 +1,12 @@
 import authorizeAxiosInstance, { waitForSessionRefresh } from '@/lib/authorize-axios';
 import type { ClientCoursesQuery, GetClientCoursesResponse } from './client-courses.type';
 
-async function getClientCourses(params: ClientCoursesQuery) {
+async function getClientCourses(params: ClientCoursesQuery, signal?: AbortSignal) {
   // Public requests must not be rejected by an anonymous session bootstrap in progress.
   await waitForSessionRefresh();
   const response = await authorizeAxiosInstance.get<GetClientCoursesResponse>('/client/courses', {
     params,
+    signal,
     localErrorHandling: true,
   });
   return response.data.data;

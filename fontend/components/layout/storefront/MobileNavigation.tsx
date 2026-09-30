@@ -7,11 +7,15 @@ import { StorefrontCartLink } from './StorefrontCartLink';
 
 const navigation = [
   { label: 'Trang chủ', href: '/' },
-  { label: 'Khóa học', href: '/#courses' },
+  { label: 'Khóa học', href: '/courses' },
   { label: 'Thi thử JLPT', href: '/#mock-exam' },
 ] as const;
 
-export function MobileNavigation({ activePage = 'home' }: { activePage?: 'home' | 'cart' }) {
+export function MobileNavigation({
+  activePage = 'home',
+}: {
+  activePage?: 'home' | 'courses' | 'cart';
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const navigationRef = useRef<HTMLDivElement>(null);
 
@@ -84,8 +88,18 @@ export function MobileNavigation({ activePage = 'home' }: { activePage?: 'home' 
               key={item.label}
               href={item.href}
               onClick={closeMenu}
-              aria-current={item.href === '/' && activePage === 'home' ? 'page' : undefined}
-              className={`block rounded text-sm hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${item.href === '/' && activePage === 'home' ? 'font-semibold text-brand-navy' : 'font-medium text-slate-600'}`}
+              aria-current={
+                (item.href === '/' && activePage === 'home') ||
+                (item.href === '/courses' && activePage === 'courses')
+                  ? 'page'
+                  : undefined
+              }
+              className={`block rounded text-sm hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                (item.href === '/' && activePage === 'home') ||
+                (item.href === '/courses' && activePage === 'courses')
+                  ? 'font-semibold text-brand-navy'
+                  : 'font-medium text-slate-600'
+              }`}
             >
               {item.label}
             </Link>

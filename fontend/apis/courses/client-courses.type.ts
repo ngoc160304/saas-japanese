@@ -14,8 +14,15 @@ export interface ClientCourse {
 }
 
 export interface ClientCoursesQuery {
+  title?: string;
+  search?: string;
+  categoryId?: number;
+  published?: boolean;
+  pricing?: 'free' | 'paid';
   page: number;
   size: number;
+  sortKey?: 'id' | 'title' | 'price' | 'categoryName' | 'createdAt' | 'updatedAt' | 'isPublished';
+  sortType?: 'ASC' | 'DESC';
 }
 
 export type GetClientCoursesResponse = ApiResponse<PageResponse<ClientCourse>>;

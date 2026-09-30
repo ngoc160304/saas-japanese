@@ -34,7 +34,10 @@ export function CourseThumbnail({
           onError={() => setFailedSrc(src)}
         />
       ) : (
-        <BookOpen aria-label="Chưa có ảnh khóa học" className="size-6" />
+        <>
+          <BookOpen aria-hidden="true" className="size-6" />
+          <span className="sr-only">Chưa có ảnh khóa học</span>
+        </>
       )}
     </div>
   );
