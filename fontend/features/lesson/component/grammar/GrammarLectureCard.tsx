@@ -19,6 +19,8 @@ export function GrammarLectureCard({ video }: { video: GrammarLectureVideo }) {
         <div className="flex items-center gap-2">
           <Button
             type="button"
+            disabled
+            aria-describedby="lecture-video-unavailable"
             variant="ghost"
             size="sm"
             className="px-0 text-xs font-bold text-sky-600 hover:bg-transparent hover:text-sky-700"
@@ -30,6 +32,8 @@ export function GrammarLectureCard({ video }: { video: GrammarLectureVideo }) {
           </span>
           <Button
             type="button"
+            disabled
+            aria-describedby="lecture-video-unavailable"
             variant="ghost"
             size="sm"
             className="px-0 text-xs font-bold text-rose-600 hover:bg-transparent hover:text-rose-700"
@@ -54,6 +58,9 @@ export function GrammarLectureCard({ video }: { video: GrammarLectureVideo }) {
           Ready
         </span>
       </div>
+      <p id="lecture-video-unavailable" className="mt-2 text-[11px] text-slate-500">
+        Replacing and detaching video are unavailable in this preview.
+      </p>
     </section>
   );
 }

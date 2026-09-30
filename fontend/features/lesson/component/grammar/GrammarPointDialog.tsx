@@ -43,7 +43,7 @@ export function GrammarPointDialog({
             className={
               point
                 ? 'rounded-lg border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-                : `h-10 self-start rounded-2xl px-4 text-xs font-bold text-white shadow-2xs ${variant === 'primary' ? 'bg-slate-900 hover:bg-amber-600' : 'bg-sky-600 hover:bg-sky-700'}`
+                : `self-start text-xs font-bold text-white shadow-2xs ${variant === 'primary' ? 'h-10 rounded-2xl bg-slate-900 px-4 hover:bg-amber-600' : 'h-9 rounded-xl bg-sky-600 px-3.5 hover:bg-sky-700'}`
             }
           />
         }
@@ -91,6 +91,9 @@ export function GrammarPointDialog({
             />
           </div>
           <div className="flex flex-wrap justify-end gap-2.5 border-t border-slate-100 pt-3">
+            <p id={`${id}-save-unavailable`} className="w-full text-xs text-slate-500">
+              Saving grammar points is unavailable in this preview.
+            </p>
             <DialogClose
               render={
                 <Button
@@ -104,6 +107,8 @@ export function GrammarPointDialog({
             </DialogClose>
             <Button
               type="button"
+              disabled
+              aria-describedby={`${id}-save-unavailable`}
               className="rounded-xl bg-slate-900 px-5 text-xs font-bold text-white hover:bg-amber-600"
             >
               Save Grammar Point
