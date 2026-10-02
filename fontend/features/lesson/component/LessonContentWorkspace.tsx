@@ -8,6 +8,8 @@ import { LessonContentTabs, type LessonContentTab } from './LessonContentTabs';
 import { LessonCurriculumSidebar } from './LessonCurriculumSidebar';
 import { LessonHeaderCard } from './LessonHeaderCard';
 import { LessonWorkspaceHeader } from './LessonWorkspaceHeader';
+import { QuizSection } from './quiz/QuizSection';
+import { useLessonQuiz } from './quiz/useLessonQuiz';
 
 export function LessonContentWorkspace({
   courseId,
@@ -24,6 +26,7 @@ export function LessonContentWorkspace({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState(true);
+  const quizQuery = useLessonQuiz(lessonId, activeTab === 'quiz');
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
@@ -77,6 +80,19 @@ export function LessonContentWorkspace({
                 video={lesson.video}
                 grammarPoints={lesson.points}
                 vocabularyItems={vocabularyItems}
+                quizCount={
+                  quizQuery.isSuccess ? (quizQuery.data?.questions.length ?? 0) : undefined
+                }
+                quizPanel={
+                  <QuizSection
+                    quiz={quizQuery.data}
+                    isPending={quizQuery.isPending}
+                    isFetching={quizQuery.isFetching}
+                    isError={quizQuery.isError}
+                    error={quizQuery.error}
+                    onRetry={() => void quizQuery.refetch()}
+                  />
+                }
               />
             </div>
           </main>

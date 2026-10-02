@@ -1,13 +1,13 @@
 'use client';
 
-import { useRef, type KeyboardEvent } from 'react';
+import { useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { BookOpen, CircleCheck, Video } from 'lucide-react';
 import type { GrammarLectureVideo, GrammarPoint } from '../types/grammar';
 import type { VocabularyItem } from '../types/vocabulary';
 import { GrammarSection } from './grammar/GrammarSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
 
-export type LessonContentTab = 'grammar' | 'vocabulary';
+export type LessonContentTab = 'grammar' | 'vocabulary' | 'quiz';
 
 interface LessonContentTabsProps {
   activeTab: LessonContentTab;
@@ -15,6 +15,8 @@ interface LessonContentTabsProps {
   video: GrammarLectureVideo;
   grammarPoints: readonly GrammarPoint[];
   vocabularyItems: readonly VocabularyItem[];
+  quizPanel: ReactNode;
+  quizCount?: number;
 }
 
 export function LessonContentTabs({
@@ -23,6 +25,8 @@ export function LessonContentTabs({
   video,
   grammarPoints,
   vocabularyItems,
+  quizPanel,
+  quizCount,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const tabs = [
@@ -37,6 +41,12 @@ export function LessonContentTabs({
       label: 'Vocabulary',
       count: vocabularyItems.length,
       icon: BookOpen,
+    },
+    {
+      id: 'quiz' as const,
+      label: 'Quiz',
+      count: quizCount,
+      icon: CircleCheck,
     },
   ];
 
@@ -88,13 +98,15 @@ export function LessonContentTabs({
             >
               <Icon className="size-4" aria-hidden="true" />
               {tab.label}
-              <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
-                {tab.count}
-              </span>
+              {tab.count !== undefined && (
+                <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
+                  {tab.count}
+                </span>
+              )}
             </button>
           );
         })}
-        {(['Kanji', 'Quiz'] as const).map((label) => (
+        {(['Kanji'] as const).map((label) => (
           <button
             key={label}
             type="button"
@@ -134,6 +146,14 @@ export function LessonContentTabs({
         hidden={activeTab !== 'vocabulary'}
       >
         <VocabularySection items={vocabularyItems} />
+      </div>
+      <div
+        id="lesson-content-panel-quiz"
+        role="tabpanel"
+        aria-labelledby="lesson-content-tab-quiz"
+        hidden={activeTab !== 'quiz'}
+      >
+        {quizPanel}
       </div>
     </>
   );

@@ -138,6 +138,12 @@ export function LessonCurriculumSidebar({
                     symbol: '語',
                     color: 'bg-emerald-50 text-emerald-700',
                   },
+                  {
+                    id: 'quiz',
+                    label: 'Quiz',
+                    symbol: '?',
+                    color: 'bg-amber-50 text-amber-700',
+                  },
                 ] as const
               ).map((item) => (
                 <button
@@ -158,10 +164,7 @@ export function LessonCurriculumSidebar({
                 </button>
               ))}
               {(
-                [
-                  { label: 'Kanji', symbol: '漢', color: 'bg-purple-50 text-purple-700' },
-                  { label: 'Quiz', symbol: '?', color: 'bg-amber-50 text-amber-700' },
-                ] as const
+                [{ label: 'Kanji', symbol: '漢', color: 'bg-purple-50 text-purple-700' }] as const
               ).map((item) => (
                 <button
                   key={item.label}
