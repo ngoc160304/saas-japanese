@@ -1,15 +1,20 @@
 'use client';
 
 import { useRef, type KeyboardEvent } from 'react';
+import type { UseQueryResult } from '@tanstack/react-query';
+import type { KanjiItem } from '@/apis/lessons/lesson-content.api';
 import { BookOpen, CircleCheck, Video } from 'lucide-react';
 import type { GrammarLectureVideo, GrammarPoint } from '../types/grammar';
 import type { VocabularyItem } from '../types/vocabulary';
 import { GrammarSection } from './grammar/GrammarSection';
+import { KanjiSection } from './kanji/KanjiSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
 
-export type LessonContentTab = 'grammar' | 'vocabulary';
+export type LessonContentTab = 'grammar' | 'vocabulary' | 'kanji';
 
 interface LessonContentTabsProps {
+  lessonId: number;
+  kanjiQuery: UseQueryResult<KanjiItem[], Error>;
   activeTab: LessonContentTab;
   onTabChange: (tab: LessonContentTab) => void;
   video: GrammarLectureVideo;
@@ -18,6 +23,8 @@ interface LessonContentTabsProps {
 }
 
 export function LessonContentTabs({
+  lessonId,
+  kanjiQuery,
   activeTab,
   onTabChange,
   video,
@@ -36,6 +43,12 @@ export function LessonContentTabs({
       id: 'vocabulary' as const,
       label: 'Vocabulary',
       count: vocabularyItems.length,
+      icon: BookOpen,
+    },
+    {
+      id: 'kanji' as const,
+      label: 'Kanji',
+      count: kanjiQuery.data?.length ?? null,
       icon: BookOpen,
     },
   ];
@@ -89,12 +102,12 @@ export function LessonContentTabs({
               <Icon className="size-4" aria-hidden="true" />
               {tab.label}
               <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
-                {tab.count}
+                {tab.count ?? '—'}
               </span>
             </button>
           );
         })}
-        {(['Kanji', 'Quiz'] as const).map((label) => (
+        {(['Quiz'] as const).map((label) => (
           <button
             key={label}
             type="button"
@@ -103,16 +116,7 @@ export function LessonContentTabs({
             disabled
             className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-400"
           >
-            {label === 'Kanji' ? (
-              <span
-                aria-hidden="true"
-                className="flex size-4 items-center justify-center rounded bg-emerald-100 text-[11px] font-black text-emerald-800"
-              >
-                漢
-              </span>
-            ) : (
-              <CircleCheck aria-hidden="true" className="size-4" />
-            )}
+            <CircleCheck aria-hidden="true" className="size-4" />
             {label}
             <span className="text-[10px] font-medium">Unavailable</span>
           </button>
@@ -134,6 +138,14 @@ export function LessonContentTabs({
         hidden={activeTab !== 'vocabulary'}
       >
         <VocabularySection items={vocabularyItems} />
+      </div>
+      <div
+        id="lesson-content-panel-kanji"
+        role="tabpanel"
+        aria-labelledby="lesson-content-tab-kanji"
+        hidden={activeTab !== 'kanji'}
+      >
+        <KanjiSection key={lessonId} query={kanjiQuery} />
       </div>
     </>
   );

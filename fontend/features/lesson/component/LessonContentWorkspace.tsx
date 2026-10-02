@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { kanjiAPI } from '@/apis/lessons/lesson-content.api';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { LessonGrammarPreview } from '../types/grammar';
 import type { VocabularyItem } from '../types/vocabulary';
@@ -21,6 +23,12 @@ export function LessonContentWorkspace({
   vocabularyItems: readonly VocabularyItem[];
 }) {
   const [activeTab, setActiveTab] = useState<LessonContentTab>('grammar');
+  const kanjiQuery = useQuery({
+    queryKey: ['lessons', 'kanjis', lessonId],
+    queryFn: ({ signal }) => kanjiAPI.listByLesson(lessonId, signal),
+    enabled: activeTab === 'kanji' && Number.isSafeInteger(lessonId) && lessonId > 0,
+    retry: false,
+  });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState(true);
@@ -72,6 +80,8 @@ export function LessonContentWorkspace({
             <div className="space-y-5">
               <LessonHeaderCard courseId={courseId} lessonId={lessonId} lesson={lesson} />
               <LessonContentTabs
+                lessonId={lessonId}
+                kanjiQuery={kanjiQuery}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 video={lesson.video}

@@ -87,7 +87,14 @@ export const vocabularyAPI = {
 };
 
 export const kanjiAPI = {
-  listByLesson: (lessonId: number) => listAll<KanjiItem>(kanjiPath, lessonId),
+  listByLesson: async (lessonId: number, signal?: AbortSignal) => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem[]>>(
+      `/study/lessons/${lessonId}/kanjis`,
+      { localErrorHandling: true, signal },
+    );
+    if (!Array.isArray(response.data.data)) throw new Error('Invalid Kanji response');
+    return response.data.data;
+  },
   create: async (data: KanjiInput) => {
     const response = await authorizeAxiosInstance.post<ApiResponse<KanjiItem>>(kanjiPath, data, {
       localErrorHandling: true,
