@@ -1,20 +1,21 @@
 'use client';
 
-import { useRef, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { BookOpen, CircleCheck, Video } from 'lucide-react';
 import type { GrammarLectureVideo, GrammarPoint } from '../types/grammar';
-import type { VocabularyItem } from '../types/vocabulary';
 import { GrammarSection } from './grammar/GrammarSection';
+import { KanjiSection } from './kanji/KanjiSection';
+import { QuizSection } from './quiz/QuizSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
 
-export type LessonContentTab = 'grammar' | 'vocabulary';
+export type LessonContentTab = 'grammar' | 'vocabulary' | 'kanji' | 'quiz';
 
 interface LessonContentTabsProps {
   activeTab: LessonContentTab;
   onTabChange: (tab: LessonContentTab) => void;
   video: GrammarLectureVideo;
   grammarPoints: readonly GrammarPoint[];
-  vocabularyItems: readonly VocabularyItem[];
+  lessonId: number;
 }
 
 export function LessonContentTabs({
@@ -22,9 +23,12 @@ export function LessonContentTabs({
   onTabChange,
   video,
   grammarPoints,
-  vocabularyItems,
+  lessonId,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [vocabularyCount, setVocabularyCount] = useState(0);
+  const [kanjiCount, setKanjiCount] = useState(0);
+  const [quizCount, setQuizCount] = useState(0);
   const tabs = [
     {
       id: 'grammar' as const,
@@ -35,10 +39,28 @@ export function LessonContentTabs({
     {
       id: 'vocabulary' as const,
       label: 'Vocabulary',
-      count: vocabularyItems.length,
+      count: vocabularyCount,
       icon: BookOpen,
     },
+    {
+      id: 'kanji' as const,
+      label: 'Kanji',
+      count: kanjiCount,
+      icon: null,
+    },
+    {
+      id: 'quiz' as const,
+      label: 'Quiz',
+      count: quizCount,
+      icon: CircleCheck,
+    },
   ];
+
+  useEffect(() => {
+    tabRefs.current
+      .find((tab) => tab?.id === `lesson-content-tab-${activeTab}`)
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [activeTab]);
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
     let nextIndex: number | undefined;
@@ -63,7 +85,6 @@ export function LessonContentTabs({
         className="flex items-center gap-2 overflow-x-auto pb-2"
       >
         {tabs.map((tab, index) => {
-          const Icon = tab.icon;
           const isActive = activeTab === tab.id;
 
           return (
@@ -86,7 +107,16 @@ export function LessonContentTabs({
                   : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900'
               }`}
             >
-              <Icon className="size-4" aria-hidden="true" />
+              {tab.icon ? (
+                <tab.icon className="size-4" aria-hidden="true" />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="flex size-4 items-center justify-center rounded bg-emerald-100 text-[11px] font-black text-emerald-800"
+                >
+                  漢
+                </span>
+              )}
               {tab.label}
               <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
                 {tab.count}
@@ -94,29 +124,6 @@ export function LessonContentTabs({
             </button>
           );
         })}
-        {(['Kanji', 'Quiz'] as const).map((label) => (
-          <button
-            key={label}
-            type="button"
-            role="tab"
-            aria-selected={false}
-            disabled
-            className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-400"
-          >
-            {label === 'Kanji' ? (
-              <span
-                aria-hidden="true"
-                className="flex size-4 items-center justify-center rounded bg-emerald-100 text-[11px] font-black text-emerald-800"
-              >
-                漢
-              </span>
-            ) : (
-              <CircleCheck aria-hidden="true" className="size-4" />
-            )}
-            {label}
-            <span className="text-[10px] font-medium">Unavailable</span>
-          </button>
-        ))}
       </div>
 
       <div
@@ -133,7 +140,35 @@ export function LessonContentTabs({
         aria-labelledby="lesson-content-tab-vocabulary"
         hidden={activeTab !== 'vocabulary'}
       >
-        <VocabularySection items={vocabularyItems} />
+        <VocabularySection
+          lessonId={lessonId}
+          active={activeTab === 'vocabulary'}
+          onVisibleCountChange={setVocabularyCount}
+        />
+      </div>
+      <div
+        id="lesson-content-panel-kanji"
+        role="tabpanel"
+        aria-labelledby="lesson-content-tab-kanji"
+        hidden={activeTab !== 'kanji'}
+      >
+        <KanjiSection
+          lessonId={lessonId}
+          active={activeTab === 'kanji'}
+          onCountChange={setKanjiCount}
+        />
+      </div>
+      <div
+        id="lesson-content-panel-quiz"
+        role="tabpanel"
+        aria-labelledby="lesson-content-tab-quiz"
+        hidden={activeTab !== 'quiz'}
+      >
+        <QuizSection
+          lessonId={lessonId}
+          active={activeTab === 'quiz'}
+          onCountChange={setQuizCount}
+        />
       </div>
     </>
   );

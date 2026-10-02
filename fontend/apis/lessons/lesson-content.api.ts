@@ -34,6 +34,13 @@ export interface KanjiItem {
   exampleWords: string | null;
 }
 
+/** Study Kanji filters are applied to its complete response in the client. */
+export interface KanjiQuery {
+  lessonId: number;
+  kanji: string;
+  meaningVi: string;
+}
+
 export interface KanjiInput {
   lessonId: number;
   kanji: string;
@@ -42,6 +49,27 @@ export interface KanjiInput {
   meaningVi: string;
   strokeCount: number | null;
   exampleWords: string;
+}
+
+export interface StudyQuizOption {
+  id: number;
+  optionText: string;
+  sortOrder: number;
+}
+
+export interface StudyQuizQuestion {
+  id: number;
+  questionText: string;
+  questionType: 'SINGLE_CHOICE' | 'MULTIPLE_CHOICE';
+  sortOrder: number;
+  options: StudyQuizOption[];
+}
+
+export interface StudyQuiz {
+  id: number;
+  title: string;
+  description: string;
+  questions: StudyQuizQuestion[];
 }
 
 async function listAll<T>(path: string, lessonId: number): Promise<T[]> {
@@ -65,6 +93,13 @@ const kanjiPath = '/kanjis';
 
 export const vocabularyAPI = {
   listByLesson: (lessonId: number) => listAll<VocabularyItem>(vocabularyPath, lessonId),
+  listStudyByLesson: async (lessonId: number): Promise<VocabularyItem[]> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem[]>>(
+      `/study/lessons/${lessonId}/vocabularies`,
+      { localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   create: async (data: VocabularyInput) => {
     const response = await authorizeAxiosInstance.post<ApiResponse<VocabularyItem>>(
       vocabularyPath,
@@ -88,6 +123,13 @@ export const vocabularyAPI = {
 
 export const kanjiAPI = {
   listByLesson: (lessonId: number) => listAll<KanjiItem>(kanjiPath, lessonId),
+  listStudyByLesson: async (lessonId: number): Promise<KanjiItem[]> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem[]>>(
+      `/study/lessons/${lessonId}/kanjis`,
+      { localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   create: async (data: KanjiInput) => {
     const response = await authorizeAxiosInstance.post<ApiResponse<KanjiItem>>(kanjiPath, data, {
       localErrorHandling: true,
@@ -104,5 +146,15 @@ export const kanjiAPI = {
   },
   deleteById: async (id: number) => {
     await authorizeAxiosInstance.delete(`${kanjiPath}/${id}`, { localErrorHandling: true });
+  },
+};
+
+export const quizAPI = {
+  getStudyByLesson: async (lessonId: number): Promise<StudyQuiz> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<StudyQuiz>>(
+      `/study/lessons/${lessonId}/quiz`,
+      { localErrorHandling: true },
+    );
+    return response.data.data;
   },
 };
