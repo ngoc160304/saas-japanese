@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type { LessonGrammarPreview } from '../types/grammar';
-import type { VocabularyItem } from '../types/vocabulary';
 import { LessonContentTabs, type LessonContentTab } from './LessonContentTabs';
 import { LessonCurriculumSidebar } from './LessonCurriculumSidebar';
 import { LessonHeaderCard } from './LessonHeaderCard';
@@ -13,12 +12,10 @@ export function LessonContentWorkspace({
   courseId,
   lessonId,
   lesson,
-  vocabularyItems,
 }: {
   courseId: number;
   lessonId: number;
   lesson: LessonGrammarPreview;
-  vocabularyItems: readonly VocabularyItem[];
 }) {
   const [activeTab, setActiveTab] = useState<LessonContentTab>('grammar');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -51,7 +48,7 @@ export function LessonContentWorkspace({
 
   return (
     <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
-      <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-[#f3f6fa] text-slate-800 antialiased">
+      <div className="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-[#f3f6fa] text-slate-800 antialiased">
         <LessonWorkspaceHeader
           courseId={courseId}
           lessonId={lessonId}
@@ -76,7 +73,7 @@ export function LessonContentWorkspace({
                 onTabChange={setActiveTab}
                 video={lesson.video}
                 grammarPoints={lesson.points}
-                vocabularyItems={vocabularyItems}
+                lessonId={lessonId}
               />
             </div>
           </main>

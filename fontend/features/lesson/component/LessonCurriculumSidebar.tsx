@@ -138,6 +138,18 @@ export function LessonCurriculumSidebar({
                     symbol: '語',
                     color: 'bg-emerald-50 text-emerald-700',
                   },
+                  {
+                    id: 'kanji',
+                    label: 'Kanji',
+                    symbol: '漢',
+                    color: 'bg-purple-50 text-purple-700',
+                  },
+                  {
+                    id: 'quiz',
+                    label: 'Quiz',
+                    symbol: '?',
+                    color: 'bg-amber-50 text-amber-700',
+                  },
                 ] as const
               ).map((item) => (
                 <button
@@ -155,28 +167,6 @@ export function LessonCurriculumSidebar({
                     {item.symbol}
                   </span>
                   {item.label}
-                </button>
-              ))}
-              {(
-                [
-                  { label: 'Kanji', symbol: '漢', color: 'bg-purple-50 text-purple-700' },
-                  { label: 'Quiz', symbol: '?', color: 'bg-amber-50 text-amber-700' },
-                ] as const
-              ).map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  disabled
-                  className="flex w-full items-center gap-2 rounded-xl border border-transparent px-3 py-2 text-left text-xs font-semibold text-slate-400"
-                >
-                  <span
-                    className={`flex size-5 shrink-0 items-center justify-center rounded-md text-[10px] font-black ${item.color}`}
-                    aria-hidden="true"
-                  >
-                    {item.symbol}
-                  </span>
-                  {item.label}
-                  <span className="ml-auto text-[10px]">Unavailable</span>
                 </button>
               ))}
             </nav>

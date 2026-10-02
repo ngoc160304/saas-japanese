@@ -1,5 +1,6 @@
 import { Pencil, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import type { VocabularyItem } from '@/apis/lessons/lesson-content.api';
 import {
   Table,
   TableBody,
@@ -8,9 +9,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { VocabularyItem } from '../../types/vocabulary';
 
-export function VocabularyTable({ items }: { items: readonly VocabularyItem[] }) {
+export function VocabularyTable({
+  items,
+  emptyMessage,
+}: {
+  items: readonly VocabularyItem[];
+  emptyMessage: string;
+}) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
       <Table className="min-w-4xl text-left text-xs">
@@ -46,10 +52,19 @@ export function VocabularyTable({ items }: { items: readonly VocabularyItem[] })
                 </TableCell>
                 <TableCell className="px-4 py-3 font-medium text-sky-700">{item.reading}</TableCell>
                 <TableCell className="px-4 py-3 font-semibold text-slate-700">
-                  {item.meaning}
+                  <p>{item.meaningVi}</p>
+                  {item.partOfSpeech && (
+                    <span
+                      aria-label={`Part of speech: ${item.partOfSpeech}`}
+                      className="mt-1 inline-block rounded-full bg-sky-50 px-2 py-0.5 text-[10px] font-medium text-sky-700"
+                    >
+                      {item.partOfSpeech}
+                    </span>
+                  )}
                 </TableCell>
-                <TableCell className="max-w-xs truncate px-4 py-3 text-[11px] text-slate-500">
-                  {item.exampleSentence}
+                <TableCell className="max-w-xs px-4 py-3 text-[11px] text-slate-500">
+                  {item.exampleSentenceJp && <p>{item.exampleSentenceJp}</p>}
+                  {item.exampleSentenceVi && <p>{item.exampleSentenceVi}</p>}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-1">
@@ -80,7 +95,7 @@ export function VocabularyTable({ items }: { items: readonly VocabularyItem[] })
           ) : (
             <TableRow className="hover:bg-transparent">
               <TableCell colSpan={6} className="px-4 py-10 text-center text-xs text-slate-500">
-                Không tìm thấy từ vựng phù hợp.
+                {emptyMessage}
               </TableCell>
             </TableRow>
           )}

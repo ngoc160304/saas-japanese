@@ -97,6 +97,9 @@ try {
   };
   const errors = [];
   const requests = [];
+  let failVocabularyOnce = true;
+  let failKanjiOnce = true;
+  let failQuizOnce = true;
   let authenticated = true;
   const lesson = {
     id: 21,
@@ -121,7 +124,7 @@ try {
         else await send('Fetch.failRequest', { requestId, errorReason: 'BlockedByClient' });
         return;
       }
-      requests.push(`${request.method} ${url.pathname}`);
+      requests.push(`${request.method} ${url.pathname}${url.search}`);
       let status = 200;
       let body;
       if (request.method === 'OPTIONS') status = 204;
@@ -154,7 +157,138 @@ try {
             createdAt: null,
           },
         };
-      else if (url.pathname.endsWith('/lessons/21')) body = { data: lesson };
+      else if (url.pathname.endsWith('/study/lessons/21/vocabularies')) {
+        await delay(250);
+        if (failVocabularyOnce) {
+          failVocabularyOnce = false;
+          status = 503;
+          body = { statusCode: status, message: 'Service unavailable', data: null };
+        } else {
+          body = {
+            data: [
+              {
+                id: 31,
+                lessonId: 21,
+                word: '学生',
+                reading: 'がくせい',
+                meaningVi: 'học sinh, sinh viên',
+                exampleSentenceJp: 'わたしは学生です。',
+                exampleSentenceVi: 'Tôi là sinh viên.',
+                partOfSpeech: 'Danh từ',
+              },
+              {
+                id: 32,
+                lessonId: 21,
+                word: '本',
+                reading: 'ほん',
+                meaningVi: 'sách',
+                exampleSentenceJp: null,
+                exampleSentenceVi: null,
+                partOfSpeech: null,
+              },
+            ],
+            error: null,
+            message: 'CALL API SUCCESS !',
+            statusCode: 200,
+          };
+        }
+      } else if (url.pathname.endsWith('/study/lessons/22/vocabularies'))
+        body = { data: [], error: null, message: 'CALL API SUCCESS !', statusCode: 200 };
+      else if (url.pathname.endsWith('/study/lessons/21/kanjis')) {
+        await delay(250);
+        if (failKanjiOnce) {
+          failKanjiOnce = false;
+          status = 503;
+          body = { statusCode: status, message: 'Service unavailable', data: null };
+        } else {
+          body = {
+            data: [
+              {
+                id: 41,
+                lessonId: 21,
+                kanji: '学',
+                meaningVi: 'học',
+                onyomi: 'ガク',
+                kunyomi: 'まなぶ',
+                strokeCount: 8,
+                exampleWords: '学生（がくせい）: học sinh, 学校（がっこう）: trường học',
+              },
+              {
+                id: 42,
+                lessonId: 21,
+                kanji: '文',
+                meaningVi: 'văn',
+                onyomi: null,
+                kunyomi: null,
+                strokeCount: null,
+                exampleWords: null,
+              },
+            ],
+            error: null,
+            message: 'CALL API SUCCESS !',
+            statusCode: 200,
+          };
+        }
+      } else if (url.pathname.endsWith('/study/lessons/22/kanjis'))
+        body = { data: [], error: null, message: 'CALL API SUCCESS !', statusCode: 200 };
+      else if (url.pathname.endsWith('/study/lessons/21/quiz')) {
+        await delay(250);
+        if (failQuizOnce) {
+          failQuizOnce = false;
+          status = 503;
+          body = { status, message: 'Service unavailable' };
+        } else {
+          body = {
+            data: {
+              id: 2,
+              title: 'Quiz Bài 2',
+              description: 'Kiểm tra kiến thức về công việc và nghề nghiệp.',
+              questions: [
+                {
+                  id: 62,
+                  questionText: 'Chọn cách đọc của 「会社」',
+                  questionType: 'MULTIPLE_CHOICE',
+                  sortOrder: 2,
+                  options: [
+                    { id: 26, optionText: 'かいしゃ', sortOrder: 2 },
+                    { id: 25, optionText: 'かしゃ', sortOrder: 1 },
+                  ],
+                },
+                {
+                  id: 61,
+                  questionText: '「会社」 có nghĩa là gì?',
+                  questionType: 'SINGLE_CHOICE',
+                  sortOrder: 1,
+                  options: [
+                    { id: 23, optionText: 'Ngân hàng.', sortOrder: 3 },
+                    { id: 21, optionText: 'Trường học.', sortOrder: 1 },
+                    { id: 22, optionText: 'Công ty.', sortOrder: 2 },
+                  ],
+                },
+              ],
+            },
+            error: null,
+            message: 'CALL API SUCCESS !',
+            statusCode: 200,
+          };
+        }
+      } else if (url.pathname.endsWith('/study/lessons/22/quiz')) {
+        status = 404;
+        body = { status, message: 'Không tìm thấy quiz của lesson' };
+      } else if (url.pathname.endsWith('/study/lessons/23/quiz'))
+        body = {
+          data: { id: 3, title: 'Quiz trống', description: '', questions: [] },
+          error: null,
+          message: 'CALL API SUCCESS !',
+          statusCode: 200,
+        };
+      else if (url.pathname.endsWith('/study/lessons/24/quiz')) {
+        status = 403;
+        body = { status, message: 'Forbidden' };
+      } else if (url.pathname.endsWith('/study/lessons/25/quiz')) {
+        status = 404;
+        body = { status, message: 'Lesson không tồn tại' };
+      } else if (url.pathname.endsWith('/lessons/21')) body = { data: lesson };
       else if (url.pathname.endsWith('/lessons'))
         body = {
           data: {
@@ -234,7 +368,7 @@ try {
     320,
   );
   assert.equal(await evaluate('document.querySelectorAll("main").length'), 1);
-  assert.equal(await evaluate('document.querySelectorAll("[role=tab]:disabled").length'), 2);
+  assert.equal(await evaluate('document.querySelectorAll("[role=tab]:disabled").length'), 0);
   assert.equal(
     await evaluate(
       'document.querySelector("header").getBoundingClientRect().bottom <= document.querySelector("aside").getBoundingClientRect().top',
@@ -252,20 +386,75 @@ try {
   await evaluate('document.querySelector("main").scrollTop = 0');
 
   // Sidebar and tab bar drive the same mounted panels; Vocabulary search survives switching.
+  assert.equal(
+    requests.some((request) => request.includes('/vocabularies')),
+    false,
+  );
   await evaluate(
     'document.querySelector("aside button[aria-controls=lesson-content-panel-vocabulary]").click()',
   );
   await waitFor(
     'document.getElementById("lesson-content-tab-vocabulary").getAttribute("aria-selected") === "true"',
   );
+  await waitFor('document.querySelector("#lesson-content-panel-vocabulary [role=status]")');
+  await waitFor('document.querySelector("#lesson-content-panel-vocabulary [role=alert]")');
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/vocabularies').length,
+    1,
+  );
+  await clickText('Thử lại');
+  await waitFor('document.querySelector("#lesson-content-panel-vocabulary [role=status]")');
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-vocabulary tbody")?.innerText.includes("学生")',
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-tab-vocabulary").innerText.includes("2")',
+    ),
+    true,
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("がくせい") && document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("học sinh, sinh viên") && document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("Danh từ") && document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("わたしは学生です。") && document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("Tôi là sinh viên.")',
+    ),
+    true,
+  );
+  assert.equal(
+    await evaluate(
+      '!document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("null")',
+    ),
+    true,
+  );
+  assert.deepEqual(
+    await evaluate(
+      '[...document.querySelector("#vocabulary-part-of-speech").options].map((option) => option.value)',
+    ),
+    ['', 'Danh từ'],
+  );
+  await screenshot('vocabulary-desktop.png');
+  await evaluate(
+    'document.querySelector("#vocabulary-part-of-speech").value = "Danh từ"; document.querySelector("#vocabulary-part-of-speech").dispatchEvent(new Event("change", { bubbles: true }))',
+  );
+  await waitFor(
+    'document.querySelectorAll("#lesson-content-panel-vocabulary tbody tr").length === 1 && document.querySelector("#lesson-content-tab-vocabulary").innerText.includes("1")',
+  );
   await evaluate('document.querySelector("input[aria-label=\\"Search vocabulary\\"]").focus()');
-  await send('Input.insertText', { text: '会社員' });
+  await send('Input.insertText', { text: 'sách' });
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-vocabulary tbody")?.innerText.includes("Không tìm thấy từ vựng phù hợp.")',
+  );
+  await clickText('Reset');
+  await waitFor(
+    'document.querySelector("input[aria-label=\\"Search vocabulary\\"]").value === "" && document.querySelector("#vocabulary-part-of-speech").value === "" && document.querySelectorAll("#lesson-content-panel-vocabulary tbody tr").length === 2 && document.querySelector("#lesson-content-tab-vocabulary").innerText.includes("2")',
+  );
+  await evaluate('document.querySelector("input[aria-label=\\"Search vocabulary\\"]").focus()');
+  await send('Input.insertText', { text: 'sinh viên' });
   await waitFor(
     'document.querySelectorAll("#lesson-content-panel-vocabulary tbody tr").length === 1',
   );
   assert.equal(
     await evaluate(
-      'document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("会社員")',
+      'document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("学生")',
     ),
     true,
   );
@@ -281,14 +470,182 @@ try {
   assert.equal(await evaluate('document.activeElement.id'), 'lesson-content-tab-vocabulary');
   assert.equal(
     await evaluate('document.querySelector("input[aria-label=\\"Search vocabulary\\"]").value'),
-    '会社員',
+    'sinh viên',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/vocabularies').length,
+    2,
+    'Returning to Vocabulary within staleTime must reuse the cached list',
+  );
+  assert.equal(
+    requests.some((request) => request.includes('/kanjis')),
+    false,
   );
   await key('ArrowRight');
+  assert.equal(await evaluate('document.activeElement.id'), 'lesson-content-tab-kanji');
+  await waitFor('document.querySelector("#lesson-content-panel-kanji [role=status]")');
+  await waitFor('document.querySelector("#lesson-content-panel-kanji [role=alert]")');
   assert.equal(
-    await evaluate('document.activeElement.id'),
-    'lesson-content-tab-grammar',
-    'Skip unavailable tabs',
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/kanjis').length,
+    1,
   );
+  await clickText('Thử lại');
+  await waitFor('document.querySelector("#lesson-content-panel-kanji [role=status]")');
+  await waitFor('document.querySelectorAll("#lesson-content-panel-kanji article").length === 2');
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-kanji").innerText.includes("学") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("học") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("ガク") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("まなぶ") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("8 strokes") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("学生（がくせい）: học sinh, 学校（がっこう）: trường học")',
+    ),
+    true,
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-kanji").innerText.includes("null")',
+    ),
+    false,
+  );
+  assert.equal(
+    await evaluate('document.querySelector("#lesson-content-tab-kanji").innerText.includes("2")'),
+    true,
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-kanji").innerText.includes("Hiển thị 2 / 2 Kanji")',
+    ),
+    true,
+  );
+  await screenshot('kanji-desktop.png');
+  await fill('kanji-character-filter', ' 学 ');
+  await waitFor(
+    'document.querySelectorAll("#lesson-content-panel-kanji article").length === 1 && document.querySelector("#lesson-content-panel-kanji").innerText.includes("Hiển thị 1 / 2 Kanji")',
+  );
+  await fill('kanji-meaning-filter', ' HỌC ');
+  await waitFor('document.querySelectorAll("#lesson-content-panel-kanji article").length === 1');
+  await evaluate('document.getElementById("kanji-meaning-filter").select()');
+  await send('Input.insertText', { text: 'văn' });
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-kanji").innerText.includes("Không tìm thấy Kanji phù hợp.") && document.querySelector("#lesson-content-panel-kanji").innerText.includes("Hiển thị 0 / 2 Kanji")',
+  );
+  await clickText('Xóa bộ lọc');
+  await waitFor(
+    'document.querySelectorAll("#lesson-content-panel-kanji article").length === 2 && document.getElementById("kanji-character-filter").value === "" && document.getElementById("kanji-meaning-filter").value === ""',
+  );
+  await fill('kanji-meaning-filter', ' VĂN ');
+  await waitFor(
+    'document.querySelectorAll("#lesson-content-panel-kanji article").length === 1 && document.querySelector("#lesson-content-panel-kanji article").innerText.includes("文")',
+  );
+  await clickText('Xóa bộ lọc');
+  await waitFor('document.querySelectorAll("#lesson-content-panel-kanji article").length === 2');
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/kanjis').length,
+    2,
+    'Client-side Kanji filters must not trigger additional requests or query params',
+  );
+  assert.equal(
+    requests.some((request) => request.includes('/quiz')),
+    false,
+    'Quiz loads only when its tab opens',
+  );
+  await evaluate('document.getElementById("lesson-content-tab-kanji").focus()');
+  await key('ArrowRight');
+  assert.equal(await evaluate('document.activeElement.id'), 'lesson-content-tab-quiz');
+  await waitFor('document.querySelector("#lesson-content-panel-quiz [role=status]")');
+  await waitFor('document.querySelector("#lesson-content-panel-quiz [role=alert]")');
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/quiz').length,
+    1,
+  );
+  await clickText('Thử lại');
+  await waitFor('document.querySelector("#lesson-content-panel-quiz [role=status]")');
+  await waitFor('document.querySelectorAll("#lesson-content-panel-quiz article").length === 2');
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-quiz").innerText.includes("Quiz Bài 2") && document.querySelector("#lesson-content-panel-quiz").innerText.includes("Kiểm tra kiến thức về công việc và nghề nghiệp.") && document.querySelector("#lesson-content-panel-quiz").innerText.includes("Quiz Questions (2)")',
+    ),
+    true,
+  );
+  assert.deepEqual(
+    await evaluate(
+      '[...document.querySelectorAll("#lesson-content-panel-quiz article")].map((card) => ({ heading: card.querySelector("h4").innerText, question: card.querySelector("p").innerText, type: card.querySelector("span.font-mono").innerText, options: [...card.querySelectorAll("li")].map((option) => ({ label: option.firstElementChild.textContent.trim(), text: option.lastElementChild.lastChild.textContent.trim() })) }))',
+    ),
+    [
+      {
+        heading: 'Question 1',
+        question: '「会社」 có nghĩa là gì?',
+        type: 'SINGLE_CHOICE',
+        options: [
+          { label: 'A', text: 'Trường học.' },
+          { label: 'B', text: 'Công ty.' },
+          { label: 'C', text: 'Ngân hàng.' },
+        ],
+      },
+      {
+        heading: 'Question 2',
+        question: 'Chọn cách đọc của 「会社」',
+        type: 'MULTIPLE_CHOICE',
+        options: [
+          { label: 'A', text: 'かしゃ' },
+          { label: 'B', text: 'かいしゃ' },
+        ],
+      },
+    ],
+  );
+  assert.equal(
+    await evaluate('document.querySelector("#lesson-content-tab-quiz").innerText.includes("2")'),
+    true,
+  );
+  assert.equal(
+    await evaluate('document.querySelector("#lesson-content-panel-quiz").innerText.includes("✓")'),
+    false,
+    'The response does not identify correct answers',
+  );
+  await screenshot('quiz-desktop.png');
+  await evaluate('document.getElementById("lesson-content-tab-quiz").focus()');
+  await key('ArrowRight');
+  assert.equal(await evaluate('document.activeElement.id'), 'lesson-content-tab-grammar');
+  await evaluate(
+    'document.querySelector("aside button[aria-controls=lesson-content-panel-quiz]").click()',
+  );
+  await waitFor(
+    'document.getElementById("lesson-content-tab-quiz").getAttribute("aria-selected") === "true"',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/quiz').length,
+    2,
+    'Returning to Quiz within staleTime must reuse its cached result',
+  );
+  await evaluate(
+    'document.querySelector("aside button[aria-controls=lesson-content-panel-kanji]").click()',
+  );
+  await waitFor(
+    'document.getElementById("lesson-content-tab-kanji").getAttribute("aria-selected") === "true"',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/kanjis').length,
+    2,
+    'Returning to Kanji within staleTime must reuse the cached list',
+  );
+  await clickTab('grammar');
+  await clickTab('vocabulary');
+  await evaluate('document.querySelector("input[aria-label=\\"Search vocabulary\\"]").focus()');
+  await send('Input.insertText', { text: 'not found' });
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-vocabulary tbody")?.innerText.includes("Không tìm thấy từ vựng phù hợp.") && document.querySelector("#lesson-content-tab-vocabulary").innerText.includes("0")',
+  );
+  for (const term of ['学生', 'がくせい', 'học sinh', '  HỌC SINH  ']) {
+    await evaluate('document.querySelector("input[aria-label=\\"Search vocabulary\\"]").select()');
+    await send('Input.insertText', { text: term });
+    await waitFor(
+      'document.querySelectorAll("#lesson-content-panel-vocabulary tbody tr").length === 1 && document.querySelector("#lesson-content-panel-vocabulary tbody")?.innerText.includes("学生")',
+    );
+    assert.equal(
+      await evaluate(
+        'document.querySelector("#lesson-content-panel-vocabulary tbody").innerText.includes("本")',
+      ),
+      false,
+    );
+  }
+  await clickTab('grammar');
   await clickText('Collapse All');
   assert.equal(
     await evaluate('document.getElementById("curriculum-content-desktop").hidden'),
@@ -312,13 +669,15 @@ try {
     ),
     true,
   );
-  await evaluate('document.querySelector(".tox-edit-area iframe").contentDocument.body.focus()');
+  await waitFor(
+    'document.querySelector(".tox-edit-area iframe").contentDocument.body.isContentEditable',
+  );
+  await evaluate(
+    'document.querySelector(".tox-edit-area iframe").contentWindow.focus(); document.querySelector(".tox-edit-area iframe").contentDocument.body.focus()',
+  );
   await send('Input.insertText', { text: 'Workspace editor check' });
-  assert.equal(
-    await evaluate(
-      'document.querySelector(".tox-edit-area iframe").contentDocument.body.innerText.includes("Workspace editor check")',
-    ),
-    true,
+  await waitFor(
+    'document.querySelector(".tox-edit-area iframe").contentDocument.body.innerText.includes("Workspace editor check")',
   );
   await screenshot('grammar-editor-desktop.png');
   await clickText('Cancel');
@@ -334,14 +693,28 @@ try {
   await key('Escape');
   await waitFor('!document.querySelector("[role=dialog]")');
   assert.equal(
-    requests.some((request) => /\/(lessons|vocabularies|kanjis)/.test(request)),
-    false,
-    'Content preview adds no API calls',
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/vocabularies').length,
+    2,
   );
 
   await viewport(390, 844);
   await noOverflow();
   await screenshot('workspace-mobile.png');
+  await clickTab('vocabulary');
+  await screenshot('vocabulary-mobile.png');
+  await clickTab('kanji');
+  await waitFor(
+    'document.getElementById("lesson-content-tab-kanji").getBoundingClientRect().right <= window.innerWidth',
+  );
+  await screenshot('kanji-mobile.png');
+  await clickTab('quiz');
+  await waitFor(
+    'document.getElementById("lesson-content-tab-quiz").getAttribute("aria-selected") === "true" && document.getElementById("lesson-content-tab-quiz").getBoundingClientRect().right <= window.innerWidth',
+  );
+  await delay(200);
+  await screenshot('quiz-mobile.png');
+  await noOverflow();
+  await clickTab('grammar');
   await clickLabel('Open curriculum');
   await waitFor('document.querySelector("[role=dialog]")?.textContent.includes("Curriculum Tree")');
   await waitFor('document.querySelector("[role=dialog]").contains(document.activeElement)');
@@ -379,6 +752,34 @@ try {
       'document.getElementById("lesson-content-tab-vocabulary").getAttribute("aria-selected")',
     ),
     'true',
+  );
+  await clickLabel('Open curriculum');
+  await waitFor('document.querySelector("[role=dialog]")');
+  await evaluate(
+    'document.querySelector("[role=dialog] button[aria-controls=lesson-content-panel-kanji]").click()',
+  );
+  await waitFor('!document.querySelector("[role=dialog]")');
+  assert.equal(
+    await evaluate(
+      'document.getElementById("lesson-content-tab-kanji").getAttribute("aria-selected")',
+    ),
+    'true',
+  );
+  await clickLabel('Open curriculum');
+  await waitFor('document.querySelector("[role=dialog]")');
+  await evaluate(
+    'document.querySelector("[role=dialog] button[aria-controls=lesson-content-panel-quiz]").click()',
+  );
+  await waitFor('!document.querySelector("[role=dialog]")');
+  assert.equal(
+    await evaluate(
+      'document.getElementById("lesson-content-tab-quiz").getAttribute("aria-selected")',
+    ),
+    'true',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/21/quiz').length,
+    2,
   );
   await noOverflow();
   await clickLabel('Open curriculum');
@@ -461,6 +862,75 @@ try {
     ),
     'true',
   );
+  await clickTab('vocabulary');
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-vocabulary tbody")?.innerText.includes("Bài học chưa có từ vựng.")',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/22/vocabularies').length,
+    1,
+  );
+  assert.equal(await evaluate('document.body.innerText.includes("学生")'), false);
+  await clickTab('kanji');
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-kanji")?.innerText.includes("Bài học chưa có Kanji.")',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/22/kanjis').length,
+    1,
+  );
+  assert.equal(await evaluate('document.body.innerText.includes("ガク")'), false);
+  await clickTab('quiz');
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-quiz")?.innerText.includes("Bài học chưa có Quiz.")',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/22/quiz').length,
+    1,
+  );
+  assert.equal(await evaluate('document.body.innerText.includes("Quiz Bài 2")'), false);
+  await send('Page.navigate', { url: `${origin}/admin/courses/7/lessons/23` });
+  await workspaceReady();
+  await clickTab('quiz');
+  await waitFor(
+    'document.querySelector("#lesson-content-panel-quiz")?.innerText.includes("Quiz chưa có câu hỏi.")',
+  );
+  assert.equal(
+    requests.filter((request) => request === 'GET /api/v1/study/lessons/23/quiz').length,
+    1,
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-quiz").innerText.includes("Quiz trống")',
+    ),
+    true,
+  );
+  await send('Page.navigate', { url: `${origin}/admin/courses/7/lessons/24` });
+  await workspaceReady();
+  await clickTab('quiz');
+  await waitFor('document.querySelector("#lesson-content-panel-quiz [role=alert]")');
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-quiz").innerText.includes("Bài học chưa có Quiz.")',
+    ),
+    false,
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-quiz [role=alert]").innerText.includes("quyền truy cập")',
+    ),
+    true,
+  );
+  await send('Page.navigate', { url: `${origin}/admin/courses/7/lessons/25` });
+  await workspaceReady();
+  await clickTab('quiz');
+  await waitFor('document.querySelector("#lesson-content-panel-quiz [role=alert]")');
+  assert.equal(
+    await evaluate(
+      'document.querySelector("#lesson-content-panel-quiz").innerText.includes("Bài học chưa có Quiz.")',
+    ),
+    false,
+  );
   await send('Page.navigate', { url: `${origin}/admin/courses/7/lessons/invalid` });
   await waitFor('document.body.innerText.includes("404")');
   assert.deepEqual(errors, []);
@@ -469,7 +939,7 @@ try {
   await waitFor('location.pathname === "/login"');
   assert.equal(await evaluate('document.querySelector("#grammar-heading") === null'), true);
   process.stdout.write(
-    `Workspace browser checks passed: desktop/mobile/tablet, scrolling, drawer focus/Escape/backdrop, shared tabs, Vocabulary search, grammar editor, admin create/edit layouts, lesson navigation, route validation and AuthGuard.\nScreenshots: ${profile}\n`,
+    `Workspace browser checks passed: desktop/mobile/tablet, scrolling, drawer focus/Escape/backdrop, shared tabs, Vocabulary, Kanji and Quiz API states, grammar editor, admin create/edit layouts, lesson navigation, route validation and AuthGuard.\nScreenshots: ${profile}\n`,
   );
 } finally {
   socket?.close();
