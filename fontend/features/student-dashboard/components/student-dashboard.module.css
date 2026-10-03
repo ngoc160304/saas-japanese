@@ -1,0 +1,73 @@
+.dashboard {
+  color: #1e293b;
+}
+
+.dashboard :global(.text-slate-900),
+.dashboard :global(.text-slate-800),
+.dashboard :global(.text-slate-700) {
+  color: #1e293b;
+}
+
+.dashboard :global(.text-slate-600),
+.dashboard :global(.text-slate-500),
+.dashboard :global(.text-slate-400),
+.dashboard :global(.text-slate-300) {
+  color: #64748b;
+}
+
+.dashboard :global(.text-sky-600),
+.dashboard :global(.text-sky-700) {
+  color: #0284c7;
+}
+
+.dashboard :global(.bg-sky-500),
+.dashboard :global(.bg-sky-600) {
+  background-color: #1e88e5;
+}
+
+.dashboard :global(.bg-slate-900) {
+  background-color: #2b4263;
+}
+
+.dashboard :global(.bg-sky-50),
+.dashboard :global(.bg-indigo-50) {
+  background-color: #ebf3fa;
+}
+
+.dashboard :global(.bg-slate-50),
+.dashboard :global(.bg-slate-100) {
+  background-color: #f8fafc;
+}
+
+.dashboard :global(.border-slate-100) {
+  border-color: #e2e8f0;
+}
+
+.dashboard :global(.bg-emerald-500) {
+  background-color: #16a34a;
+}
+
+.dashboard :global(.bg-emerald-50) {
+  background-color: #e6f4ea;
+}
+
+.dashboard :global(.text-emerald-600) {
+  color: #16a34a;
+}
+
+.dashboard :global(.bg-amber-500) {
+  background-color: #d97706;
+}
+
+.dashboard :global(.bg-amber-50) {
+  background-color: #fef3c7;
+}
+
+.dashboard :global(.bg-rose-500) {
+  background-color: #dc2626;
+}
+
+.dashboard :global(.text-amber-600),
+.dashboard :global(.text-amber-700) {
+  color: #d97706;
+}

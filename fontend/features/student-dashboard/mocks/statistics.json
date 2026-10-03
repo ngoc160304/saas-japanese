@@ -1,0 +1,5 @@
+[
+  { "label": "Active Courses", "value": 62, "tone": "sky" },
+  { "label": "Courses In Progress", "value": 18, "tone": "amber" },
+  { "label": "Completed Courses", "value": 44, "tone": "emerald" }
+]

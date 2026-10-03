@@ -1,0 +1,29 @@
+{
+  "totalMinutes": 2040,
+  "scaleMaximum": 2345,
+  "bars": [
+    { "day": 1, "percent": 60, "completed": true },
+    { "day": 2, "percent": 85, "completed": true },
+    { "day": 3, "percent": 40, "completed": true },
+    { "day": 4, "percent": 95, "completed": true },
+    { "day": 5, "percent": 70, "completed": true },
+    { "day": 6, "percent": 55, "completed": true },
+    { "day": 7, "percent": 100, "completed": true },
+    { "day": 8, "percent": 80, "completed": true },
+    { "day": 9, "percent": 65, "completed": true },
+    { "day": 10, "percent": 90, "completed": true },
+    { "day": 11, "percent": 45, "completed": true },
+    { "day": 12, "percent": 75, "completed": true },
+    { "day": 13, "percent": 88, "completed": true },
+    { "day": 14, "percent": 60, "completed": true },
+    { "day": 15, "percent": 30, "completed": false },
+    { "day": 16, "percent": 20, "completed": false },
+    { "day": 17, "percent": 25, "completed": false },
+    { "day": 18, "percent": 15, "completed": false }
+  ],
+  "metrics": [
+    { "label": "This Week", "value": "12", "unit": "Hours" },
+    { "label": "This Month", "value": "38", "unit": "Hours" },
+    { "label": "Growth Rate", "value": "+18%", "unit": "MoM", "positive": true }
+  ]
+}
