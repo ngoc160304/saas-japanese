@@ -1,0 +1,6 @@
+{
+  "learnerAvatars": ["/student/learner-a.jpg", "/student/learner-b.jpg", "/student/learner-c.jpg"],
+  "sessionsCompleted": 2,
+  "sessionsTarget": 5,
+  "description": "Improve retention with short, focused JLPT lessons designed to fit your schedule."
+}

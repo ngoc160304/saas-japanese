@@ -1,0 +1,57 @@
+[
+  {
+    "id": "n3-soumatome",
+    "level": "N3",
+    "title": "Tiếng Nhật Trung Cấp N3 Soumatome",
+    "slug": "courses/n3-soumatome",
+    "enrolledDate": "Jan 4, 2024",
+    "progress": 40,
+    "additionalLearners": 5,
+    "tone": "sky",
+    "learnerAvatars": ["/student/learner-a.jpg", "/student/learner-b.jpg", "/student/learner-c.jpg"]
+  },
+  {
+    "id": "n2-exam-mastery",
+    "level": "N2",
+    "title": "Luyện Đề Thi Thử Toàn Diện N2",
+    "slug": "courses/n2-exam-mastery",
+    "enrolledDate": "Jan 4, 2024",
+    "progress": 60,
+    "additionalLearners": 8,
+    "tone": "navy",
+    "learnerAvatars": ["/student/learner-d.jpg", "/student/learner-c.jpg", "/student/learner-a.jpg"]
+  },
+  {
+    "id": "n4-kanji-vocab",
+    "level": "N4",
+    "title": "Kanji & Từ Vựng Cấp Tốc N4",
+    "slug": "courses/n4-kanji-vocab",
+    "enrolledDate": "Jan 2, 2024",
+    "progress": 90,
+    "additionalLearners": 9,
+    "tone": "emerald",
+    "learnerAvatars": ["/student/learner-b.jpg", "/student/learner-a.jpg", "/student/learner-d.jpg"]
+  },
+  {
+    "id": "n5-starter",
+    "level": "N5",
+    "title": "Tiếng Nhật Cơ Bản Cho Người Mới Bắt Đầu N5",
+    "slug": "courses/n5-starter",
+    "enrolledDate": "Jan 6, 2024",
+    "progress": 30,
+    "additionalLearners": 6,
+    "tone": "amber",
+    "learnerAvatars": ["/student/learner-a.jpg", "/student/learner-c.jpg"]
+  },
+  {
+    "id": "n3-shadowing",
+    "level": "N3",
+    "title": "Luyện Giao Tiếp & Shadowing N3",
+    "slug": "courses/n3-shadowing",
+    "enrolledDate": "Jan 8, 2024",
+    "progress": 80,
+    "additionalLearners": 4,
+    "tone": "sky",
+    "learnerAvatars": ["/student/learner-b.jpg", "/student/learner-d.jpg"]
+  }
+]
