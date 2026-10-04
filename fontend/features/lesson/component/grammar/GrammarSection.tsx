@@ -1,14 +1,36 @@
+'use client';
+
+import { useState } from 'react';
 import type { GrammarLectureVideo, GrammarPoint } from '../../types/grammar';
 import { GrammarLectureCard } from './GrammarLectureCard';
-import { GrammarPointCard } from './GrammarPointCard';
 import { GrammarPointDialog } from './GrammarPointDialog';
+import { GrammarRichTextEditor } from './GrammarRichTextEditor';
 
 interface GrammarSectionProps {
   video: GrammarLectureVideo;
   points: readonly GrammarPoint[];
+  pointCount: number;
+  onPointAdded: () => void;
 }
 
-export function GrammarSection({ video, points }: GrammarSectionProps) {
+function formatGrammarPoint(title: string, content: string) {
+  const safeTitle = title.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  return `<h2>${safeTitle}</h2>\n${content}`;
+}
+
+export function GrammarSection({ video, points, pointCount, onPointAdded }: GrammarSectionProps) {
+  const [editorContent, setEditorContent] = useState(() =>
+    points
+      .map((point) => formatGrammarPoint(point.title, point.editorContent))
+      .join('\n<hr />\n'),
+  );
+
+  function addGrammarPoint(title: string, content: string) {
+    const nextPoint = formatGrammarPoint(title, content);
+    setEditorContent((current) => (current ? `${current}\n<hr />\n${nextPoint}` : nextPoint));
+    onPointAdded();
+  }
+
   return (
     <section
       aria-labelledby="grammar-heading"
@@ -29,25 +51,33 @@ export function GrammarSection({ video, points }: GrammarSectionProps) {
             Video bài giảng lý thuyết và các mẫu ngữ pháp trọng điểm của bài học.
           </p>
         </div>
-        <GrammarPointDialog variant="primary" />
+        <GrammarPointDialog variant="primary" onAdd={addGrammarPoint} />
       </div>
       <div className="space-y-6">
         <GrammarLectureCard video={video} />
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h3 className="text-sm font-extrabold text-slate-900">
-              Grammar Points ({points.length})
+              Grammar Points ({pointCount})
             </h3>
             <p className="mt-0.5 text-xs font-medium text-slate-500">
-              Danh sách các mẫu ngữ pháp trọng tâm trong bài học
+              Nội dung các mẫu ngữ pháp trọng tâm trong bài học
             </p>
           </div>
-          <GrammarPointDialog />
+          <GrammarPointDialog onAdd={addGrammarPoint} />
         </div>
-        <div className="space-y-4">
-          {points.map((point, index) => (
-            <GrammarPointCard key={point.id} point={point} index={index + 1} />
-          ))}
+        <div className="min-w-0">
+          <label htmlFor="lesson-grammar-content" className="sr-only">
+            Nội dung Grammar Points
+          </label>
+          <GrammarRichTextEditor
+            id="lesson-grammar-content"
+            value={editorContent}
+            onChange={setEditorContent}
+          />
+          <p className="mt-2 text-xs text-slate-500">
+            Nội dung chỉnh sửa chỉ được giữ tạm trên trang này và sẽ mất khi tải lại.
+          </p>
         </div>
       </div>
     </section>

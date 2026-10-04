@@ -5,6 +5,19 @@ import type {
   GetClientCourseResponse,
   GetClientCourseLessonsResponse,
 } from './client-courses.type';
+import type { ApiResponse } from '@/types/api';
+
+export interface CourseEnrollment {
+  Id: number;
+  userId: number;
+  courseId: number;
+  courseTitle: string;
+  enrollAt: string;
+  completedAt: string | null;
+  progressPercent: number;
+}
+
+export type EnrollCourseResponse = ApiResponse<CourseEnrollment | null>;
 
 async function getClientCourses(params: ClientCoursesQuery, signal?: AbortSignal) {
   // Public requests must not be rejected by an anonymous session bootstrap in progress.
@@ -38,6 +51,16 @@ async function getLessons(courseId: number, signal?: AbortSignal) {
   return response.data.data;
 }
 
+async function enrollCourse(courseId: number) {
+  const response = await authorizeAxiosInstance.post<EnrollCourseResponse | '' | null>(
+    `/courses/${courseId}/enroll`,
+    undefined,
+    { localErrorHandling: true },
+  );
+  // The current controller also sends an empty 200 body for paid courses.
+  return response.data === '' || response.data === null ? null : response.data.data;
+}
+
 export const clientCoursesQueryKeys = {
   all: ['client-courses'] as const,
   list: (params: ClientCoursesQuery) => [...clientCoursesQueryKeys.all, params] as const,
@@ -46,4 +69,4 @@ export const clientCoursesQueryKeys = {
     [...clientCoursesQueryKeys.all, 'detail', courseId, 'lessons'] as const,
 };
 
-export const clientCoursesAPI = { getClientCourses, getDetail, getLessons };
+export const clientCoursesAPI = { getClientCourses, getDetail, getLessons, enrollCourse };

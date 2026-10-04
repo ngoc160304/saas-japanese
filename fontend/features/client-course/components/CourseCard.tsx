@@ -2,6 +2,7 @@
 
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 import type { ClientCourse } from '@/apis/courses/client-courses.type';
 import { CourseThumbnail } from '@/features/course/component/CourseThumbnail';
 import { formatCoursePrice } from '@/features/course/utils/course-format';
@@ -9,9 +10,11 @@ import { formatCoursePrice } from '@/features/course/utils/course-format';
 export function CourseCard({
   course,
   variant = 'listing',
+  featuredAction,
 }: {
   course: ClientCourse;
   variant?: 'listing' | 'featured';
+  featuredAction?: ReactNode;
 }) {
   const isFree = course.price === 0;
   const isFeatured = variant === 'featured';
@@ -80,6 +83,7 @@ export function CourseCard({
         >
           Xem chi tiết
         </Link>
+        {isFeatured && featuredAction}
       </div>
     </article>
   );

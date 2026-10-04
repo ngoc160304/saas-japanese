@@ -26,6 +26,7 @@ export function LessonContentTabs({
   lessonId,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const [grammarCount, setGrammarCount] = useState(grammarPoints.length);
   const [vocabularyCount, setVocabularyCount] = useState(0);
   const [kanjiCount, setKanjiCount] = useState(0);
   const [quizCount, setQuizCount] = useState(0);
@@ -33,7 +34,7 @@ export function LessonContentTabs({
     {
       id: 'grammar' as const,
       label: 'Grammar + Video',
-      count: grammarPoints.length,
+      count: grammarCount,
       icon: Video,
     },
     {
@@ -132,7 +133,12 @@ export function LessonContentTabs({
         aria-labelledby="lesson-content-tab-grammar"
         hidden={activeTab !== 'grammar'}
       >
-        <GrammarSection video={video} points={grammarPoints} />
+        <GrammarSection
+          video={video}
+          points={grammarPoints}
+          pointCount={grammarCount}
+          onPointAdded={() => setGrammarCount((count) => count + 1)}
+        />
       </div>
       <div
         id="lesson-content-panel-vocabulary"
