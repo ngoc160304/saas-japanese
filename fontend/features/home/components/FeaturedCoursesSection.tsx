@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { clientCoursesAPI, clientCoursesQueryKeys } from '@/apis/courses/client-courses.api';
-import { CourseCard } from '@/features/client-course/components/CourseCard';
+import { FeaturedCourseCard } from './FeaturedCourseCard';
 
 const featuredCoursesParams = { page: 0, size: 3 } as const;
 
@@ -93,7 +93,7 @@ export function FeaturedCoursesSection() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {coursesQuery.data.content.map((course) => (
-              <CourseCard key={course.id} course={course} variant="featured" />
+              <FeaturedCourseCard key={course.id} course={course} />
             ))}
           </div>
         )}

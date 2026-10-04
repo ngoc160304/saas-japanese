@@ -13,25 +13,45 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { newGrammarPointEditorMock } from '../../data/grammar.mock';
 import type { GrammarPoint } from '../../types/grammar';
 import { GrammarRichTextEditor } from './GrammarRichTextEditor';
 
 export function GrammarPointDialog({
   point,
   variant = 'secondary',
+  onAdd,
 }: {
   point?: GrammarPoint;
   variant?: 'primary' | 'secondary';
+  onAdd?: (title: string, content: string) => void;
 }) {
   const id = useId();
   const title = point ? 'Edit Grammar Point' : 'Add Grammar Point';
-  const [editorContent, setEditorContent] = useState(
-    point?.editorContent ?? newGrammarPointEditorMock,
-  );
+  const [open, setOpen] = useState(false);
+  const [pointTitle, setPointTitle] = useState(point?.title ?? '');
+  const [editorContent, setEditorContent] = useState(point?.editorContent ?? '');
+  const canAdd =
+    !point &&
+    Boolean(onAdd) &&
+    Boolean(pointTitle.trim()) &&
+    Boolean(editorContent.replace(/<[^>]*>/g, '').replaceAll('&nbsp;', ' ').trim());
+
+  function handleOpenChange(nextOpen: boolean) {
+    if (nextOpen) {
+      setPointTitle(point?.title ?? '');
+      setEditorContent(point?.editorContent ?? '');
+    }
+    setOpen(nextOpen);
+  }
+
+  function handleAdd() {
+    if (!canAdd || !onAdd) return;
+    onAdd(pointTitle.trim(), editorContent);
+    setOpen(false);
+  }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger
         render={
           <Button
@@ -71,7 +91,8 @@ export function GrammarPointDialog({
             </label>
             <Input
               id={`${id}-title`}
-              defaultValue={point?.title ?? ''}
+              value={pointTitle}
+              onChange={(event) => setPointTitle(event.target.value)}
               aria-required="true"
               placeholder="e.g. ~わけがない / ~わけはない"
               className="h-10 rounded-2xl border-slate-200 bg-slate-50 px-3.5 text-xs font-bold text-slate-900 md:text-xs"
@@ -91,8 +112,10 @@ export function GrammarPointDialog({
             />
           </div>
           <div className="flex flex-wrap justify-end gap-2.5 border-t border-slate-100 pt-3">
-            <p id={`${id}-save-unavailable`} className="w-full text-xs text-slate-500">
-              Saving grammar points is unavailable in this preview.
+            <p id={`${id}-save-note`} className="w-full text-xs text-slate-500">
+              {onAdd && !point
+                ? 'Nội dung chỉ được thêm tạm vào trình soạn thảo, chưa lưu lên máy chủ.'
+                : 'Saving grammar points is unavailable in this preview.'}
             </p>
             <DialogClose
               render={
@@ -107,8 +130,9 @@ export function GrammarPointDialog({
             </DialogClose>
             <Button
               type="button"
-              disabled
-              aria-describedby={`${id}-save-unavailable`}
+              disabled={!canAdd}
+              onClick={handleAdd}
+              aria-describedby={`${id}-save-note`}
               className="rounded-xl bg-slate-900 px-5 text-xs font-bold text-white hover:bg-amber-600"
             >
               Save Grammar Point
