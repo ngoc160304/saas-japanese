@@ -6,7 +6,7 @@ export default function Page() {
     <Suspense
       fallback={
         <p role="status" className="p-6 text-sm text-slate-500">
-          Loading courses…
+          Loading my courses…
         </p>
       }
     >

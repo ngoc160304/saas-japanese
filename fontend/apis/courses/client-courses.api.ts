@@ -9,7 +9,7 @@ import type { ApiResponse } from '@/types/api';
 import type { PageResponse } from '@/types/pagination';
 
 export interface CourseEnrollment {
-  Id: number;
+  id: number;
   userId: number;
   courseId: number;
   courseTitle: string;
@@ -18,8 +18,19 @@ export interface CourseEnrollment {
   progressPercent: number;
 }
 
-export type EnrollCourseResponse = ApiResponse<CourseEnrollment | null>;
-export type MyCoursesResponse = ApiResponse<PageResponse<CourseEnrollment>>;
+type CourseEnrollmentApiResponse = Omit<CourseEnrollment, 'id'> & { Id: number };
+
+export type EnrollCourseResponse = ApiResponse<CourseEnrollmentApiResponse | null>;
+export type MyCoursesResponse = ApiResponse<PageResponse<CourseEnrollmentApiResponse>>;
+export interface MyCoursesQuery {
+  page: number;
+  size: number;
+  courseTitle?: string;
+}
+
+function normalizeEnrollment({ Id, ...enrollment }: CourseEnrollmentApiResponse): CourseEnrollment {
+  return { ...enrollment, id: Id };
+}
 
 async function getClientCourses(params: ClientCoursesQuery, signal?: AbortSignal) {
   // Public requests must not be rejected by an anonymous session bootstrap in progress.
@@ -60,23 +71,26 @@ async function enrollCourse(courseId: number) {
     { localErrorHandling: true },
   );
   // The current controller also sends an empty 200 body for paid courses.
-  return response.data === '' || response.data === null ? null : response.data.data;
+  return response.data === '' || response.data === null || response.data.data === null
+    ? null
+    : normalizeEnrollment(response.data.data);
 }
 
-async function getMyCourses(page: number, signal?: AbortSignal) {
+async function getMyCourses(params: MyCoursesQuery, signal?: AbortSignal) {
   const response = await authorizeAxiosInstance.get<MyCoursesResponse>('/courses/my-courses', {
-    params: { page, size: 12 },
+    params,
     signal,
     localErrorHandling: true,
   });
-  return response.data.data;
+  const page = response.data.data;
+  return { ...page, content: page.content.map(normalizeEnrollment) };
 }
 
 async function getAllMyCourseIds(signal?: AbortSignal) {
-  const first = await getMyCourses(0, signal);
+  const first = await getMyCourses({ page: 0, size: 12 }, signal);
   const ids = first.content.map((enrollment) => enrollment.courseId);
   for (let page = 1; page < first.totalPages; page += 1) {
-    const result = await getMyCourses(page, signal);
+    const result = await getMyCourses({ page, size: 12 }, signal);
     ids.push(...result.content.map((enrollment) => enrollment.courseId));
   }
   return ids;
@@ -88,7 +102,10 @@ export const clientCoursesQueryKeys = {
   detail: (courseId: number) => [...clientCoursesQueryKeys.all, 'detail', courseId] as const,
   lessons: (courseId: number) =>
     [...clientCoursesQueryKeys.all, 'detail', courseId, 'lessons'] as const,
-  enrollments: (userId: number) => ['course-enrollments', userId] as const,
+  enrollments: (userId: number) => ['course-enrollments', userId, 'ids'] as const,
+  myCourses: (userId: number) => ['course-enrollments', userId, 'my-courses'] as const,
+  myCoursesPage: (userId: number, params: MyCoursesQuery) =>
+    [...clientCoursesQueryKeys.myCourses(userId), params] as const,
 };
 
 export const clientCoursesAPI = {
