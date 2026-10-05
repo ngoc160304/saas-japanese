@@ -19,7 +19,11 @@ const studentItems: ISidebarItem[] = [
     href: '/student/dashboard',
     icon: <House className={iconClass} aria-hidden="true" />,
   },
-  { title: 'Courses', icon: <BookOpen className={iconClass} aria-hidden="true" /> },
+  {
+    title: 'Courses',
+    href: '/student/courses',
+    icon: <BookOpen className={iconClass} aria-hidden="true" />,
+  },
   { title: 'Category', icon: <Tags className={iconClass} aria-hidden="true" /> },
   { title: 'JLPT Exams', icon: <GraduationCap className={iconClass} aria-hidden="true" /> },
   { title: 'Analytics', icon: <TrendingUp className={iconClass} aria-hidden="true" /> },
