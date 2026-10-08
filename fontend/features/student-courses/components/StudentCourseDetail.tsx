@@ -7,10 +7,10 @@ import { ArrowLeft, BookOpen } from 'lucide-react';
 import { cartAPI, cartQueryKeys } from '@/apis/cart/cart.api';
 import { clientCoursesAPI, clientCoursesQueryKeys } from '@/apis/courses/client-courses.api';
 import { getApiError, getApiErrorMessage } from '@/lib/api-error';
+import { formatCoursePrice } from '@/features/course/utils/course-format';
 import { selectCurrentUser } from '@/store/authSlice';
 import { useAppSelector } from '@/store/hooks';
 import { useCourseEnrollment } from '../hooks/useCourseEnrollment';
-import { formatCoursePrice } from './CourseCard';
 import { LessonList } from './LessonList';
 
 export function StudentCourseDetail({ courseId }: { courseId: number }) {
@@ -78,7 +78,7 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
           href="/student/courses"
           className="mt-4 block text-xs font-bold text-sky-600 hover:underline"
         >
-          Back to all courses
+          Back to My Courses
         </Link>
       </section>
     );
@@ -102,7 +102,7 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
               className="flex items-center gap-1 font-bold text-sky-600 hover:underline"
             >
               <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
-              Back to all courses
+              Back to My Courses
             </Link>
             <span aria-hidden="true">/</span>
             <span aria-current="page" className="max-w-xs truncate font-bold text-slate-900">

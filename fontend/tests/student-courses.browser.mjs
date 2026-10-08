@@ -44,6 +44,7 @@ try {
   let nextId = 0;
   const pending = new Map();
   const errors = [];
+  const consoleWarnings = [];
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data);
     if (message.id) {
@@ -53,6 +54,12 @@ try {
       else callback.resolve(message.result);
     } else if (message.method === 'Runtime.exceptionThrown') {
       errors.push(message.params.exceptionDetails.text);
+    } else if (message.method === 'Runtime.consoleAPICalled') {
+      if (message.params.type === 'warning' || message.params.type === 'error') {
+        consoleWarnings.push(
+          message.params.args.map((arg) => arg.value ?? arg.description ?? '').join(' '),
+        );
+      }
     } else if (message.method === 'Fetch.requestPaused') {
       void handleRequest(message.params);
     }
@@ -98,6 +105,7 @@ try {
   let enrollPosts = 0;
   let failList = false;
   let sessionExpired = false;
+  const listRequests = [];
   async function handleRequest({ requestId, request }) {
     try {
       const url = new URL(request.url);
@@ -176,22 +184,39 @@ try {
         if (course) body = { data: course };
         else status = 404;
       } else if (url.pathname === '/api/v1/courses/my-courses') {
+        assert.equal(request.method, 'GET');
+        assert.equal(request.headers.Authorization, 'Bearer browser-test-token');
+        assert.equal(url.searchParams.has('pricing'), false);
+        assert.equal(url.searchParams.has('title'), false);
+        listRequests.push(url.search);
         const page = Number(url.searchParams.get('page') ?? 0);
-        const content = enrollments.slice(page * 12, (page + 1) * 12).map((courseId) => ({
-          Id: courseId,
+        const size = Number(url.searchParams.get('size') ?? 10);
+        const courseTitle = (url.searchParams.get('courseTitle') ?? '').toLowerCase();
+        const filtered = enrollments.filter((courseId) =>
+          `Course ${courseId}`.toLowerCase().includes(courseTitle),
+        );
+        const content = filtered.slice(page * size, (page + 1) * size).map((courseId) => ({
+          Id: courseId + 1000,
           userId: 1,
           courseId,
-          courseTitle: `Course ${courseId}`,
+          courseTitle: courseId === 1 ? 'Free Basics' : `Course ${courseId}`,
           enrollAt: '2026-01-01T00:00:00Z',
-          completedAt: null,
-          progressPercent: 0,
+          completedAt: courseId === 100 ? '2026-02-01T00:00:00Z' : null,
+          progressPercent: courseId === 100 ? 100 : 25,
         }));
-        body = {
+        if (failList) {
+          status = 500;
+          failList = false;
+        } else body = {
           data: {
             content,
             number: page,
-            totalPages: Math.ceil(enrollments.length / 12),
-            last: (page + 1) * 12 >= enrollments.length,
+            size,
+            numberOfElements: content.length,
+            totalElements: filtered.length,
+            totalPages: Math.ceil(filtered.length / size),
+            first: page === 0,
+            last: (page + 1) * size >= filtered.length,
           },
         };
       } else if (/^\/api\/v1\/courses\/\d+\/enroll$/.test(url.pathname)) {
@@ -250,8 +275,13 @@ try {
   await waitFor('document.querySelector(\'a[href="/student/courses"]\') !== null');
   await evaluate('document.querySelector(\'a[href="/student/courses"]\').click()');
   await waitFor(
-    'location.pathname === "/student/courses" && document.body.innerText.includes("Free Basics")',
+    'location.pathname === "/student/courses" && document.body.innerText.includes("Course 100")',
   );
+  assert.equal(enrollPosts, 0);
+  assert.equal(await evaluate('document.body.innerText.includes("Completed Feb 1, 2026")'), true);
+  assert.equal(await evaluate('document.body.innerText.includes("100%")'), true);
+  assert.equal(await evaluate('document.querySelector(\'a[href="/student/courses/100"]\') !== null'), true);
+  assert.equal(listRequests.some((search) => search.includes('page=0') && search.includes('size=9')), true);
   assert.equal(
     await evaluate(
       'document.querySelector(\'a[href="/student/courses"]\').className.includes("ring-sky-500")',
@@ -259,38 +289,37 @@ try {
     true,
   );
   await evaluate(
-    'document.querySelector(\'input[placeholder="Search courses by title…"]\').focus()',
+    'document.querySelector(\'input[placeholder="Search my courses by title…"]\').focus()',
   );
-  await send('Input.insertText', { text: 'Free' });
+  await send('Input.insertText', { text: 'Course 100' });
   await waitFor(
-    'location.search.includes("title=Free") && document.body.innerText.includes("Showing 1 of 1")',
+    'location.search.includes("courseTitle=Course+100") && document.body.innerText.includes("Course 100")',
   );
+  assert.equal(listRequests.some((search) => search.includes('courseTitle=Course+100')), true);
   await evaluate(
-    'document.querySelector("#student-course-pricing").value = "paid"; document.querySelector("#student-course-pricing").dispatchEvent(new Event("change", { bubbles: true }))',
+    'Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Clear search"))?.click()',
   );
-  await waitFor('document.body.innerText.includes("No courses match your search")');
-  await evaluate(
-    'Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Reset"))?.click()',
-  );
-  await waitFor('location.search === "" && document.body.innerText.includes("Showing 9 of 13")');
+  await waitFor('location.search === "" && document.body.innerText.includes("Course 100")');
   await evaluate('document.querySelector(\'button[aria-label="Trang 2"]\').click()');
   await waitFor(
-    'location.search.includes("page=2") && document.body.innerText.includes("Paid Course 13")',
+    'location.search.includes("page=2") && document.body.innerText.includes("Course 3")',
   );
+  assert.equal(listRequests.some((search) => search.includes('page=1') && search.includes('size=9')), true);
   failList = true;
   await evaluate(
-    'document.querySelector(\'input[placeholder="Search courses by title…"]\').focus()',
+    'document.querySelector(\'input[placeholder="Search my courses by title…"]\').focus()',
   );
   await send('Input.insertText', { text: 'Failure' });
   await waitFor('document.body.innerText.includes("Retry")');
+  assert.equal(await evaluate('new URLSearchParams(location.search).has("page")'), false);
   await evaluate(
     'Array.from(document.querySelectorAll("button")).find((button) => button.textContent === "Retry")?.click()',
   );
   await waitFor('document.body.innerText.includes("No courses match your search")');
   await evaluate(
-    'Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Reset"))?.click()',
+    'Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Clear search"))?.click()',
   );
-  await waitFor('location.search === "" && document.body.innerText.includes("Free Basics")');
+  await waitFor('location.search === "" && document.body.innerText.includes("Course 100")');
   await send('Emulation.setDeviceMetricsOverride', {
     width: 1440,
     height: 900,
@@ -320,6 +349,14 @@ try {
     captureBeyondViewport: true,
   });
   await writeFile(join(profile, 'courses-mobile.png'), Buffer.from(mobile.data, 'base64'));
+  const savedEnrollments = enrollments.splice(0);
+  await navigate('/student/courses?courseTitle=none');
+  await waitFor('document.body.innerText.includes("No courses match your search")');
+  await evaluate(
+    'Array.from(document.querySelectorAll("button")).find((button) => button.textContent.includes("Clear search"))?.click()',
+  );
+  await waitFor('document.body.innerText.includes("You have no enrolled courses yet")');
+  enrollments.push(...savedEnrollments);
   await send('Emulation.setDeviceMetricsOverride', {
     width: 1440,
     height: 900,
@@ -332,10 +369,8 @@ try {
   );
   assert.equal(enrollPosts, 0);
   await evaluate('document.querySelector(\'a[href="/student/courses"]\').click()');
-  await waitFor(
-    'location.pathname === "/student/courses" && document.body.innerText.includes("Free Basics")',
-  );
-  await evaluate('document.querySelector(\'a[href="/student/courses/1"]\').click()');
+  await waitFor('location.pathname === "/student/courses" && document.body.innerText.includes("Course 100")');
+  await navigate('/student/courses/1');
   await waitFor(
     'location.pathname === "/student/courses/1" && document.body.innerText.includes("Enroll for free") && document.body.innerText.includes("Lesson One")',
   );
@@ -344,6 +379,9 @@ try {
   );
   await waitFor('document.body.innerText.includes("Already enrolled")');
   assert.equal(enrollPosts, 1);
+  await navigate('/student/courses?page=2');
+  await waitFor('document.body.innerText.includes("Free Basics")');
+  assert.equal(await evaluate('document.querySelector(\'a[href="/student/courses/1"]\') !== null'), true);
   await navigate('/student/courses/2');
   await waitFor('document.body.innerText.includes("Add to cart")');
   await evaluate(
@@ -393,6 +431,11 @@ try {
   );
   await waitFor('location.pathname === "/login"');
   assert.deepEqual(errors, []);
+  assert.deepEqual(
+    consoleWarnings.filter((message) => message.includes('Each child in a list should have a unique')),
+    [],
+    'React should not warn about enrollment card keys',
+  );
   process.stdout.write(`Student courses browser checks passed (mocked API). Captures: ${profile}\n`);
 } finally {
   socket?.close();

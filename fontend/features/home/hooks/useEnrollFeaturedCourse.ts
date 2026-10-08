@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { cartQueryKeys } from '@/apis/cart/cart.api';
-import { clientCoursesAPI } from '@/apis/courses/client-courses.api';
+import { clientCoursesAPI, clientCoursesQueryKeys } from '@/apis/courses/client-courses.api';
 import { safeReturnPath } from '@/features/auth/auth-navigation';
 import { getApiError } from '@/lib/api-error';
 import { selectAuthInitialized, selectCurrentUser, selectIsAuthenticated } from '@/store/authSlice';
@@ -43,6 +43,12 @@ export function useEnrollFeaturedCourse(courseId: number) {
       if (currentUserId === undefined) return;
       if (enrollment !== null) {
         setCompleted({ userId: currentUserId, kind: 'enrolled' });
+        await queryClient.invalidateQueries({
+          queryKey: clientCoursesQueryKeys.enrollments(currentUserId),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: clientCoursesQueryKeys.myCourses(currentUserId),
+        });
         toast.success('Đăng ký khóa học thành công.');
       } else {
         setCompleted({ userId: currentUserId, kind: 'cart' });
@@ -64,6 +70,12 @@ export function useEnrollFeaturedCourse(courseId: number) {
         const currentUserId = store.getState().auth.user?.id;
         if (currentUserId !== undefined) {
           setCompleted({ userId: currentUserId, kind: 'enrolled' });
+          void queryClient.invalidateQueries({
+            queryKey: clientCoursesQueryKeys.enrollments(currentUserId),
+          });
+          void queryClient.invalidateQueries({
+            queryKey: clientCoursesQueryKeys.myCourses(currentUserId),
+          });
         }
         toast.error('Bạn đã đăng ký khóa học này.');
         return;

@@ -41,6 +41,9 @@ export function useCourseEnrollment(courseId: number) {
           await queryClient.invalidateQueries({
             queryKey: clientCoursesQueryKeys.enrollments(context.userId),
           });
+          await queryClient.invalidateQueries({
+            queryKey: clientCoursesQueryKeys.myCourses(context.userId),
+          });
         }
         toast.success('Course enrollment completed.');
       } else {
@@ -57,11 +60,15 @@ export function useCourseEnrollment(courseId: number) {
         return;
       const failure = getApiError(error);
       if (failure.status === 401) return;
-      if (failure.message === 'Bạn đã đăng ký course này') {
-        if (context.userId !== undefined)
+      if (failure.status === 400 && failure.message === 'Bạn đã đăng ký course này') {
+        if (context.userId !== undefined) {
           void queryClient.invalidateQueries({
             queryKey: clientCoursesQueryKeys.enrollments(context.userId),
           });
+          void queryClient.invalidateQueries({
+            queryKey: clientCoursesQueryKeys.myCourses(context.userId),
+          });
+        }
         toast.info('You are already enrolled in this course.');
       } else if (failure.message === 'Chương trình học đã có trong giỏ hàng') {
         void queryClient.invalidateQueries({ queryKey: cartQueryKeys.all });
