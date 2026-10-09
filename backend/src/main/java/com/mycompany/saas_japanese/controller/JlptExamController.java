@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/jlptExams")
+@RequestMapping("/jlpt-exams")
 @RequiredArgsConstructor
 public class JlptExamController {
 
