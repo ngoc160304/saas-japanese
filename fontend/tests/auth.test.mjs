@@ -373,3 +373,21 @@ test('return URLs stay same-origin and system errors do not expose server detail
   });
   assert.equal(getApiError(error).message.includes('secret'), false);
 });
+
+test('free enrollment accepts an empty success body and sends no request body', async () => {
+  const app = loadApp();
+  app.store.dispatch(app.actions.sessionReceived(session()));
+  const { clientCoursesAPI } = app.load(resolve(root, 'apis/courses/client-courses.api'));
+  let calls = 0;
+  app.client.defaults.adapter = async (config) => {
+    assert.equal(config.method, 'post');
+    assert.equal(config.url, '/courses/10/enroll');
+    assert.equal(config.data, undefined);
+    assert.equal(config.headers.get('Authorization'), 'Bearer test-access');
+    calls++;
+    return response(config, calls === 1 ? '' : undefined, calls === 1 ? 200 : 204);
+  };
+  assert.equal(await clientCoursesAPI.enrollCourse(10), null);
+  assert.equal(await clientCoursesAPI.enrollCourse(10), null);
+  assert.equal(calls, 2);
+});

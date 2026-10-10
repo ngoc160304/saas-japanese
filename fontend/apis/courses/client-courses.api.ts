@@ -65,13 +65,16 @@ async function getLessons(courseId: number, signal?: AbortSignal) {
 }
 
 async function enrollCourse(courseId: number) {
-  const response = await authorizeAxiosInstance.post<EnrollCourseResponse | '' | null>(
+  const response = await authorizeAxiosInstance.post<EnrollCourseResponse | '' | null | undefined>(
     `/courses/${courseId}/enroll`,
     undefined,
     { localErrorHandling: true },
   );
   // The current controller also sends an empty 200 body for paid courses.
-  return response.data === '' || response.data === null || response.data.data === null
+  return response.data === undefined ||
+    response.data === null ||
+    response.data === '' ||
+    response.data.data === null
     ? null
     : normalizeEnrollment(response.data.data);
 }
