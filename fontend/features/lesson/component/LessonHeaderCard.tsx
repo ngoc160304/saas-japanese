@@ -11,6 +11,7 @@ export function LessonHeaderCard({
   grammarDirty,
   isSaving,
   isChangingPublication,
+  isVideoBusy,
   saveError,
   onSave,
   onPublicationClick,
@@ -23,6 +24,7 @@ export function LessonHeaderCard({
   grammarDirty: boolean;
   isSaving: boolean;
   isChangingPublication: boolean;
+  isVideoBusy: boolean;
   saveError: string | null;
   onSave: () => void;
   onPublicationClick: () => void;
@@ -67,12 +69,12 @@ export function LessonHeaderCard({
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           {showGrammarSave && (
-            <Button type="button" onClick={onSave} disabled={!grammarDirty || isSaving || isChangingPublication} className="h-9 rounded-2xl bg-primary px-3.5 text-xs font-bold text-white hover:bg-primary/90">
+            <Button type="button" onClick={onSave} disabled={!grammarDirty || isSaving || isChangingPublication || isVideoBusy} className="h-9 rounded-2xl bg-primary px-3.5 text-xs font-bold text-white hover:bg-primary/90">
               {isSaving ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" /> : <Save className="size-3.5" aria-hidden="true" />}
               {isSaving ? 'Đang lưu…' : 'Lưu ngữ pháp'}
             </Button>
           )}
-          <Button type="button" onClick={onPublicationClick} disabled={isSaving || isChangingPublication} variant="outline" className="h-9 rounded-2xl border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
+          <Button type="button" onClick={onPublicationClick} disabled={isSaving || isChangingPublication || isVideoBusy} variant="outline" className="h-9 rounded-2xl border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700 hover:bg-slate-50">
             {isChangingPublication ? <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" /> : lesson.isPublished ? <EyeOff className="size-3.5" aria-hidden="true" /> : <Upload className="size-3.5" aria-hidden="true" />}
             {isChangingPublication ? 'Đang cập nhật…' : lesson.isPublished ? 'Ẩn bài học' : 'Xuất bản'}
           </Button>

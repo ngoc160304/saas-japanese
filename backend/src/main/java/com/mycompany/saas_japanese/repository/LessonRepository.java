@@ -8,13 +8,21 @@ import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.response.ClientLessonResponse;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.repository.query.Param;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, Long>, JpaSpecificationExecutor<Lesson> {
   Optional<Lesson> findByIdAndIsDeletedFalse(Long id);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select lesson from Lesson lesson where lesson.id = :id and lesson.isDeleted = false")
+  Optional<Lesson> findActiveForUpdate(@Param("id") Long id);
+
+  boolean existsByVideoMediaIdAndIsDeletedFalse(Long videoMediaId);
 
   long countByCourseIdAndIsDeletedFalse(Long courseId);
 

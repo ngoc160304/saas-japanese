@@ -24,4 +24,5 @@ public interface CourseCategoryRepository extends JpaRepository<CourseCategory, 
   Page<CourseCategory> findAll(Specification<CourseCategory> spec, Pageable pageable);
 
   boolean existsBySlugAndIdNot(String slug, Long id);
+  boolean existsByMediaIdAndIsDeletedFalse(Long mediaId);
 }

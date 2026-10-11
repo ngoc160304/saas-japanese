@@ -75,9 +75,12 @@ public class SecurityConfiguration {
                                                                 "/api/v1/auth/refresh-token", "/api/v1/auth/logout")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/client/**").permitAll()
+                                                .requestMatchers(HttpMethod.POST, "/api/v1/upload/videos")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.PATCH,
                                                                 "/api/v1/lessons/{id}/grammar",
-                                                                "/api/v1/lessons/{id}/publication")
+                                                                "/api/v1/lessons/{id}/publication",
+                                                                "/api/v1/lessons/{id}/video")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/auth/myProfile", "/api/v1/auth/updateProfile")
                                                 .authenticated()

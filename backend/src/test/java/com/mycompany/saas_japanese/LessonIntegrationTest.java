@@ -2,6 +2,8 @@ package com.mycompany.saas_japanese;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -9,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -32,11 +37,13 @@ import com.mycompany.saas_japanese.domain.CourseCategory;
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.request.ReqCreateLesson;
+import com.mycompany.saas_japanese.domain.request.ReqUpdateLesson;
 import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
 import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.service.LessonService;
+import com.mycompany.saas_japanese.service.UploadService;
 import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
@@ -49,6 +56,7 @@ class LessonIntegrationTest extends AuthTestSupport {
     @Autowired private LessonRepository lessons;
     @Autowired private MediaRepository media;
     @Autowired private LessonService service;
+    @MockitoBean private UploadService uploads;
     @Autowired private EntityManager entityManager;
     private MockMvc mvc;
 
@@ -153,6 +161,140 @@ class LessonIntegrationTest extends AuthTestSupport {
         var replacement = service.createLesson(request);
         entityManager.flush();
         assertThat(replacement.getVideoMediaId()).isEqualTo(video.getId());
+    }
+
+    @Test
+    void videoPatchAttachesReplacesAndDetachesWithoutChangingLessonContent() throws Exception {
+        Course course = course("Video patch");
+        Lesson lesson = lesson(course, "Video lifecycle");
+        lesson.setGrammar("<p>Saved grammar</p>");
+        lesson.setDurationMinutes(42);
+        lesson.setIsPublished(true);
+        Media first = media.save(Media.builder().fileName("first.mp4").publicId("first-video")
+            .secureUrl("https://example.test/first.mp4").fileType(FileTypeEnum.VIDEO).isUsed(false).build());
+        Media second = media.save(Media.builder().fileName("second.mp4").publicId("second-video")
+            .secureUrl("https://example.test/second.mp4").fileType(FileTypeEnum.VIDEO).isUsed(false).build());
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        Long id = lesson.getId();
+
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + first.getId() + "}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.videoMediaId").value(first.getId()));
+        assertThat(first.getIsUsed()).isTrue();
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + first.getId() + "}"))
+            .andExpect(status().isOk());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + second.getId() + "}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.videoMediaId").value(second.getId()));
+        assertThat(first.getIsUsed()).isFalse();
+        assertThat(second.getIsUsed()).isTrue();
+        mvc.perform(delete("/api/v1/lessons/{id}/video", id).with(admin))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.videoMediaId").isEmpty());
+        mvc.perform(delete("/api/v1/lessons/{id}/video", id).with(admin))
+            .andExpect(status().isOk());
+        assertThat(second.getIsUsed()).isFalse();
+        assertThat(lesson.getVideoMedia()).isNull();
+        assertThat(lesson.getGrammar()).isEqualTo("<p>Saved grammar</p>");
+        assertThat(lesson.getDurationMinutes()).isEqualTo(42);
+        assertThat(lesson.getIsPublished()).isTrue();
+        assertThat(lesson.getCourse().getId()).isEqualTo(course.getId());
+    }
+
+    @Test
+    void videoPatchRejectsInvalidMediaAndNonAdminWrites() throws Exception {
+        Lesson lesson = lesson(course("Video guard"), "Guarded video");
+        Media image = media.save(Media.builder().fileName("image.png").publicId("image-video-guard")
+            .secureUrl("https://example.test/image.png").fileType(FileTypeEnum.IMAGE).isUsed(false).build());
+        Media deleted = media.save(Media.builder().fileName("deleted.mp4").publicId("deleted-video-guard")
+            .secureUrl("https://example.test/deleted.mp4").fileType(FileTypeEnum.VIDEO)
+            .isDeleted(true).isUsed(false).build());
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        var student = jwt().authorities(new SimpleGrantedAuthority("ROLE_STUDENT"));
+        Long id = lesson.getId();
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"videoMediaId\":1}"))
+            .andExpect(status().isUnauthorized());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(student)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"videoMediaId\":1}"))
+            .andExpect(status().isForbidden());
+        mvc.perform(delete("/api/v1/lessons/{id}/video", id).with(student))
+            .andExpect(status().isForbidden());
+        mvc.perform(multipart("/api/v1/upload/videos").file("file", new byte[] {1}).with(student))
+            .andExpect(status().isForbidden());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isBadRequest());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + image.getId() + "}"))
+            .andExpect(status().isBadRequest());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + deleted.getId() + "}"))
+            .andExpect(status().isNotFound());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", Long.MAX_VALUE).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + image.getId() + "}"))
+            .andExpect(status().isNotFound());
+        assertThat(lesson.getVideoMedia()).isNull();
+        assertThat(image.getIsUsed()).isFalse();
+        Lesson owner = lesson(course("Video owner"), "Owner");
+        Media owned = media.save(Media.builder().fileName("owned.mp4").publicId("owned-video")
+            .secureUrl("https://example.test/owned.mp4").fileType(FileTypeEnum.VIDEO).isUsed(false).build());
+        service.attachVideo(owner.getId(), owned.getId());
+        mvc.perform(patch("/api/v1/lessons/{id}/video", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"videoMediaId\":" + owned.getId() + "}"))
+            .andExpect(status().isBadRequest());
+        ReqCreateLesson create = new ReqCreateLesson();
+        create.setCourseId(lesson.getCourse().getId());
+        create.setTitle("Image is not video");
+        create.setVideoMediaId(image.getId());
+        assertThatThrownBy(() -> service.createLesson(create)).isInstanceOf(BadRequestException.class);
+    }
+
+    @Test
+    void adminVideoUploadUsesFileFieldAndReturnsPersistedMediaReference() throws Exception {
+        Media saved = Media.builder().id(91L).fileName("lesson.mp4").originalName("lesson.mp4")
+            .publicId("mock-video").secureUrl("https://example.test/lesson.mp4")
+            .fileType(FileTypeEnum.VIDEO).isUsed(false).build();
+        when(uploads.uploadVideo(any())).thenReturn(saved);
+        mvc.perform(multipart("/api/v1/upload/videos")
+                .file(new MockMultipartFile("file", "lesson.mp4", "video/mp4", new byte[] {1}))
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.id").value(91))
+            .andExpect(jsonPath("$.data.secureUrl").value("https://example.test/lesson.mp4"))
+            .andExpect(jsonPath("$.data.publicId").value("mock-video"))
+            .andExpect(jsonPath("$.data.fileName").doesNotExist());
+    }
+
+    @Test
+    void legacyPutKeepsVideoWhenOmittedAndReplacesItWhenRequested() {
+        Course course = course("Video PUT");
+        Lesson lesson = lesson(course, "Video PUT lesson");
+        Media first = media.save(Media.builder().fileName("put-first.mp4").publicId("put-first")
+            .secureUrl("https://example.test/put-first.mp4").fileType(FileTypeEnum.VIDEO).isUsed(false).build());
+        Media second = media.save(Media.builder().fileName("put-second.mp4").publicId("put-second")
+            .secureUrl("https://example.test/put-second.mp4").fileType(FileTypeEnum.VIDEO).isUsed(false).build());
+        service.attachVideo(lesson.getId(), first.getId());
+        ReqUpdateLesson request = new ReqUpdateLesson();
+        request.setCourseId(course.getId());
+        request.setTitle("Video PUT lesson");
+        request.setSlug(lesson.getSlug());
+        request.setGrammar("<p>Metadata edit</p>");
+        request.setDurationMinutes(12);
+        request.setIsPublished(false);
+        assertThat(service.updateLesson(lesson.getId(), request).getVideoMediaId()).isEqualTo(first.getId());
+        assertThat(first.getIsUsed()).isTrue();
+        request.setVideoMediaId(second.getId());
+        assertThat(service.updateLesson(lesson.getId(), request).getVideoMediaId()).isEqualTo(second.getId());
+        assertThat(first.getIsUsed()).isFalse();
+        assertThat(second.getIsUsed()).isTrue();
     }
 
     @Test

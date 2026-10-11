@@ -1,7 +1,7 @@
 'use client';
 
 import type { Lesson } from '@/apis/lessons/lessons.type';
-import { GrammarLectureCard } from './GrammarLectureCard';
+import { GrammarLectureCard, type LessonVideoControls } from './GrammarLectureCard';
 import { GrammarPointDialog } from './GrammarPointDialog';
 import { GrammarRichTextEditor } from './GrammarRichTextEditor';
 import { sanitizeGrammarHtml } from './sanitizeGrammarHtml';
@@ -12,10 +12,13 @@ function escapeText(value: string): string {
   return element.innerHTML;
 }
 
-export function GrammarSection({ lesson, draft, onDraftChange }: {
+export function GrammarSection({ lesson, draft, onDraftChange, video, videoDisabled, onReloadVideo }: {
   lesson: Lesson;
   draft: string;
   onDraftChange: (value: string) => void;
+  video: LessonVideoControls;
+  videoDisabled: boolean;
+  onReloadVideo: () => void;
 }) {
   function addPoint(title: string, body: string) {
     const safeBody = sanitizeGrammarHtml(body);
@@ -30,7 +33,8 @@ export function GrammarSection({ lesson, draft, onDraftChange }: {
         <p className="mt-0.5 text-xs font-medium text-slate-500">Ngữ pháp và video bài giảng của bài học.</p>
       </div>
       <div className="space-y-6">
-        <GrammarLectureCard videoUrl={lesson.videoUrl} videoMediaId={lesson.videoMediaId} />
+        <GrammarLectureCard videoUrl={lesson.videoUrl} videoMediaId={lesson.videoMediaId}
+          controls={video} disabled={videoDisabled} onReload={onReloadVideo} />
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-sm font-extrabold text-slate-900">Nội dung ngữ pháp</h3>

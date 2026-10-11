@@ -1,8 +1,10 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map;
 import java.util.Set;
+import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +16,6 @@ import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.service.UploadService;
 import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
-import com.mycompany.saas_japanese.util.error.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,7 +31,6 @@ public class UploadServiceImpl implements UploadService {
   @SuppressWarnings("unchecked")
   @Override
   public Media uploadImage(MultipartFile file) {
-    System.out.println(file.getContentType());
     validateImage(file);
     try {
 
@@ -39,9 +39,6 @@ public class UploadServiceImpl implements UploadService {
           ObjectUtils.asMap(
               "resource_type", "image",
               "folder", "images"));
-
-      System.out.println("result :" + result.get("secure_url"));
-      System.out.println("result :" + result.get("public_id"));
 
       Media media = Media.builder()
           .fileName(file.getOriginalFilename())
@@ -104,6 +101,7 @@ public class UploadServiceImpl implements UploadService {
   private static final Set<String> ALLOWED_VIDEO_TYPES = Set.of(
       "mp4",
       "webm",
+      "mov",
       "quicktime");
 
   public void validateImage(MultipartFile file) {
@@ -134,13 +132,28 @@ public class UploadServiceImpl implements UploadService {
     }
 
     String filename = file.getOriginalFilename();
-
-    String fileType = filename.substring(
-        filename.lastIndexOf(".") + 1);
-
-    if (fileType == null || !ALLOWED_VIDEO_TYPES.contains(fileType)) {
-      throw new BadRequestException(
-          "Unsupported video type: " + fileType);
+    String extension = filename == null || !filename.contains(".") ? ""
+        : filename.substring(filename.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT);
+    String mime = file.getContentType();
+    if (!ALLOWED_VIDEO_TYPES.contains(extension)
+        || !("mp4".equals(extension) && "video/mp4".equals(mime)
+            || "webm".equals(extension) && "video/webm".equals(mime)
+            || ("mov".equals(extension) || "quicktime".equals(extension))
+                && "video/quicktime".equals(mime))) {
+      throw new BadRequestException("Unsupported video type");
+    }
+    try (InputStream stream = file.getInputStream()) {
+      byte[] header = stream.readNBytes(12);
+      boolean isoMedia = header.length >= 8 && header[4] == 'f' && header[5] == 't'
+          && header[6] == 'y' && header[7] == 'p';
+      boolean webm = header.length >= 4 && (header[0] & 0xff) == 0x1a
+          && (header[1] & 0xff) == 0x45 && (header[2] & 0xff) == 0xdf
+          && (header[3] & 0xff) == 0xa3;
+      if ("webm".equals(extension) ? !webm : !isoMedia) {
+        throw new BadRequestException("Invalid video file");
+      }
+    } catch (IOException exception) {
+      throw new BadRequestException("Cannot read video file");
     }
   }
 

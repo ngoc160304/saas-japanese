@@ -15,6 +15,7 @@ public interface JlptExamPartRepository
         extends JpaRepository<JlptExamPart, Long> {
 
     List<JlptExamPart> findByJlptExamSession_IdOrderBySortOrderAsc(Long sessionId);
+    boolean existsByAudioMediaId(Long mediaId);
 
     @Query("""
             SELECT part

@@ -20,6 +20,7 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
   Optional<Course> findByIdAndIsDeletedFalse(Long id);
 
   boolean existsByCategoryIdAndIsDeletedFalse(Long categoryId);
+  boolean existsByThumbnailMediaIdAndIsDeletedFalse(Long mediaId);
 
   long countByCategoryIdAndIsDeletedFalse(Long categoryId);
   @Override

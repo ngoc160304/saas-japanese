@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { BookOpen, CircleCheck, Video } from 'lucide-react';
 import type { Lesson } from '@/apis/lessons/lessons.type';
 import { GrammarSection } from './grammar/GrammarSection';
+import type { LessonVideoControls } from './grammar/GrammarLectureCard';
 import { KanjiSection } from './kanji/KanjiSection';
 import { QuizSection } from './quiz/QuizSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
@@ -17,6 +18,9 @@ interface LessonContentTabsProps {
   lessonId: number;
   grammarDraft: string;
   onGrammarChange: (value: string) => void;
+  video: LessonVideoControls;
+  videoDisabled: boolean;
+  onReloadVideo: () => void;
 }
 
 export function LessonContentTabs({
@@ -26,6 +30,9 @@ export function LessonContentTabs({
   lessonId,
   grammarDraft,
   onGrammarChange,
+  video,
+  videoDisabled,
+  onReloadVideo,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [vocabularyCount, setVocabularyCount] = useState<number | null>(null);
@@ -141,7 +148,8 @@ export function LessonContentTabs({
         aria-labelledby="lesson-content-tab-grammar"
         hidden={activeTab !== 'grammar'}
       >
-        {activeTab === 'grammar' && <GrammarSection lesson={lesson} draft={grammarDraft} onDraftChange={onGrammarChange} />}
+        {activeTab === 'grammar' && <GrammarSection lesson={lesson} draft={grammarDraft} onDraftChange={onGrammarChange}
+          video={video} videoDisabled={videoDisabled} onReloadVideo={onReloadVideo} />}
       </div>
       <div
         id="lesson-content-panel-vocabulary"

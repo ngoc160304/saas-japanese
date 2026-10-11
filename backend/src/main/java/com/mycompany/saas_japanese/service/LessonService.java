@@ -21,6 +21,10 @@ public interface LessonService {
 
   LessonResponse updatePublication(Long id, boolean isPublished);
 
+  LessonResponse attachVideo(Long id, Long videoMediaId);
+
+  LessonResponse detachVideo(Long id);
+
   void deleteLesson(Long id);
 
   void deleteByCourseId(long courseId);

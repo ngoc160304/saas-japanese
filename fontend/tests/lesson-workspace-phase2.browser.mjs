@@ -63,6 +63,12 @@ try {
   let publicationWrites = 0;
   let delayNextGrammar = false;
   let failNextGrammar = false;
+  let videoUploads = 0;
+  let videoAttachments = 0;
+  let videoDetaches = 0;
+  let failNextVideoUpload = false;
+  let failNextVideoAttach = false;
+  let failNextVideoDetach = false;
   const errors = [];
   const navigationDialogs = [];
   listeners.set('Runtime.exceptionThrown', ({ exceptionDetails }) => errors.push(exceptionDetails.text));
@@ -83,7 +89,7 @@ try {
         { name: 'Access-Control-Allow-Origin', value: origin },
         { name: 'Access-Control-Allow-Credentials', value: 'true' },
         { name: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-XSRF-TOKEN' },
-        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, PATCH, OPTIONS' },
+        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, PATCH, DELETE, OPTIONS' },
       ];
       let status = 200;
       let body;
@@ -93,10 +99,14 @@ try {
       } else if (url.pathname.endsWith('/auth/refresh-token')) {
         body = { data: { access_token: 'mock-admin-token', tokenType: 'Bearer', expiresIn: 600, user: { id: 1, email: 'admin@example.test', name: 'Admin' } } };
       } else if (url.pathname === '/api/v1/courses/1') body = { data: course };
-      else if (url.pathname === '/api/v1/lessons' && request.method === 'GET') {
+      else if (url.pathname === '/api/v1/upload/videos' && request.method === 'POST') {
+        videoUploads++;
+        if (failNextVideoUpload) { failNextVideoUpload = false; status = 500; }
+        else body = { data: { id: 100 + videoUploads, originalName: 'lesson.mp4', publicId: `mock-${videoUploads}`, secureUrl: `https://video.example.test/${videoUploads}.mp4` } };
+      } else if (url.pathname === '/api/v1/lessons' && request.method === 'GET') {
         body = { data: { content: lessons, totalPages: 1, totalElements: lessons.length } };
       } else {
-        const match = url.pathname.match(/^\/api\/v1\/lessons\/(\d+)(?:\/(grammar|publication))?$/);
+        const match = url.pathname.match(/^\/api\/v1\/lessons\/(\d+)(?:\/(grammar|publication|video))?$/);
         const lesson = match && lessons.find((item) => item.id === Number(match[1]));
         if (!lesson) status = 404;
         else if (request.method === 'GET') body = { data: lesson };
@@ -113,6 +123,24 @@ try {
           assert.deepEqual(Object.keys(payload), ['isPublished']);
           lesson.isPublished = payload.isPublished;
           body = { data: { ...lesson } };
+        } else if (request.method === 'PATCH' && match[2] === 'video') {
+          videoAttachments++;
+          const payload = JSON.parse(request.postData);
+          assert.deepEqual(Object.keys(payload), ['videoMediaId']);
+          if (failNextVideoAttach) { failNextVideoAttach = false; status = 500; }
+          else {
+            lesson.videoMediaId = payload.videoMediaId;
+            lesson.videoUrl = `https://video.example.test/${payload.videoMediaId - 100}.mp4`;
+            body = { data: { ...lesson } };
+          }
+        } else if (request.method === 'DELETE' && match[2] === 'video') {
+          videoDetaches++;
+          if (failNextVideoDetach) { failNextVideoDetach = false; status = 500; }
+          else {
+            lesson.videoMediaId = null;
+            lesson.videoUrl = null;
+            body = { data: { ...lesson } };
+          }
         } else status = 404;
       }
       if (status >= 400) body = { status, message: status === 500 ? 'Lưu thất bại' : 'Không tìm thấy', fieldErrors: {} };
@@ -254,8 +282,69 @@ try {
   assert.equal(navigationDialogs.length, 1);
   await waitFor('window.tinymce?.get("lesson-2-grammar")?.initialized');
   assert.equal(await evaluate('window.tinymce.get("lesson-2-grammar").getContent().includes("Unsaved reload")'), false);
+  const chooseVideo = () => evaluate(`(() => {
+    const file = new File([new Uint8Array([0,0,0,12,102,116,121,112,105,115,111,109])], 'lesson.mp4', { type: 'video/mp4' });
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    const input = document.querySelector('#lesson-video-file');
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await evaluate(`(() => {
+    const transfer = new DataTransfer();
+    transfer.items.add(new File(['invalid'], 'notes.txt', { type: 'text/plain' }));
+    const input = document.querySelector('#lesson-video-file');
+    input.files = transfer.files;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  })()`);
+  await waitFor('document.body.innerText.includes("Chỉ hỗ trợ video MP4")');
+  assert.equal(videoUploads, 0);
+  await edit('lesson-2-grammar', '<p>Video must not erase this draft</p>');
+  await waitFor('document.body.innerText.includes("Chưa lưu thay đổi")');
+  await chooseVideo();
+  await waitFor('document.body.innerText.includes("lesson.mp4")');
+  failNextVideoUpload = true;
+  await clickText('Tải lên và gắn video');
+  await waitFor('document.body.innerText.includes("Dịch vụ tạm thời gián đoạn")');
+  assert.equal(lessons[1].videoMediaId, null);
+  failNextVideoAttach = true;
+  await clickText('Tải lên và gắn video');
+  await waitFor('[...document.querySelectorAll("button")].some(item => item.textContent.trim() === "Gắn video vào bài học" && !item.disabled)');
+  assert.equal(videoUploads, 2);
+  assert.equal(lessons[1].videoMediaId, null);
+  await clickText('Gắn video vào bài học');
+  await waitFor('document.querySelector("video source")?.getAttribute("src")?.includes("/2.mp4")');
+  await waitFor('document.body.innerText.includes("Không thể phát video hiện tại")');
+  await clickText('Tải lại video');
+  await waitFor('document.querySelector("video[controls]")');
+  assert.equal(videoUploads, 2);
+  assert.equal(videoAttachments, 2);
+  assert.equal(lessons[1].videoMediaId, 102);
+  assert.equal(await evaluate('window.tinymce.get("lesson-2-grammar").getContent().includes("Video must not erase this draft")'), true);
+  await chooseVideo();
+  failNextVideoAttach = true;
+  await clickText('Tải lên và gắn video');
+  await waitFor('[...document.querySelectorAll("button")].some(item => item.textContent.trim() === "Gắn video vào bài học" && !item.disabled)');
+  assert.equal(lessons[1].videoMediaId, 102);
+  assert.equal(await evaluate('document.querySelector("video source")?.getAttribute("src")?.includes("/2.mp4")'), true);
+  await clickText('Gắn video vào bài học');
+  await waitFor('document.querySelector("video source")?.getAttribute("src")?.includes("/3.mp4")');
+  assert.equal(lessons[1].videoMediaId, 103);
+  assert.equal(videoUploads, 3);
+  failNextVideoDetach = true;
+  await clickText('Gỡ video');
+  await waitFor('document.querySelector("[role=alertdialog]")?.textContent.includes("Tệp trên dịch vụ lưu trữ sẽ không bị xóa")');
+  await clickText('Gỡ video', 'document.querySelector("[role=alertdialog]")');
+  await waitFor('document.body.innerText.includes("Dịch vụ tạm thời gián đoạn")');
+  assert.equal(lessons[1].videoMediaId, 103);
+  await clickText('Gỡ video');
+  await clickText('Gỡ video', 'document.querySelector("[role=alertdialog]")');
+  await waitFor('document.body.innerText.includes("Chưa có video")');
+  assert.equal(lessons[1].videoMediaId, null);
+  assert.equal(videoDetaches, 2);
+  assert.equal(await evaluate('window.tinymce.get("lesson-2-grammar").getContent().includes("Video must not erase this draft")'), true);
   assert.deepEqual(errors, []);
-  process.stdout.write('Mocked browser lesson workspace passed: draft tabs, save race, failure retry, clear/add grammar, guarded navigation/reload, publication, mobile lesson switch, URL tab refresh/back/forward.\n');
+  process.stdout.write('Mocked browser lesson workspace passed: phase-2 draft/navigation flows and phase-3 upload/attachment retry, replacement/detachment failure recovery, playback error/reload, draft preservation.\n');
 } finally {
   socket?.close();
   browser.kill();

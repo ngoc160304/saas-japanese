@@ -19,6 +19,7 @@ import com.mycompany.saas_japanese.domain.request.ReqCreateLesson;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLesson;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLessonGrammar;
 import com.mycompany.saas_japanese.domain.request.ReqUpdateLessonPublication;
+import com.mycompany.saas_japanese.domain.request.ReqAttachLessonVideo;
 import com.mycompany.saas_japanese.domain.response.LessonResponse;
 import com.mycompany.saas_japanese.service.LessonService;
 
@@ -78,6 +79,17 @@ public class LessonController {
   public ResponseEntity<LessonResponse> updatePublication(@PathVariable("id") Long id,
       @Valid @RequestBody ReqUpdateLessonPublication request) {
     return ResponseEntity.ok(lessonService.updatePublication(id, request.getIsPublished()));
+  }
+
+  @PatchMapping("/{id}/video")
+  public ResponseEntity<LessonResponse> attachVideo(@PathVariable("id") Long id,
+      @Valid @RequestBody ReqAttachLessonVideo request) {
+    return ResponseEntity.ok(lessonService.attachVideo(id, request.getVideoMediaId()));
+  }
+
+  @DeleteMapping("/{id}/video")
+  public ResponseEntity<LessonResponse> detachVideo(@PathVariable("id") Long id) {
+    return ResponseEntity.ok(lessonService.detachVideo(id));
   }
 
   @DeleteMapping("/{id}")

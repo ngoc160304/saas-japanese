@@ -47,4 +47,10 @@ export interface UpdateLessonGrammarRequest {
 
 export interface UpdateLessonPublicationRequest {
   isPublished: boolean;
+  /** Omit or send null to preserve the current video in the existing PUT contract. */
+  videoMediaId?: number | null;
+}
+
+export interface AttachLessonVideoRequest {
+  videoMediaId: number;
 }

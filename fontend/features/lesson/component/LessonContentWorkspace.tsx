@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { Course } from '@/apis/courses/courses.type';
 import { lessonAPI } from '@/apis/lessons/lessons.api';
 import type { Lesson } from '@/apis/lessons/lessons.type';
@@ -14,6 +14,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useLessonWorkspaceActions } from '../hooks/useLessonWorkspaceActions';
+import { useLessonVideo } from '../hooks/useLessonVideo';
 import { LessonContentTabs, type LessonContentTab } from './LessonContentTabs';
 import { LessonCurriculumSidebar } from './LessonCurriculumSidebar';
 import { LessonHeaderCard } from './LessonHeaderCard';
@@ -31,6 +32,7 @@ export function LessonContentWorkspace({
   lesson: Lesson;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get('tab');
@@ -48,16 +50,17 @@ export function LessonContentWorkspace({
   const [publicationOpen, setPublicationOpen] = useState(false);
   const [showPublicationError, setShowPublicationError] = useState(false);
   const actions = useLessonWorkspaceActions(lesson);
+  const video = useLessonVideo(lesson);
 
   useEffect(() => {
-    if (!actions.dirty) return;
+    if (!actions.dirty && !video.hasPendingWork) return;
     const warnBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = '';
     };
     window.addEventListener('beforeunload', warnBeforeUnload);
     return () => window.removeEventListener('beforeunload', warnBeforeUnload);
-  }, [actions.dirty]);
+  }, [actions.dirty, video.hasPendingWork]);
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
@@ -80,14 +83,14 @@ export function LessonContentWorkspace({
     setDrawerOpen(false);
     const current = `${pathname}${searchParams.size ? `?${searchParams.toString()}` : ''}`;
     if (href === current) return;
-    if (actions.dirty || actions.isSaving) {
+    if (actions.dirty || actions.isSaving || video.hasPendingWork) {
       event.preventDefault();
       setPendingDestination(href);
     }
   }
 
   function discardAndLeave() {
-    if (!pendingDestination) return;
+    if (!pendingDestination || video.isBusy) return;
     const destination = pendingDestination;
     setPendingDestination(null);
     router.push(destination, { scroll: false });
@@ -146,6 +149,7 @@ export function LessonContentWorkspace({
                 grammarDirty={actions.dirty}
                 isSaving={actions.isSaving}
                 isChangingPublication={actions.isChangingPublication}
+                isVideoBusy={video.isBusy}
                 saveError={actions.saveError ? getApiErrorMessage(actions.saveError) : null}
                 onSave={() => void actions.saveGrammar()}
                 onPublicationClick={() => { setShowPublicationError(false); setPublicationOpen(true); }}
@@ -158,6 +162,9 @@ export function LessonContentWorkspace({
                 lessonId={lessonId}
                 grammarDraft={actions.draft}
                 onGrammarChange={actions.setDraft}
+                video={video}
+                videoDisabled={actions.isSaving || actions.isChangingPublication}
+                onReloadVideo={() => void queryClient.invalidateQueries({ queryKey: ['lessons', 'detail', lesson.id] })}
               />
             </div>
           </main>
@@ -173,19 +180,21 @@ export function LessonContentWorkspace({
       <AlertDialog open={pendingDestination !== null} onOpenChange={(open) => { if (!open) setPendingDestination(null); }}>
         <AlertDialogContent className="max-w-md rounded-3xl border border-slate-100 bg-white p-6 text-slate-900 shadow-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>{actions.dirty ? 'Chưa lưu thay đổi' : 'Đã lưu ngữ pháp'}</AlertDialogTitle>
+            <AlertDialogTitle>{actions.dirty || video.hasPendingWork ? 'Có thay đổi chưa hoàn tất' : 'Đã lưu ngữ pháp'}</AlertDialogTitle>
             <AlertDialogDescription>
-              {actions.isSaving
+              {video.isBusy
+                ? 'Đang xử lý video. Hãy chờ thao tác hoàn tất trước khi rời bài học.'
+                : actions.isSaving
                 ? 'Đang lưu ngữ pháp. Hãy chờ thao tác hoàn tất trước khi rời bài học.'
-                : actions.dirty
-                  ? 'Bản nháp ngữ pháp sẽ bị mất nếu bạn rời bài học này.'
+                : actions.dirty || video.hasPendingWork
+                  ? 'Bản nháp ngữ pháp hoặc video đã chọn/chưa gắn sẽ bị bỏ lại nếu bạn rời bài học này.'
                   : 'Thay đổi ngữ pháp đã được lưu. Bạn có thể rời bài học.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Ở lại</AlertDialogCancel>
-            <AlertDialogAction disabled={actions.isSaving} onClick={discardAndLeave} className="bg-rose-700 text-white hover:bg-rose-800">
-              {actions.dirty ? 'Bỏ thay đổi và rời đi' : 'Rời đi'}
+            <AlertDialogAction disabled={actions.isSaving || video.isBusy} onClick={discardAndLeave} className="bg-rose-700 text-white hover:bg-rose-800">
+              {actions.dirty || video.hasPendingWork ? 'Bỏ thay đổi và rời đi' : 'Rời đi'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
