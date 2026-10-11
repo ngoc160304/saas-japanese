@@ -83,7 +83,7 @@ export function LessonCurriculumSidebar({
             className="h-9 rounded-xl border-slate-200 bg-white pr-8 pl-8 text-xs text-slate-800 shadow-2xs focus-visible:ring-sky-500 md:text-xs"
           />
           <Search
-            className="pointer-events-none absolute top-3 left-2.5 size-3.5 text-slate-400"
+            className="pointer-events-none absolute top-3 left-2.5 size-3.5 text-slate-600"
             aria-hidden="true"
           />
           {search && (
@@ -103,7 +103,7 @@ export function LessonCurriculumSidebar({
         {matchesSearch ? (
           <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
             <div
-              className="flex items-center gap-2.5 rounded-xl bg-slate-900 px-3.5 py-3 text-white shadow-xs"
+              className="flex items-center gap-2.5 rounded-xl bg-primary px-3.5 py-3 text-white shadow-xs"
               aria-current="page"
             >
               <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[11px] font-black">
@@ -113,7 +113,7 @@ export function LessonCurriculumSidebar({
                 <p className="truncate text-xs font-bold" title={lesson.title}>
                   Lesson {lessonId}: {lesson.title}
                 </p>
-                <p className="mt-0.5 text-[10px] text-slate-400">
+                <p className="mt-0.5 text-[10px] text-slate-600">
                   {lesson.durationMinutes} mins • Published
                 </p>
               </div>
@@ -180,7 +180,7 @@ export function LessonCurriculumSidebar({
       <div className="shrink-0 border-t border-slate-100 bg-slate-50/70 p-3">
         <Link
           href={`/admin/courses/${courseId}/lessons/create`}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-sky-500"
         >
           <Plus className="size-3.5" aria-hidden="true" />
           Add New Lesson

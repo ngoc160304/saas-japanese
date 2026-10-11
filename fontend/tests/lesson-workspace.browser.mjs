@@ -682,16 +682,11 @@ try {
   await screenshot('grammar-editor-desktop.png');
   await clickText('Cancel');
   await waitFor('!document.querySelector("[role=dialog]")');
-  await evaluate('document.querySelector("button[title=\\"Edit Grammar\\"]").click()');
-  await waitFor(
-    'document.querySelector("[role=dialog]")?.innerText.includes("Edit Grammar Point")',
-  );
+  // The current workspace edits grammar in its inline editor, without per-point edit buttons.
   assert.equal(
-    await evaluate('document.querySelector("[role=dialog] input").value.includes("わけがない")'),
+    await evaluate('document.querySelector(".tox-edit-area iframe").contentDocument.body.innerText.includes("わけがない")'),
     true,
   );
-  await key('Escape');
-  await waitFor('!document.querySelector("[role=dialog]")');
   assert.equal(
     requests.filter((request) => request === 'GET /api/v1/study/lessons/21/vocabularies').length,
     2,

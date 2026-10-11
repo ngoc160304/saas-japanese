@@ -74,9 +74,9 @@ export function DeleteConfirmPopover({
             Hủy
           </Button>
           <Button
-            variant="outline"
+            variant="destructive"
             size="sm"
-            className="border-rose-200 bg-white text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+            className="border-rose-700 bg-rose-700 text-white hover:bg-rose-800 hover:text-white"
             disabled={pending}
             onClick={confirm}
           >

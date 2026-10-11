@@ -108,7 +108,7 @@ export function VocabularySection({
             </Button>
             <Button
               type="button"
-              className="h-9 rounded-xl bg-sky-600 px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-sky-700"
+              className="h-9 rounded-xl bg-primary px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-primary/90"
             >
               <Plus className="size-3.5" aria-hidden="true" />
               Add Vocabulary

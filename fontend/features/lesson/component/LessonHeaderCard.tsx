@@ -16,7 +16,7 @@ export function LessonHeaderCard({
     <section className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft md:p-6">
       <div className="flex flex-col justify-between gap-4 2xl:flex-row 2xl:items-center">
         <div className="min-w-0 flex-1">
-          <div className="mb-1.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-400">
+          <div className="mb-1.5 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600">
             <span className="rounded-lg border border-sky-100 bg-sky-50 px-2 py-0.5 font-bold text-sky-700">
               Lesson #{lessonId}
             </span>
@@ -67,7 +67,7 @@ export function LessonHeaderCard({
             type="button"
             disabled
             aria-describedby="lesson-unavailable-actions"
-            className="h-9 rounded-2xl bg-slate-900 px-3.5 text-xs font-bold text-white"
+            className="h-9 rounded-2xl bg-primary px-3.5 text-xs font-bold text-white"
           >
             <Check className="size-3.5" aria-hidden="true" />
             Save

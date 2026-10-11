@@ -5,6 +5,7 @@ import { Plus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { courseAPI } from '@/apis/courses/courses.api';
 import { IsLoading } from '@/components/common/loading/IsLoading';
+import { adminMockStatistics } from '@/features/admin/data/mock-statistics';
 import { StatCard } from '@/components/common/stats/StatCard';
 import { DataTablePagination } from '@/components/common/table/DataTablePagination';
 import { DataTableToolbar } from '@/components/common/table/DataTableToolbar';
@@ -31,11 +32,6 @@ export function CoursePage() {
   const page = query.data?.data;
   // Do not present the previous query's records as the current search/page.
   const current = page && !query.isPlaceholderData && !query.isError ? page : undefined;
-  const published = current?.content.filter((course) => course.published).length;
-  const lessons =
-    current && current.content.every((course) => course.lessonCount !== null)
-      ? current.content.reduce((total, course) => total + (course.lessonCount ?? 0), 0)
-      : undefined;
 
   return (
     <div className="min-w-0 max-w-full">
@@ -43,38 +39,12 @@ export function CoursePage() {
         title="Courses Management"
         description="Quản lý khóa học tiếng Nhật, danh mục, số bài học và trạng thái xuất bản."
       >
-        <Link href="/admin/courses/create" className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500 md:text-sm">
+        <Link href="/admin/courses/create" className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-sky-500 md:text-sm">
           <Plus className="size-4" aria-hidden="true" />
           Tạo khóa học
         </Link>
       </Header>
-      <StatCard
-        items={[
-          {
-            label: 'Khóa học phù hợp',
-            value: current?.totalElements ?? '—',
-            description: 'Theo tìm kiếm hiện tại',
-          },
-          {
-            label: 'Published',
-            value: published ?? '—',
-            description: 'Chỉ trang hiện tại',
-            valueClassName: 'text-emerald-600',
-          },
-          {
-            label: 'Draft',
-            value: current && published !== undefined ? current.content.length - published : '—',
-            description: 'Chỉ trang hiện tại',
-            valueClassName: 'text-amber-600',
-          },
-          {
-            label: 'Số bài học',
-            value: lessons ?? '—',
-            description: 'Chỉ trang hiện tại',
-            valueClassName: 'text-indigo-600',
-          },
-        ]}
-      />
+      <StatCard items={adminMockStatistics.courses} isMock />
       <PageSection>
         <DataTableToolbar
           searchValue={query.search}
@@ -103,7 +73,7 @@ export function CoursePage() {
               aria-label="Số dòng mỗi trang"
               value={query.size}
               onChange={(event) => query.setSize(Number(event.target.value))}
-              className="h-10 rounded-2xl border border-slate-200 bg-slate-50 px-3 focus-visible:outline-sky-500"
+              className="h-10 rounded-2xl border border-input bg-slate-50 px-3 focus-visible:outline-sky-500"
             >
               {Array.from({ length: 12 }, (_, index) => index + 1).map((size) => (
                 <option key={size} value={size}>

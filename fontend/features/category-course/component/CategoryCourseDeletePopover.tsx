@@ -27,7 +27,7 @@ export function CategoryCourseDeletePopover({
         <Button
           variant="outline"
           size="icon"
-          className="border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900"
+          className="rounded-xl border-input bg-white text-rose-700 hover:bg-rose-50 hover:text-rose-800"
           aria-label={`Xóa ${category.name}`}
         >
           <Trash2 />

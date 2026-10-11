@@ -46,7 +46,7 @@ export function VocabularyTable({
           {items.length > 0 ? (
             items.map((item, index) => (
               <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/60">
-                <TableCell className="px-4 py-3 font-bold text-slate-400">{index + 1}</TableCell>
+                <TableCell className="px-4 py-3 font-bold text-slate-600">{index + 1}</TableCell>
                 <TableCell className="px-4 py-3 text-sm font-bold text-slate-900">
                   {item.word}
                 </TableCell>
@@ -84,7 +84,7 @@ export function VocabularyTable({
                       size="icon-sm"
                       aria-label={`Delete ${item.word}`}
                       title={`Delete ${item.word}`}
-                      className="rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                      className="rounded-lg bg-slate-50 text-slate-600 hover:bg-rose-50 hover:text-rose-600"
                     >
                       <X className="size-3.5" aria-hidden="true" />
                     </Button>

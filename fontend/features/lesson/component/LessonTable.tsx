@@ -33,16 +33,16 @@ export function LessonTable({
   return (
     <Table aria-label="Danh sách bài học" className="min-w-[720px] border-collapse text-xs">
       <TableHeader>
-        <TableRow className="border-slate-100 text-[11px] font-extrabold tracking-wider text-slate-700 uppercase hover:bg-transparent">
-          <TableHead className="w-14 px-3 text-center text-[11px] font-extrabold">#</TableHead>
-          <TableHead className="px-4 text-[11px] font-extrabold">Tên bài học</TableHead>
-          <TableHead className="w-32 px-4 text-center text-[11px] font-extrabold">
+        <TableRow className="border-slate-100 text-xs font-semibold tracking-wider text-slate-700 uppercase hover:bg-transparent">
+          <TableHead className="w-14 px-3 text-center text-xs font-semibold">#</TableHead>
+          <TableHead className="px-4 text-xs font-semibold">Tên bài học</TableHead>
+          <TableHead className="w-32 px-4 text-center text-xs font-semibold">
             Thời lượng
           </TableHead>
-          <TableHead className="w-32 px-4 text-center text-[11px] font-extrabold">
+          <TableHead className="w-32 px-4 text-center text-xs font-semibold">
             Trạng thái
           </TableHead>
-          <TableHead className="w-24 px-4 text-right text-[11px] font-extrabold">
+          <TableHead className="w-24 px-4 text-right text-xs font-semibold">
             Thao tác
           </TableHead>
         </TableRow>
@@ -110,7 +110,7 @@ export function LessonTable({
                     }
                     title={`Sửa ${lesson.title}`}
                     aria-label={`Sửa ${lesson.title}`}
-                    className="rounded-xl border-slate-300 bg-white text-slate-700 transition-colors hover:border-amber-300 hover:bg-amber-50 hover:text-amber-700"
+                    className="rounded-xl border-slate-300 bg-white text-slate-700 transition-colors hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700"
                   >
                     <Pencil className="size-4" aria-hidden="true" />
                   </Button>
@@ -120,7 +120,7 @@ export function LessonTable({
                     disabled={busy}
                     onClick={() => onDelete(lesson)}
                     aria-label={`Xóa ${lesson.title}`}
-                    className="rounded-xl border-slate-300 bg-white text-slate-700 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+                    className="rounded-xl border-slate-300 bg-white text-rose-700 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
                   >
                     <Trash2 className="size-4" aria-hidden="true" />
                   </Button>

@@ -46,7 +46,7 @@ export function CourseDeleteDialog({ course }: { course: Course }) {
       }
     }}>
       <AlertDialogTrigger render={
-        <Button type="button" variant="outline" size="icon" aria-label={`Xóa ${course.title}`} className="rounded-xl border-slate-200 bg-slate-50 text-slate-500 hover:bg-rose-50 hover:text-rose-600" />
+        <Button type="button" variant="outline" size="icon" aria-label={`Xóa ${course.title}`} className="rounded-xl border-input bg-white text-rose-700 hover:bg-rose-50 hover:text-rose-800" />
       }>
         <Trash2 className="size-4" />
       </AlertDialogTrigger>
@@ -63,7 +63,7 @@ export function CourseDeleteDialog({ course }: { course: Course }) {
         {deletion.isError && <p role="alert" className="text-center text-xs text-rose-600">{getApiErrorMessage(deletion.error)}</p>}
         <AlertDialogFooter className="-mx-0 -mb-0 grid grid-cols-2 border-0 bg-transparent p-0">
           <AlertDialogCancel disabled={deletion.isPending} className="h-10 rounded-2xl border-slate-200 text-xs font-bold">Hủy</AlertDialogCancel>
-          <AlertDialogAction type="button" disabled={deletion.isPending} onClick={() => void confirm()} className="h-10 rounded-2xl bg-rose-500 text-xs font-bold text-white hover:bg-rose-600">
+          <AlertDialogAction type="button" disabled={deletion.isPending} onClick={() => void confirm()} className="h-10 rounded-2xl bg-rose-700 text-xs font-bold text-white hover:bg-rose-800">
             {deletion.isPending && <LoaderCircle className="size-4 animate-spin" />}
             {deletion.isPending ? 'Đang xóa…' : 'Xóa khóa học'}
           </AlertDialogAction>

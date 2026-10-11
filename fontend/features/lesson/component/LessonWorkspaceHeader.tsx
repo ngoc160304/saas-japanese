@@ -78,7 +78,7 @@ export function LessonWorkspaceHeader({
             href={`/admin/courses/${courseId}`}
             className="hidden items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 sm:flex"
           >
-            <Settings className="size-3.5 text-slate-400" aria-hidden="true" />
+            <Settings className="size-3.5 text-slate-600" aria-hidden="true" />
             Outline
           </Link>
           <Button
@@ -93,7 +93,7 @@ export function LessonWorkspaceHeader({
           </Button>
           <span className="hidden border-l border-slate-200 pl-2 sm:block">
             <span
-              className="flex size-8 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white"
+              className="flex size-8 items-center justify-center rounded-xl bg-primary text-xs font-bold text-white"
               aria-label="Admin workspace"
             >
               AD

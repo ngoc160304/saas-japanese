@@ -43,7 +43,7 @@ export function GrammarSection({ video, points, pointCount, onPointAdded }: Gram
             className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-base font-bold text-slate-900 md:text-lg"
           >
             Grammar &amp; Lecture Video
-            <span className="text-xs font-normal text-slate-400">
+            <span className="text-xs font-normal text-slate-600">
               | Ngữ pháp &amp; Video bài giảng
             </span>
           </h2>

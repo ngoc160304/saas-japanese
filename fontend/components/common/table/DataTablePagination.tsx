@@ -32,12 +32,12 @@ export function DataTablePagination({ page, totalPages, onPageChange }: DataTabl
   const pages = getPageNumbers(page, totalPages);
 
   return (
-    <div className="flex items-center justify-end gap-1 border-t border-slate-100 pt-4">
+    <div className="flex flex-wrap items-center justify-end gap-1 border-t border-slate-100 pt-4">
       {/* Previous */}
       <Button
         type="button"
         size="icon"
-        className="h-8 w-8 border-0 bg-black text-white hover:bg-slate-800 disabled:bg-slate-300 disabled:text-slate-500"
+        className="h-8 w-8 border-0 bg-primary text-white hover:bg-primary/90 disabled:bg-slate-100 disabled:text-slate-600"
         disabled={page <= 1}
         onClick={() => onPageChange?.(page - 1)}
         aria-label="Previous page"
@@ -51,7 +51,7 @@ export function DataTablePagination({ page, totalPages, onPageChange }: DataTabl
           return (
             <span
               key={`ellipsis-${index}`}
-              className="flex h-8 w-8 items-center justify-center text-sm text-slate-400"
+              className="flex h-8 w-8 items-center justify-center text-sm text-slate-600"
             >
               ...
             </span>
@@ -67,8 +67,8 @@ export function DataTablePagination({ page, totalPages, onPageChange }: DataTabl
             size="icon"
             className={
               isActive
-                ? 'h-8 w-8 border-0 bg-black text-sm text-white hover:bg-slate-800'
-                : 'h-8 w-8 border border-slate-200 bg-white text-sm text-black hover:bg-slate-100'
+                ? 'h-8 w-8 border-0 bg-primary text-sm text-white hover:bg-primary/90'
+                : 'h-8 w-8 border border-input bg-white text-sm text-slate-700 hover:bg-slate-100'
             }
             onClick={() => onPageChange?.(item)}
             aria-label={`Page ${item}`}
@@ -83,7 +83,7 @@ export function DataTablePagination({ page, totalPages, onPageChange }: DataTabl
       <Button
         type="button"
         size="icon"
-        className="h-8 w-8 border-0 bg-black text-white hover:bg-slate-800 disabled:bg-slate-300 disabled:text-slate-500"
+        className="h-8 w-8 border-0 bg-primary text-white hover:bg-primary/90 disabled:bg-slate-100 disabled:text-slate-600"
         disabled={page >= totalPages}
         onClick={() => onPageChange?.(page + 1)}
         aria-label="Next page"

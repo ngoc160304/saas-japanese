@@ -133,7 +133,7 @@ export function CourseForm({
             disabled={busy}
             aria-invalid={Boolean(errors.title)}
             aria-describedby={errors.title ? 'course-title-error' : undefined}
-            className="h-11 rounded-2xl border-slate-200 bg-slate-50 px-4 text-sm font-semibold focus-visible:bg-white focus-visible:ring-sky-500"
+            className="h-11 rounded-2xl border-input bg-slate-50 px-4 text-sm font-semibold focus-visible:bg-white focus-visible:ring-sky-500"
             {...register('title')}
           />
           {errors.title && (
@@ -156,7 +156,7 @@ export function CourseForm({
               disabled={busy}
               aria-invalid={Boolean(errors.categoryId)}
               aria-describedby={errors.categoryId ? 'course-category-error' : undefined}
-              className="h-11 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-800 focus-visible:outline-2 focus-visible:outline-sky-500 disabled:opacity-50"
+              className="h-11 w-full rounded-2xl border border-input bg-slate-50 px-4 text-sm font-semibold text-slate-800 focus-visible:outline-2 focus-visible:outline-sky-500 disabled:opacity-50"
               {...register('categoryId', { valueAsNumber: true })}
             >
               <option value="0">Chọn danh mục</option>
@@ -190,7 +190,7 @@ export function CourseForm({
               readOnly={mode === 'edit'}
               aria-invalid={Boolean(errors.price)}
               aria-describedby={errors.price ? 'course-price-error' : undefined}
-              className="h-11 rounded-2xl border-slate-200 bg-slate-50 px-4 text-sm font-semibold focus-visible:bg-white focus-visible:ring-sky-500"
+              className="h-11 rounded-2xl border-input bg-slate-50 px-4 text-sm font-semibold focus-visible:bg-white focus-visible:ring-sky-500"
               {...register('price', { valueAsNumber: true })}
             />
             {errors.price && (
@@ -220,7 +220,7 @@ export function CourseForm({
             placeholder="Mô tả nội dung và mục tiêu của khóa học"
             aria-invalid={Boolean(errors.description)}
             aria-describedby={errors.description ? 'course-description-error' : undefined}
-            className="w-full rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-sm focus-visible:bg-white focus-visible:ring-sky-500"
+            className="w-full rounded-2xl border-input bg-slate-50 px-4 py-3 text-sm focus-visible:bg-white focus-visible:ring-sky-500"
             {...register('description')}
           />
           {errors.description && (
@@ -233,7 +233,7 @@ export function CourseForm({
         <section className="border-t border-slate-100 pt-6">
           <p className="mb-1.5 text-xs font-bold text-slate-700">Ảnh khóa học</p>
           <div className="flex items-center gap-3.5 rounded-2xl border border-slate-200 bg-slate-50 p-3">
-            <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-400">
+            <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white text-slate-600">
               {preview ? (
                 // Backend media URLs and local previews do not use the image optimizer.
                 // eslint-disable-next-line @next/next/no-img-element
@@ -267,7 +267,7 @@ export function CourseForm({
                   size="sm"
                   disabled={busy || !canUpload}
                   onClick={() => fileInput.current?.click()}
-                  className="rounded-xl border-slate-200 text-xs"
+                  className="h-9 rounded-xl border-input text-xs"
                 >
                   {upload.isPending ? (
                     <LoaderCircle className="size-4 animate-spin" />
@@ -348,7 +348,7 @@ export function CourseForm({
           <Button
             type="submit"
             disabled={busy}
-            className="h-auto rounded-2xl bg-slate-900 px-6 py-3 text-xs font-bold text-white hover:bg-sky-600 md:text-sm"
+            className="h-auto rounded-2xl bg-primary px-6 py-3 text-xs font-bold text-white hover:bg-primary/90 md:text-sm"
           >
             {isSubmitting && <LoaderCircle className="size-4 animate-spin" />}
             {isSubmitting ? 'Đang lưu…' : mode === 'edit' ? 'Lưu thay đổi' : 'Tạo khóa học'}

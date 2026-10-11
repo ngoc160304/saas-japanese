@@ -63,7 +63,7 @@ export function GrammarPointDialog({
             className={
               point
                 ? 'rounded-lg border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900'
-                : `self-start text-xs font-bold text-white shadow-2xs ${variant === 'primary' ? 'h-10 rounded-2xl bg-slate-900 px-4 hover:bg-amber-600' : 'h-9 rounded-xl bg-sky-600 px-3.5 hover:bg-sky-700'}`
+                : `self-start text-xs font-bold text-white shadow-2xs ${variant === 'primary' ? 'h-10 rounded-2xl bg-primary px-4 hover:bg-primary/90' : 'h-9 rounded-xl bg-primary px-3.5 hover:bg-primary/90'}`
             }
           />
         }
@@ -133,7 +133,7 @@ export function GrammarPointDialog({
               disabled={!canAdd}
               onClick={handleAdd}
               aria-describedby={`${id}-save-note`}
-              className="rounded-xl bg-slate-900 px-5 text-xs font-bold text-white hover:bg-amber-600"
+              className="rounded-xl bg-primary px-5 text-xs font-bold text-white hover:bg-primary/90"
             >
               Save Grammar Point
             </Button>

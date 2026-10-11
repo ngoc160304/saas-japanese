@@ -304,7 +304,7 @@ try {
   await clickText('Hủy');
   await evaluate('document.querySelector("a[href=\\"/admin/categories-course/7\\"]").click()');
   await waitFor(
-    'document.body.innerText.includes("Khóa học trong danh mục") && document.body.innerText.includes("Kanji N5")',
+    'location.pathname === "/admin/categories-course/7" && document.querySelector("table")?.textContent.includes("Kanji N5")',
   );
   assert.equal(courseRequests.at(-1).categoryId, '7');
   await screenshot('category-detail-desktop', 1440, 1000);

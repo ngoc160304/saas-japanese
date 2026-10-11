@@ -77,7 +77,7 @@ export function LessonDeleteDialog({
           <AlertDialogAction
             disabled={pending}
             onClick={() => void confirm()}
-            className="bg-rose-500 text-white hover:bg-rose-600"
+            className="bg-rose-700 text-white hover:bg-rose-800"
           >
             {pending && <LoaderCircle className="size-4 animate-spin" />}
             {pending ? 'Đang xóa…' : 'Xóa bài học'}

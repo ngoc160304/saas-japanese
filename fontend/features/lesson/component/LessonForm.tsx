@@ -52,7 +52,7 @@ export function LessonForm({
     }
   });
   const inputClass =
-    'h-12 rounded-2xl border-slate-200 bg-slate-50 px-4 text-sm text-slate-800 focus-visible:ring-sky-500';
+    'h-12 rounded-2xl border-input bg-slate-50 px-4 text-sm text-slate-800 focus-visible:ring-sky-500';
   const backHref = `/admin/courses/${course.id}`;
 
   return (
@@ -113,7 +113,7 @@ export function LessonForm({
           </div>
           <div>
             <p className="mb-1.5 text-xs font-bold text-slate-700">Trạng thái xuất bản</p>
-            <div className="flex h-12 items-center justify-between rounded-2xl border border-slate-200 bg-slate-50 px-4">
+            <div className="flex h-12 items-center justify-between rounded-2xl border border-input bg-slate-50 px-4">
               <label htmlFor="lesson-published" className="text-xs font-bold text-slate-800">
                 Xuất bản
               </label>
@@ -139,7 +139,7 @@ export function LessonForm({
             rows={3}
             disabled={isSubmitting}
             placeholder="Giới thiệu mục tiêu bài học hoặc kiến thức trọng tâm..."
-            className="rounded-2xl border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-800"
+            className="rounded-2xl border-input bg-slate-50 px-4 py-3 text-sm text-slate-800"
             {...register('grammar')}
           />
           {errors.grammar && <p className="mt-1 text-xs text-rose-600">{errors.grammar.message}</p>}
@@ -159,7 +159,7 @@ export function LessonForm({
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="h-auto rounded-2xl bg-slate-900 px-6 py-3 text-xs font-bold text-white hover:bg-sky-600"
+            className="h-auto rounded-2xl bg-primary px-6 py-3 text-xs font-bold text-white hover:bg-primary/90"
           >
             {isSubmitting && <LoaderCircle className="size-4 animate-spin" />}
             {isSubmitting ? submittingLabel : submitLabel}

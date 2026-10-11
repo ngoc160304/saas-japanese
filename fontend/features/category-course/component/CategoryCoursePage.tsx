@@ -13,6 +13,7 @@ import Header from '@/components/layout/management/header/Header';
 
 import { CourseCategoriesTable } from '@/features/category-course/component/CategoryCourseTable';
 import { useDataTableQuery } from '@/components/common/table/hooks/useDataTableQuery';
+import { adminMockStatistics } from '@/features/admin/data/mock-statistics';
 import { StatCard } from '@/components/common/stats/StatCard';
 import { useState } from 'react';
 import { CategoryCourseDialog } from './CategoryCourseDialog';
@@ -91,17 +92,7 @@ const CategoryCoursePage = () => {
         <CreateButton label="Tạo danh mục" handleClick={() => setCreateDialogOpen(true)} />
       </Header>
 
-      <StatCard
-        items={[
-          {
-            label: 'Danh mục phù hợp',
-            value: categories?.data.totalElements ?? '—',
-            description: 'Theo tìm kiếm hiện tại',
-            valueClassName: 'text-slate-900',
-            descriptionClassName: 'text-sky-600 bg-sky-50',
-          },
-        ]}
-      />
+      <StatCard items={adminMockStatistics.categories} isMock />
 
       <PageSection>
         <DataTableToolbar
@@ -140,7 +131,7 @@ const CategoryCoursePage = () => {
               aria-label="Số danh mục mỗi trang"
               value={size}
               onChange={(event) => setSize(Number(event.target.value))}
-              className="h-10 rounded-2xl border border-slate-200 bg-slate-50 px-3 focus-visible:outline-sky-500"
+              className="h-10 rounded-2xl border border-input bg-slate-50 px-3 focus-visible:outline-sky-500"
             >
               {[5, 10, 12].map((pageSize) => (
                 <option key={pageSize} value={pageSize}>

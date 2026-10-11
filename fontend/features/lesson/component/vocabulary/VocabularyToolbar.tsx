@@ -25,7 +25,7 @@ export function VocabularyToolbar({
     <div className="flex w-full flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center 2xl:w-auto">
       <div className="relative w-full sm:w-60">
         <Search
-          className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-400"
+          className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-600"
           aria-hidden="true"
         />
         <Input
@@ -65,7 +65,7 @@ export function VocabularyToolbar({
       </Button>
       <Button
         type="button"
-        className="h-10 justify-center rounded-2xl bg-slate-900 px-4 text-xs font-bold text-white shadow-2xs hover:bg-sky-600"
+        className="h-10 justify-center rounded-2xl bg-primary px-4 text-xs font-bold text-white shadow-2xs hover:bg-primary/90"
       >
         <Plus className="size-4" aria-hidden="true" />
         Add Vocabulary

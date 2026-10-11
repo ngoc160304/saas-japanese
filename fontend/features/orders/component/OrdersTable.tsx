@@ -120,7 +120,7 @@ export function OrdersTable({
                           ))}
                         </ul>
                       ) : (
-                        <span className="text-slate-400">Chưa có thông tin khóa học</span>
+                        <span className="text-slate-600">Chưa có thông tin khóa học</span>
                       )}
                     </TableCell>
                     <TableCell className="px-4 text-right font-semibold tabular-nums">

@@ -36,7 +36,11 @@ test('course API uses configured client, zero-based page, search and response en
     '@/lib/authorize-axios': {
       get: async (url, config) => {
         assert.equal(url, '/courses');
-        assert.deepEqual(config.params, { search: '日本語', page: 1, size: 12 });
+        // Axios omits undefined optional filters when serializing the request.
+        assert.deepEqual(
+          Object.fromEntries(Object.entries(config.params).filter(([, value]) => value !== undefined)),
+          { search: '日本語', page: 1, size: 12 },
+        );
         return { data: envelope };
       },
     },

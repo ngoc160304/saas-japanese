@@ -42,7 +42,7 @@ export function GrammarLectureCard({ video }: { video: GrammarLectureVideo }) {
           </Button>
         </div>
       </div>
-      <div className="flex min-w-0 flex-col justify-between gap-4 rounded-xl bg-slate-900 p-4 text-white md:flex-row md:items-center">
+      <div className="flex min-w-0 flex-col justify-between gap-4 rounded-xl bg-primary p-4 text-white md:flex-row md:items-center">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-white/10">
             <Clapperboard className="size-6" aria-hidden="true" />
@@ -51,7 +51,7 @@ export function GrammarLectureCard({ video }: { video: GrammarLectureVideo }) {
             <p className="text-xs font-bold break-words text-white">
               {video.fileName} ({video.duration})
             </p>
-            <p className="mt-0.5 text-[11px] break-all text-slate-400">{video.url}</p>
+            <p className="mt-0.5 text-[11px] break-all text-slate-600">{video.url}</p>
           </div>
         </div>
         <span className="self-start rounded-md bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400 md:shrink-0 md:self-center">

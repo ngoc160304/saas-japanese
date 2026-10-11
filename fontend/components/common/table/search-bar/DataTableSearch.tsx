@@ -20,7 +20,7 @@ export function DataTableSearch({
 }: DataTableSearchProps) {
   return (
     <div className={cn('relative w-full max-w-md', className)}>
-      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-600" />
 
       <Input
         value={value}
@@ -29,14 +29,14 @@ export function DataTableSearch({
         placeholder={placeholder}
         className="
           h-10
-          rounded-2xl
-          border-slate-100
+          rounded-xl
+          border-input
           bg-slate-50
           pl-10
           pr-4
           text-xs
           text-slate-800
-          placeholder:text-slate-400
+          placeholder:text-slate-600
           focus-visible:bg-white
           focus-visible:ring-2
           focus-visible:ring-sky-500
