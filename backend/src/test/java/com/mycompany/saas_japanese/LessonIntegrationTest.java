@@ -7,6 +7,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Propagation;
@@ -57,7 +60,8 @@ class LessonIntegrationTest extends AuthTestSupport {
     @Test
     void createContractKeepsCourseAndValidatesInputs() throws Exception {
         Course course = course("Create");
-        mvc.perform(post("/api/v1/lessons").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        mvc.perform(post("/api/v1/lessons").with(admin).contentType(MediaType.APPLICATION_JSON)
                 .content("""
                     {"courseId":%d,"title":"  New lesson  ","grammar":"Overview",
                      "durationMinutes":0,"isPublished":true}
@@ -68,17 +72,17 @@ class LessonIntegrationTest extends AuthTestSupport {
             .andExpect(jsonPath("$.data.grammar").value("Overview"))
             .andExpect(jsonPath("$.data.durationMinutes").value(0))
             .andExpect(jsonPath("$.data.isPublished").value(true));
-        mvc.perform(post("/api/v1/lessons").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/lessons").with(admin).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"title\":\" \",\"durationMinutes\":-1}"))
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.fieldErrors.courseId").exists())
             .andExpect(jsonPath("$.fieldErrors.title").exists())
             .andExpect(jsonPath("$.fieldErrors.durationMinutes").exists());
-        mvc.perform(post("/api/v1/lessons").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/lessons").with(admin).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"courseId\":9223372036854775807,\"title\":\"Missing\"}"))
             .andExpect(status().isNotFound());
         course.setIsDeleted(true);
-        mvc.perform(post("/api/v1/lessons").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/api/v1/lessons").with(admin).contentType(MediaType.APPLICATION_JSON)
                 .content("{\"courseId\":%d,\"title\":\"Deleted parent\"}".formatted(course.getId())))
             .andExpect(status().isNotFound());
     }
@@ -90,7 +94,8 @@ class LessonIntegrationTest extends AuthTestSupport {
         Lesson kept = lesson(course, "Kept");
         Lesson other = lesson(course("Other"), "Other");
         Long id = removed.getId();
-        mvc.perform(delete("/api/v1/lessons/{id}", id).with(jwt())).andExpect(status().isOk());
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        mvc.perform(delete("/api/v1/lessons/{id}", id).with(admin)).andExpect(status().isOk());
         entityManager.flush();
         entityManager.clear();
         Lesson persisted = lessons.findById(id).orElseThrow();
@@ -104,8 +109,8 @@ class LessonIntegrationTest extends AuthTestSupport {
         mvc.perform(get("/api/v1/lessons").with(jwt()).param("search", "Removed"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.data.totalElements").value(0));
         mvc.perform(get("/api/v1/lessons/{id}", id).with(jwt())).andExpect(status().isNotFound());
-        mvc.perform(delete("/api/v1/lessons/{id}", id).with(jwt())).andExpect(status().isNotFound());
-        mvc.perform(delete("/api/v1/lessons/{id}", Long.MAX_VALUE).with(jwt()))
+        mvc.perform(delete("/api/v1/lessons/{id}", id).with(admin)).andExpect(status().isNotFound());
+        mvc.perform(delete("/api/v1/lessons/{id}", Long.MAX_VALUE).with(admin))
             .andExpect(status().isNotFound());
     }
 
@@ -118,7 +123,8 @@ class LessonIntegrationTest extends AuthTestSupport {
         prior.setIsDeleted(true);
         prior.setDeletedAt(priorDeletion);
         Lesson other = lesson(course("Unaffected"), "Other");
-        mvc.perform(delete("/api/v1/lessons/course/{id}", course.getId()).with(jwt()))
+        mvc.perform(delete("/api/v1/lessons/course/{id}", course.getId())
+                .with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
             .andExpect(status().isOk());
         assertThat(first.getIsDeleted()).isTrue();
         assertThat(prior.getDeletedAt()).isEqualTo(priorDeletion);
@@ -147,6 +153,119 @@ class LessonIntegrationTest extends AuthTestSupport {
         var replacement = service.createLesson(request);
         entityManager.flush();
         assertThat(replacement.getVideoMediaId()).isEqualTo(video.getId());
+    }
+
+    @Test
+    void adminPatchesOnlyTheirFieldAndSanitizesGrammar() throws Exception {
+        Course course = course("Patch");
+        Media video = media.save(Media.builder().fileName("patch-video").publicId("lesson-patch-video")
+            .secureUrl("https://example.test/patch-video").fileType(FileTypeEnum.VIDEO).isUsed(true).build());
+        Lesson lesson = lessons.save(Lesson.builder().course(course).title("Patch lesson")
+            .slug("patch-lesson").durationMinutes(32).isPublished(false).videoMedia(video).build());
+        Long id = lesson.getId();
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        String unsafeGrammar = "<h2>Heading</h2><p><strong>Bold</strong> "
+            + "<a href='javascript:alert(1)' onclick='alert(1)'>bad</a> "
+            + "<a href='https://example.test'>safe</a></p><script>alert(1)</script>";
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"grammar\":\"" + unsafeGrammar + "\"}"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.data.isPublished").value(false))
+            .andExpect(jsonPath("$.data.title").value("Patch lesson"))
+            .andExpect(jsonPath("$.data.durationMinutes").value(32))
+            .andExpect(jsonPath("$.data.videoMediaId").value(video.getId()));
+        entityManager.flush();
+        entityManager.clear();
+        Lesson grammarSaved = lessons.findById(id).orElseThrow();
+        assertThat(grammarSaved.getGrammar()).contains("<h2>Heading</h2>", "<strong>Bold</strong>",
+            "https://example.test");
+        assertThat(grammarSaved.getGrammar()).doesNotContain("javascript:", "onclick", "<script");
+
+        mvc.perform(patch("/api/v1/lessons/{id}/publication", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"isPublished\":true}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.isPublished").value(true));
+        entityManager.flush();
+        entityManager.clear();
+        Lesson published = lessons.findById(id).orElseThrow();
+        assertThat(published.getGrammar()).isEqualTo(grammarSaved.getGrammar());
+        assertThat(published.getVideoMedia().getId()).isEqualTo(video.getId());
+        assertThat(published.getTitle()).isEqualTo("Patch lesson");
+        assertThat(published.getDurationMinutes()).isEqualTo(32);
+        assertThat(published.getCourse().getId()).isEqualTo(course.getId());
+
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"grammar\":\"\"}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.grammar").isEmpty());
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(lessons.findById(id).orElseThrow().getGrammar()).isNull();
+        assertThat(lessons.findById(id).orElseThrow().getIsPublished()).isTrue();
+    }
+
+    @Test
+    void lessonGrammarWritesRequireAdminAndValidateRequests() throws Exception {
+        Lesson lesson = lesson(course("Guard"), "Guarded");
+        Long id = lesson.getId();
+        var student = jwt().authorities(new SimpleGrantedAuthority("ROLE_STUDENT"));
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", id).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"grammar\":\"test\"}"))
+            .andExpect(status().isUnauthorized());
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", id).with(student)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"grammar\":\"test\"}"))
+            .andExpect(status().isForbidden());
+        mvc.perform(patch("/api/v1/lessons/{id}/publication", id).with(student)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"isPublished\":true}"))
+            .andExpect(status().isForbidden());
+        mvc.perform(post("/api/v1/lessons").with(student).contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isForbidden());
+        mvc.perform(put("/api/v1/lessons/{id}", id).with(student)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isForbidden());
+        mvc.perform(delete("/api/v1/lessons/{id}", id).with(student))
+            .andExpect(status().isForbidden());
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.fieldErrors.grammar").exists());
+        mvc.perform(patch("/api/v1/lessons/{id}/publication", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{}"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.fieldErrors.isPublished").exists());
+        mvc.perform(patch("/api/v1/lessons/{id}/grammar", Long.MAX_VALUE).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"grammar\":\"test\"}"))
+            .andExpect(status().isNotFound());
+        lesson.setIsDeleted(true);
+        mvc.perform(patch("/api/v1/lessons/{id}/publication", id).with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"isPublished\":true}"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void createAndPutCannotBypassGrammarSanitization() throws Exception {
+        Course course = course("Sanitized writes");
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        String unsafeCreate = "{\"courseId\":" + course.getId() + ",\"title\":\"Safe\",\"grammar\":\""
+            + "<p onmouseover='alert(1)'>Text</p><iframe src='javascript:alert(1)'></iframe>\"}";
+        String createResponse = mvc.perform(post("/api/v1/lessons").with(admin)
+                .contentType(MediaType.APPLICATION_JSON).content(unsafeCreate))
+            .andExpect(status().isCreated()).andReturn().getResponse().getContentAsString();
+        assertThat(createResponse).contains("<p>Text</p>").doesNotContain("onmouseover", "iframe");
+        Lesson created = lessons.findAll().stream().filter(item -> "Safe".equals(item.getTitle()))
+            .findFirst().orElseThrow();
+        mvc.perform(put("/api/v1/lessons/{id}", created.getId()).with(admin)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"courseId":%d,"title":"Safe","slug":"safe","durationMinutes":0,
+                     "isPublished":false,"grammar":"<h3>Heading</h3><a href='javascript:alert(1)'>unsafe</a>"}
+                    """.formatted(course.getId())))
+            .andExpect(status().isOk());
+        entityManager.flush();
+        entityManager.clear();
+        assertThat(lessons.findById(created.getId()).orElseThrow().getGrammar())
+            .contains("<h3>Heading</h3>").doesNotContain("javascript:");
     }
 
     @Test

@@ -7,10 +7,12 @@ export function LessonWorkspaceHeader({
   courseId,
   courseTitle,
   lessonTitle,
+  onNavigate,
 }: {
   courseId: number;
   courseTitle: string;
   lessonTitle: string;
+  onNavigate: (href: string, event: { preventDefault(): void }) => void;
 }) {
   return (
     <header className="z-30 shrink-0 border-b border-slate-200/80 bg-white px-4 py-2.5 shadow-xs lg:px-6">
@@ -18,6 +20,7 @@ export function LessonWorkspaceHeader({
         <div className="flex min-w-0 items-center gap-3 md:gap-5">
           <Link
             href="/admin/courses"
+            onNavigate={(event) => onNavigate('/admin/courses', event)}
             aria-label="Studify Admin courses"
             className="flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-2 focus-visible:outline-sky-500"
           >
@@ -36,12 +39,13 @@ export function LessonWorkspaceHeader({
             aria-label="Breadcrumb"
             className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-slate-500"
           >
-            <Link href="/admin/courses" className="font-semibold hover:text-slate-900">
+            <Link href="/admin/courses" onNavigate={(event) => onNavigate('/admin/courses', event)} className="font-semibold hover:text-slate-900">
               Courses
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href={`/admin/courses/${courseId}`}
+              onNavigate={(event) => onNavigate(`/admin/courses/${courseId}`, event)}
               className="min-w-0 truncate rounded-xl bg-slate-50 px-2.5 py-1 font-bold text-slate-800 hover:bg-slate-100 hover:text-sky-600"
               title={courseTitle}
             >
@@ -74,6 +78,7 @@ export function LessonWorkspaceHeader({
           </DialogTrigger>
           <Link
             href={`/admin/courses/${courseId}`}
+            onNavigate={(event) => onNavigate(`/admin/courses/${courseId}`, event)}
             className="hidden items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 sm:flex"
           >
             <Settings className="size-3.5 text-slate-600" aria-hidden="true" />

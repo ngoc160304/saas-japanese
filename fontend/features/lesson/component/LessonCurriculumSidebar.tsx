@@ -15,7 +15,7 @@ interface Props {
   onRetryCurriculum: () => void;
   activeTab: LessonContentTab;
   onSelectTab: (tab: LessonContentTab) => void;
-  onNavigate: () => void;
+  onNavigate: (href: string, event: { preventDefault(): void }) => void;
   searchParams: string;
   search: string;
   onSearchChange: (value: string) => void;
@@ -143,7 +143,7 @@ export function LessonCurriculumSidebar({
                 <Link
                   href={`/admin/courses/${courseId}/lessons/${item.id}${query}`}
                   scroll={false}
-                  onClick={onNavigate}
+                  onNavigate={(event) => onNavigate(`/admin/courses/${courseId}/lessons/${item.id}${query}`, event)}
                   aria-current={active ? 'page' : undefined}
                   className={`flex items-center gap-2.5 rounded-xl px-3.5 py-3 focus-visible:outline-2 focus-visible:outline-sky-500 ${active ? 'bg-primary text-white' : 'text-slate-800 hover:bg-slate-50'}`}
                 >
@@ -200,7 +200,7 @@ export function LessonCurriculumSidebar({
       <div className="shrink-0 border-t border-slate-100 bg-slate-50/70 p-3">
         <Link
           href={`/admin/courses/${courseId}/lessons/create`}
-          onClick={onNavigate}
+          onNavigate={(event) => onNavigate(`/admin/courses/${courseId}/lessons/create`, event)}
           className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-sky-500"
         >
           <Plus className="size-3.5" aria-hidden="true" />

@@ -22,9 +22,9 @@ export function GrammarRichTextEditor({ id, value, onChange }: GrammarRichTextEd
           suffix: '.min',
           height: 280,
           menubar: false,
-          plugins: ['lists', 'wordcount'],
+          plugins: ['lists', 'link', 'wordcount'],
           toolbar:
-            'undo redo | blocks | bold italic underline | alignleft aligncenter alignright | bullist numlist | removeformat',
+            'undo redo | blocks | bold italic underline | bullist numlist | link unlink | removeformat',
           toolbar_mode: 'sliding',
           branding: false,
           promotion: false,

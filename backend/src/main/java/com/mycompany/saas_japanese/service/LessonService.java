@@ -17,6 +17,10 @@ public interface LessonService {
 
   LessonResponse updateLesson(Long id, ReqUpdateLesson request);
 
+  LessonResponse updateGrammar(Long id, String grammar);
+
+  LessonResponse updatePublication(Long id, boolean isPublished);
+
   void deleteLesson(Long id);
 
   void deleteByCourseId(long courseId);

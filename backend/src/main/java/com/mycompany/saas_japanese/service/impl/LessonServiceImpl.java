@@ -22,6 +22,7 @@ import com.mycompany.saas_japanese.service.LessonService;
 import com.mycompany.saas_japanese.service.mapper.LessonMapper;
 import com.mycompany.saas_japanese.specification.LessonSpecs;
 import com.mycompany.saas_japanese.util.SlugUtil;
+import com.mycompany.saas_japanese.util.GrammarHtmlSanitizer;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
@@ -43,6 +44,7 @@ public class LessonServiceImpl implements LessonService {
         MediaRepository mediaRepository;
 
         LessonMapper lessonMapper;
+        GrammarHtmlSanitizer grammarHtmlSanitizer;
 
         @Override
         public LessonResponse createLesson(
@@ -67,7 +69,7 @@ public class LessonServiceImpl implements LessonService {
                                                 lesson.getTitle()));
 
                 lesson.setGrammar(
-                                request.getGrammar());
+                                grammarHtmlSanitizer.sanitize(request.getGrammar()));
 
                 lesson.setDurationMinutes(
                                 request.getDurationMinutes());
@@ -175,7 +177,7 @@ public class LessonServiceImpl implements LessonService {
                                                 lesson.getTitle()));
 
                 lesson.setGrammar(
-                                request.getGrammar());
+                                grammarHtmlSanitizer.sanitize(request.getGrammar()));
 
                 lesson.setDurationMinutes(
                                 request.getDurationMinutes());
@@ -201,6 +203,22 @@ public class LessonServiceImpl implements LessonService {
 
                 return lessonMapper.toResponse(
                                 updatedLesson);
+        }
+
+        @Override
+        public LessonResponse updateGrammar(Long id, String grammar) {
+                Lesson lesson = lessonRepository.findByIdAndIsDeletedFalse(id)
+                                .orElseThrow(() -> new NotFoundException("Lesson không tồn tại"));
+                lesson.setGrammar(grammarHtmlSanitizer.sanitize(grammar));
+                return lessonMapper.toResponse(lessonRepository.saveAndFlush(lesson));
+        }
+
+        @Override
+        public LessonResponse updatePublication(Long id, boolean isPublished) {
+                Lesson lesson = lessonRepository.findByIdAndIsDeletedFalse(id)
+                                .orElseThrow(() -> new NotFoundException("Lesson không tồn tại"));
+                lesson.setIsPublished(isPublished);
+                return lessonMapper.toResponse(lessonRepository.saveAndFlush(lesson));
         }
 
      

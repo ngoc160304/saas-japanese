@@ -1,7 +1,7 @@
 import authorizeAxiosInstance from '@/lib/authorize-axios';
 import type { ApiResponse } from '@/types/api';
 import type { PageResponse } from '@/types/pagination';
-import type { CreateLessonRequest, Lesson, LessonQuery, UpdateLessonRequest } from './lessons.type';
+import type { CreateLessonRequest, Lesson, LessonQuery, UpdateLessonGrammarRequest, UpdateLessonPublicationRequest, UpdateLessonRequest } from './lessons.type';
 
 async function getLessons({ courseId, page, size, search, sortKey, sortType }: LessonQuery) {
   const response = await authorizeAxiosInstance.get<ApiResponse<PageResponse<Lesson>>>('/lessons', {
@@ -42,6 +42,20 @@ async function update({ id, data }: { id: number; data: UpdateLessonRequest }) {
   return response.data.data;
 }
 
+async function updateGrammar({ id, data }: { id: number; data: UpdateLessonGrammarRequest }) {
+  const response = await authorizeAxiosInstance.patch<ApiResponse<Lesson>>(`/lessons/${id}/grammar`, data, {
+    localErrorHandling: true,
+  });
+  return response.data.data;
+}
+
+async function updatePublication({ id, data }: { id: number; data: UpdateLessonPublicationRequest }) {
+  const response = await authorizeAxiosInstance.patch<ApiResponse<Lesson>>(`/lessons/${id}/publication`, data, {
+    localErrorHandling: true,
+  });
+  return response.data.data;
+}
+
 async function create(data: CreateLessonRequest) {
   const response = await authorizeAxiosInstance.post<ApiResponse<Lesson>>('/lessons', data, {
     localErrorHandling: true,
@@ -53,4 +67,4 @@ async function deleteById(id: number) {
   await authorizeAxiosInstance.delete(`/lessons/${id}`, { localErrorHandling: true });
 }
 
-export const lessonAPI = { getLessons, getCourseCurriculum, getById, update, create, deleteById };
+export const lessonAPI = { getLessons, getCourseCurriculum, getById, update, updateGrammar, updatePublication, create, deleteById };

@@ -40,3 +40,11 @@ export interface UpdateLessonRequest {
   durationMinutes: number;
   isPublished: boolean;
 }
+
+export interface UpdateLessonGrammarRequest {
+  grammar: string;
+}
+
+export interface UpdateLessonPublicationRequest {
+  isPublished: boolean;
+}

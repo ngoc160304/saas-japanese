@@ -15,6 +15,8 @@ interface LessonContentTabsProps {
   onTabChange: (tab: LessonContentTab) => void;
   lesson: Lesson;
   lessonId: number;
+  grammarDraft: string;
+  onGrammarChange: (value: string) => void;
 }
 
 export function LessonContentTabs({
@@ -22,6 +24,8 @@ export function LessonContentTabs({
   onTabChange,
   lesson,
   lessonId,
+  grammarDraft,
+  onGrammarChange,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [vocabularyCount, setVocabularyCount] = useState<number | null>(null);
@@ -137,7 +141,7 @@ export function LessonContentTabs({
         aria-labelledby="lesson-content-tab-grammar"
         hidden={activeTab !== 'grammar'}
       >
-        <GrammarSection lesson={lesson} />
+        {activeTab === 'grammar' && <GrammarSection lesson={lesson} draft={grammarDraft} onDraftChange={onGrammarChange} />}
       </div>
       <div
         id="lesson-content-panel-vocabulary"

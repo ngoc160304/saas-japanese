@@ -68,6 +68,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("com.turkraft.springfilter:jpa:3.1.7")
+	implementation("org.jsoup:jsoup:1.23.2")
 
 	implementation("com.cloudinary:cloudinary-http5:2.0.0")
 

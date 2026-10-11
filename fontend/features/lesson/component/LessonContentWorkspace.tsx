@@ -7,7 +7,13 @@ import type { Course } from '@/apis/courses/courses.type';
 import { lessonAPI } from '@/apis/lessons/lessons.api';
 import type { Lesson } from '@/apis/lessons/lessons.type';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/api-error';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useLessonWorkspaceActions } from '../hooks/useLessonWorkspaceActions';
 import { LessonContentTabs, type LessonContentTab } from './LessonContentTabs';
 import { LessonCurriculumSidebar } from './LessonCurriculumSidebar';
 import { LessonHeaderCard } from './LessonHeaderCard';
@@ -38,6 +44,20 @@ export function LessonContentWorkspace({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [expanded, setExpanded] = useState(true);
+  const [pendingDestination, setPendingDestination] = useState<string | null>(null);
+  const [publicationOpen, setPublicationOpen] = useState(false);
+  const [showPublicationError, setShowPublicationError] = useState(false);
+  const actions = useLessonWorkspaceActions(lesson);
+
+  useEffect(() => {
+    if (!actions.dirty) return;
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warnBeforeUnload);
+    return () => window.removeEventListener('beforeunload', warnBeforeUnload);
+  }, [actions.dirty]);
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
@@ -56,6 +76,29 @@ export function LessonContentWorkspace({
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   }
 
+  function guardNavigation(href: string, event: { preventDefault(): void }) {
+    setDrawerOpen(false);
+    const current = `${pathname}${searchParams.size ? `?${searchParams.toString()}` : ''}`;
+    if (href === current) return;
+    if (actions.dirty || actions.isSaving) {
+      event.preventDefault();
+      setPendingDestination(href);
+    }
+  }
+
+  function discardAndLeave() {
+    if (!pendingDestination) return;
+    const destination = pendingDestination;
+    setPendingDestination(null);
+    router.push(destination, { scroll: false });
+  }
+
+  async function confirmPublication() {
+    setShowPublicationError(false);
+    if (await actions.changePublication(!lesson.isPublished)) setPublicationOpen(false);
+    else setShowPublicationError(true);
+  }
+
   const sidebarProps = {
     courseId,
     lessonId,
@@ -68,7 +111,7 @@ export function LessonContentWorkspace({
     search,
     expanded,
     onSelectTab: selectTab,
-    onNavigate: () => setDrawerOpen(false),
+    onNavigate: guardNavigation,
     searchParams: searchParams.toString(),
     onSearchChange: setSearch,
     onToggleExpanded: () => setExpanded((value) => !value),
@@ -81,6 +124,7 @@ export function LessonContentWorkspace({
           courseId={courseId}
           courseTitle={course.title}
           lessonTitle={lesson.title}
+          onNavigate={guardNavigation}
         />
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <aside
@@ -94,12 +138,26 @@ export function LessonContentWorkspace({
             className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain p-4 md:p-6 lg:p-7"
           >
             <div className="space-y-5">
-              <LessonHeaderCard courseId={courseId} lessonId={lessonId} lesson={lesson} />
+              <LessonHeaderCard
+                courseId={courseId}
+                lessonId={lessonId}
+                lesson={lesson}
+                showGrammarSave={activeTab === 'grammar'}
+                grammarDirty={actions.dirty}
+                isSaving={actions.isSaving}
+                isChangingPublication={actions.isChangingPublication}
+                saveError={actions.saveError ? getApiErrorMessage(actions.saveError) : null}
+                onSave={() => void actions.saveGrammar()}
+                onPublicationClick={() => { setShowPublicationError(false); setPublicationOpen(true); }}
+                onNavigate={guardNavigation}
+              />
               <LessonContentTabs
                 activeTab={activeTab}
                 onTabChange={selectTab}
                 lesson={lesson}
                 lessonId={lessonId}
+                grammarDraft={actions.draft}
+                onGrammarChange={actions.setDraft}
               />
             </div>
           </main>
@@ -112,6 +170,53 @@ export function LessonContentWorkspace({
         <DialogTitle className="sr-only">Lesson curriculum</DialogTitle>
         <LessonCurriculumSidebar {...sidebarProps} mobile />
       </DialogContent>
+      <AlertDialog open={pendingDestination !== null} onOpenChange={(open) => { if (!open) setPendingDestination(null); }}>
+        <AlertDialogContent className="max-w-md rounded-3xl border border-slate-100 bg-white p-6 text-slate-900 shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{actions.dirty ? 'Chưa lưu thay đổi' : 'Đã lưu ngữ pháp'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {actions.isSaving
+                ? 'Đang lưu ngữ pháp. Hãy chờ thao tác hoàn tất trước khi rời bài học.'
+                : actions.dirty
+                  ? 'Bản nháp ngữ pháp sẽ bị mất nếu bạn rời bài học này.'
+                  : 'Thay đổi ngữ pháp đã được lưu. Bạn có thể rời bài học.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ở lại</AlertDialogCancel>
+            <AlertDialogAction disabled={actions.isSaving} onClick={discardAndLeave} className="bg-rose-700 text-white hover:bg-rose-800">
+              {actions.dirty ? 'Bỏ thay đổi và rời đi' : 'Rời đi'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      <AlertDialog open={publicationOpen} onOpenChange={setPublicationOpen}>
+        <AlertDialogContent className="max-w-md rounded-3xl border border-slate-100 bg-white p-6 text-slate-900 shadow-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{lesson.isPublished ? 'Ẩn bài học?' : actions.dirty ? 'Lưu ngữ pháp trước khi xuất bản' : 'Xuất bản bài học?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {lesson.isPublished
+                ? 'Bài học sẽ chuyển về bản nháp. Nội dung ngữ pháp chưa lưu sẽ được giữ nguyên trong trình soạn thảo.'
+                : actions.dirty
+                  ? 'Xuất bản chỉ dùng nội dung đã lưu. Hãy lưu hoặc bỏ bản nháp, sau đó chọn Xuất bản lại.'
+                  : 'Bài học sẽ được đánh dấu đã xuất bản với nội dung đang lưu trên máy chủ.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {showPublicationError && actions.publicationError && <p role="alert" className="text-sm text-rose-700">{getApiErrorMessage(actions.publicationError)}</p>}
+          {!lesson.isPublished && actions.dirty && actions.saveError && <p role="alert" className="text-sm text-rose-700">{getApiErrorMessage(actions.saveError)}</p>}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={actions.isSaving || actions.isChangingPublication}>Ở lại</AlertDialogCancel>
+            {!lesson.isPublished && actions.dirty ? (
+              <>
+                <Button type="button" disabled={actions.isSaving} onClick={() => { actions.discardDraft(); setPublicationOpen(false); }} className="bg-slate-600 text-white hover:bg-slate-700">Bỏ bản nháp</Button>
+                <Button type="button" disabled={actions.isSaving} onClick={() => { void actions.saveGrammar().then((saved) => { if (saved) setPublicationOpen(false); }); }} className="bg-primary text-white hover:bg-primary/90">{actions.isSaving ? 'Đang lưu…' : 'Lưu ngữ pháp'}</Button>
+              </>
+            ) : (
+              <Button type="button" disabled={actions.isChangingPublication} onClick={() => void confirmPublication()} className="bg-primary text-white hover:bg-primary/90">{actions.isChangingPublication ? 'Đang cập nhật…' : lesson.isPublished ? 'Ẩn bài học' : 'Xuất bản'}</Button>
+            )}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
