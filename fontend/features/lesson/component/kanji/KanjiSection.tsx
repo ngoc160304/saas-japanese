@@ -11,7 +11,7 @@ import { KanjiToolbar } from './KanjiToolbar';
 interface KanjiSectionProps {
   lessonId: number;
   active: boolean;
-  onCountChange: (count: number) => void;
+  onCountChange: (count: number | null) => void;
 }
 
 export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionProps) {
@@ -19,8 +19,8 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
   const [meaningVi, setMeaningVi] = useState('');
   const filters: KanjiQuery = { lessonId, kanji, meaningVi };
   const kanjiQuery = useQuery({
-    queryKey: ['study', 'lessons', filters.lessonId, 'kanjis'],
-    queryFn: () => kanjiAPI.listStudyByLesson(filters.lessonId),
+    queryKey: ['admin', 'lessons', filters.lessonId, 'kanjis'],
+    queryFn: () => kanjiAPI.listByLesson(filters.lessonId),
     enabled: active && Number.isSafeInteger(filters.lessonId) && filters.lessonId > 0,
     retry: false,
   });
@@ -35,8 +35,8 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
   const count = visibleItems.length;
 
   useEffect(() => {
-    onCountChange(count);
-  }, [count, onCountChange]);
+    onCountChange(kanjiQuery.isSuccess ? items.length : null);
+  }, [items.length, kanjiQuery.isSuccess, onCountChange]);
 
   function resetFilters() {
     setKanji('');
@@ -71,13 +71,17 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
 
       <div className="space-y-4">
         <div>
-          <h3 className="text-sm font-extrabold text-slate-900">Kanji Cards ({items.length})</h3>
+          <h3 className="text-sm font-extrabold text-slate-900">
+            Kanji Cards {kanjiQuery.isSuccess ? `(${items.length})` : ''}
+          </h3>
           <p className="mt-0.5 text-xs font-medium text-slate-600">
             Chữ Hán, âm On/Kun và các từ vựng phái sinh
           </p>
-          <p className="mt-1 text-xs font-medium text-slate-500">
-            Hiển thị {count} / {items.length} Kanji
-          </p>
+          {kanjiQuery.isSuccess && (
+            <p className="mt-1 text-xs font-medium text-slate-500">
+              Hiển thị {count} / {items.length} Kanji
+            </p>
+          )}
         </div>
         {kanjiQuery.isFetching && !kanjiQuery.data ? (
           <p role="status" className="py-10 text-center text-xs text-slate-500">

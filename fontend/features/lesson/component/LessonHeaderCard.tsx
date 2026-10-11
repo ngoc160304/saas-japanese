@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Check, Paperclip, Pencil } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { LessonGrammarPreview } from '../types/grammar';
+import type { Lesson } from '@/apis/lessons/lessons.type';
 
 export function LessonHeaderCard({
   courseId,
@@ -10,7 +10,7 @@ export function LessonHeaderCard({
 }: {
   courseId: number;
   lessonId: number;
-  lesson: LessonGrammarPreview;
+  lesson: Lesson;
 }) {
   return (
     <section className="rounded-3xl border border-slate-100 bg-white p-5 shadow-soft md:p-6">
@@ -21,30 +21,30 @@ export function LessonHeaderCard({
               Lesson #{lessonId}
             </span>
             <span aria-hidden="true">•</span>
-            <span className="font-mono text-slate-500">{lesson.durationMinutes} mins</span>
+            <span className="font-mono text-slate-500">
+              {lesson.durationMinutes === null
+                ? 'Chưa cập nhật thời lượng'
+                : `${lesson.durationMinutes} phút`}
+            </span>
             <span aria-hidden="true">•</span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-100 bg-emerald-50 px-2 py-0.5 font-bold text-emerald-700">
-              <span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
-              Published
+            <span
+              className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 font-bold ${lesson.isPublished ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : 'border-amber-100 bg-amber-50 text-amber-700'}`}
+            >
+              <span
+                className={`size-1.5 rounded-full ${lesson.isPublished ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                aria-hidden="true"
+              />
+              {lesson.isPublished ? 'Published' : 'Draft'}
             </span>
           </div>
           <h1 className="text-base font-black break-words text-slate-900 md:text-lg">
-            Lesson {lessonId}: {lesson.title}
+            {lesson.title}
           </h1>
           <p className="mt-1 text-xs font-medium text-slate-500 md:text-sm">
             Quản lý ngữ pháp và video bài giảng của bài học.
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Button
-            type="button"
-            disabled
-            aria-describedby="lesson-unavailable-actions"
-            className="h-9 rounded-2xl border-sky-200/80 bg-sky-50 px-3.5 text-xs font-bold text-sky-800"
-          >
-            <Paperclip className="size-4" aria-hidden="true" />
-            Resources
-          </Button>
           <Button
             nativeButton={false}
             render={<Link href={`/admin/courses/${courseId}/lessons/${lessonId}/edit`} />}
@@ -54,29 +54,8 @@ export function LessonHeaderCard({
             <Pencil className="size-3.5" aria-hidden="true" />
             Edit Lesson
           </Button>
-          <Button
-            type="button"
-            disabled
-            aria-describedby="lesson-unavailable-actions"
-            variant="secondary"
-            className="h-9 rounded-2xl bg-slate-100 px-3.5 text-xs font-bold text-slate-700"
-          >
-            Toggle Status
-          </Button>
-          <Button
-            type="button"
-            disabled
-            aria-describedby="lesson-unavailable-actions"
-            className="h-9 rounded-2xl bg-primary px-3.5 text-xs font-bold text-white"
-          >
-            <Check className="size-3.5" aria-hidden="true" />
-            Save
-          </Button>
         </div>
       </div>
-      <p id="lesson-unavailable-actions" className="mt-3 text-[11px] text-slate-500">
-        Resources, status changes and saving are unavailable in this content preview.
-      </p>
     </section>
   );
 }

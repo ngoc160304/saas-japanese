@@ -5,12 +5,10 @@ import { DialogTrigger } from '@/components/ui/dialog';
 
 export function LessonWorkspaceHeader({
   courseId,
-  lessonId,
   courseTitle,
   lessonTitle,
 }: {
   courseId: number;
-  lessonId: number;
   courseTitle: string;
   lessonTitle: string;
 }) {
@@ -57,7 +55,7 @@ export function LessonWorkspaceHeader({
               className="hidden min-w-0 truncate md:block"
               title={lessonTitle}
             >
-              Lesson {lessonId}: {lessonTitle}
+              {lessonTitle}
             </span>
           </nav>
         </div>

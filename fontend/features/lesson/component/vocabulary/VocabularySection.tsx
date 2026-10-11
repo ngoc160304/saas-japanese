@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Download, Plus } from 'lucide-react';
 import { vocabularyAPI } from '@/apis/lessons/lesson-content.api';
 import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/api-error';
@@ -12,19 +11,15 @@ import { VocabularyToolbar } from './VocabularyToolbar';
 interface VocabularySectionProps {
   lessonId: number;
   active: boolean;
-  onVisibleCountChange: (count: number) => void;
+  onCountChange: (count: number | null) => void;
 }
 
-export function VocabularySection({
-  lessonId,
-  active,
-  onVisibleCountChange,
-}: VocabularySectionProps) {
+export function VocabularySection({ lessonId, active, onCountChange }: VocabularySectionProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [partOfSpeech, setPartOfSpeech] = useState('');
   const vocabularyQuery = useQuery({
-    queryKey: ['study', 'lessons', lessonId, 'vocabularies'],
-    queryFn: () => vocabularyAPI.listStudyByLesson(lessonId),
+    queryKey: ['admin', 'lessons', lessonId, 'vocabularies'],
+    queryFn: () => vocabularyAPI.listByLesson(lessonId),
     enabled: active && Number.isSafeInteger(lessonId) && lessonId > 0,
     retry: false,
   });
@@ -45,11 +40,11 @@ export function VocabularySection({
       );
     return matchesSearch && (!partOfSpeech || item.partOfSpeech?.trim() === partOfSpeech);
   });
-  const visibleCount = vocabularyQuery.isError ? 0 : visibleItems.length;
+  const visibleCount = visibleItems.length;
 
   useEffect(() => {
-    onVisibleCountChange(visibleCount);
-  }, [onVisibleCountChange, visibleCount]);
+    onCountChange(vocabularyQuery.isSuccess ? items.length : null);
+  }, [onCountChange, vocabularyQuery.isSuccess, items.length]);
 
   function resetFilters() {
     setSearchTerm('');
@@ -90,29 +85,14 @@ export function VocabularySection({
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
             <h3 className="text-sm font-extrabold text-slate-900">
-              Vocabulary List ({visibleCount}
-              {visibleCount !== items.length ? ` / ${items.length}` : ''})
+              Vocabulary List{' '}
+              {vocabularyQuery.isSuccess
+                ? `(${visibleCount}${visibleCount !== items.length ? ` / ${items.length}` : ''})`
+                : ''}
             </h3>
             <p className="mt-0.5 text-xs font-medium text-slate-600">
               Bảng từ vựng tương ứng với bài học
             </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              className="h-9 rounded-xl border-slate-200 bg-white px-3.5 text-xs font-bold text-slate-700"
-            >
-              <Download className="size-3.5" aria-hidden="true" />
-              Import CSV
-            </Button>
-            <Button
-              type="button"
-              className="h-9 rounded-xl bg-primary px-3.5 text-xs font-bold text-white shadow-2xs hover:bg-primary/90"
-            >
-              <Plus className="size-3.5" aria-hidden="true" />
-              Add Vocabulary
-            </Button>
           </div>
         </div>
         {vocabularyQuery.isFetching && !vocabularyQuery.data ? (

@@ -10,14 +10,15 @@ import { QuizQuestionCard } from './QuizQuestionCard';
 interface QuizSectionProps {
   lessonId: number;
   active: boolean;
-  onCountChange: (count: number) => void;
+  published: boolean;
+  onCountChange: (count: number | null) => void;
 }
 
-export function QuizSection({ lessonId, active, onCountChange }: QuizSectionProps) {
+export function QuizSection({ lessonId, active, published, onCountChange }: QuizSectionProps) {
   const quizQuery = useQuery({
     queryKey: ['study', 'lessons', lessonId, 'quiz'],
     queryFn: () => quizAPI.getStudyByLesson(lessonId),
-    enabled: active && Number.isSafeInteger(lessonId) && lessonId > 0,
+    enabled: active && published && Number.isSafeInteger(lessonId) && lessonId > 0,
     retry: false,
   });
   const error = quizQuery.isError ? getApiError(quizQuery.error) : null;
@@ -26,8 +27,8 @@ export function QuizSection({ lessonId, active, onCountChange }: QuizSectionProp
   const questions = quiz ? [...quiz.questions].sort((a, b) => a.sortOrder - b.sortOrder) : [];
 
   useEffect(() => {
-    onCountChange(questions.length);
-  }, [onCountChange, questions.length]);
+    onCountChange(published && quizQuery.isSuccess ? questions.length : null);
+  }, [onCountChange, published, quizQuery.isSuccess, questions.length]);
 
   return (
     <section
@@ -47,7 +48,11 @@ export function QuizSection({ lessonId, active, onCountChange }: QuizSectionProp
         </p>
       </div>
 
-      {quizQuery.isFetching && !quizQuery.data ? (
+      {!published ? (
+        <p className="py-10 text-center text-xs text-slate-500">
+          Chưa có API quản trị Quiz cho bài học nháp. Chỉ có thể xem trước Quiz đã xuất bản.
+        </p>
+      ) : quizQuery.isFetching && !quizQuery.data ? (
         <p role="status" className="py-10 text-center text-xs text-slate-500">
           Đang tải Quiz...
         </p>
