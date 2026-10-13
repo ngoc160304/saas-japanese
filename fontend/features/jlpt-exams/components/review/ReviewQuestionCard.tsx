@@ -42,10 +42,10 @@ export function ReviewQuestionCard({ entry, total }: { entry: ReviewQuestionEntr
 
       {status === 'unanswered' && <p className="text-xs font-semibold text-amber-800">You did not select an answer for this question.</p>}
 
-      <section aria-labelledby="review-explanation-heading" className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 md:p-6">
+      {question.explanation && <section aria-labelledby="review-explanation-heading" className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-5 md:p-6">
         <h3 id="review-explanation-heading" className="text-xs font-bold tracking-wider text-slate-800 uppercase"><span aria-hidden="true">💡 </span>Detailed Explanation &amp; Solution Notes</h3>
         <p className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 text-sm leading-relaxed whitespace-pre-line text-slate-700">{question.explanation}</p>
-      </section>
+      </section>}
     </section>
   );
 }

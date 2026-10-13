@@ -28,6 +28,7 @@ const studentItems: ISidebarItem[] = [
   {
     title: 'JLPT Exams',
     href: '/student/jlpt-exams',
+    activePaths: ['/student/jlpt_exam_result', '/student/jlpt_exam_history'],
     icon: <GraduationCap className={iconClass} aria-hidden="true" />,
   },
   { title: 'Analytics', icon: <TrendingUp className={iconClass} aria-hidden="true" /> },

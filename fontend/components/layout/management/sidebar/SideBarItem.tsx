@@ -8,12 +8,13 @@ interface SideBarItemProps {
   icon: ReactNode;
   title: string;
   href?: string;
+  activePaths?: readonly string[];
 }
 
-const SideBarItem = ({ icon, title, href }: SideBarItemProps) => {
+const SideBarItem = ({ icon, title, href, activePaths = [] }: SideBarItemProps) => {
   const pathname = usePathname();
 
-  const isActive = href ? pathname === href || pathname.startsWith(`${href}/`) : false;
+  const isActive = href ? [href, ...activePaths].some((path) => pathname === path || pathname.startsWith(`${path}/`)) : false;
   const className = `
         flex items-center gap-3.5
         px-4 py-3
@@ -32,7 +33,7 @@ const SideBarItem = ({ icon, title, href }: SideBarItemProps) => {
     );
   }
   return (
-    <Link href={href} className={className}>
+    <Link href={href} aria-current={pathname === href ? 'page' : isActive ? 'location' : undefined} className={className}>
       {icon}
       <span>{title}</span>
     </Link>

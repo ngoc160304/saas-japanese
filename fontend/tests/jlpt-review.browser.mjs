@@ -66,6 +66,26 @@ try {
     const result = await send('Page.captureScreenshot', { format: 'png' });
     await writeFile(join(profile, name), Buffer.from(result.data, 'base64'));
   };
+  const review = (attemptId) => {
+    const question = (questionId, questionText, selectedAnswerId, correctAnswerId, passageText = null) => ({
+      questionId, questionOrder: questionId, questionText, passageText, selectedAnswerId, correctAnswerId,
+      isCorrect: selectedAnswerId === correctAnswerId,
+      answers: [1, 2, 3, 4].map((number) => ({ answerId: questionId * 10 + number, answerText: `Choice ${number}` })),
+      explanation: 'The correct option is shown above.',
+    });
+    return {
+      attemptId, examId: 5, examTitle: 'JLPT N5 Practice Exam', jlptLevel: 'N5', status: 'COMPLETED',
+      sessions: [
+        { attemptSessionId: 101, sessionId: 11, sessionName: 'Language Knowledge', sessionType: 'language_knowledge', sessionOrder: 1, parts: [
+          { attemptPartId: 201, partId: 21, partName: 'Kanji Reading', partOrder: 1, questions: [question(1, '川 は どう よみますか。', 11, 11), question(2, '学校 は どう よみますか。', 21, 22)] },
+          { attemptPartId: 202, partId: 22, partName: 'Grammar', partOrder: 2, questions: [question(3, 'ともだちと あいます。', 31, 31, 'Reading passage'), question(4, 'この ほんは おもしろいです。', null, 41)] },
+        ] },
+        { attemptSessionId: 102, sessionId: 12, sessionName: 'Reading', sessionType: 'reading', sessionOrder: 2, parts: [
+          { attemptPartId: 203, partId: 23, partName: 'Short Passage', partOrder: 1, questions: [question(5, 'いつ スーパーへ いきますか。', 51, 52, 'Reading passage'), question(6, '日曜日に なにを しますか。', null, 61)] },
+        ] },
+      ],
+    };
+  };
   async function intercept({ requestId, request }) {
     try {
       const url = new URL(request.url);
@@ -82,9 +102,12 @@ try {
         { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
         { name: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-XSRF-TOKEN' },
       ];
-      const body = url.pathname.endsWith('/auth/refresh-token')
+      let body = url.pathname.endsWith('/auth/refresh-token')
         ? { data: { access_token: 'test-access', tokenType: 'Bearer', expiresIn: 600, user: { id: 73, name: 'Student', email: 'student@example.test' } } }
         : { data: { token: 'test-csrf', headerName: 'X-XSRF-TOKEN' } };
+      const attemptId = Number(url.pathname.match(/\/attempts\/(\d+)/)?.[1]);
+      if (url.pathname.endsWith('/review')) body = { data: review(attemptId) };
+      if (url.pathname.endsWith('/result')) body = { data: { attemptId, examId: 5, examTitle: 'JLPT N5 Practice Exam', jlptLevel: 'N5', status: 'COMPLETED', mode: 'full', totalScore: 2, maxScore: 6, correctCount: 2, totalQuestions: 6, isPassed: false, startedAt: new Date().toISOString(), finishedAt: new Date().toISOString(), durationSeconds: 60 } };
       await send('Fetch.fulfillRequest', { requestId, responseCode: request.method === 'OPTIONS' ? 204 : 200, responseHeaders: headers, body: Buffer.from(JSON.stringify(body)).toString('base64') });
     } catch (error) { errors.push(error.message); await send('Fetch.failRequest', { requestId, errorReason: 'Failed' }); }
   }
@@ -97,7 +120,8 @@ try {
   await waitFor('document.querySelector("#review-question-heading")?.textContent.includes("川")');
   assert.equal(await evaluate('document.querySelector("header").textContent.includes("Attempt #901 Review")'), true);
   assert.equal(await evaluate('document.querySelector("header a").getAttribute("href")'), '/student/jlpt-exams/5');
-  assert.deepEqual(await evaluate('[...document.querySelectorAll("header [aria-pressed]")].map(button => button.textContent.trim())'), ['All (6)', 'Incorrect (2)', 'Correct (2)']);
+  assert.equal(await evaluate('[...document.querySelectorAll("a")].some(link => link.textContent.includes("View Result") && link.getAttribute("href") === "/student/jlpt_exam_result/901")'), true);
+  assert.deepEqual(await evaluate('[...document.querySelectorAll("header [aria-pressed]")].map(button => button.textContent.trim())'), ['All (6)', 'Incorrect (2)', 'Correct (2)', 'Unanswered (2)']);
   assert.equal(await evaluate(`document.querySelector('section[aria-label="Reading passage"]') === null`), true);
   assert.equal(await evaluate(`document.querySelector('button[aria-label="Question 1, correct"]').getAttribute('aria-current')`), 'true');
   assert.equal(await evaluate(`document.querySelectorAll('ol[aria-label="Answer options"] li span').length > 0`), true);
@@ -152,7 +176,7 @@ try {
   await waitFor('document.body.textContent.includes("404")');
   await send('Page.navigate', { url: `${origin}/student/jlpt_exam_review/9007199254740992` });
   await waitFor('document.body.textContent.includes("404")');
-  assert.equal(apiRequests.some((request) => request.includes('/jlpt-exams/attempts/')), false);
+  assert.equal(apiRequests.some((request) => request.includes('/jlpt-exams/attempts/901/review')), true);
   assert.deepEqual(errors, []);
   process.stdout.write(`JLPT review browser checks passed; screenshots: ${profile}\n`);
 } finally {

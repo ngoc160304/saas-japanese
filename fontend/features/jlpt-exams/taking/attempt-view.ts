@@ -18,6 +18,7 @@ export interface AttemptViewPart {
 
 export interface AttemptViewSession {
   id: number;
+  attemptSessionId: number;
   title: string;
   timeLimitMinutes: number | null;
   parts: AttemptViewPart[];
@@ -29,6 +30,7 @@ export function buildAttemptView(attempt: StartedJlptAttempt, exam: JlptExamStru
     const detailSession = exam.sessions.find((item) => item.id === session.sessionId);
     return {
       id: session.sessionId,
+      attemptSessionId: session.attemptSessionId,
       title: session.sessionTitle,
       timeLimitMinutes: detailSession?.timeLimitMinutes ?? null,
       parts: session.parts.map((part) => ({

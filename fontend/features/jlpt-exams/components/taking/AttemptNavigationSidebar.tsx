@@ -9,9 +9,11 @@ interface AttemptNavigationSidebarProps {
   isOpen: boolean;
   onSelectSession: (sessionId: number) => void;
   onSelectQuestion: (sessionId: number, questionId: number) => void;
+  onSubmit: () => void;
+  submitting: boolean;
 }
 
-export function AttemptNavigationSidebar({ sessions, selectedSessionId, currentQuestionId, answers, flaggedIds, isOpen, onSelectSession, onSelectQuestion }: AttemptNavigationSidebarProps) {
+export function AttemptNavigationSidebar({ sessions, selectedSessionId, currentQuestionId, answers, flaggedIds, isOpen, onSelectSession, onSelectQuestion, onSubmit, submitting }: AttemptNavigationSidebarProps) {
   return (
     <aside id="exam-navigation" aria-label="Question navigation" className={`${isOpen ? 'flex' : 'hidden'} max-h-[48dvh] w-full shrink-0 flex-col border-b border-slate-200 bg-white shadow-sm md:flex md:max-h-none md:w-80 md:border-r md:border-b-0`}>
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto overscroll-contain p-5">
@@ -41,8 +43,7 @@ export function AttemptNavigationSidebar({ sessions, selectedSessionId, currentQ
         ))}
       </div>
       <div className="border-t border-slate-200 bg-white p-4">
-        <button type="button" disabled aria-describedby="submit-unavailable" className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm font-bold text-slate-500">Submit Section</button>
-        <p id="submit-unavailable" className="mt-2 text-center text-xs text-slate-500">Submission is not available yet.</p>
+        <button type="button" onClick={onSubmit} disabled={submitting} className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-sm font-bold text-slate-800 hover:bg-slate-50 disabled:opacity-50">{submitting ? 'Submitting…' : 'Submit Exam'}</button>
       </div>
     </aside>
   );

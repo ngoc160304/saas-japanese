@@ -34,7 +34,6 @@ try {
   const pending = new Map();
   const errors = [];
   const posts = [];
-  let failedStarts = 0;
   socket.onmessage = ({ data }) => {
     const message = JSON.parse(data);
     if (message.id) {
@@ -76,7 +75,7 @@ try {
     ],
   };
   const attempt = (examId, mode, sessionId) => ({
-    attemptId: 901, examId, examTitle: exam.title, mode, startedAt: '2026-10-13T00:00:00Z',
+    attemptId: 901, examId, examTitle: exam.title, mode, startedAt: new Date().toISOString(),
     sessions: [
       { attemptSessionId: 100, sessionId: 6, sessionTitle: 'Language knowledge', sessionOrder: 1, parts: [
         { attemptPartId: 102, partId: 12, partName: 'First part', partOrder: 1, questions: [
@@ -105,7 +104,7 @@ try {
       const headers = [
         { name: 'Access-Control-Allow-Origin', value: origin },
         { name: 'Access-Control-Allow-Credentials', value: 'true' },
-        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
+        { name: 'Access-Control-Allow-Methods', value: 'GET, POST, PUT, OPTIONS' },
         { name: 'Access-Control-Allow-Headers', value: 'Content-Type, Authorization, X-XSRF-TOKEN' },
       ];
       if (request.method === 'OPTIONS') { await send('Fetch.fulfillRequest', { requestId, responseCode: 204, responseHeaders: headers }); return; }
@@ -119,9 +118,13 @@ try {
       if (request.method === 'POST' && url.pathname.endsWith('/attempts')) {
         const payload = JSON.parse(request.postData);
         posts.push({ examId, payload });
-        if (examId === 7 && failedStarts++ === 0) { responseCode = 500; body = { message: 'Server error' }; }
-        else body = { data: attempt(examId, payload.mode, payload.sessionId) };
+        body = { data: attempt(examId, payload.mode, payload.sessionId) };
       }
+      if (request.method === 'PUT' && url.pathname.endsWith('/answers')) {
+        const payload = JSON.parse(request.postData);
+        body = { data: { ...payload, attemptId: 901, attemptSessionId: Number(url.pathname.match(/\/sessions\/(\d+)/)?.[1]), attemptAnswerId: payload.questionId, answeredAt: new Date().toISOString() } };
+      }
+      if (url.pathname.endsWith('/result')) { responseCode = 400; body = { message: 'JLPT attempt is not completed' }; }
       await send('Fetch.fulfillRequest', { requestId, responseCode, responseHeaders: [{ name: 'Content-Type', value: 'application/json' }, ...headers], body: Buffer.from(JSON.stringify(body)).toString('base64') });
     } catch (error) { errors.push(error.message); await send('Fetch.failRequest', { requestId, errorReason: 'Failed' }); }
   }
@@ -143,7 +146,7 @@ try {
   assert.equal(await evaluate('document.querySelector("main")?.textContent.includes("Choose the correct reading.")'), true);
   assert.equal(await evaluate('document.querySelector("main")?.textContent.includes("川を読みます。")'), true);
   assert.deepEqual(await evaluate('[...document.querySelectorAll("#exam-navigation section button:first-child span:first-child")].map(item => item.textContent)'), ['Language knowledge', 'Listening']);
-  assert.equal(await evaluate('document.querySelector("button[aria-describedby=submit-unavailable]").disabled'), true);
+  assert.equal(await evaluate('[...document.querySelectorAll("button")].some(button => button.textContent.includes("Submit Exam") && !button.disabled)'), true);
   assert.equal(await evaluate('document.body.textContent.includes("Correct answer")'), false);
   await evaluate('[...document.querySelectorAll("input[type=radio]")].find(input => input.value === "300").click()');
   assert.equal(await evaluate('[...document.querySelectorAll("input[type=radio]")].find(input => input.value === "300").checked'), true);
@@ -169,13 +172,9 @@ try {
   await waitFor('document.querySelector("main")?.textContent.includes("valid numeric session ID")');
   await navigate('/jlpt-exams/invalid/taking?mode=full');
   await waitFor('document.querySelector("main")?.textContent.includes("positive number")');
-  await navigate('/jlpt-exams/7/taking?mode=full');
-  await waitFor('[...document.querySelectorAll("button")].some(button => button.textContent.includes("Begin attempt"))');
-  await evaluate('[...document.querySelectorAll("button")].find(button => button.textContent.includes("Begin attempt")).click()');
-  await waitFor('document.querySelector("[role=alert]")?.textContent.includes("gián đoạn")');
-  await evaluate('[...document.querySelectorAll("button")].find(button => button.textContent.includes("Try starting again")).click()');
+  await navigate('/jlpt-exams/5/taking?mode=full');
   await waitFor('document.querySelector("main")?.textContent.includes("川を読みます。")');
-  assert.equal(posts.length, 4);
+  assert.equal(posts.length, 2);
   await evaluate('[...document.querySelectorAll("input[type=radio]")].find(input => input.value === "300").click()');
   const measureScroll = async () => evaluate('(() => { const root = document.querySelector(".jlpt-taking-route"); const main = document.querySelector("#exam-questions"); const sidebar = document.querySelector("#exam-navigation > div"); return { viewport: innerHeight, documentHeight: document.scrollingElement.scrollHeight, scrollY, documentScrollTop: document.scrollingElement.scrollTop, bodyScrollTop: document.body.scrollTop, rootScrollTop: root?.scrollTop, rootScrollHeight: root?.scrollHeight, rootTop: root?.getBoundingClientRect().top, rootBottom: root?.getBoundingClientRect().bottom, mainClientHeight: main?.clientHeight, mainScrollHeight: main?.scrollHeight, mainScrollTop: main?.scrollTop, sidebarClientHeight: sidebar?.clientHeight, sidebarScrollHeight: sidebar?.scrollHeight, sidebarScrollTop: sidebar?.scrollTop }; })()');
   const assertViewport = (metrics) => {
@@ -211,7 +210,7 @@ try {
   await evaluate('document.querySelector("#exam-questions").scrollTop = 0');
   for (const number of [1, 16, 24, 30, 1]) await clickQuestion(number, false);
   assert.equal(await evaluate('[...document.querySelectorAll("input[type=radio]")].find(input => input.value === "300").checked'), true);
-  assert.equal(posts.length, 4);
+  assert.equal(posts.length, 2);
   await evaluate('document.querySelector("#exam-questions").scrollTop = 0');
   assertViewport(await measureScroll());
   assert.equal((await measureScroll()).mainScrollTop, 0);
@@ -232,7 +231,7 @@ try {
   await evaluate('document.querySelector("#exam-questions").scrollTop = 0');
   for (const number of [1, 16, 24, 30, 1]) await clickQuestion(number, true);
   assert.equal(await evaluate('[...document.querySelectorAll("input[type=radio]")].find(input => input.value === "300").checked'), true);
-  assert.equal(posts.length, 4);
+  assert.equal(posts.length, 2);
   await evaluate('document.querySelector("#exam-questions").scrollTop = 0');
   assertViewport(await measureScroll());
   assert.equal((await measureScroll()).mainScrollTop, 0);

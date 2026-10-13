@@ -3,18 +3,36 @@
 import { useState } from 'react';
 import type { JlptExamStructure, StartedJlptAttempt } from '@/apis/jlpt-exams/jlpt-exams.type';
 import { buildAttemptView } from '../../taking/attempt-view';
+import { useAttemptProgress } from '../../taking/use-attempt-progress';
 import { AttemptNavigationSidebar } from './AttemptNavigationSidebar';
 import { AttemptQuestionCard } from './AttemptQuestionCard';
+import { ExamConfirmDialog } from './ExamConfirmDialog';
 import { ExamSessionHeader } from './ExamSessionHeader';
 
-export function JlptExamTaking({ attempt, exam }: { attempt: StartedJlptAttempt; exam: JlptExamStructure }) {
+export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey }: { attempt: StartedJlptAttempt; exam: JlptExamStructure; initialSavedAnswers: Record<number, number>; storageKey: string | null }) {
   const sessions = buildAttemptView(attempt, exam);
   const [selectedSessionId, setSelectedSessionId] = useState(sessions[0]?.id ?? 0);
   const [currentQuestionId, setCurrentQuestionId] = useState<number | null>(sessions[0]?.parts[0]?.questions[0]?.question.questionId ?? null);
-  const [answers, setAnswers] = useState<Record<number, number>>({});
   const [flaggedIds, setFlaggedIds] = useState<ReadonlySet<number>>(new Set());
   const [navigationOpen, setNavigationOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const selectedSession = sessions.find((session) => session.id === selectedSessionId) ?? sessions[0];
+  const timeLimitMinutes = attempt.mode === 'session' ? selectedSession?.timeLimitMinutes ?? exam.totalTimeMinutes : exam.totalTimeMinutes;
+  const { answers, statuses, selectAnswer, retryAnswer, submit, submitting, submitError, remainingSeconds } = useAttemptProgress(attempt, timeLimitMinutes, initialSavedAnswers, storageKey);
+  const allQuestions = sessions.flatMap((session) => session.parts.flatMap((part) => part.questions));
+  const answeredCount = allQuestions.filter(({ question }) => answers[question.questionId] !== undefined).length;
+
+  function selectValidAnswer(questionId: number, answerId: number) {
+    const session = sessions.find((item) => item.parts.some((part) => part.questions.some(({ question }) => question.questionId === questionId && question.answers.some((answer) => answer.answerId === answerId))));
+    if (!session) return;
+    selectAnswer(questionId, answerId, session.attemptSessionId);
+    setCurrentQuestionId(questionId);
+  }
+
+  function retryQuestion(questionId: number) {
+    const session = sessions.find((item) => item.parts.some((part) => part.questions.some(({ question }) => question.questionId === questionId)));
+    if (session) retryAnswer(questionId, session.attemptSessionId);
+  }
 
   function selectSession(sessionId: number) {
     const session = sessions.find((item) => item.id === sessionId);
@@ -52,11 +70,14 @@ export function JlptExamTaking({ attempt, exam }: { attempt: StartedJlptAttempt;
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#f8fafc] text-slate-900 antialiased">
-      <ExamSessionHeader examId={exam.id} attemptId={attempt.attemptId} title={attempt.examTitle} level={exam.jlptLevel} totalTimeMinutes={attempt.mode === 'session' ? selectedSession?.timeLimitMinutes ?? exam.totalTimeMinutes : exam.totalTimeMinutes} navigationOpen={navigationOpen} onToggleNavigation={() => setNavigationOpen((open) => !open)} />
+      <ExamSessionHeader examId={exam.id} attemptId={attempt.attemptId} title={attempt.examTitle} level={exam.jlptLevel} totalTimeMinutes={timeLimitMinutes} remainingSeconds={remainingSeconds} onSubmit={() => setConfirmOpen(true)} submitting={submitting} navigationOpen={navigationOpen} onToggleNavigation={() => setNavigationOpen((open) => !open)} />
       <div className="flex min-h-0 flex-1 flex-col md:flex-row">
-        <AttemptNavigationSidebar sessions={sessions} selectedSessionId={selectedSession?.id ?? 0} currentQuestionId={currentQuestionId} answers={answers} flaggedIds={flaggedIds} isOpen={navigationOpen} onSelectSession={selectSession} onSelectQuestion={selectQuestion} />
+        <AttemptNavigationSidebar sessions={sessions} selectedSessionId={selectedSession?.id ?? 0} currentQuestionId={currentQuestionId} answers={answers} flaggedIds={flaggedIds} isOpen={navigationOpen} onSelectSession={selectSession} onSelectQuestion={selectQuestion} onSubmit={() => setConfirmOpen(true)} submitting={submitting} />
         <main id="exam-questions" aria-label="Exam questions" className="min-h-0 min-w-0 flex-1 overflow-y-auto overscroll-contain bg-[#f8fafc] px-4 py-6 pb-20 sm:px-6 md:p-8 md:pb-32">
           <div className="mx-auto max-w-3xl space-y-8">
+            {submitError && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">{submitError}<button type="button" onClick={() => void submit()} disabled={submitting} className="ml-3 font-bold text-sky-700 underline disabled:opacity-50">Retry submission</button></div>}
+            {submitting && <p role="status" className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-800">Saving pending answers and submitting this attempt…</p>}
+            {remainingSeconds === 0 && <p role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">Time is up. This attempt must be submitted. If the network failed, use the retry action above.</p>}
             {selectedSession ? (
               <section aria-label={selectedSession.title} className="space-y-8">
                 <div className="flex flex-wrap items-end justify-between gap-2">
@@ -72,16 +93,16 @@ export function JlptExamTaking({ attempt, exam }: { attempt: StartedJlptAttempt;
                     </div>
                     {part.questions.length === 0 && <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">No questions are available for this part.</p>}
                     {part.questions.map((item) => (
-                      <AttemptQuestionCard key={item.question.questionId} item={item} selectedAnswerId={answers[item.question.questionId]} flagged={flaggedIds.has(item.question.questionId)} onFocusQuestion={setCurrentQuestionId} onSelectAnswer={(questionId, answerId) => { setAnswers((current) => ({ ...current, [questionId]: answerId })); setCurrentQuestionId(questionId); }} onToggleFlag={toggleFlag} />
+                      <AttemptQuestionCard key={item.question.questionId} item={item} selectedAnswerId={answers[item.question.questionId]} saveStatus={statuses[item.question.questionId] ?? (initialSavedAnswers[item.question.questionId] !== undefined ? 'saved' : 'idle')} disabled={submitting || remainingSeconds === 0} retryDisabled={submitting} onRetry={retryQuestion} flagged={flaggedIds.has(item.question.questionId)} onFocusQuestion={setCurrentQuestionId} onSelectAnswer={selectValidAnswer} onToggleFlag={toggleFlag} />
                     ))}
                   </section>
                 ))}
               </section>
             ) : <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">No sessions are available for this attempt.</p>}
-            <p className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">Answers and flags are stored on this page only. Saving and submission are not available yet.</p>
           </div>
         </main>
       </div>
+      <ExamConfirmDialog kind={confirmOpen ? 'submit' : null} answeredCount={answeredCount} totalCount={allQuestions.length} onOpenChange={setConfirmOpen} onConfirm={() => { setConfirmOpen(false); void submit(); }} />
     </div>
   );
 }

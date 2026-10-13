@@ -38,7 +38,7 @@ export interface JlptAttemptReview {
   sessions: ReviewSession[];
 }
 
-export type ReviewFilter = 'all' | 'incorrect' | 'correct';
+export type ReviewFilter = 'all' | 'incorrect' | 'correct' | 'unanswered';
 export type ReviewQuestionStatus = 'correct' | 'incorrect' | 'unanswered';
 
 export interface ReviewQuestionEntry {

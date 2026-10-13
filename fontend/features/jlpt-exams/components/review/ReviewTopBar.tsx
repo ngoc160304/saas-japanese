@@ -4,7 +4,7 @@ import type { JlptAttemptReview, ReviewFilter } from '../../review/types';
 interface ReviewTopBarProps {
   review: JlptAttemptReview;
   filter: ReviewFilter;
-  counts: { all: number; incorrect: number; correct: number };
+  counts: { all: number; incorrect: number; correct: number; unanswered: number };
   onFilterChange: (filter: ReviewFilter) => void;
 }
 
@@ -12,6 +12,7 @@ const filters: { value: ReviewFilter; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'incorrect', label: 'Incorrect' },
   { value: 'correct', label: 'Correct' },
+  { value: 'unanswered', label: 'Unanswered' },
 ];
 
 export function ReviewTopBar({ review, filter, counts, onFilterChange }: ReviewTopBarProps) {
@@ -20,7 +21,7 @@ export function ReviewTopBar({ review, filter, counts, onFilterChange }: ReviewT
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <Link href={`/student/jlpt-exams/${review.examId}`} className="shrink-0 rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">
-            ← Back to Exam
+            ← Exam Details
           </Link>
           <span aria-hidden="true" className="hidden h-6 w-px bg-slate-200 sm:block" />
           <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-xs text-slate-500">

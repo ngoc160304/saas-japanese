@@ -28,5 +28,5 @@ export function getReviewQuestions(review: JlptAttemptReview): ReviewQuestionEnt
 export function filterReviewQuestions(questions: ReviewQuestionEntry[], filter: ReviewFilter): ReviewQuestionEntry[] {
   if (filter === 'all') return questions;
   if (filter === 'correct') return questions.filter((entry) => entry.status === 'correct');
-  return questions.filter((entry) => entry.status === 'incorrect');
+  return questions.filter((entry) => entry.status === filter);
 }
