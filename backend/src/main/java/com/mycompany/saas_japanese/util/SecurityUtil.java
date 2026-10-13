@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.util;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -10,7 +11,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jwt.Jwt;
 
+import com.mycompany.saas_japanese.util.constant.UserRoleEnum;
+
 public final class SecurityUtil {
+
+  public static String getUserAuthority(UserRoleEnum role) {
+    // Accounts created before roles were introduced retain their original authority.
+    return role == null ? "ROLE_USER" : "ROLE_" + role.name().toUpperCase(Locale.ROOT);
+  }
 
   /**
    * Get the login of the current user.

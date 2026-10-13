@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import com.mycompany.saas_japanese.repository.UserRepository;
+import com.mycompany.saas_japanese.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 
 @Component("userDetailsService")
@@ -22,7 +23,7 @@ public class UserDetailCustom implements UserDetailsService {
         .findByEmail(email.trim().toLowerCase(Locale.ROOT))
         .orElseThrow(() -> new UsernameNotFoundException("Invalid email or password"));
     // Check status after the password in AuthService to avoid disclosing account state.
-    String authority = "ROLE_" + user.getRole().name().toUpperCase();
+    String authority = SecurityUtil.getUserAuthority(user.getRole());
     return User.withUsername(user.getEmail()).password(user.getPassword()).authorities(authority).build();
   }
 }

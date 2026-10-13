@@ -197,6 +197,47 @@ class AuthIntegrationTest extends AuthTestSupport {
   }
 
   @Test
+  void legacyUserWithoutRoleCanLoginRefreshAndReadProfileWithoutChangingPassword() throws Exception {
+    user.setRole(null);
+    users.save(user);
+    String storedHash = users.findById(user.getId()).orElseThrow().getPassword();
+    assertThat(storedHash).startsWith("$2a$10$");
+    assertThat(passwords.matches(PASSWORD, storedHash)).isTrue();
+
+    MvcResult result = login(EMAIL, PASSWORD, false).andExpect(status().isOk()).andReturn();
+    String access = JSON.readTree(result.getResponse().getContentAsString()).at("/data/access_token").asText();
+    assertThat(accessDecoder.decode(access).getClaimAsStringList("permission")).containsExactly("ROLE_USER");
+    mvc.perform(get("/api/v1/auth/myProfile").header("Authorization", "Bearer " + access))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.data.email").value(EMAIL));
+    mvc.perform(post("/api/v1/lessons").header("Authorization", "Bearer " + access)
+        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+        .andExpect(status().isForbidden());
+
+    MvcResult refreshed = refresh(refreshCookie(result).getValue()).andExpect(status().isOk()).andReturn();
+    String refreshedAccess = JSON.readTree(refreshed.getResponse().getContentAsString())
+        .at("/data/access_token").asText();
+    assertThat(accessDecoder.decode(refreshedAccess).getClaimAsStringList("permission"))
+        .containsExactly("ROLE_USER");
+    mvc.perform(get("/api/v1/auth/myProfile").header("Authorization", "Bearer " + refreshedAccess))
+        .andExpect(status().isOk());
+    User persisted = users.findById(user.getId()).orElseThrow();
+    assertThat(persisted.getRole()).isNull();
+    assertThat(persisted.getPassword()).isEqualTo(storedHash);
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void legacyUserWithoutRoleStillRequiresCorrectPasswordAndEnabledAccount(boolean inactive) throws Exception {
+    user.setRole(null);
+    user.setActive(!inactive);
+    user.setVerified(inactive);
+    users.save(user);
+    login(EMAIL, UUID.randomUUID().toString(), false).andExpect(status().isUnauthorized());
+    login(EMAIL, PASSWORD, false).andExpect(status().isForbidden());
+    assertThat(sessions.count()).isZero();
+  }
+
+  @Test
   void loginWithoutRememberMeUsesSessionCookie() throws Exception {
     Cookie cookie = refreshCookie(login(EMAIL, PASSWORD, false).andExpect(status().isOk()).andReturn());
     assertThat(cookie.getMaxAge()).isEqualTo(-1);
