@@ -21,6 +21,7 @@ interface LessonContentTabsProps {
   video: LessonVideoControls;
   videoDisabled: boolean;
   onReloadVideo: () => void;
+  onQuizBusyChange: (busy: boolean) => void;
 }
 
 export function LessonContentTabs({
@@ -33,6 +34,7 @@ export function LessonContentTabs({
   video,
   videoDisabled,
   onReloadVideo,
+  onQuizBusyChange,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
   const [vocabularyCount, setVocabularyCount] = useState<number | null>(null);
@@ -185,7 +187,7 @@ export function LessonContentTabs({
           lessonId={lessonId}
           active={activeTab === 'quiz'}
           onCountChange={setQuizCount}
-          published={lesson.isPublished}
+          onBusyChange={onQuizBusyChange}
         />
       </div>
     </>

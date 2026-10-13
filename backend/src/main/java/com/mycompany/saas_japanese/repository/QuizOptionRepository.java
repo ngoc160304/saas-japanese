@@ -14,4 +14,6 @@ public interface QuizOptionRepository extends JpaRepository<QuizOption, Long> {
     Optional<QuizOption> findById(Long id);
 
     List<QuizOption> findByQuestionIdOrderBySortOrderAsc(Long questionId);
+
+    List<QuizOption> findByQuestionIdInOrderBySortOrderAscIdAsc(List<Long> questionIds);
 }

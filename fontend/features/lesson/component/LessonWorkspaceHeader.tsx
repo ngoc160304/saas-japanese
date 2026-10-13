@@ -8,11 +8,15 @@ export function LessonWorkspaceHeader({
   courseTitle,
   lessonTitle,
   onNavigate,
+  onPreview,
+  previewDisabled,
 }: {
   courseId: number;
   courseTitle: string;
   lessonTitle: string;
   onNavigate: (href: string, event: { preventDefault(): void }) => void;
+  onPreview: () => void;
+  previewDisabled: boolean;
 }) {
   return (
     <header className="z-30 shrink-0 border-b border-slate-200/80 bg-white px-4 py-2.5 shadow-xs lg:px-6">
@@ -86,13 +90,12 @@ export function LessonWorkspaceHeader({
           </Link>
           <Button
             type="button"
-            disabled
-            title="Student View is unavailable"
-            className="hidden h-auto items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-1.5 text-xs font-bold text-sky-700 shadow-2xs sm:flex"
+            disabled={previewDisabled}
+            onClick={onPreview}
+            className="h-auto shrink-0 items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-2 py-2 text-xs font-bold text-sky-700 shadow-2xs hover:bg-sky-100 sm:px-3.5"
           >
             <Eye className="size-3.5" aria-hidden="true" />
-            Student View
-            <span className="text-[10px] font-medium">Unavailable</span>
+            Xem trước bài học
           </Button>
           <span className="hidden border-l border-slate-200 pl-2 sm:block">
             <span

@@ -19,6 +19,7 @@ import { LessonContentTabs, type LessonContentTab } from './LessonContentTabs';
 import { LessonCurriculumSidebar } from './LessonCurriculumSidebar';
 import { LessonHeaderCard } from './LessonHeaderCard';
 import { LessonWorkspaceHeader } from './LessonWorkspaceHeader';
+import { LessonPreviewDialog } from './LessonPreviewDialog';
 
 export function LessonContentWorkspace({
   courseId,
@@ -49,6 +50,9 @@ export function LessonContentWorkspace({
   const [pendingDestination, setPendingDestination] = useState<string | null>(null);
   const [publicationOpen, setPublicationOpen] = useState(false);
   const [showPublicationError, setShowPublicationError] = useState(false);
+  const [quizBusy, setQuizBusy] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewGuard, setPreviewGuard] = useState(false);
   const actions = useLessonWorkspaceActions(lesson);
   const video = useLessonVideo(lesson);
 
@@ -128,6 +132,8 @@ export function LessonContentWorkspace({
           courseTitle={course.title}
           lessonTitle={lesson.title}
           onNavigate={guardNavigation}
+          onPreview={() => { if (actions.dirty || video.hasPendingWork) setPreviewGuard(true); else setPreviewOpen(true); }}
+          previewDisabled={quizBusy || actions.isSaving || actions.isChangingPublication || video.isBusy}
         />
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <aside
@@ -165,6 +171,7 @@ export function LessonContentWorkspace({
                 video={video}
                 videoDisabled={actions.isSaving || actions.isChangingPublication}
                 onReloadVideo={() => void queryClient.invalidateQueries({ queryKey: ['lessons', 'detail', lesson.id] })}
+                onQuizBusyChange={setQuizBusy}
               />
             </div>
           </main>
@@ -226,6 +233,22 @@ export function LessonContentWorkspace({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <AlertDialog open={previewGuard} onOpenChange={open => { if (!actions.isSaving) setPreviewGuard(open); }}>
+        <AlertDialogContent className="rounded-3xl bg-white text-slate-900">
+          <AlertDialogHeader><AlertDialogTitle>Xem trước nội dung đã lưu</AlertDialogTitle>
+            <AlertDialogDescription>{video.hasPendingWork ? 'Video đang chọn chưa được lưu. Hãy hoàn tất hoặc hủy thao tác video trước khi xem trước.' : 'Ngữ pháp có thay đổi chưa lưu. Bạn có thể lưu, bỏ thay đổi hoặc xem bản đã lưu và giữ nguyên bản nháp.'}</AlertDialogDescription></AlertDialogHeader>
+          {actions.saveError && <p role="alert" className="text-rose-700">{getApiErrorMessage(actions.saveError)}</p>}
+          <AlertDialogFooter>
+            <Button variant="outline" disabled={actions.isSaving} onClick={() => setPreviewGuard(false)}>Hủy</Button>
+            {!video.hasPendingWork && <>
+              <Button variant="outline" disabled={actions.isSaving} onClick={() => { setPreviewGuard(false); setPreviewOpen(true); }}>Xem bản đã lưu</Button>
+              <Button variant="outline" disabled={actions.isSaving} onClick={() => { actions.discardDraft(); setPreviewGuard(false); setPreviewOpen(true); }}>Bỏ thay đổi và xem</Button>
+              <Button disabled={actions.isSaving} onClick={() => { void actions.saveGrammar().then(saved => { if (saved) { setPreviewGuard(false); setPreviewOpen(true); } }); }} className="bg-primary text-white hover:bg-primary/90">{actions.isSaving ? 'Đang lưu…' : 'Lưu và xem trước'}</Button>
+            </>}
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {previewOpen && <LessonPreviewDialog lessonId={lessonId} courseId={courseId} onClose={() => setPreviewOpen(false)} />}
     </Dialog>
   );
 }

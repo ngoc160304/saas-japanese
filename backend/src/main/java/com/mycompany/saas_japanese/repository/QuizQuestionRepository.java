@@ -14,4 +14,6 @@ public interface QuizQuestionRepository extends JpaRepository<QuizQuestion, Long
     Optional<QuizQuestion> findByIdAndDeletedAtIsNull(Long id);
 
     List<QuizQuestion> findByQuizIdAndDeletedAtIsNullOrderBySortOrderAsc(Long quizId);
+
+    List<QuizQuestion> findByQuizIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(Long quizId);
 }

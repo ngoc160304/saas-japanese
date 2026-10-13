@@ -84,9 +84,15 @@ public class SecurityConfiguration {
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/auth/myProfile", "/api/v1/auth/updateProfile")
                                                 .authenticated()
+                                                .requestMatchers("/api/v1/admin/lessons/*/quiz",
+                                                                "/api/v1/admin/lessons/*/quiz/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/admin/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/lessons")
                                                 .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/v1/study/lessons/*/quiz/*/questions/*/answer")
+                                                .authenticated()
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/**")

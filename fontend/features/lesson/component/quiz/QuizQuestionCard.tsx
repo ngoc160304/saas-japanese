@@ -26,10 +26,10 @@ export function QuizQuestionCard({ question, number }: QuizQuestionCardProps) {
     >
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <h4 id={`quiz-question-${question.id}`} className="text-xs font-extrabold text-slate-900">
-          Question {number}
+          Câu hỏi {number}
         </h4>
         <span className="rounded bg-indigo-50 px-2 py-0.5 font-mono text-[10px] font-bold text-indigo-700">
-          {question.questionType}
+          {question.questionType === 'SINGLE_CHOICE' ? 'Chọn một đáp án' : 'Chọn nhiều đáp án'}
         </span>
       </div>
       <p className="mb-3 whitespace-pre-wrap break-words text-xs font-semibold text-slate-800">
