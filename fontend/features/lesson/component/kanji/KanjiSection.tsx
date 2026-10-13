@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLessonContentMutation } from '../../hooks/useLessonContentMutation';
+import { LessonContentDeleteDialog } from '../LessonContentDeleteDialog';
+import { KanjiDialog } from './KanjiDialog';
 import { useQuery } from '@tanstack/react-query';
 import { kanjiAPI, type KanjiQuery } from '@/apis/lessons/lesson-content.api';
 import { Button } from '@/components/ui/button';
@@ -20,17 +23,23 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
   const filters: KanjiQuery = { lessonId, kanji, meaningVi };
   const kanjiQuery = useQuery({
     queryKey: ['admin', 'lessons', filters.lessonId, 'kanjis'],
-    queryFn: () => kanjiAPI.listByLesson(filters.lessonId),
+    queryFn: ({ signal }) => kanjiAPI.listByLesson(filters.lessonId, signal),
     enabled: active && Number.isSafeInteger(filters.lessonId) && filters.lessonId > 0,
     retry: false,
   });
   const items = kanjiQuery.isError ? [] : (kanjiQuery.data ?? []);
   const normalizedKanji = filters.kanji.trim().toLocaleLowerCase('vi');
   const normalizedMeaning = filters.meaningVi.trim().toLocaleLowerCase('vi');
-  const visibleItems = items.filter(
-    (item) =>
-      (!normalizedKanji || item.kanji.toLocaleLowerCase('vi').includes(normalizedKanji)) &&
-      (!normalizedMeaning || item.meaningVi.toLocaleLowerCase('vi').includes(normalizedMeaning)),
+  const matchesFilter = (item: (typeof items)[number]) =>
+    (!normalizedKanji || item.kanji.toLocaleLowerCase('vi').includes(normalizedKanji)) &&
+    (!normalizedMeaning || item.meaningVi.toLocaleLowerCase('vi').includes(normalizedMeaning));
+  const visibleItems = items.filter(matchesFilter);
+  const editor = useLessonContentMutation(
+    lessonId,
+    'kanjis',
+    kanjiAPI,
+    matchesFilter,
+    kanjiQuery.isSuccess ? kanjiQuery.data : undefined,
   );
   const count = visibleItems.length;
 
@@ -58,10 +67,11 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
             <span className="text-xs font-normal text-slate-500">| Chữ Hán bài học</span>
           </h2>
           <p className="mt-0.5 text-xs font-medium text-slate-600">
-            Chữ Hán, âm On/Kun, số nét, Hán Việt và các từ ghép minh họa.
+            Chữ Hán, âm On/Kun, số nét, nghĩa tiếng Việt và các từ ghép minh họa.
           </p>
         </div>
         <KanjiToolbar
+          onAdd={() => editor.open('create')}
           filters={filters}
           onKanjiChange={setKanji}
           onMeaningChange={setMeaningVi}
@@ -97,12 +107,34 @@ export function KanjiSection({ lessonId, active, onCountChange }: KanjiSectionPr
         ) : (
           <KanjiList
             items={visibleItems}
+            onEdit={(item) => editor.open('edit', item)}
+            onDelete={(item) => editor.open('delete', item)}
             emptyMessage={
               items.length === 0 ? 'Bài học chưa có Kanji.' : 'Không tìm thấy Kanji phù hợp.'
             }
           />
         )}
       </div>
+      {editor.target?.mode === 'delete' ? (
+        <LessonContentDeleteDialog
+          label={editor.target.item.kanji}
+          pending={editor.pending}
+          unavailable={editor.unavailable}
+          onClose={editor.close}
+          onConfirm={() => editor.submit()}
+        />
+      ) : (
+        editor.target && (
+          <KanjiDialog
+            key={`${editor.target.revision}-${editor.target.item?.id ?? 'new'}`}
+            item={editor.target.item}
+            pending={editor.pending}
+            unavailable={editor.unavailable}
+            onClose={editor.close}
+            onSubmit={(values) => editor.submit({ ...values, lessonId })}
+          />
+        )
+      )}
     </section>
   );
 }

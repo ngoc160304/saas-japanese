@@ -11,6 +11,9 @@ import com.mycompany.saas_japanese.service.KanjiService;
 import com.mycompany.saas_japanese.service.mapper.KanjiMapper;
 import com.mycompany.saas_japanese.specification.KanjiSpecs;
 
+import com.mycompany.saas_japanese.util.error.NotFoundException;
+import com.mycompany.saas_japanese.util.error.ConflictException;
+
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -34,7 +37,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         if (kanjiRepository.existsByKanjiAndDeletedAtIsNull(
                 request.getKanji().trim())) {
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "Kanji đã tồn tại: " + request.getKanji());
         }
 
@@ -42,8 +45,8 @@ public class KanjiServiceImpl implements KanjiService {
 
         if (request.getLessonId() != null) {
             Lesson lesson = lessonRepository
-                    .findById(request.getLessonId())
-                    .orElseThrow(() -> new IllegalArgumentException(
+                    .findByIdAndIsDeletedFalse(request.getLessonId())
+                    .orElseThrow(() -> new NotFoundException(
                             "Không tìm thấy lesson: "
                                     + request.getLessonId()));
 
@@ -60,7 +63,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         Kanji kanji = kanjiRepository
                 .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
 
         return kanjiMapper.toResponse(kanji);
@@ -100,20 +103,19 @@ public class KanjiServiceImpl implements KanjiService {
 
         Kanji kanji = kanjiRepository
                 .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
 
-        kanjiMapper.updateEntity(
-                kanji,
-                request);
+        if (request.getLessonId() != null) {
+            Lesson lesson = lessonRepository
+                    .findByIdAndIsDeletedFalse(request.getLessonId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy lesson: " + request.getLessonId()));
+            kanji.setLesson(lesson);
+        } else {
+            kanji.setLesson(null);
+        }
 
-        Lesson lesson = lessonRepository
-                .findById(request.getLessonId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Không tìm thấy lesson: "
-                                + request.getLessonId()));
-
-        kanji.setLesson(lesson);
+        kanjiMapper.updateEntity(kanji, request);
 
         return kanjiMapper.toResponse(
                 kanjiRepository.save(kanji));
@@ -125,7 +127,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         Kanji kanji = kanjiRepository
                 .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
 
         kanji.setDeletedAt(
@@ -140,7 +142,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         String field = switch (sortKey == null ? "" : sortKey) {
             case "id" -> "id";
-            case "lessonId" -> "lessonId";
+            case "lessonId" -> "lesson.id";
             case "kanji" -> "kanji";
             case "onyomi" -> "onyomi";
             case "kunyomi" -> "kunyomi";

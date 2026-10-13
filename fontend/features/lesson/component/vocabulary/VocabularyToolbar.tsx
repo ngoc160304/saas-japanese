@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface VocabularyToolbarProps {
+  onAdd: () => void;
   searchTerm: string;
   onSearchTermChange: (value: string) => void;
   partOfSpeech: string;
@@ -13,6 +14,7 @@ interface VocabularyToolbarProps {
 }
 
 export function VocabularyToolbar({
+  onAdd,
   searchTerm,
   onSearchTermChange,
   partOfSpeech,
@@ -65,6 +67,7 @@ export function VocabularyToolbar({
       </Button>
       <Button
         type="button"
+        onClick={onAdd}
         className="h-10 justify-center rounded-2xl bg-primary px-4 text-xs font-bold text-white shadow-2xs hover:bg-primary/90"
       >
         <Plus className="size-4" aria-hidden="true" />

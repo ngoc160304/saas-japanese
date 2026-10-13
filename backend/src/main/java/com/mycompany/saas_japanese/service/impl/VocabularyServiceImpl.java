@@ -9,11 +9,12 @@ import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mycompany.saas_japanese.util.error.NotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.Vocabulary;
-import com.mycompany.saas_japanese.domain.query.KanjiQuery;
 import com.mycompany.saas_japanese.domain.query.VocabularyQuery;
 import com.mycompany.saas_japanese.domain.request.ReqVocabulary;
 import com.mycompany.saas_japanese.domain.response.VocabularyResponse;
@@ -43,8 +44,8 @@ public class VocabularyServiceImpl implements VocabularyService {
     if (request.getLessonId() != null) {
 
       Lesson lesson = lessonRepository
-          .findById(request.getLessonId())
-          .orElseThrow(() -> new IllegalArgumentException(
+          .findByIdAndIsDeletedFalse(request.getLessonId())
+          .orElseThrow(() -> new NotFoundException(
               "Không tìm thấy lesson: "
                   + request.getLessonId()));
 
@@ -108,7 +109,7 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     Vocabulary vocabulary = vocabularyRepository
         .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
+        .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
 
@@ -124,19 +125,15 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     Vocabulary vocabulary = vocabularyRepository
         .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
+        .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
-
-    vocabularyMapper.updateEntity(
-        vocabulary,
-        request);
 
     if (request.getLessonId() != null) {
 
       Lesson lesson = lessonRepository
-          .findById(request.getLessonId())
-          .orElseThrow(() -> new IllegalArgumentException(
+          .findByIdAndIsDeletedFalse(request.getLessonId())
+          .orElseThrow(() -> new NotFoundException(
               "Không tìm thấy lesson: "
                   + request.getLessonId()));
 
@@ -146,6 +143,8 @@ public class VocabularyServiceImpl implements VocabularyService {
 
       vocabulary.setLesson(null);
     }
+
+    vocabularyMapper.updateEntity(vocabulary, request);
 
     vocabulary = vocabularyRepository.save(
         vocabulary);
@@ -160,7 +159,7 @@ public class VocabularyServiceImpl implements VocabularyService {
 
     Vocabulary vocabulary = vocabularyRepository
         .findByIdAndDeletedAtIsNull(id)
-        .orElseThrow(() -> new IllegalArgumentException(
+        .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
 
@@ -176,7 +175,7 @@ public class VocabularyServiceImpl implements VocabularyService {
 
         String field = switch (sortKey == null ? "" : sortKey) {
             case "id" -> "id";
-            case "lessonId" -> "lessonId";
+            case "lessonId" -> "lesson.id";
             case "word" -> "word";
             case "reading" -> "reading";
             case "meaningVi" -> "meaningVi";

@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLessonContentMutation } from '../../hooks/useLessonContentMutation';
+import { LessonContentDeleteDialog } from '../LessonContentDeleteDialog';
+import { VocabularyDialog } from './VocabularyDialog';
 import { useQuery } from '@tanstack/react-query';
 import { vocabularyAPI } from '@/apis/lessons/lesson-content.api';
 import { Button } from '@/components/ui/button';
@@ -19,7 +22,7 @@ export function VocabularySection({ lessonId, active, onCountChange }: Vocabular
   const [partOfSpeech, setPartOfSpeech] = useState('');
   const vocabularyQuery = useQuery({
     queryKey: ['admin', 'lessons', lessonId, 'vocabularies'],
-    queryFn: () => vocabularyAPI.listByLesson(lessonId),
+    queryFn: ({ signal }) => vocabularyAPI.listByLesson(lessonId, signal),
     enabled: active && Number.isSafeInteger(lessonId) && lessonId > 0,
     retry: false,
   });
@@ -27,19 +30,30 @@ export function VocabularySection({ lessonId, active, onCountChange }: Vocabular
   const normalizedSearchTerm = searchTerm.trim().toLocaleLowerCase('vi');
   const partOfSpeechOptions = [
     ...new Set(
-      items
-        .map((item) => item.partOfSpeech?.trim())
-        .filter((value): value is string => Boolean(value)),
+      [
+        partOfSpeech,
+        ...items
+          .map((item) => item.partOfSpeech?.trim())
+          .filter((value): value is string => Boolean(value)),
+      ].filter(Boolean),
     ),
   ].sort((a, b) => a.localeCompare(b, 'vi'));
-  const visibleItems = items.filter((item) => {
+  const matchesFilter = (item: (typeof items)[number]) => {
     const matchesSearch =
       !normalizedSearchTerm ||
       [item.word, item.reading, item.meaningVi].some((value) =>
         value.toLocaleLowerCase('vi').includes(normalizedSearchTerm),
       );
     return matchesSearch && (!partOfSpeech || item.partOfSpeech?.trim() === partOfSpeech);
-  });
+  };
+  const visibleItems = items.filter(matchesFilter);
+  const editor = useLessonContentMutation(
+    lessonId,
+    'vocabularies',
+    vocabularyAPI,
+    matchesFilter,
+    vocabularyQuery.isSuccess ? vocabularyQuery.data : undefined,
+  );
   const visibleCount = visibleItems.length;
 
   useEffect(() => {
@@ -71,6 +85,7 @@ export function VocabularySection({ lessonId, active, onCountChange }: Vocabular
           </p>
         </div>
         <VocabularyToolbar
+          onAdd={() => editor.open('create')}
           searchTerm={searchTerm}
           onSearchTermChange={setSearchTerm}
           partOfSpeech={partOfSpeech}
@@ -109,12 +124,34 @@ export function VocabularySection({ lessonId, active, onCountChange }: Vocabular
         ) : (
           <VocabularyTable
             items={visibleItems}
+            onEdit={(item) => editor.open('edit', item)}
+            onDelete={(item) => editor.open('delete', item)}
             emptyMessage={
               items.length === 0 ? 'Bài học chưa có từ vựng.' : 'Không tìm thấy từ vựng phù hợp.'
             }
           />
         )}
       </div>
+      {editor.target?.mode === 'delete' ? (
+        <LessonContentDeleteDialog
+          label={editor.target.item.word}
+          pending={editor.pending}
+          unavailable={editor.unavailable}
+          onClose={editor.close}
+          onConfirm={() => editor.submit()}
+        />
+      ) : (
+        editor.target && (
+          <VocabularyDialog
+            key={`${editor.target.revision}-${editor.target.item?.id ?? 'new'}`}
+            item={editor.target.item}
+            pending={editor.pending}
+            unavailable={editor.unavailable}
+            onClose={editor.close}
+            onSubmit={(values) => editor.submit({ ...values, lessonId })}
+          />
+        )
+      )}
     </section>
   );
 }

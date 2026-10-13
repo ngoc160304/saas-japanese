@@ -72,14 +72,16 @@ export interface StudyQuiz {
   questions: StudyQuizQuestion[];
 }
 
-async function listAll<T>(path: string, lessonId: number): Promise<T[]> {
+async function listAll<T>(path: string, lessonId: number, signal?: AbortSignal): Promise<T[]> {
   const first = await authorizeAxiosInstance.get<ApiResponse<PageResponse<T>>>(path, {
+    signal,
     params: { lessonId, page: 0, size: 12, sortKey: 'id', sortType: 'ASC' },
     localErrorHandling: true,
   });
   const items = [...first.data.data.content];
   for (let page = 1; page < first.data.data.totalPages; page += 1) {
     const next = await authorizeAxiosInstance.get<ApiResponse<PageResponse<T>>>(path, {
+      signal,
       params: { lessonId, page, size: 12, sortKey: 'id', sortType: 'ASC' },
       localErrorHandling: true,
     });
@@ -92,7 +94,15 @@ const vocabularyPath = '/vocabularies';
 const kanjiPath = '/kanjis';
 
 export const vocabularyAPI = {
-  listByLesson: (lessonId: number) => listAll<VocabularyItem>(vocabularyPath, lessonId),
+  listByLesson: (lessonId: number, signal?: AbortSignal) =>
+    listAll<VocabularyItem>(vocabularyPath, lessonId, signal),
+  getById: async (id: number): Promise<VocabularyItem> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem>>(
+      `${vocabularyPath}/${id}`,
+      { localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   listStudyByLesson: async (lessonId: number): Promise<VocabularyItem[]> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem[]>>(
       `/study/lessons/${lessonId}/vocabularies`,
@@ -122,7 +132,15 @@ export const vocabularyAPI = {
 };
 
 export const kanjiAPI = {
-  listByLesson: (lessonId: number) => listAll<KanjiItem>(kanjiPath, lessonId),
+  listByLesson: (lessonId: number, signal?: AbortSignal) =>
+    listAll<KanjiItem>(kanjiPath, lessonId, signal),
+  getById: async (id: number): Promise<KanjiItem> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem>>(
+      `${kanjiPath}/${id}`,
+      { localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   listStudyByLesson: async (lessonId: number): Promise<KanjiItem[]> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem[]>>(
       `/study/lessons/${lessonId}/kanjis`,

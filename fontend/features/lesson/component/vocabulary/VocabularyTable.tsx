@@ -13,9 +13,13 @@ import {
 export function VocabularyTable({
   items,
   emptyMessage,
+  onEdit,
+  onDelete,
 }: {
   items: readonly VocabularyItem[];
   emptyMessage: string;
+  onEdit: (item: VocabularyItem) => void;
+  onDelete: (item: VocabularyItem) => void;
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
@@ -72,6 +76,7 @@ export function VocabularyTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
+                      onClick={() => onEdit(item)}
                       aria-label={`Edit ${item.word}`}
                       title={`Edit ${item.word}`}
                       className="rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -82,6 +87,7 @@ export function VocabularyTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
+                      onClick={() => onDelete(item)}
                       aria-label={`Delete ${item.word}`}
                       title={`Delete ${item.word}`}
                       className="rounded-lg bg-slate-50 text-slate-600 hover:bg-rose-50 hover:text-rose-600"

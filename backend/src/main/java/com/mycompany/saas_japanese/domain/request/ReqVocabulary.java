@@ -24,8 +24,10 @@ public class ReqVocabulary {
   @Size(max = 500, message = "Nghĩa tiếng Việt không được vượt quá 500 ký tự")
   private String meaningVi;
 
+  @Size(max = 1000, message = "Ví dụ không được vượt quá 1000 ký tự")
   private String exampleSentenceJp;
 
+  @Size(max = 1000, message = "Ví dụ không được vượt quá 1000 ký tự")
   private String exampleSentenceVi;
 
   @Size(max = 50, message = "Từ loại không được vượt quá 50 ký tự")

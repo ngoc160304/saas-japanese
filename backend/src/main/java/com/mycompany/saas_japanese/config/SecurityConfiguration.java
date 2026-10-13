@@ -91,6 +91,18 @@ public class SecurityConfiguration {
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/**")
                                                 .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers(HttpMethod.POST,
+                                                                "/api/v1/vocabularies", "/api/v1/vocabularies/**",
+                                                                "/api/v1/kanjis", "/api/v1/kanjis/**")
+                                                .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers(HttpMethod.PUT,
+                                                                "/api/v1/vocabularies", "/api/v1/vocabularies/**",
+                                                                "/api/v1/kanjis", "/api/v1/kanjis/**")
+                                                .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers(HttpMethod.DELETE,
+                                                                "/api/v1/vocabularies", "/api/v1/vocabularies/**",
+                                                                "/api/v1/kanjis", "/api/v1/kanjis/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/**").permitAll()
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/**").permitAll()
                                                 .requestMatchers(HttpMethod.PATCH, "/api/v1/**").permitAll()

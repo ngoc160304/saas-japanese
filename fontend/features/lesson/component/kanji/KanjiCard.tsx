@@ -1,6 +1,16 @@
+import { Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { KanjiItem } from '@/apis/lessons/lesson-content.api';
 
-export function KanjiCard({ item }: { item: KanjiItem }) {
+export function KanjiCard({
+  item,
+  onEdit,
+  onDelete,
+}: {
+  item: KanjiItem;
+  onEdit: (item: KanjiItem) => void;
+  onDelete: (item: KanjiItem) => void;
+}) {
   const exampleWords = item.exampleWords?.trim();
 
   return (
@@ -9,6 +19,25 @@ export function KanjiCard({ item }: { item: KanjiItem }) {
         <div className="mb-3 flex items-start justify-between">
           <div className="flex size-14 items-center justify-center rounded-2xl border border-purple-100 bg-purple-50 text-3xl font-extrabold text-purple-900">
             {item.kanji.trim() || '—'}
+          </div>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label={`Sửa Kanji ${item.kanji}`}
+              onClick={() => onEdit(item)}
+            >
+              <Pencil className="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-rose-700 hover:bg-rose-50"
+              aria-label={`Xóa Kanji ${item.kanji}`}
+              onClick={() => onDelete(item)}
+            >
+              <Trash2 className="size-4" />
+            </Button>
           </div>
         </div>
         <h4 className="mb-1 text-xs font-bold text-slate-900">
