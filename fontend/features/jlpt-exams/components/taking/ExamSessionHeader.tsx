@@ -5,13 +5,14 @@ import type { JlptLevel } from '@/apis/jlpt-exams/jlpt-exams.type';
 interface ExamSessionHeaderProps {
   title: string;
   examId: number;
+  attemptId: number;
   level: JlptLevel;
   totalTimeMinutes: number;
   navigationOpen: boolean;
   onToggleNavigation: () => void;
 }
 
-export function ExamSessionHeader({ examId, title, level, totalTimeMinutes, navigationOpen, onToggleNavigation }: ExamSessionHeaderProps) {
+export function ExamSessionHeader({ examId, attemptId, title, level, totalTimeMinutes, navigationOpen, onToggleNavigation }: ExamSessionHeaderProps) {
   return (
     <header className="z-20 flex shrink-0 items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-3 shadow-sm sm:px-6">
       <div className="flex min-w-0 items-center gap-2">
@@ -20,6 +21,7 @@ export function ExamSessionHeader({ examId, title, level, totalTimeMinutes, navi
         </button>
         <span className="rounded-lg bg-sky-50 px-2 py-1 text-xs font-extrabold text-sky-700">{level}</span>
         <h1 className="truncate text-xs font-bold tracking-wide text-slate-900 sm:text-sm">{title}</h1>
+        <span className="hidden shrink-0 text-xs font-medium text-slate-500 lg:inline">Attempt #{attemptId}</span>
       </div>
       <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
         <div aria-label={`Total duration: ${totalTimeMinutes} minutes`} className="flex items-center gap-1 rounded-xl border border-slate-200 bg-slate-50 px-2 py-1.5 text-xs font-extrabold text-slate-800 shadow-sm sm:gap-1.5 sm:px-3 sm:text-sm">
