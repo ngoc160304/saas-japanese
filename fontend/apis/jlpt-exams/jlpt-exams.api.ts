@@ -1,5 +1,5 @@
 import authorizeAxiosInstance, { waitForSessionRefresh } from '@/lib/authorize-axios';
-import type { GetJlptExamResponse, GetJlptExamStructureResponse, GetJlptExamsResponse, JlptExamsQuery } from './jlpt-exams.type';
+import type { GetJlptExamResponse, GetJlptExamStructureResponse, GetJlptExamsResponse, JlptExamsQuery, StartJlptAttemptRequest, StartJlptAttemptResponse } from './jlpt-exams.type';
 
 async function getJlptExams(params: JlptExamsQuery, signal?: AbortSignal) {
   await waitForSessionRefresh();
@@ -29,10 +29,20 @@ async function getJlptExamStructure(examId: number, signal?: AbortSignal) {
   return response.data.data;
 }
 
+async function startJlptAttempt(examId: number, data: StartJlptAttemptRequest) {
+  await waitForSessionRefresh();
+  const response = await authorizeAxiosInstance.post<StartJlptAttemptResponse>(
+    `/jlpt-exams/${examId}/attempts`,
+    data,
+    { localErrorHandling: true },
+  );
+  return response.data.data;
+}
+
 export const jlptExamsQueryKeys = {
   list: (params: JlptExamsQuery) => ['jlpt-exams', 'list', params] as const,
   detail: (examId: number) => ['jlpt-exams', 'detail', examId] as const,
   structure: (examId: number) => ['jlpt-exams', 'structure', examId] as const,
 };
 
-export const jlptExamsAPI = { getJlptExams, getJlptExam, getJlptExamStructure };
+export const jlptExamsAPI = { getJlptExams, getJlptExam, getJlptExamStructure, startJlptAttempt };
