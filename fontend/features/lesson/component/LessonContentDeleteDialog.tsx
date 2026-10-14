@@ -64,7 +64,7 @@ export function LessonContentDeleteDialog({
             </p>
           )
         )}
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex-row flex-wrap justify-end">
           <Button variant="outline" disabled={pending} onClick={onClose}>
             {unavailable ? 'Đóng' : 'Hủy'}
           </Button>

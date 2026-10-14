@@ -110,7 +110,7 @@ export function GrammarLectureCard({
             <AlertDialogTitle>Gỡ video khỏi bài học?</AlertDialogTitle>
             <AlertDialogDescription>Video sẽ được gỡ khỏi bài học này. Tệp trên dịch vụ lưu trữ sẽ không bị xóa.</AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-row flex-wrap justify-end">
             <AlertDialogCancel disabled={controls.isBusy}>Ở lại</AlertDialogCancel>
             <AlertDialogAction disabled={controls.isBusy} onClick={() => { setDetachOpen(false); void controls.detach(); }} className="bg-rose-700 text-white hover:bg-rose-800">Gỡ video</AlertDialogAction>
           </AlertDialogFooter>

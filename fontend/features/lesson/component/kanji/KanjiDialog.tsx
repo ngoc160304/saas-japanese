@@ -93,8 +93,13 @@ export function KanjiDialog({
       dirty={isDirty}
       pending={busy}
       onClose={onClose}
+      actions={
+        <Button type="submit" form="kanji-form" disabled={busy || unavailable} className="bg-primary text-white hover:bg-primary/90">
+          {busy ? 'Đang lưu…' : 'Lưu Kanji'}
+        </Button>
+      }
     >
-      <form noValidate onSubmit={submit} className="space-y-4">
+      <form id="kanji-form" noValidate onSubmit={submit} className="space-y-4">
         {fields.map(({ name, label, required, max, example, multiline }) => {
           const Component = multiline ? Textarea : Input;
           return (
@@ -155,13 +160,6 @@ export function KanjiDialog({
             </p>
           )
         )}
-        <Button
-          type="submit"
-          disabled={busy || unavailable}
-          className="w-full bg-primary text-white hover:bg-primary/90"
-        >
-          {busy ? 'Đang lưu…' : 'Lưu Kanji'}
-        </Button>
       </form>
     </LessonContentFormDialog>
   );

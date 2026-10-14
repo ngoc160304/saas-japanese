@@ -107,8 +107,13 @@ export function VocabularyDialog({
       dirty={isDirty}
       pending={busy}
       onClose={onClose}
+      actions={
+        <Button type="submit" form="vocabulary-form" disabled={busy || unavailable} className="bg-primary text-white hover:bg-primary/90">
+          {busy ? 'Đang lưu…' : 'Lưu từ vựng'}
+        </Button>
+      }
     >
-      <form noValidate onSubmit={submit} className="space-y-4">
+      <form id="vocabulary-form" noValidate onSubmit={submit} className="space-y-4">
         {fields.map(({ name, label, required, max, example, multiline }) => {
           const Component = multiline ? Textarea : Input;
           return (
@@ -147,13 +152,6 @@ export function VocabularyDialog({
             </p>
           )
         )}
-        <Button
-          type="submit"
-          disabled={busy || unavailable}
-          className="w-full bg-primary text-white hover:bg-primary/90"
-        >
-          {busy ? 'Đang lưu…' : 'Lưu từ vựng'}
-        </Button>
       </form>
     </LessonContentFormDialog>
   );

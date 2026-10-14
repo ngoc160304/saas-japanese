@@ -56,7 +56,7 @@ export function QuizActionDialog({
             {error ?? 'Nội dung không còn tồn tại. Hãy đóng hộp thoại và tải lại.'}
           </p>
         )}
-        <AlertDialogFooter>
+        <AlertDialogFooter className="flex-row flex-wrap justify-end">
           <Button variant="outline" disabled={pending} onClick={onClose}>
             {unavailable ? 'Đóng' : 'Hủy'}
           </Button>
