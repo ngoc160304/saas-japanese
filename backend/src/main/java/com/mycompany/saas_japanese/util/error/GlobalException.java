@@ -17,6 +17,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -70,7 +71,7 @@ public class GlobalException {
   }
 
   @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class,
-      MethodArgumentTypeMismatchException.class})
+      MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
   public ResponseEntity<ErrorResponse> invalidRequest(Exception exception) {
     return error(HttpStatus.BAD_REQUEST, "Invalid request");
   }

@@ -1,4 +1,4 @@
-import { Bell, CalendarDays } from 'lucide-react';
+import { CalendarDays } from 'lucide-react';
 import type { DashboardProfile } from '../types';
 
 export function DashboardHeader({ profile }: { profile: DashboardProfile }) {
@@ -28,14 +28,6 @@ export function DashboardHeader({ profile }: { profile: DashboardProfile }) {
             </span>
           </span>
         </div>
-        <span
-          className="shadow-soft relative flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-100 bg-white text-slate-600"
-          role="img"
-          aria-label="Notification indicator"
-        >
-          <Bell className="h-5 w-5" aria-hidden="true" />
-          <span className="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
-        </span>
       </div>
     </header>
   );

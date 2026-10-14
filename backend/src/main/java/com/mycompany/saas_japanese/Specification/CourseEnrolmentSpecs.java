@@ -15,6 +15,10 @@ public class CourseEnrolmentSpecs {
             root.get("user").get("id"),userId);
     }
 
+    public static PredicateSpecification<CourseEnrollment> hasActiveCourse() {
+        return (root, builder) -> builder.isFalse(root.get("course").get("isDeleted"));
+    }
+
     public static PredicateSpecification<CourseEnrollment> hasCourseTitle(String title) {
         return (root, builder) -> builder.like(
             builder.lower(root.get("course").get("title")),

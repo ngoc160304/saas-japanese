@@ -33,4 +33,8 @@ public interface CourseRepository extends JpaRepository<Course, Long>, JpaSpecif
 
   @EntityGraph(attributePaths = {"category", "thumbnailMedia"})
   Optional<Course> findByIdAndIsDeletedFalseAndIsPublishedTrue(Long id);
+
+  @Query("select c from Course c where c.id = :id and c.isDeleted = false "
+      + "and c.deletedAt is null and c.isPublished = true")
+  Optional<Course> findAvailableForStudy(@Param("id") Long id);
 }

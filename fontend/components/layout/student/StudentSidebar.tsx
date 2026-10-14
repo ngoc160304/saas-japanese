@@ -6,6 +6,7 @@ import {
   GraduationCap,
   House,
   MessageCircle,
+  Mic,
   Settings,
   Tags,
   TrendingUp,
@@ -25,6 +26,11 @@ const studentItems: ISidebarItem[] = [
     icon: <BookOpen className={iconClass} aria-hidden="true" />,
   },
   { title: 'Category', icon: <Tags className={iconClass} aria-hidden="true" /> },
+  {
+    title: 'Speaking',
+    href: '/student/speaking',
+    icon: <Mic className={iconClass} aria-hidden="true" />,
+  },
   {
     title: 'JLPT Exams',
     href: '/student/jlpt-exams',

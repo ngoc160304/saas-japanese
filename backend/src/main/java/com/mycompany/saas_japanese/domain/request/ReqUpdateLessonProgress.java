@@ -10,6 +10,8 @@ import lombok.Setter;
 @Setter
 public class ReqUpdateLessonProgress {
 
+    // Both durations are whole seconds reported by the video player, not lesson estimates in minutes.
+
     @NotNull(message = "Watch duration không được để trống")
     @Min(value = 0,message = "Watch duration không hợp lệ")
     private Integer watchDuration;
