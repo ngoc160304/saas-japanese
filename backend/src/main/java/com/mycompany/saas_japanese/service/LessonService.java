@@ -17,6 +17,14 @@ public interface LessonService {
 
   LessonResponse updateLesson(Long id, ReqUpdateLesson request);
 
+  LessonResponse updateGrammar(Long id, String grammar);
+
+  LessonResponse updatePublication(Long id, boolean isPublished);
+
+  LessonResponse attachVideo(Long id, Long videoMediaId);
+
+  LessonResponse detachVideo(Long id);
+
   void deleteLesson(Long id);
 
   void deleteByCourseId(long courseId);

@@ -40,8 +40,8 @@ export function DataTableFilter({
         className={[
           'h-10',
           'w-auto',
-          'rounded-2xl',
-          'border-slate-100',
+          'rounded-xl',
+          'border-input',
           'bg-slate-50',
           'px-3.5',
           'text-xs',

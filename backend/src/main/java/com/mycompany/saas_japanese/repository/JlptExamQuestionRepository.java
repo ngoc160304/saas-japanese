@@ -18,6 +18,7 @@ public interface JlptExamQuestionRepository
             Long examPartId);
 
     long countByJlptExamPart_Id(Long partId);
+    boolean existsByImageMediaId(Long mediaId);
 
     @Query("""
             SELECT question

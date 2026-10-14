@@ -12,11 +12,11 @@ public interface VocabularyService {
 
   Page<VocabularyResponse> findAll(VocabularyQuery query);
 
-  VocabularyResponse findById(Long id);
+  VocabularyResponse findById(Long id, Long lessonId);
 
   VocabularyResponse update(
       Long id,
-      ReqVocabulary request);
+      ReqVocabulary request, Long lessonId);
 
-  void delete(Long id);
+  void delete(Long id, Long lessonId);
 }

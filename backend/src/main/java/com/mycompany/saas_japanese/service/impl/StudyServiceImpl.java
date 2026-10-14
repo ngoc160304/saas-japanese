@@ -3,7 +3,7 @@ package com.mycompany.saas_japanese.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.HashMap;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +44,7 @@ import com.mycompany.saas_japanese.service.mapper.VocabularyMapper;
 import com.mycompany.saas_japanese.util.SecurityUtil;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
+import com.mycompany.saas_japanese.util.error.ConflictException;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +107,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -133,7 +134,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -152,7 +153,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -171,38 +172,20 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
 
         checkPublished(lesson);
 
-        Quiz quiz = quizRepository
-                .findByLessonIdAndDeletedAtIsNullAndIsPublishedTrue(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Không tìm thấy quiz của lesson"));
-
-        List<QuizQuestion> questions =
-                quizQuestionRepository
-                        .findByQuizIdAndDeletedAtIsNullOrderBySortOrderAsc(
-                                quiz.getId());
-
-        Map<Long, List<QuizOption>> optionsByQuestionId =
-                new HashMap<>();
-
-        for (QuizQuestion question : questions) {
-
-            List<QuizOption> options =
-                    quizOptionRepository
-                            .findByQuestionIdOrderBySortOrderAsc(
-                                    question.getId());
-
-            optionsByQuestionId.put(
-                    question.getId(),
-                    options);
-        }
+        Quiz quiz = publishedQuiz(lessonId);
+        List<QuizQuestion> questions = quizQuestionRepository
+                .findByQuizIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(quiz.getId());
+        Map<Long, List<QuizOption>> optionsByQuestionId = questions.isEmpty() ? Map.of()
+                : quizOptionRepository.findByQuestionIdInOrderBySortOrderAscIdAsc(
+                        questions.stream().map(QuizQuestion::getId).toList())
+                        .stream().collect(Collectors.groupingBy(option -> option.getQuestion().getId()));
 
         return quizMapper.toResponse(
                 quiz,
@@ -217,27 +200,13 @@ public class StudyServiceImpl implements StudyService {
             Long questionId,
             Long optionId) {
 
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
+        // Use the same stable parent lock as administration while evaluating an answer.
+        Lesson lesson = lessonRepository.findActiveForUpdate(lessonId)
+                .orElseThrow(() -> new NotFoundException("Lesson không tồn tại"));
         checkPublished(lesson);
-
-        Quiz quiz = quizRepository
-                .findByIdAndDeletedAtIsNull(quizId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Quiz không tồn tại"));
-
-        if (quiz.getLesson() == null
-                || !quiz.getLesson()
-                        .getId()
-                        .equals(lessonId)) {
-
-            throw new BadRequestException(
-                    "Quiz không thuộc lesson này");
+        Quiz quiz = publishedQuiz(lessonId);
+        if (!quiz.getId().equals(quizId)) {
+            throw new NotFoundException("Quiz không tồn tại trong lesson này");
         }
 
         QuizQuestion question = quizQuestionRepository
@@ -299,7 +268,7 @@ public class StudyServiceImpl implements StudyService {
                 ReqUpdateLessonProgress request) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -433,7 +402,7 @@ public class StudyServiceImpl implements StudyService {
                 Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -542,6 +511,15 @@ public class StudyServiceImpl implements StudyService {
                         enrollment.getCompletedAt())
                 .build();
 }
+
+    private Quiz publishedQuiz(Long lessonId) {
+        List<Quiz> active = quizRepository.findByLessonIdAndDeletedAtIsNull(lessonId);
+        if (active.size() > 1) {
+            throw new ConflictException("Multiple active quizzes exist for this lesson; administrator repair required");
+        }
+        return active.stream().filter(quiz -> Boolean.TRUE.equals(quiz.getIsPublished())).findFirst()
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy quiz của lesson"));
+    }
 
     private void checkEnrollment(
             Long userId,

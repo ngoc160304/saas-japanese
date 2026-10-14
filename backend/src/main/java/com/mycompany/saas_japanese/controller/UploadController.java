@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mycompany.saas_japanese.domain.Media;
+import com.mycompany.saas_japanese.domain.response.MediaResponse;
 import com.mycompany.saas_japanese.service.UploadService;
 
 import lombok.RequiredArgsConstructor;
@@ -31,9 +32,14 @@ public class UploadController {
   }
 
   @PostMapping(value = "/videos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<?> uploadVideo(
+  public ResponseEntity<MediaResponse> uploadVideo(
       @RequestParam("file") MultipartFile file) throws IOException {
     Media result = uploadService.uploadVideo(file);
-    return ResponseEntity.ok(result);
+    MediaResponse response = new MediaResponse();
+    response.setId(result.getId());
+    response.setOriginalName(result.getOriginalName());
+    response.setPublicId(result.getPublicId());
+    response.setSecureUrl(result.getSecureUrl());
+    return ResponseEntity.ok(response);
   }
 }

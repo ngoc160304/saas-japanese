@@ -15,7 +15,7 @@ export function CategoryCourseDetailHeader({
       <div className="min-w-0">
         <nav
           aria-label="Đường dẫn"
-          className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-400"
+          className="mb-1 flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-600"
         >
           <Link
             href="/admin/categories-course"

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import type { KanjiQuery } from '@/apis/lessons/lesson-content.api';
 
 interface KanjiToolbarProps {
+  onAdd: () => void;
   filters: Pick<KanjiQuery, 'kanji' | 'meaningVi'>;
   onKanjiChange: (value: string) => void;
   onMeaningChange: (value: string) => void;
@@ -11,6 +12,7 @@ interface KanjiToolbarProps {
 }
 
 export function KanjiToolbar({
+  onAdd,
   filters,
   onKanjiChange,
   onMeaningChange,
@@ -27,7 +29,7 @@ export function KanjiToolbar({
         </label>
         <div className="relative">
           <Search
-            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-400"
+            className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-slate-600"
             aria-hidden="true"
           />
           <Input
@@ -65,6 +67,13 @@ export function KanjiToolbar({
       >
         <RotateCcw className="size-3.5" aria-hidden="true" />
         Xóa bộ lọc
+      </Button>
+      <Button
+        type="button"
+        onClick={onAdd}
+        className="h-10 rounded-2xl bg-primary text-white hover:bg-primary/90"
+      >
+        Thêm Kanji
       </Button>
     </div>
   );

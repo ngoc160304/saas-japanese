@@ -72,14 +72,16 @@ export interface StudyQuiz {
   questions: StudyQuizQuestion[];
 }
 
-async function listAll<T>(path: string, lessonId: number): Promise<T[]> {
+async function listAll<T>(path: string, lessonId: number, signal?: AbortSignal): Promise<T[]> {
   const first = await authorizeAxiosInstance.get<ApiResponse<PageResponse<T>>>(path, {
+    signal,
     params: { lessonId, page: 0, size: 12, sortKey: 'id', sortType: 'ASC' },
     localErrorHandling: true,
   });
   const items = [...first.data.data.content];
   for (let page = 1; page < first.data.data.totalPages; page += 1) {
     const next = await authorizeAxiosInstance.get<ApiResponse<PageResponse<T>>>(path, {
+      signal,
       params: { lessonId, page, size: 12, sortKey: 'id', sortType: 'ASC' },
       localErrorHandling: true,
     });
@@ -92,7 +94,15 @@ const vocabularyPath = '/vocabularies';
 const kanjiPath = '/kanjis';
 
 export const vocabularyAPI = {
-  listByLesson: (lessonId: number) => listAll<VocabularyItem>(vocabularyPath, lessonId),
+  listByLesson: (lessonId: number, signal?: AbortSignal) =>
+    listAll<VocabularyItem>(vocabularyPath, lessonId, signal),
+  getById: async (id: number, lessonId: number): Promise<VocabularyItem> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem>>(
+      `${vocabularyPath}/${id}`,
+      { params: { lessonId }, localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   listStudyByLesson: async (lessonId: number): Promise<VocabularyItem[]> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem[]>>(
       `/study/lessons/${lessonId}/vocabularies`,
@@ -108,21 +118,29 @@ export const vocabularyAPI = {
     );
     return response.data.data;
   },
-  update: async ({ id, data }: { id: number; data: VocabularyInput }) => {
+  update: async ({ id, data, lessonId }: { id: number; data: VocabularyInput; lessonId: number }) => {
     const response = await authorizeAxiosInstance.put<ApiResponse<VocabularyItem>>(
       `${vocabularyPath}/${id}`,
       data,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
-  deleteById: async (id: number) => {
-    await authorizeAxiosInstance.delete(`${vocabularyPath}/${id}`, { localErrorHandling: true });
+  deleteById: async (id: number, lessonId: number) => {
+    await authorizeAxiosInstance.delete(`${vocabularyPath}/${id}`, { params: { lessonId }, localErrorHandling: true });
   },
 };
 
 export const kanjiAPI = {
-  listByLesson: (lessonId: number) => listAll<KanjiItem>(kanjiPath, lessonId),
+  listByLesson: (lessonId: number, signal?: AbortSignal) =>
+    listAll<KanjiItem>(kanjiPath, lessonId, signal),
+  getById: async (id: number, lessonId: number): Promise<KanjiItem> => {
+    const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem>>(
+      `${kanjiPath}/${id}`,
+      { params: { lessonId }, localErrorHandling: true },
+    );
+    return response.data.data;
+  },
   listStudyByLesson: async (lessonId: number): Promise<KanjiItem[]> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem[]>>(
       `/study/lessons/${lessonId}/kanjis`,
@@ -136,16 +154,16 @@ export const kanjiAPI = {
     });
     return response.data.data;
   },
-  update: async ({ id, data }: { id: number; data: KanjiInput }) => {
+  update: async ({ id, data, lessonId }: { id: number; data: KanjiInput; lessonId: number }) => {
     const response = await authorizeAxiosInstance.put<ApiResponse<KanjiItem>>(
       `${kanjiPath}/${id}`,
       data,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
-  deleteById: async (id: number) => {
-    await authorizeAxiosInstance.delete(`${kanjiPath}/${id}`, { localErrorHandling: true });
+  deleteById: async (id: number, lessonId: number) => {
+    await authorizeAxiosInstance.delete(`${kanjiPath}/${id}`, { params: { lessonId }, localErrorHandling: true });
   },
 };
 

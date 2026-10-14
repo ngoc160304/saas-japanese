@@ -26,7 +26,7 @@ export function CategoryCourseInformation({ category }: { category: CourseCatego
         </div>
         <dl className="flex w-full shrink-0 justify-between gap-6 border-t border-slate-100 pt-3 text-right md:w-auto md:border-0 md:pt-0">
           <div>
-            <dt className="text-xs font-medium text-slate-400">Khóa học</dt>
+            <dt className="text-xs font-medium text-slate-600">Khóa học</dt>
             <dd className="mt-0.5 text-lg font-extrabold text-slate-900">
               {category.courseCount} khóa học
             </dd>

@@ -1,6 +1,8 @@
 package com.mycompany.saas_japanese.domain.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +28,7 @@ public class ReqKanji {
   @Min(value = 1, message = "Số nét phải lớn hơn 0")
   private Integer strokeCount;
 
+  @Size(max = 1000, message = "Ví dụ không được vượt quá 1000 ký tự")
   private String exampleWords;
 
   private Long lessonId;

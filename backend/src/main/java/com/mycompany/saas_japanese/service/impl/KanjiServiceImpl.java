@@ -1,5 +1,7 @@
 package com.mycompany.saas_japanese.service.impl;
 
+import java.util.Objects;
+
 import com.mycompany.saas_japanese.domain.Kanji;
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.query.KanjiQuery;
@@ -10,6 +12,10 @@ import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.service.KanjiService;
 import com.mycompany.saas_japanese.service.mapper.KanjiMapper;
 import com.mycompany.saas_japanese.specification.KanjiSpecs;
+
+import com.mycompany.saas_japanese.util.error.BadRequestException;
+import com.mycompany.saas_japanese.util.error.NotFoundException;
+import com.mycompany.saas_japanese.util.error.ConflictException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +40,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         if (kanjiRepository.existsByKanjiAndDeletedAtIsNull(
                 request.getKanji().trim())) {
-            throw new IllegalArgumentException(
+            throw new ConflictException(
                     "Kanji đã tồn tại: " + request.getKanji());
         }
 
@@ -42,8 +48,8 @@ public class KanjiServiceImpl implements KanjiService {
 
         if (request.getLessonId() != null) {
             Lesson lesson = lessonRepository
-                    .findById(request.getLessonId())
-                    .orElseThrow(() -> new IllegalArgumentException(
+                    .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(request.getLessonId())
+                    .orElseThrow(() -> new NotFoundException(
                             "Không tìm thấy lesson: "
                                     + request.getLessonId()));
 
@@ -56,18 +62,22 @@ public class KanjiServiceImpl implements KanjiService {
 
     @Override
     @Transactional(readOnly = true)
-    public KanjiResponse findById(Long id) {
+    public KanjiResponse findById(Long id, Long lessonId) {
 
         Kanji kanji = kanjiRepository
                 .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
+        requireScope(kanji.getLesson(), lessonId);
 
         return kanjiMapper.toResponse(kanji);
     }
 
     @Transactional(readOnly = true)
     public Page<KanjiResponse> findAll(KanjiQuery query) {
+        if (query.getLessonId() != null) {
+            requireLesson(query.getLessonId());
+        }
 
         PredicateSpecification<Kanji> spec = KanjiSpecs.isNotDeleted();
 
@@ -96,24 +106,30 @@ public class KanjiServiceImpl implements KanjiService {
     @Transactional
     public KanjiResponse update(
             Long id,
-            ReqKanji request) {
+            ReqKanji request, Long lessonId) {
 
         Kanji kanji = kanjiRepository
-                .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .findActiveForUpdate(id)
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
+        requireScope(kanji.getLesson(), lessonId);
+        if (lessonId != null && !Objects.equals(lessonId, request.getLessonId())) {
+            throw new BadRequestException("Cannot move content from the requested lesson");
+        }
 
-        kanjiMapper.updateEntity(
-                kanji,
-                request);
+        if (request.getLessonId() != null) {
+            Lesson lesson = lessonRepository
+                    .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(request.getLessonId())
+                    .orElseThrow(() -> new NotFoundException("Không tìm thấy lesson: " + request.getLessonId()));
+            kanji.setLesson(lesson);
+        } else {
+            kanji.setLesson(null);
+        }
 
-        Lesson lesson = lessonRepository
-                .findById(request.getLessonId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Không tìm thấy lesson: "
-                                + request.getLessonId()));
-
-        kanji.setLesson(lesson);
+        if (kanjiRepository.existsByKanjiAndIdNotAndDeletedAtIsNull(request.getKanji().trim(), id)) {
+            throw new ConflictException("Kanji already exists");
+        }
+        kanjiMapper.updateEntity(kanji, request);
 
         return kanjiMapper.toResponse(
                 kanjiRepository.save(kanji));
@@ -121,12 +137,13 @@ public class KanjiServiceImpl implements KanjiService {
 
     @Override
     @Transactional
-    public void delete(Long id) {
+    public void delete(Long id, Long lessonId) {
 
         Kanji kanji = kanjiRepository
-                .findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new IllegalArgumentException(
+                .findActiveForUpdate(id)
+                .orElseThrow(() -> new NotFoundException(
                         "Không tìm thấy kanji: " + id));
+        requireScope(kanji.getLesson(), lessonId);
 
         kanji.setDeletedAt(
                 java.time.Instant.now());
@@ -140,7 +157,7 @@ public class KanjiServiceImpl implements KanjiService {
 
         String field = switch (sortKey == null ? "" : sortKey) {
             case "id" -> "id";
-            case "lessonId" -> "lessonId";
+            case "lessonId" -> "lesson.id";
             case "kanji" -> "kanji";
             case "onyomi" -> "onyomi";
             case "kunyomi" -> "kunyomi";
@@ -161,6 +178,21 @@ public class KanjiServiceImpl implements KanjiService {
         }
 
         return Sort.by(direction, field);
+    }
+
+    private void requireLesson(Long lessonId) {
+        lessonRepository.findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
+            .orElseThrow(() -> new NotFoundException("Lesson not found"));
+    }
+
+    private void requireScope(Lesson parent, Long lessonId) {
+        if (lessonId == null) {
+            return;
+        }
+        requireLesson(lessonId);
+        if (parent == null || !Objects.equals(parent.getId(), lessonId)) {
+            throw new NotFoundException("Content not found in this lesson");
+        }
     }
 
 }

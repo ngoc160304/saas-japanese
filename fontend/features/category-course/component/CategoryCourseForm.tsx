@@ -134,7 +134,7 @@ export function CategoryCourseForm({
         <div className="space-y-2">
           <label htmlFor="category-name" className="text-sm font-medium text-slate-700">
             Name
-            <span className="ml-1 text-red-500">*</span>
+            <span className="ml-1 text-rose-700">*</span>
           </label>
 
           <Input
@@ -142,10 +142,10 @@ export function CategoryCourseForm({
             placeholder="e.g. JLPT N5"
             disabled={isSubmitting}
             {...register('name')}
-            className="h-10 border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 focus-visible:border-slate-900 focus-visible:ring-1 focus-visible:ring-slate-900"
+            className="h-10 rounded-xl border-input bg-white text-slate-900 placeholder:text-slate-600 focus-visible:border-slate-900 focus-visible:ring-1 focus-visible:ring-slate-900"
           />
 
-          {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+          {errors.name && <p className="text-xs text-rose-700">{errors.name.message}</p>}
         </div>
 
         {/* Description */}
@@ -159,11 +159,11 @@ export function CategoryCourseForm({
             placeholder="Describe this course category..."
             disabled={isSubmitting}
             {...register('description')}
-            className="min-h-32 w-full resize-y border-slate-200 bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 placeholder:text-slate-400 focus-visible:border-slate-900 focus-visible:ring-1 focus-visible:ring-slate-900"
+            className="min-h-32 w-full resize-y rounded-xl border-input bg-white px-3 py-2.5 text-sm leading-6 text-slate-900 placeholder:text-slate-600 focus-visible:border-slate-900 focus-visible:ring-1 focus-visible:ring-slate-900"
           />
 
           {errors.description && (
-            <p className="text-xs text-red-500">{errors.description.message}</p>
+            <p className="text-xs text-rose-700">{errors.description.message}</p>
           )}
         </div>
 
@@ -198,7 +198,7 @@ export function CategoryCourseForm({
                   </button>
                 </>
               ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
+                <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-600">
                   <ImagePlus className="h-7 w-7" />
 
                   <span className="text-xs">Image preview</span>
@@ -217,22 +217,25 @@ export function CategoryCourseForm({
                 id="category-image"
               />
 
-              <label
-                htmlFor="category-image"
-                className="inline-flex h-10 w-fit cursor-pointer items-center gap-2 rounded-md border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isSubmitting || uploadImageMutation.isPending}
+                onClick={() => fileInputRef.current?.click()}
+                className="h-10 w-fit rounded-xl px-4"
               >
                 <ImagePlus className="h-4 w-4" />
-                Choose Image
-              </label>
+                {uploadImageMutation.isPending ? 'Đang tải ảnh…' : 'Chọn ảnh'}
+              </Button>
 
-              <p className="text-xs leading-5 text-slate-400">
+              <p className="text-xs leading-5 text-slate-600">
                 PNG, JPG or WebP. Maximum file size: 5MB.
               </p>
 
               {image && <p className="max-w-full truncate text-xs text-slate-600">{image.name}</p>}
 
               {uploadImageMutation.isSuccess && (
-                <p className="text-xs text-emerald-600">Image uploaded successfully.</p>
+                <p className="text-xs text-emerald-700">Image uploaded successfully.</p>
               )}
             </div>
           </div>
@@ -251,13 +254,13 @@ export function CategoryCourseForm({
       )}
       <div className="border-t border-slate-100 px-6 pt-4 pb-6">
         <div className="flex justify-end gap-2">
-          <Button type="button" variant="outline" className="border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900" onClick={onCancel}>
+          <Button type="button" variant="outline" className="h-10 rounded-xl" onClick={onCancel}>
             Hủy
           </Button>
           <Button
             type="submit"
             disabled={isSubmitting || uploadImageMutation.isPending}
-            className="border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900"
+            className="h-10 rounded-xl"
           >
             {isSubmitting && <LoaderCircle className="mr-2 h-4 w-4 animate-spin" />}
 

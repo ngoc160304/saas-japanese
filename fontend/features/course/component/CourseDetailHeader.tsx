@@ -50,7 +50,7 @@ export function CourseDetailHeader({
         </Link>
         <Link
           href={createHref}
-          className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 md:text-sm"
+          className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 md:text-sm"
         >
           <Plus className="size-4" aria-hidden="true" />
           Tạo bài học

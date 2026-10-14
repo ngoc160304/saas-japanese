@@ -7,15 +7,23 @@ import type {
   UpdateCourseRequest,
 } from './courses.type';
 
-async function getCourses({ search, title, page, size, categoryId, published, pricing }: CourseQuery) {
+async function getCourses({
+  search,
+  title,
+  page,
+  size,
+  categoryId,
+  published,
+  pricing,
+}: CourseQuery) {
   const response = await authorizeAxiosInstance.get<GetCoursesResponse>('/courses', {
     params: { search, title, page: page - 1, size, categoryId, published, pricing },
   });
   return response.data;
 }
 
-async function getById(id: number) {
-  const response = await authorizeAxiosInstance.get<CourseResponse>(`/courses/${id}`);
+async function getById(id: number, options?: { localErrorHandling?: boolean }) {
+  const response = await authorizeAxiosInstance.get<CourseResponse>(`/courses/${id}`, options);
   return response.data.data;
 }
 

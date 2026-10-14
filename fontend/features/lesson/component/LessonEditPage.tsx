@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -12,10 +13,24 @@ import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/api-error';
 import { LessonForm } from './LessonForm';
 import type { LessonFormValues } from '../schemas/lesson.schema';
+import { useAppStore } from '@/store/hooks';
 
 export function LessonEditPage({ courseId, lessonId }: { courseId: number; lessonId: number }) {
+  return <LessonEditForm key={`${courseId}-${lessonId}`} courseId={courseId} lessonId={lessonId} />;
+}
+
+function LessonEditForm({ courseId, lessonId }: { courseId: number; lessonId: number }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const store = useAppStore();
+  const busy = useRef(false);
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => {
+      active.current = false;
+    };
+  }, []);
   const courseQuery = useQuery({
     queryKey: ['courses', 'detail', courseId],
     queryFn: () => courseAPI.getById(courseId),
@@ -23,7 +38,7 @@ export function LessonEditPage({ courseId, lessonId }: { courseId: number; lesso
   });
   const lessonQuery = useQuery({
     queryKey: ['lessons', 'detail', lessonId],
-    queryFn: () => lessonAPI.getById(lessonId),
+    queryFn: ({ signal }) => lessonAPI.getById(lessonId, signal),
     retry: false,
   });
   const update = useMutation({ mutationFn: lessonAPI.update });
@@ -34,30 +49,37 @@ export function LessonEditPage({ courseId, lessonId }: { courseId: number; lesso
   const invalidLesson = lesson && lesson.courseId !== courseId;
 
   const submit = async (values: LessonFormValues) => {
-    if (!lesson) return;
-    await update.mutateAsync({
-      id: lesson.id,
-      data: {
-        title: values.title,
-        courseId,
-        slug: lesson.slug,
-        grammar: values.grammar || null,
-        durationMinutes: values.durationMinutes ?? 0,
-        isPublished: values.isPublished,
-      },
-    });
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ['lessons', courseId] }),
-      queryClient.invalidateQueries({ queryKey: ['lessons', 'detail', lessonId] }),
-      queryClient.invalidateQueries({ queryKey: ['courses'] }),
-      queryClient.invalidateQueries({ queryKey: ['categories-course'] }),
-    ]);
-    toast.success('Đã cập nhật bài học.');
-    router.push(backHref);
+    if (!lesson || busy.current) return;
+    busy.current = true;
+    const revision = store.getState().auth.revision;
+    try {
+      await update.mutateAsync({
+        id: lesson.id,
+        data: {
+          title: values.title,
+          courseId,
+          durationMinutes: values.durationMinutes,
+          isPublished: values.isPublished,
+        },
+      });
+      if (store.getState().auth.revision !== revision) return;
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['lessons', 'curriculum', courseId] }),
+        queryClient.invalidateQueries({ queryKey: ['lessons', courseId] }),
+        queryClient.invalidateQueries({ queryKey: ['lessons', 'detail', lessonId] }),
+        queryClient.invalidateQueries({ queryKey: ['courses'] }),
+        queryClient.invalidateQueries({ queryKey: ['categories-course'] }),
+      ]);
+      if (!active.current || store.getState().auth.revision !== revision) return;
+      toast.success('Đã cập nhật bài học.');
+      router.push(backHref);
+    } finally {
+      busy.current = false;
+    }
   };
 
   if (loading) return <IsLoading className="min-h-64 rounded-3xl bg-white" size={28} />;
-  if (!course || !lesson || invalidLesson)
+  if (!course || !lesson || invalidLesson || courseQuery.isError || lessonQuery.isError)
     return (
       <div
         role="alert"
@@ -93,6 +115,8 @@ export function LessonEditPage({ courseId, lessonId }: { courseId: number; lesso
         }
       />
       <LessonForm
+        key={`${courseId}-${lessonId}`}
+        grammarHref={`/admin/courses/${courseId}/lessons/${lessonId}?tab=grammar`}
         course={course}
         initialValues={{
           title: lesson.title,

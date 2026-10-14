@@ -194,7 +194,9 @@ try {
             cartItems = [];
             body = 'Xóa thành công';
           } else status = 401;
-        } else if (authenticated)
+        } else if (url.pathname.endsWith('/client/courses') && request.method === 'GET')
+          body = { data: { content: [], totalPages: 0 } };
+        else if (authenticated)
           body = { data: { content: [], pageable: { pageNumber: 0 }, totalPages: 0 } };
         else status = 401;
       }
@@ -248,6 +250,10 @@ try {
   await navigate('/');
   await waitFor('document.querySelector(\'header a[href="/login"]\') !== null');
   assert.equal(
+    await evaluate('document.querySelector(\'a[href="/student/dashboard"]\') === null'),
+    true,
+  );
+  assert.equal(
     await evaluate('document.querySelector(\'button[aria-label="Thông báo"]\') === null'),
     true,
   );
@@ -258,6 +264,7 @@ try {
     deviceScaleFactor: 1,
     mobile: true,
   });
+  await waitFor('document.querySelector(\'button[aria-label="Mở menu"]\') !== null');
   await evaluate('document.querySelector(\'button[aria-label="Mở menu"]\').click()');
   await waitFor('document.querySelector(\'button[aria-label="Đóng menu"]\') !== null');
   await screenshot('storefront-guest-mobile', 390, 844);
@@ -331,7 +338,35 @@ try {
   );
   await evaluate('document.querySelector(\'button[aria-label^="Mở menu tài khoản"]\').click()');
   await waitFor('document.body.innerText.includes("student@example.test")');
+  await waitFor(
+    'document.querySelector(\'[data-slot="popover-content"] a[href="/student/dashboard"]\') !== null',
+  );
+  assert.equal(
+    await evaluate(
+      'document.querySelector(\'[data-slot="popover-content"] a[href^="/admin/"]\') === null',
+    ),
+    true,
+  );
   await screenshot('storefront-authenticated-desktop', 1440, 1000);
+  await evaluate(
+    'document.querySelector(\'[data-slot="popover-content"] a[href="/student/dashboard"]\').focus()',
+  );
+  assert.equal(await evaluate('document.activeElement.getAttribute("href")'), '/student/dashboard');
+  await send('Input.dispatchKeyEvent', {
+    type: 'keyDown',
+    key: 'Enter',
+    code: 'Enter',
+    windowsVirtualKeyCode: 13,
+  });
+  await send('Input.dispatchKeyEvent', {
+    type: 'keyUp',
+    key: 'Enter',
+    code: 'Enter',
+    windowsVirtualKeyCode: 13,
+  });
+  await waitFor('location.pathname === "/student/dashboard"');
+  await navigate('/');
+  await waitFor('document.querySelector(\'button[aria-label="Thông báo"]\') !== null');
 
   await waitFor('document.querySelector(\'a[aria-label="Giỏ hàng, 1 khóa học"]\') !== null');
   await navigate('/cart');
@@ -360,6 +395,11 @@ try {
   );
   await waitFor('document.querySelector(\'button[aria-label="Thông báo"]\') !== null');
   assert.equal(refreshes, beforeReload + 1);
+  await evaluate('document.querySelector(\'button[aria-label^="Mở menu tài khoản"]\').click()');
+  await waitFor(
+    'document.querySelector(\'[data-slot="popover-content"] a[href="/student/dashboard"]\') !== null',
+  );
+  await evaluate('document.querySelector(\'button[aria-label^="Mở menu tài khoản"]\').click()');
   assert.equal(
     await evaluate('Object.keys(localStorage).length + Object.keys(sessionStorage).length'),
     0,
@@ -384,6 +424,43 @@ try {
     true,
   );
   await evaluate(
+    'document.querySelector(\'#storefront-mobile-menu button[aria-label^="Mở menu tài khoản"]\').click()',
+  );
+  await waitFor(
+    'document.querySelector(\'[data-slot="popover-content"] a[href="/student/dashboard"]\') !== null',
+  );
+  const linkBounds = await evaluate(`(() => {
+    const rect = document.querySelector('[data-slot="popover-content"] a[href="/student/dashboard"]').getBoundingClientRect();
+    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+  })()`);
+  await send('Input.dispatchMouseEvent', {
+    type: 'mousePressed',
+    x: linkBounds.x,
+    y: linkBounds.y,
+    button: 'left',
+    clickCount: 1,
+    modifiers: 2,
+  });
+  await send('Input.dispatchMouseEvent', {
+    type: 'mouseReleased',
+    x: linkBounds.x,
+    y: linkBounds.y,
+    button: 'left',
+    clickCount: 1,
+    modifiers: 2,
+  });
+  await waitFor('document.querySelector(\'#storefront-mobile-menu\').classList.contains("hidden")');
+  let newTab;
+  for (let i = 0; i < 100; i++) {
+    newTab = (await send('Target.getTargets')).targetInfos.find(
+      (target) => target.type === 'page' && target.url === `${origin}/student/dashboard`,
+    );
+    if (newTab) break;
+    await delay(100);
+  }
+  assert.ok(newTab, 'Ctrl+click should open the study dashboard in a new tab');
+  await send('Target.closeTarget', { targetId: newTab.targetId });
+  await evaluate(
     'document.querySelector("main").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))',
   );
   await waitFor('document.querySelector(\'button[aria-label="Mở menu"]\') !== null');
@@ -405,6 +482,10 @@ try {
     await evaluate('document.querySelector(\'header a[href="/login"]\') !== null'),
     true,
   );
+  assert.equal(
+    await evaluate('document.querySelector(\'a[href="/student/dashboard"]\') === null'),
+    true,
+  );
   await evaluate(
     '[...document.querySelectorAll("[data-sonner-toast] button")].find(button => button.textContent.includes("Thử lại")).click()',
   );
@@ -414,7 +495,7 @@ try {
   await waitFor('location.pathname === "/login"');
   assert.deepEqual(errors, []);
   process.stdout.write(
-    `Browser auth/cart passed: storefront guest/auth/mobile states, cart filled/empty/removal states, notification/account popovers, refresh bootstrap, failed logout retry, register → OTP → login, protected route, and no token storage.\nScreenshots: ${profile}\n`,
+    `Browser auth/cart passed: guest/auth/mobile states, account navigation by keyboard and Ctrl+click, mobile menu closure, cart states, refresh bootstrap, logout retry, register → OTP → login, protected route, and no token storage.\nScreenshots: ${profile}\n`,
   );
 } finally {
   socket?.close();

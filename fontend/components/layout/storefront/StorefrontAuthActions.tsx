@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { Bell, ChevronDown, Inbox, UserRound } from 'lucide-react';
+import { Bell, ChevronDown, GraduationCap, Inbox, UserRound } from 'lucide-react';
 import type { AuthUser } from '@/apis/auth/auth.type';
 import {
   Popover,
@@ -129,9 +130,15 @@ function AccountPopover({
   onNavigate: () => void;
 }) {
   const initials = getInitials(user);
+  const [open, setOpen] = useState(false);
+
+  function closeOnNavigate() {
+    setOpen(false);
+    onNavigate();
+  }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
         render={
           <button
@@ -170,6 +177,26 @@ function AccountPopover({
             </div>
           </div>
         </PopoverHeader>
+        <nav aria-label="Điều hướng tài khoản" className="pt-2">
+          <Link
+            href="/student/dashboard"
+            onClick={closeOnNavigate}
+            className="flex items-center gap-2 rounded-lg px-2 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+          >
+            <GraduationCap className="h-4 w-4" aria-hidden="true" />
+            Dashboard học tập
+          </Link>
+        </nav>
+        <nav aria-label="Điều hướng tài khoản" className="pt-2">
+          <Link
+            href="/student/dashboard"
+            onClick={closeOnNavigate}
+            className="flex items-center gap-2 rounded-lg px-2 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+          >
+            <GraduationCap className="h-4 w-4" aria-hidden="true" />
+            Dashboard admin
+          </Link>
+        </nav>
         <LogoutButton
           onSuccess={onNavigate}
           className="mt-2 rounded-lg px-2 py-2.5 text-rose-600 hover:bg-rose-50 hover:text-rose-700 focus-visible:ring-brand-blue"

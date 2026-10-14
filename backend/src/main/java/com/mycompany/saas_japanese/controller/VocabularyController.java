@@ -30,33 +30,36 @@ public class VocabularyController {
 
   @GetMapping
   public Page<VocabularyResponse> findAll(
-      @ModelAttribute VocabularyQuery query) {
+      @Valid @ModelAttribute VocabularyQuery query) {
 
     return vocabularyService.findAll(query);
   }
 
   @GetMapping("/{id}")
   public VocabularyResponse findById(
-      @PathVariable Long id) {
+      @PathVariable("id") Long id,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
 
-    return vocabularyService.findById(id);
+    return vocabularyService.findById(id, lessonId);
   }
 
   @PutMapping("/{id}")
   public VocabularyResponse update(
-      @PathVariable Long id,
-      @Valid @RequestBody ReqVocabulary request) {
+      @PathVariable("id") Long id,
+      @Valid @RequestBody ReqVocabulary request,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
 
     return vocabularyService.update(
         id,
-        request);
+        request, lessonId);
   }
 
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(
-      @PathVariable Long id) {
+      @PathVariable("id") Long id,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
 
-    vocabularyService.delete(id);
+    vocabularyService.delete(id, lessonId);
   }
 }

@@ -125,7 +125,7 @@ export function CourseEditor({ id }: { id?: number }) {
     <div className="min-w-0 max-w-full">
       <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <nav aria-label="Đường dẫn" className="mb-1 flex items-center gap-2 text-xs font-semibold text-slate-400">
+          <nav aria-label="Đường dẫn" className="mb-1 flex items-center gap-2 text-xs font-semibold text-slate-600">
             <Link href="/admin/courses" className="hover:text-slate-600">Khóa học</Link>
             <span aria-hidden="true">/</span>
             <span className="text-slate-800">{isEditing ? 'Chỉnh sửa' : 'Tạo mới'}</span>
@@ -141,7 +141,7 @@ export function CourseEditor({ id }: { id?: number }) {
           <Link href="/admin/courses" className="rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500">
             Hủy
           </Link>
-          <Button type="submit" form="course-form" disabled={mutation.isPending || categories.length === 0} className="h-auto rounded-2xl bg-slate-900 px-5 py-2.5 text-xs font-bold text-white hover:bg-sky-600 md:text-sm">
+          <Button type="submit" form="course-form" disabled={mutation.isPending || categories.length === 0} className="h-auto rounded-2xl bg-primary px-5 py-2.5 text-xs font-bold text-white hover:bg-primary/90 md:text-sm">
             {mutation.isPending && <LoaderCircle className="size-4 animate-spin" />}
             {mutation.isPending ? 'Đang lưu…' : isEditing ? 'Lưu thay đổi' : 'Tạo khóa học'}
           </Button>

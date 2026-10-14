@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.time.Instant;
+import java.util.Objects;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +19,17 @@ import com.mycompany.saas_japanese.domain.response.LessonResponse;
 import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.MediaRepository;
+import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
+import com.mycompany.saas_japanese.repository.JlptExamPartRepository;
+import com.mycompany.saas_japanese.repository.JlptExamQuestionRepository;
 import com.mycompany.saas_japanese.service.LessonService;
 import com.mycompany.saas_japanese.service.mapper.LessonMapper;
 import com.mycompany.saas_japanese.specification.LessonSpecs;
 import com.mycompany.saas_japanese.util.SlugUtil;
+import com.mycompany.saas_japanese.util.GrammarHtmlSanitizer;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
+import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
@@ -41,8 +47,12 @@ public class LessonServiceImpl implements LessonService {
         CourseRepository courseRepository;
 
         MediaRepository mediaRepository;
+        CourseCategoryRepository courseCategoryRepository;
+        JlptExamPartRepository jlptExamPartRepository;
+        JlptExamQuestionRepository jlptExamQuestionRepository;
 
         LessonMapper lessonMapper;
+        GrammarHtmlSanitizer grammarHtmlSanitizer;
 
         @Override
         public LessonResponse createLesson(
@@ -67,7 +77,7 @@ public class LessonServiceImpl implements LessonService {
                                                 lesson.getTitle()));
 
                 lesson.setGrammar(
-                                request.getGrammar());
+                                grammarHtmlSanitizer.sanitize(request.getGrammar()));
 
                 lesson.setDurationMinutes(
                                 request.getDurationMinutes());
@@ -80,20 +90,8 @@ public class LessonServiceImpl implements LessonService {
                 lesson.setIsDeleted(false);
 
                 if (request.getVideoMediaId() != null) {
-
-                        Media media = mediaRepository
-                                        .findByIdAndIsDeletedFalse(
-                                                        request.getVideoMediaId())
-                                        .orElseThrow(
-                                                        () -> new NotFoundException(
-                                                                        "Video Media không tồn tại"));
-
-            if (Boolean.TRUE.equals(media.getIsUsed())) {
-                throw new BadRequestException("Tài nguyên đã được sử dụng !");
-            }
-            lesson.setVideoMedia(media);
-            media.setIsUsed(true);
-        }
+                        lesson.setVideoMedia(claimVideo(request.getVideoMediaId()));
+                }
 
         Lesson savedLesson = lessonRepository.save(lesson);
 
@@ -110,7 +108,7 @@ public class LessonServiceImpl implements LessonService {
                         Long id) {
 
                 Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
+                                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(id)
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Lesson không tồn tại"));
@@ -162,39 +160,25 @@ public class LessonServiceImpl implements LessonService {
                         ReqUpdateLesson request) {
 
                 Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
+                                .findActiveForUpdate(id)
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Lesson không tồn tại"));
 
-                lesson.setTitle(
-                                request.getTitle().trim());
+                if (!Objects.equals(lesson.getCourse().getId(), request.getCourseId())) {
+                        throw new NotFoundException("Lesson not found in this course");
+                }
+                lesson.setTitle(request.getTitle().trim());
+                lesson.setSlug(SlugUtil.toSlug(lesson.getTitle()));
+                if (request.isGrammarProvided()) {
+                        lesson.setGrammar(grammarHtmlSanitizer.sanitize(request.getGrammar()));
+                }
+                lesson.setDurationMinutes(request.getDurationMinutes());
+                lesson.setIsPublished(request.getIsPublished());
 
-                lesson.setSlug(
-                                SlugUtil.toSlug(
-                                                lesson.getTitle()));
-
-                lesson.setGrammar(
-                                request.getGrammar());
-
-                lesson.setDurationMinutes(
-                                request.getDurationMinutes());
-
-                lesson.setIsPublished(
-                                request.getIsPublished());
-
-                if (request.getVideoMediaId() != null && request.getVideoMediaId() != lesson.getVideoMedia().getId()) {
-
-                        Media media = mediaRepository
-                                        .findByIdAndIsDeletedFalse(
-                                                        request.getVideoMediaId())
-                                        .orElseThrow(
-                                                        () -> new NotFoundException(
-                                                                        "Video Media không tồn tại"));
-                        if (media.getIsUsed()) {
-                                throw new BadRequestException("Tài nguyên đã được sử dụng !");
-                        }
-                        lesson.setVideoMedia(media);
+                // A null videoMediaId in the established PUT contract means leave video unchanged.
+                if (request.getVideoMediaId() != null) {
+                        changeVideo(lesson, request.getVideoMediaId());
                 }
 
                 Lesson updatedLesson = lessonRepository.save(lesson);
@@ -203,20 +187,94 @@ public class LessonServiceImpl implements LessonService {
                                 updatedLesson);
         }
 
+        @Override
+        public LessonResponse updateGrammar(Long id, String grammar) {
+                Lesson lesson = activeLessonForUpdate(id);
+                lesson.setGrammar(grammarHtmlSanitizer.sanitize(grammar));
+                return lessonMapper.toResponse(lessonRepository.saveAndFlush(lesson));
+        }
+
+        @Override
+        public LessonResponse updatePublication(Long id, boolean isPublished) {
+                Lesson lesson = activeLessonForUpdate(id);
+                lesson.setIsPublished(isPublished);
+                return lessonMapper.toResponse(lessonRepository.saveAndFlush(lesson));
+        }
+
+        @Override
+        public LessonResponse attachVideo(Long id, Long videoMediaId) {
+                Lesson lesson = activeLessonForUpdate(id);
+                changeVideo(lesson, videoMediaId);
+                return lessonMapper.toResponse(lesson);
+        }
+
+        @Override
+        public LessonResponse detachVideo(Long id) {
+                Lesson lesson = activeLessonForUpdate(id);
+                changeVideo(lesson, null);
+                return lessonMapper.toResponse(lesson);
+        }
+
+        private Lesson activeLessonForUpdate(Long id) {
+                return lessonRepository.findActiveForUpdate(id)
+                                .orElseThrow(() -> new NotFoundException("Lesson không tồn tại"));
+        }
+
+        private Media claimVideo(Long mediaId) {
+                Media media = mediaRepository.findActiveForUpdate(mediaId)
+                                .orElseThrow(() -> new NotFoundException("Video Media không tồn tại"));
+                if (media.getFileType() != FileTypeEnum.VIDEO) {
+                        throw new BadRequestException("Tài nguyên không phải video");
+                }
+                if (Boolean.TRUE.equals(media.getIsUsed())
+                                || lessonRepository.existsByVideoMediaIdAndIsDeletedFalse(mediaId)
+                                || referencedOutsideLessons(mediaId)) {
+                        throw new BadRequestException("Tài nguyên đã được sử dụng");
+                }
+                media.setIsUsed(true);
+                return media;
+        }
+
+        private void changeVideo(Lesson lesson, Long mediaId) {
+                Media old = lesson.getVideoMedia();
+                if (Objects.equals(old == null ? null : old.getId(), mediaId)) {
+                        return;
+                }
+                Media replacement = mediaId == null ? null : claimVideo(mediaId);
+                lesson.setVideoMedia(replacement);
+                lessonRepository.saveAndFlush(lesson);
+                if (old != null) {
+                        releaseIfUnreferenced(old);
+                }
+        }
+
+        private void releaseIfUnreferenced(Media old) {
+                Long mediaId = old.getId();
+                if (!lessonRepository.existsByVideoMediaIdAndIsDeletedFalse(mediaId)
+                                && !referencedOutsideLessons(mediaId)) {
+                        old.setIsUsed(false);
+                }
+        }
+
+        private boolean referencedOutsideLessons(Long mediaId) {
+                return courseRepository.existsByThumbnailMediaIdAndIsDeletedFalse(mediaId)
+                                || courseCategoryRepository.existsByMediaIdAndIsDeletedFalse(mediaId)
+                                || jlptExamPartRepository.existsByAudioMediaId(mediaId)
+                                || jlptExamQuestionRepository.existsByImageMediaId(mediaId);
+        }
+
      
 
 @Override
 public void deleteLesson(Long id) {
 
         Lesson lesson = lessonRepository
-                        .findByIdAndIsDeletedFalse(id)
+                        .findActiveForUpdate(id)
                         .orElseThrow(
                                         () -> new NotFoundException(
                                                         "Lesson không tồn tại"));
 
         softDelete(lesson, Instant.now());
-
-        lessonRepository.save(lesson);
 }
 
 private void softDelete(Lesson lesson, Instant deletedAt) {
@@ -225,11 +283,11 @@ private void softDelete(Lesson lesson, Instant deletedAt) {
 
         lesson.setDeletedAt(deletedAt);
 
-        if (lesson.getVideoMedia() != null) {
-
-                lesson.getVideoMedia().setIsUsed(false);
-
-                lesson.setVideoMedia(null);
+        Media old = lesson.getVideoMedia();
+        lesson.setVideoMedia(null);
+        lessonRepository.saveAndFlush(lesson);
+        if (old != null) {
+                releaseIfUnreferenced(old);
         }
 }
     

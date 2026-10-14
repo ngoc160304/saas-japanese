@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { BookOpen, CircleCheck, Video } from 'lucide-react';
-import type { GrammarLectureVideo, GrammarPoint } from '../types/grammar';
+import type { Lesson } from '@/apis/lessons/lessons.type';
 import { GrammarSection } from './grammar/GrammarSection';
+import type { LessonVideoControls } from './grammar/GrammarLectureCard';
 import { KanjiSection } from './kanji/KanjiSection';
 import { QuizSection } from './quiz/QuizSection';
 import { VocabularySection } from './vocabulary/VocabularySection';
@@ -13,28 +14,47 @@ export type LessonContentTab = 'grammar' | 'vocabulary' | 'kanji' | 'quiz';
 interface LessonContentTabsProps {
   activeTab: LessonContentTab;
   onTabChange: (tab: LessonContentTab) => void;
-  video: GrammarLectureVideo;
-  grammarPoints: readonly GrammarPoint[];
+  lesson: Lesson;
   lessonId: number;
+  grammarDraft: string;
+  onGrammarChange: (value: string) => void;
+  onGrammarSave: () => void;
+  onGrammarCancel: () => void;
+  grammarDirty: boolean;
+  grammarSaving: boolean;
+  grammarSaveError: string | null;
+  video: LessonVideoControls;
+  videoDisabled: boolean;
+  onReloadVideo: () => void;
+  onQuizBusyChange: (busy: boolean) => void;
 }
 
 export function LessonContentTabs({
   activeTab,
   onTabChange,
-  video,
-  grammarPoints,
+  lesson,
   lessonId,
+  grammarDraft,
+  onGrammarChange,
+  onGrammarSave,
+  onGrammarCancel,
+  grammarDirty,
+  grammarSaving,
+  grammarSaveError,
+  video,
+  videoDisabled,
+  onReloadVideo,
+  onQuizBusyChange,
 }: LessonContentTabsProps) {
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const [grammarCount, setGrammarCount] = useState(grammarPoints.length);
-  const [vocabularyCount, setVocabularyCount] = useState(0);
-  const [kanjiCount, setKanjiCount] = useState(0);
-  const [quizCount, setQuizCount] = useState(0);
+  const [vocabularyCount, setVocabularyCount] = useState<number | null>(null);
+  const [kanjiCount, setKanjiCount] = useState<number | null>(null);
+  const [quizCount, setQuizCount] = useState<number | null>(null);
   const tabs = [
     {
       id: 'grammar' as const,
       label: 'Grammar + Video',
-      count: grammarCount,
+      count: null,
       icon: Video,
     },
     {
@@ -58,9 +78,14 @@ export function LessonContentTabs({
   ];
 
   useEffect(() => {
-    tabRefs.current
-      .find((tab) => tab?.id === `lesson-content-tab-${activeTab}`)
-      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    const tab = tabRefs.current.find((item) => item?.id === `lesson-content-tab-${activeTab}`);
+    const list = tab?.parentElement;
+    if (!tab || !list) return;
+    const left =
+      tab.getBoundingClientRect().left - list.getBoundingClientRect().left + list.scrollLeft;
+    if (left < list.scrollLeft) list.scrollLeft = left;
+    else if (left + tab.offsetWidth > list.scrollLeft + list.clientWidth)
+      list.scrollLeft = left + tab.offsetWidth - list.clientWidth;
   }, [activeTab]);
 
   function handleTabKeyDown(event: KeyboardEvent<HTMLButtonElement>, currentIndex: number) {
@@ -119,9 +144,11 @@ export function LessonContentTabs({
                 </span>
               )}
               {tab.label}
-              <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
-                {tab.count}
-              </span>
+              {tab.count !== null && (
+                <span className="rounded-full bg-slate-100 px-1.5 text-[11px] text-slate-600">
+                  {tab.count}
+                </span>
+              )}
             </button>
           );
         })}
@@ -133,12 +160,9 @@ export function LessonContentTabs({
         aria-labelledby="lesson-content-tab-grammar"
         hidden={activeTab !== 'grammar'}
       >
-        <GrammarSection
-          video={video}
-          points={grammarPoints}
-          pointCount={grammarCount}
-          onPointAdded={() => setGrammarCount((count) => count + 1)}
-        />
+        {activeTab === 'grammar' && <GrammarSection lesson={lesson} draft={grammarDraft} onDraftChange={onGrammarChange}
+          onSave={onGrammarSave} onCancel={onGrammarCancel} dirty={grammarDirty} isSaving={grammarSaving} saveError={grammarSaveError}
+          video={video} videoDisabled={videoDisabled} onReloadVideo={onReloadVideo} />}
       </div>
       <div
         id="lesson-content-panel-vocabulary"
@@ -149,7 +173,7 @@ export function LessonContentTabs({
         <VocabularySection
           lessonId={lessonId}
           active={activeTab === 'vocabulary'}
-          onVisibleCountChange={setVocabularyCount}
+          onCountChange={setVocabularyCount}
         />
       </div>
       <div
@@ -174,6 +198,7 @@ export function LessonContentTabs({
           lessonId={lessonId}
           active={activeTab === 'quiz'}
           onCountChange={setQuizCount}
+          onBusyChange={onQuizBusyChange}
         />
       </div>
     </>

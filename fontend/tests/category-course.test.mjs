@@ -150,6 +150,7 @@ test('last-row deletion returns to previous page, but never before page one', ()
     const mocks = {
       react: { useState: () => [stateIndex++ === 0 ? false : { id: 7 }, () => {}] },
       '@/apis/categories-course/categories-course.api': { categoryCourseAPI: {} },
+      '@/features/admin/data/mock-statistics': { adminMockStatistics: { categories: [] } },
       '@/lib/api-error': { getApiErrorMessage: () => '' },
       '@/components/common/table/hooks/useDataTableQuery': {
         useDataTableQuery: () => ({
@@ -284,7 +285,7 @@ test('category detail and course filters use existing REST endpoints', async () 
     published: false,
     pricing: 'free',
   });
-  assert.deepEqual(sent, {
+  assert.deepEqual({ ...sent, params: Object.fromEntries(Object.entries(sent.params).filter(([, value]) => value !== undefined)) }, {
     url: '/courses',
     params: { categoryId: 7, page: 1, size: 5, search: 'kanji', published: false, pricing: 'free' },
   });

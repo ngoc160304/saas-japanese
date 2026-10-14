@@ -1,17 +1,22 @@
 import Link from 'next/link';
 import { ListTree, Plus, Search, X } from 'lucide-react';
+import type { Lesson } from '@/apis/lessons/lessons.type';
 import { Button } from '@/components/ui/button';
 import { DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import type { LessonGrammarPreview } from '../types/grammar';
 import type { LessonContentTab } from './LessonContentTabs';
 
-interface LessonCurriculumSidebarProps {
+interface Props {
   courseId: number;
   lessonId: number;
-  lesson: LessonGrammarPreview;
+  lessons: Lesson[];
+  curriculumLoading: boolean;
+  curriculumError: string | null;
+  onRetryCurriculum: () => void;
   activeTab: LessonContentTab;
   onSelectTab: (tab: LessonContentTab) => void;
+  onNavigate: (href: string, event: { preventDefault(): void }) => void;
+  searchParams: string;
   search: string;
   onSearchChange: (value: string) => void;
   expanded: boolean;
@@ -19,23 +24,37 @@ interface LessonCurriculumSidebarProps {
   mobile?: boolean;
 }
 
+const tabs: { id: LessonContentTab; label: string; symbol: string; color: string }[] = [
+  { id: 'grammar', label: 'Grammar + Video', symbol: '文', color: 'bg-sky-100 text-sky-700' },
+  { id: 'vocabulary', label: 'Vocabulary', symbol: '語', color: 'bg-emerald-50 text-emerald-700' },
+  { id: 'kanji', label: 'Kanji', symbol: '漢', color: 'bg-purple-50 text-purple-700' },
+  { id: 'quiz', label: 'Quiz', symbol: '?', color: 'bg-amber-50 text-amber-700' },
+];
+
 export function LessonCurriculumSidebar({
   courseId,
   lessonId,
-  lesson,
+  lessons,
+  curriculumLoading,
+  curriculumError,
+  onRetryCurriculum,
   activeTab,
   onSelectTab,
+  onNavigate,
+  searchParams,
   search,
   onSearchChange,
   expanded,
   onToggleExpanded,
   mobile = false,
-}: LessonCurriculumSidebarProps) {
+}: Props) {
   const searchId = `curriculum-search-${mobile ? 'mobile' : 'desktop'}`;
   const contentId = `curriculum-content-${mobile ? 'mobile' : 'desktop'}`;
-  const matchesSearch = `Lesson ${lessonId} ${lesson.title}`
-    .toLocaleLowerCase('vi')
-    .includes(search.trim().toLocaleLowerCase('vi'));
+  const normalizedSearch = search.trim().toLocaleLowerCase('vi');
+  const visibleLessons = lessons.filter((item) =>
+    `${item.id} ${item.title}`.toLocaleLowerCase('vi').includes(normalizedSearch),
+  );
+  const query = searchParams ? `?${searchParams}` : '';
 
   return (
     <div className="flex h-full min-h-0 flex-col bg-white">
@@ -51,20 +70,13 @@ export function LessonCurriculumSidebar({
               aria-expanded={expanded}
               aria-controls={contentId}
               onClick={onToggleExpanded}
-              className="rounded-lg px-2 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-200/60 hover:text-slate-800 focus-visible:outline-2 focus-visible:outline-sky-500"
+              className="rounded-lg px-2 py-1 text-[11px] font-bold text-slate-500 hover:bg-slate-200/60 focus-visible:outline-2 focus-visible:outline-sky-500"
             >
               {expanded ? 'Collapse All' : 'Expand All'}
             </button>
             {mobile && (
               <DialogClose
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-xs"
-                    aria-label="Close curriculum"
-                    className="text-slate-500 focus-visible:ring-sky-500"
-                  />
-                }
+                render={<Button variant="ghost" size="icon-xs" aria-label="Close curriculum" />}
               >
                 <X className="size-4" aria-hidden="true" />
               </DialogClose>
@@ -80,10 +92,10 @@ export function LessonCurriculumSidebar({
             value={search}
             onChange={(event) => onSearchChange(event.target.value)}
             placeholder="Search lessons..."
-            className="h-9 rounded-xl border-slate-200 bg-white pr-8 pl-8 text-xs text-slate-800 shadow-2xs focus-visible:ring-sky-500 md:text-xs"
+            className="h-9 rounded-xl border-slate-200 bg-white pr-8 pl-8 text-xs"
           />
           <Search
-            className="pointer-events-none absolute top-3 left-2.5 size-3.5 text-slate-400"
+            className="pointer-events-none absolute top-3 left-2.5 size-3.5 text-slate-600"
             aria-hidden="true"
           />
           {search && (
@@ -97,90 +109,99 @@ export function LessonCurriculumSidebar({
             </button>
           )}
         </div>
-        <p className="mt-2.5 px-0.5 text-[11px] font-semibold text-slate-500">1 available lesson</p>
+        <p className="mt-2.5 px-0.5 text-[11px] font-semibold text-slate-500">
+          {curriculumLoading
+            ? 'Đang tải danh sách bài học...'
+            : curriculumError
+              ? 'Không thể tải danh sách bài học'
+              : `${lessons.length} available lessons`}
+        </p>
       </div>
-      <div className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain p-3">
-        {matchesSearch ? (
-          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
-            <div
-              className="flex items-center gap-2.5 rounded-xl bg-slate-900 px-3.5 py-3 text-white shadow-xs"
-              aria-current="page"
-            >
-              <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/10 text-[11px] font-black">
-                {lessonId}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-bold" title={lesson.title}>
-                  Lesson {lessonId}: {lesson.title}
-                </p>
-                <p className="mt-0.5 text-[10px] text-slate-400">
-                  {lesson.durationMinutes} mins • Published
-                </p>
-              </div>
-            </div>
-            <nav
-              id={contentId}
-              aria-label="Curriculum content"
-              hidden={!expanded}
-              className="space-y-1.5 px-2.5 py-2.5"
-            >
-              {(
-                [
-                  {
-                    id: 'grammar',
-                    label: 'Grammar + Video',
-                    symbol: '文',
-                    color: 'bg-sky-100 text-sky-700',
-                  },
-                  {
-                    id: 'vocabulary',
-                    label: 'Vocabulary',
-                    symbol: '語',
-                    color: 'bg-emerald-50 text-emerald-700',
-                  },
-                  {
-                    id: 'kanji',
-                    label: 'Kanji',
-                    symbol: '漢',
-                    color: 'bg-purple-50 text-purple-700',
-                  },
-                  {
-                    id: 'quiz',
-                    label: 'Quiz',
-                    symbol: '?',
-                    color: 'bg-amber-50 text-amber-700',
-                  },
-                ] as const
-              ).map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-current={activeTab === item.id ? 'true' : undefined}
-                  aria-controls={`lesson-content-panel-${item.id}`}
-                  onClick={() => onSelectTab(item.id)}
-                  className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs focus-visible:outline-2 focus-visible:outline-sky-500 ${activeTab === item.id ? 'border-sky-200 bg-sky-100 font-bold text-sky-700' : 'border-transparent font-semibold text-slate-600 hover:bg-slate-50'}`}
+      <div
+        id={contentId}
+        className="min-h-0 flex-1 space-y-2.5 overflow-y-auto overscroll-contain p-3"
+      >
+        {curriculumLoading ? (
+          <p role="status" className="px-3 py-6 text-center text-xs text-slate-500">
+            Đang tải bài học...
+          </p>
+        ) : curriculumError ? (
+          <div role="alert" className="space-y-3 px-3 py-6 text-center text-xs text-slate-600">
+            <p>{curriculumError}</p>
+            <Button variant="outline" onClick={onRetryCurriculum}>
+              Thử lại
+            </Button>
+          </div>
+        ) : visibleLessons.length ? (
+          visibleLessons.map((item) => {
+            const active = item.id === lessonId;
+            return (
+              <div
+                key={item.id}
+                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs"
+              >
+                <Link
+                  href={`/admin/courses/${courseId}/lessons/${item.id}${query}`}
+                  scroll={false}
+                  onNavigate={(event) => onNavigate(`/admin/courses/${courseId}/lessons/${item.id}${query}`, event)}
+                  aria-current={active ? 'page' : undefined}
+                  className={`flex items-center gap-2.5 rounded-xl px-3.5 py-3 focus-visible:outline-2 focus-visible:outline-sky-500 ${active ? 'bg-primary text-white' : 'text-slate-800 hover:bg-slate-50'}`}
                 >
                   <span
-                    className={`flex size-5 shrink-0 items-center justify-center rounded-md text-[10px] font-black ${item.color}`}
-                    aria-hidden="true"
+                    className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-[11px] font-black ${active ? 'bg-white/10' : 'bg-slate-100'}`}
                   >
-                    {item.symbol}
+                    {item.id}
                   </span>
-                  {item.label}
-                </button>
-              ))}
-            </nav>
-          </div>
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-xs font-bold" title={item.title}>
+                      {item.title}
+                    </span>
+                    <span
+                      className={`mt-0.5 block text-[10px] ${active ? 'text-slate-200' : 'text-slate-500'}`}
+                    >
+                      {item.durationMinutes === null
+                        ? 'Chưa cập nhật thời lượng'
+                        : `${item.durationMinutes} phút`}{' '}
+                      • {item.isPublished ? 'Published' : 'Draft'}
+                    </span>
+                  </span>
+                </Link>
+                {active && expanded && (
+                  <nav aria-label="Curriculum content" className="space-y-1.5 px-2.5 py-2.5">
+                    {tabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        aria-current={activeTab === tab.id ? 'true' : undefined}
+                        aria-controls={`lesson-content-panel-${tab.id}`}
+                        onClick={() => onSelectTab(tab.id)}
+                        className={`flex w-full items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs focus-visible:outline-2 focus-visible:outline-sky-500 ${activeTab === tab.id ? 'border-sky-200 bg-sky-100 font-bold text-sky-700' : 'border-transparent font-semibold text-slate-600 hover:bg-slate-50'}`}
+                      >
+                        <span
+                          className={`flex size-5 shrink-0 items-center justify-center rounded-md text-[10px] font-black ${tab.color}`}
+                          aria-hidden="true"
+                        >
+                          {tab.symbol}
+                        </span>
+                        {tab.label}
+                      </button>
+                    ))}
+                  </nav>
+                )}
+              </div>
+            );
+          })
         ) : (
           <p role="status" className="px-3 py-6 text-center text-xs text-slate-500">
-            No matching lessons.
+            {lessons.length ? 'No matching lessons.' : 'Khóa học chưa có bài học.'}
           </p>
         )}
       </div>
       <div className="shrink-0 border-t border-slate-100 bg-slate-50/70 p-3">
         <Link
           href={`/admin/courses/${courseId}/lessons/create`}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 px-3 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-sky-600 focus-visible:outline-2 focus-visible:outline-sky-500"
+          onNavigate={(event) => onNavigate(`/admin/courses/${courseId}/lessons/create`, event)}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-3 py-2.5 text-xs font-bold text-white shadow-2xs hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-sky-500"
         >
           <Plus className="size-3.5" aria-hidden="true" />
           Add New Lesson

@@ -14,20 +14,14 @@ export function CreateButton(props: ICreateButtonProps) {
 
   return (
     <Button
-      className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-slate-900 hover:bg-sky-600 text-white font-bold text-xs shadow-sm transition-all cursor-pointer h-auto"
+      type="button"
+      nativeButton={!href}
+      render={href ? <Link href={href} /> : undefined}
+      className="h-10 rounded-xl px-4 text-sm font-semibold shadow-sm"
       onClick={handleClick}
     >
-      {href ? (
-        <Link href={href}>
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
-          <span>{label}</span>
-        </Link>
-      ) : (
-        <>
-          <Plus className="w-4 h-4" strokeWidth={2.5} />
-          <span>{label}</span>
-        </>
-      )}
+      <Plus className="size-4" aria-hidden="true" />
+      <span>{label}</span>
     </Button>
   );
 }

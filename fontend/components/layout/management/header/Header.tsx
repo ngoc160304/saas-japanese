@@ -11,21 +11,21 @@ const Header = (props: IProp) => {
     <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
       <div>
         {breadcrumbs ?? (
-          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-1">
-            <a href="admin_courses.html" className="hover:text-slate-600">
+          <nav className="flex items-center gap-2 text-xs font-semibold text-slate-600 mb-1">
+            <span>
               Admin
-            </a>
+            </span>
             <span>/</span>
-            <span className="text-slate-800">Courses</span>
+            <span className="text-slate-800">{title}</span>
           </nav>
         )}
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-2xl md:text-[28px] font-semibold text-slate-900 tracking-tight">
           {title}
         </h1>
         <p className="text-slate-500 font-medium text-sm mt-0.5">{description}</p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {children}
 
         {showProfile && (
@@ -37,7 +37,7 @@ const Header = (props: IProp) => {
             />
             <div className="text-left hidden sm:block">
               <p className="text-xs font-bold text-slate-900 leading-tight">Admin Sarah</p>
-              <p className="text-[10px] text-slate-400 font-medium">Administrator</p>
+              <p className="text-[10px] text-slate-600 font-medium">Administrator</p>
             </div>
           </div>
         )}

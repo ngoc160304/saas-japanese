@@ -8,7 +8,7 @@ import { CategoryCourseDialog } from './CategoryCourseDialog';
 import { CategoryCourseDeletePopover } from './CategoryCourseDeletePopover';
 
 const actionButtonClassName =
-  'border-slate-200 bg-white text-slate-900 hover:border-[#00A5CF] hover:bg-[#00A5CF] hover:text-slate-900';
+  'rounded-xl border-input bg-white text-slate-700 hover:bg-slate-100 hover:text-slate-900';
 
 export function CategoryCourseAction({
   courseCategory,

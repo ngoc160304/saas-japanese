@@ -13,9 +13,13 @@ import {
 export function VocabularyTable({
   items,
   emptyMessage,
+  onEdit,
+  onDelete,
 }: {
   items: readonly VocabularyItem[];
   emptyMessage: string;
+  onEdit: (item: VocabularyItem) => void;
+  onDelete: (item: VocabularyItem) => void;
 }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xs">
@@ -46,7 +50,7 @@ export function VocabularyTable({
           {items.length > 0 ? (
             items.map((item, index) => (
               <TableRow key={item.id} className="border-slate-100 hover:bg-slate-50/60">
-                <TableCell className="px-4 py-3 font-bold text-slate-400">{index + 1}</TableCell>
+                <TableCell className="px-4 py-3 font-bold text-slate-600">{index + 1}</TableCell>
                 <TableCell className="px-4 py-3 text-sm font-bold text-slate-900">
                   {item.word}
                 </TableCell>
@@ -72,6 +76,7 @@ export function VocabularyTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
+                      onClick={() => onEdit(item)}
                       aria-label={`Edit ${item.word}`}
                       title={`Edit ${item.word}`}
                       className="rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
@@ -82,9 +87,10 @@ export function VocabularyTable({
                       type="button"
                       variant="ghost"
                       size="icon-sm"
+                      onClick={() => onDelete(item)}
                       aria-label={`Delete ${item.word}`}
                       title={`Delete ${item.word}`}
-                      className="rounded-lg bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                      className="rounded-lg bg-slate-50 text-slate-600 hover:bg-rose-50 hover:text-rose-600"
                     >
                       <X className="size-3.5" aria-hidden="true" />
                     </Button>

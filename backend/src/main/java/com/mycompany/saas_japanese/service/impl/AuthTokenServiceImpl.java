@@ -31,6 +31,7 @@ import com.mycompany.saas_japanese.repository.AuthSessionRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthTokenService;
 import com.mycompany.saas_japanese.service.AuthTokens;
+import com.mycompany.saas_japanese.util.SecurityUtil;
 
 @Service
 public class AuthTokenServiceImpl implements AuthTokenService {
@@ -150,7 +151,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
   }
 
   private String authority(User user) {
-    return "ROLE_" + user.getRole().name().toUpperCase();
+    return SecurityUtil.getUserAuthority(user.getRole());
   }
 
   private Jwt decodeRefresh(String token) {

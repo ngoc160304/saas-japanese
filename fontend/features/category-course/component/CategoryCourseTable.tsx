@@ -38,10 +38,10 @@ export function CourseCategoriesTable({
       <Table className="text-xs">
         <TableHeader className="bg-slate-50/80">
           <TableRow className="border-b border-slate-100 hover:bg-transparent">
-            <TableHead className="text-slate-700 font-semibold">Course</TableHead>
-            <TableHead className="text-slate-700 font-semibold">Description</TableHead>
-            <TableHead className="text-slate-700 font-semibold">Stats</TableHead>
-            <TableHead className="text-right text-slate-700 font-semibold">Actions</TableHead>
+            <TableHead className="text-slate-700 font-semibold">Danh mục</TableHead>
+            <TableHead className="text-slate-700 font-semibold">Mô tả</TableHead>
+            <TableHead className="text-slate-700 font-semibold">Nội dung</TableHead>
+            <TableHead className="text-right text-slate-700 font-semibold">Thao tác</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody aria-busy={isLoading}>

@@ -17,13 +17,13 @@ export function DataTableReset({ onReset, label = 'Reset' }: DataTableResetProps
       onClick={onReset}
       className="
         h-10
-        rounded-2xl
-        border-slate-200
+        rounded-xl
+        border-input
         bg-white
         px-3
         text-xs
         font-semibold
-        text-slate-500
+        text-slate-600
         hover:bg-slate-50
         hover:text-slate-800
       "

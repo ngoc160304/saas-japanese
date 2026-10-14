@@ -1,11 +1,10 @@
 'use client';
 
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
 import { ordersAPI } from '@/apis/orders/orders.api';
-import type { OrderStatus } from '@/apis/orders/orders.type';
-import { Button } from '@/components/ui/button';
+import { adminMockStatistics } from '@/features/admin/data/mock-statistics';
 import { StatCard } from '@/components/common/stats/StatCard';
 import { DataTablePagination } from '@/components/common/table/DataTablePagination';
 import { DataTableToolbar } from '@/components/common/table/DataTableToolbar';
@@ -15,7 +14,6 @@ import PageSection from '@/components/layout/management/page-section/PageSection
 import { getApiErrorMessage } from '@/lib/api-error';
 import {
   buildOrderListParams,
-  buildOrderStatisticParams,
   orderStatusOptions,
   parseOrderPage,
   parseOrderStatus,
@@ -25,38 +23,7 @@ import {
 import { OrdersTable } from './OrdersTable';
 
 const selectClassName =
-  'h-10 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 text-xs text-slate-700 focus-visible:outline-2 focus-visible:outline-sky-500';
-
-const statisticDefinitions: ReadonlyArray<{
-  label: string;
-  description: string;
-  status?: OrderStatus;
-  descriptionClassName?: string;
-}> = [
-  {
-    label: 'Tổng đơn hàng',
-    description: 'Tất cả đơn hàng',
-    descriptionClassName: 'bg-sky-50 text-sky-700',
-  },
-  {
-    label: 'Chờ xác nhận',
-    description: 'Theo trạng thái đơn',
-    status: 'PENDING',
-    descriptionClassName: 'bg-amber-50 text-amber-800',
-  },
-  {
-    label: 'Đã xác nhận',
-    description: 'Theo trạng thái đơn',
-    status: 'CONFIRMED',
-    descriptionClassName: 'bg-emerald-50 text-emerald-700',
-  },
-  {
-    label: 'Đã hủy',
-    description: 'Theo trạng thái đơn',
-    status: 'CANCELLED',
-    descriptionClassName: 'bg-rose-50 text-rose-700',
-  },
-];
+  'h-10 w-full rounded-2xl border border-input bg-slate-50 px-3 text-xs text-slate-700 focus-visible:outline-2 focus-visible:outline-sky-500';
 
 export default function OrdersPage() {
   const router = useRouter();
@@ -74,17 +41,6 @@ export default function OrdersPage() {
   const ordersQuery = useQuery({
     queryKey: ['admin-orders', 'list', listParams],
     queryFn: ({ signal }) => ordersAPI.getAdminOrders(listParams, signal),
-  });
-
-  const statisticQueries = useQueries({
-    queries: statisticDefinitions.map((definition) => {
-      const queryParams = buildOrderStatisticParams(definition.status);
-      return {
-        queryKey: ['admin-orders', 'statistics', queryParams],
-        queryFn: ({ signal }: { signal: AbortSignal }) =>
-          ordersAPI.getAdminOrders(queryParams, signal),
-      };
-    }),
   });
 
   const updateParams = useCallback(
@@ -125,7 +81,6 @@ export default function OrdersPage() {
     updateParams({ search: null, status: null, payment_status: null, page: null });
   }
 
-  const statisticsHaveError = statisticQueries.some((query) => query.isError);
   const listData = ordersQuery.data;
   const lastAvailablePage = Math.max(listData?.totalPages ?? 1, 1);
   const isCorrectingPage = Boolean(listData && page > lastAvailablePage);
@@ -140,43 +95,7 @@ export default function OrdersPage() {
         showProfile={false}
       />
 
-      <StatCard
-        items={statisticDefinitions.map((definition, index) => {
-          const query = statisticQueries[index];
-          return {
-            label: definition.label,
-            value: query.isPending ? '…' : query.isError ? '—' : (query.data?.totalElements ?? 0),
-            description: query.isPending
-              ? 'Đang tải'
-              : query.isError
-                ? 'Chưa tải được'
-                : definition.description,
-            descriptionClassName: query.isError
-              ? 'bg-rose-50 text-rose-700'
-              : definition.descriptionClassName,
-          };
-        })}
-      />
-
-      {statisticsHaveError && (
-        <div
-          role="alert"
-          className="mb-6 flex flex-col items-start justify-between gap-3 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700 sm:flex-row sm:items-center"
-        >
-          <span>Không thể tải đầy đủ thống kê đơn hàng.</span>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              statisticQueries.forEach((query) => {
-                if (query.isError) void query.refetch();
-              });
-            }}
-          >
-            Thử lại
-          </Button>
-        </div>
-      )}
+      <StatCard items={adminMockStatistics.orders} isMock />
 
       <PageSection>
         <DataTableToolbar

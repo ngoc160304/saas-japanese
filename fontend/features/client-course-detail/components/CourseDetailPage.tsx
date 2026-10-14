@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { clientCoursesAPI, clientCoursesQueryKeys } from '@/apis/courses/client-courses.api';
 import { getApiError, getApiErrorMessage } from '@/lib/api-error';
 import { useAddCourseToCart } from '../hooks/useAddCourseToCart';
+import { useFreeCourseEnrollment } from '../hooks/useFreeCourseEnrollment';
 import { CourseDetailHero } from './CourseDetailHero';
 import { CoursePurchaseCard } from './CoursePurchaseCard';
 import { CourseSyllabus } from './CourseSyllabus';
@@ -29,6 +30,7 @@ export function CourseDetailPage({ courseId }: { courseId: number }) {
       ? courseQuery.data
       : undefined;
   const cartAction = useAddCourseToCart(course?.id);
+  const freeEnrollment = useFreeCourseEnrollment(course?.price === 0 ? course.id : undefined);
 
   if (courseQuery.isPending) {
     return (
@@ -95,6 +97,7 @@ export function CourseDetailPage({ courseId }: { courseId: number }) {
               onAddToCart={() => void cartAction.addToCart()}
               adding={cartAction.isPending}
               addDisabled={cartAction.disabled}
+              freeEnrollment={freeEnrollment}
             />
           </div>
         </div>

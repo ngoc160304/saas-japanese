@@ -5,14 +5,18 @@ import { DialogTrigger } from '@/components/ui/dialog';
 
 export function LessonWorkspaceHeader({
   courseId,
-  lessonId,
   courseTitle,
   lessonTitle,
+  onNavigate,
+  onPreview,
+  previewDisabled,
 }: {
   courseId: number;
-  lessonId: number;
   courseTitle: string;
   lessonTitle: string;
+  onNavigate: (href: string, event: { preventDefault(): void }) => void;
+  onPreview: () => void;
+  previewDisabled: boolean;
 }) {
   return (
     <header className="z-30 shrink-0 border-b border-slate-200/80 bg-white px-4 py-2.5 shadow-xs lg:px-6">
@@ -20,6 +24,7 @@ export function LessonWorkspaceHeader({
         <div className="flex min-w-0 items-center gap-3 md:gap-5">
           <Link
             href="/admin/courses"
+            onNavigate={(event) => onNavigate('/admin/courses', event)}
             aria-label="Studify Admin courses"
             className="flex shrink-0 items-center gap-2.5 rounded-xl focus-visible:outline-2 focus-visible:outline-sky-500"
           >
@@ -38,12 +43,13 @@ export function LessonWorkspaceHeader({
             aria-label="Breadcrumb"
             className="flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-slate-500"
           >
-            <Link href="/admin/courses" className="font-semibold hover:text-slate-900">
+            <Link href="/admin/courses" onNavigate={(event) => onNavigate('/admin/courses', event)} className="font-semibold hover:text-slate-900">
               Courses
             </Link>
             <span aria-hidden="true">/</span>
             <Link
               href={`/admin/courses/${courseId}`}
+              onNavigate={(event) => onNavigate(`/admin/courses/${courseId}`, event)}
               className="min-w-0 truncate rounded-xl bg-slate-50 px-2.5 py-1 font-bold text-slate-800 hover:bg-slate-100 hover:text-sky-600"
               title={courseTitle}
             >
@@ -57,7 +63,7 @@ export function LessonWorkspaceHeader({
               className="hidden min-w-0 truncate md:block"
               title={lessonTitle}
             >
-              Lesson {lessonId}: {lessonTitle}
+              {lessonTitle}
             </span>
           </nav>
         </div>
@@ -76,24 +82,24 @@ export function LessonWorkspaceHeader({
           </DialogTrigger>
           <Link
             href={`/admin/courses/${courseId}`}
+            onNavigate={(event) => onNavigate(`/admin/courses/${courseId}`, event)}
             className="hidden items-center gap-1.5 rounded-xl border border-slate-200 px-3 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-50 sm:flex"
           >
-            <Settings className="size-3.5 text-slate-400" aria-hidden="true" />
+            <Settings className="size-3.5 text-slate-600" aria-hidden="true" />
             Outline
           </Link>
           <Button
             type="button"
-            disabled
-            title="Student View is unavailable"
-            className="hidden h-auto items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3.5 py-1.5 text-xs font-bold text-sky-700 shadow-2xs sm:flex"
+            disabled={previewDisabled}
+            onClick={onPreview}
+            className="h-auto shrink-0 items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-2 py-2 text-xs font-bold text-sky-700 shadow-2xs hover:bg-sky-100 sm:px-3.5"
           >
             <Eye className="size-3.5" aria-hidden="true" />
-            Student View
-            <span className="text-[10px] font-medium">Unavailable</span>
+            Xem trước bài học
           </Button>
           <span className="hidden border-l border-slate-200 pl-2 sm:block">
             <span
-              className="flex size-8 items-center justify-center rounded-xl bg-slate-900 text-xs font-bold text-white"
+              className="flex size-8 items-center justify-center rounded-xl bg-primary text-xs font-bold text-white"
               aria-label="Admin workspace"
             >
               AD

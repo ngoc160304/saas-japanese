@@ -20,7 +20,6 @@ export interface CreateLessonRequest {
   durationMinutes?: number | null;
   isPublished?: boolean;
   videoMediaId?: number | null;
-  sortOrder?: number;
 }
 
 export interface LessonQuery {
@@ -35,8 +34,22 @@ export interface LessonQuery {
 export interface UpdateLessonRequest {
   title: string;
   courseId: number;
-  slug: string;
-  grammar: string | null;
-  durationMinutes: number;
+  slug?: string;
+  grammar?: string | null;
+  durationMinutes: number | null;
   isPublished: boolean;
+}
+
+export interface UpdateLessonGrammarRequest {
+  grammar: string;
+}
+
+export interface UpdateLessonPublicationRequest {
+  isPublished: boolean;
+  /** Omit or send null to preserve the current video in the existing PUT contract. */
+  videoMediaId?: number | null;
+}
+
+export interface AttachLessonVideoRequest {
+  videoMediaId: number;
 }
