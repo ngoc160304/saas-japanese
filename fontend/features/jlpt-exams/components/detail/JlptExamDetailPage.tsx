@@ -9,8 +9,8 @@ import { JlptExamDetail } from './JlptExamDetail';
 
 export function JlptExamDetailPage({ examId }: { examId: number }) {
   const query = useQuery({
-    queryKey: jlptExamsQueryKeys.detail(examId),
-    queryFn: ({ signal }) => jlptExamsAPI.getJlptExam(examId, signal),
+    queryKey: jlptExamsQueryKeys.structure(examId),
+    queryFn: ({ signal }) => jlptExamsAPI.getJlptExamStructure(examId, signal),
     retry: false,
   });
   const exam = query.isSuccess && query.data?.id === examId ? query.data : null;

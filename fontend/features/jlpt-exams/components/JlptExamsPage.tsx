@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { jlptExamsAPI, jlptExamsQueryKeys } from '@/apis/jlpt-exams/jlpt-exams.api';
 import type { JlptExamsQuery } from '@/apis/jlpt-exams/jlpt-exams.type';
 import { getApiErrorMessage } from '@/lib/api-error';
@@ -37,7 +36,7 @@ export function JlptExamsPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl">
-      <JlptExamsHeader onHistoryClick={() => toast.info('Coming soon')} />
+      <JlptExamsHeader />
       <JlptExamsToolbar search={searchText} onSearchChange={setSearch} level={state.level} onLevelChange={setLevel} />
       {query.isError ? (
         <section role="alert" className="rounded-3xl border border-slate-100 bg-white px-6 py-16 text-center shadow-sm">

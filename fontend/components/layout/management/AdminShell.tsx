@@ -11,8 +11,9 @@ export function AdminShell({ children, sidebar }: { children: ReactNode; sidebar
     /^\d+$/.test(segments[1]) &&
     segments[2] === 'lessons' &&
     /^\d+$/.test(segments[3]);
+  const isJlptReview = segments.length === 2 && segments[0] === 'jlpt_exam_review';
 
-  if (isLessonContent) return children;
+  if (isLessonContent || isJlptReview) return children;
 
   return (
     <div className="min-h-screen antialiased text-slate-800 bg-[#f3f6fa]">

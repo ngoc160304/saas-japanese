@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Clock3 } from 'lucide-react';
 
-export function JlptExamsHeader({ onHistoryClick }: { onHistoryClick: () => void }) {
+export function JlptExamsHeader() {
   return (
     <header className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
       <div>
@@ -15,10 +15,10 @@ export function JlptExamsHeader({ onHistoryClick }: { onHistoryClick: () => void
           Authentic mock examinations and session-based practice drills formatted to real JLPT standards.
         </p>
       </div>
-      <button type="button" onClick={onHistoryClick} className="self-start flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500 sm:self-auto">
+      <Link href="/student/jlpt_exam_history" className="self-start flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500 sm:self-auto">
         <Clock3 aria-hidden="true" className="size-4 text-sky-600" />
         My Attempt History
-      </button>
+      </Link>
     </header>
   );
 }

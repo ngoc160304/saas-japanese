@@ -15,7 +15,7 @@ export function FullExamStartCard({ examId, isPublished }: { examId: number; isP
           <h2 id="full-exam-title" className="text-xl font-extrabold tracking-tight text-white md:text-2xl">Full Examination</h2>
           <p className="mt-1 max-w-xl text-xs leading-relaxed text-slate-300 md:text-sm">
             {isPublished
-              ? 'View the full exam structure. Questions and attempts are not available yet.'
+              ? 'Choose this full exam to begin a new attempt. Your attempt starts after you confirm on the next screen.'
               : 'This exam is unpublished and cannot be started.'}
           </p>
         </div>

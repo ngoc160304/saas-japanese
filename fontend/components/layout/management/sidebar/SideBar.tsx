@@ -6,6 +6,7 @@ export interface ISidebarItem {
   icon: React.ReactNode;
   title: string;
   href?: string;
+  activePaths?: readonly string[];
 }
 
 interface IProp {
@@ -39,7 +40,7 @@ const SideBar = (props: IProp) => {
           className={`${mobileMenuOpen === false ? 'hidden xl:block' : ''} space-y-1.5`}
         >
           {sidebarItems.map((item: ISidebarItem, index: number) => {
-            return <SideBarItem href={item.href} title={item.title} icon={item.icon} key={index} />;
+            return <SideBarItem href={item.href} activePaths={item.activePaths} title={item.title} icon={item.icon} key={index} />;
           })}
         </nav>
       </div>

@@ -1,0 +1,5 @@
+html:has(.jlpt-taking-route),
+body:has(.jlpt-taking-route) {
+  height: 100%;
+  overflow: clip;
+}

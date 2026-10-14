@@ -1,16 +1,16 @@
-import type { JlptExamOverview } from '@/apis/jlpt-exams/jlpt-exams.type';
+import type { JlptExamStructure } from '@/apis/jlpt-exams/jlpt-exams.type';
 import { ExamDetailBreadcrumbs } from './ExamDetailBreadcrumbs';
 import { ExamOverviewCard } from './ExamOverviewCard';
 import { FullExamStartCard } from './FullExamStartCard';
 import { ExamSessionsSection } from './ExamSessionsSection';
 
-export function JlptExamDetail({ exam }: { exam: JlptExamOverview }) {
+export function JlptExamDetail({ exam }: { exam: JlptExamStructure }) {
   return (
     <div className="mx-auto w-full max-w-5xl">
       <ExamDetailBreadcrumbs title={exam.title} />
       <ExamOverviewCard exam={exam} />
       <FullExamStartCard examId={exam.id} isPublished={exam.isPublished} />
-      <ExamSessionsSection />
+      <ExamSessionsSection examId={exam.id} sessions={exam.sessions} />
     </div>
   );
 }
