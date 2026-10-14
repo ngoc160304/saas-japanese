@@ -12,6 +12,8 @@ import { selectCurrentUser } from '@/store/authSlice';
 import { useAppSelector } from '@/store/hooks';
 import { useCourseEnrollment } from '../hooks/useCourseEnrollment';
 import { LessonList } from './LessonList';
+import { useStudyLessons } from '@/features/student-lessons/hooks/useStudyQueries';
+import { StudyError, StudyLoading } from '@/features/student-lessons/components/StudyState';
 
 export function StudentCourseDetail({ courseId }: { courseId: number }) {
   const userId = useAppSelector(selectCurrentUser)?.id;
@@ -40,6 +42,8 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
     retry: false,
   });
   const action = useCourseEnrollment(courseId);
+  const enrolled = enrollmentsQuery.data?.includes(courseId) ?? false;
+  const studyLessons = useStudyLessons(userId, courseId, Boolean(course) && enrolled);
   const unavailable =
     (courseQuery.isError && getApiError(courseQuery.error).status === 404) ||
     (lessonsQuery.isError && getApiError(lessonsQuery.error).status === 404);
@@ -84,7 +88,6 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
     );
   }
 
-  const enrolled = enrollmentsQuery.data?.includes(courseId) ?? false;
   const inCart = cartQuery.data?.items.some((item) => item.courseId === courseId) ?? false;
   const checkingStatus = enrollmentsQuery.isPending || (course.price > 0 && cartQuery.isPending);
   const statusError = enrollmentsQuery.isError || (course.price > 0 && cartQuery.isError);
@@ -119,6 +122,7 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
       </header>
 
       <section
+        id="course-enrollment"
         aria-label="Course information"
         className="mb-6 flex flex-col justify-between gap-5 rounded-3xl border border-slate-100 bg-white p-5 shadow-soft md:flex-row md:items-center md:p-6"
       >
@@ -223,8 +227,29 @@ export function StudentCourseDetail({ courseId }: { courseId: number }) {
             Retry lessons
           </button>
         </section>
+      ) : enrolled && studyLessons.isPending ? (
+        <StudyLoading label="Loading your lesson progress…" />
+      ) : enrolled && studyLessons.isError ? (
+        <StudyError
+          error={studyLessons.error}
+          onRetry={() => void studyLessons.refetch()}
+          courseId={courseId}
+          label="Could not load your lessons"
+        />
+      ) : enrolled && studyLessons.isSuccess ? (
+        <LessonList
+          courseId={courseId}
+          lessons={studyLessons.data}
+          accessible
+          checkingEnrollment={false}
+        />
       ) : (
-        <LessonList lessons={lessonsQuery.data} />
+        <LessonList
+          courseId={courseId}
+          lessons={lessonsQuery.data}
+          accessible={false}
+          checkingEnrollment={enrollmentsQuery.isPending}
+        />
       )}
     </div>
   );

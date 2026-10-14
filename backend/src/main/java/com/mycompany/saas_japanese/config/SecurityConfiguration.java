@@ -75,6 +75,12 @@ public class SecurityConfiguration {
                                                                 "/api/v1/auth/refresh-token", "/api/v1/auth/logout")
                                                 .permitAll()
                                                 .requestMatchers(HttpMethod.GET, "/api/v1/client/**").permitAll()
+                                                .requestMatchers("/api/v1/study", "/api/v1/study/**").authenticated()
+                                                .requestMatchers(HttpMethod.GET,
+                                                                "/api/v1/lessons", "/api/v1/lessons/**",
+                                                                "/api/v1/vocabularies", "/api/v1/vocabularies/**",
+                                                                "/api/v1/kanjis", "/api/v1/kanjis/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/upload/videos")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.PATCH,
@@ -87,12 +93,13 @@ public class SecurityConfiguration {
                                                 .requestMatchers("/api/v1/admin/lessons/*/quiz",
                                                                 "/api/v1/admin/lessons/*/quiz/**")
                                                 .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers("/api/v1/admin/speaking/topics")
+                                                .hasAuthority("ROLE_ADMIN")
+                                                .requestMatchers("/api/v1/student/dashboard", "/api/v1/speaking/topics")
+                                                .authenticated()
                                                 .requestMatchers("/api/v1/admin/**").permitAll()
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/lessons")
                                                 .hasAuthority("ROLE_ADMIN")
-                                                .requestMatchers(HttpMethod.POST,
-                                                                "/api/v1/study/lessons/*/quiz/*/questions/*/answer")
-                                                .authenticated()
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.DELETE, "/api/v1/lessons/**")

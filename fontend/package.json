@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "eslint",
     "test:auth": "node --test tests/auth.test.mjs",
-    "test:auth:browser": "node tests/auth.browser.mjs"
+    "test:auth:browser": "node tests/auth.browser.mjs",
+    "test:speaking": "node --test tests/speaking.test.mjs",
+    "test:student:browser": "node tests/student.browser.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

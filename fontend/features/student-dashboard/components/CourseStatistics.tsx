@@ -12,7 +12,13 @@ const imageTones: Record<string, string> = {
   emerald: 'hue-rotate-90',
 };
 
-export function CourseStatistics({ statistics }: { statistics: CourseStatistic[] }) {
+export function CourseStatistics({
+  statistics,
+  loading,
+}: {
+  statistics: CourseStatistic[];
+  loading: boolean;
+}) {
   return (
     <section
       aria-label="Course statistics"
@@ -25,8 +31,10 @@ export function CourseStatistics({ statistics }: { statistics: CourseStatistic[]
         >
           <div className="relative z-10 flex items-center justify-between">
             <div>
-              <p className="text-3xl font-extrabold tracking-tight text-slate-900 lg:text-4xl">
-                {statistic.value}
+              <p
+                className={`font-extrabold tracking-tight text-slate-900 ${statistic.value === null ? 'text-sm' : 'text-3xl lg:text-4xl'}`}
+              >
+                {statistic.value ?? (loading ? 'Đang tải…' : 'Chưa có dữ liệu')}
               </p>
               <p className="mt-1 text-xs font-semibold text-slate-500">{statistic.label}</p>
             </div>

@@ -15,7 +15,8 @@ import com.mycompany.saas_japanese.domain.request.ReqUpdateLessonProgress;
 import com.mycompany.saas_japanese.domain.response.CourseProgressResponse;
 import com.mycompany.saas_japanese.domain.response.KanjiResponse;
 import com.mycompany.saas_japanese.domain.response.LessonProgressResponse;
-import com.mycompany.saas_japanese.domain.response.LessonResponse;
+import com.mycompany.saas_japanese.domain.response.StudentLessonResponse;
+import com.mycompany.saas_japanese.domain.response.StudentLessonSummaryResponse;
 import com.mycompany.saas_japanese.domain.response.QuizAnswerResponse;
 import com.mycompany.saas_japanese.domain.response.QuizResponse;
 import com.mycompany.saas_japanese.domain.response.VocabularyResponse;
@@ -35,14 +36,14 @@ public class StudyController {
     StudyService studyService;
 
     @GetMapping("/courses/{courseId}/lessons")
-    public ResponseEntity<List<LessonResponse>> getLessonsByCourse(
+    public ResponseEntity<List<StudentLessonSummaryResponse>> getLessonsByCourse(
             @PathVariable("courseId") Long courseId) {
 
         return ResponseEntity.ok(studyService.getLessonsByCourse(courseId));
     }
 
     @GetMapping("/lessons/{lessonId}")
-    public ResponseEntity<LessonResponse> getLessonDetail(
+    public ResponseEntity<StudentLessonResponse> getLessonDetail(
             @PathVariable("lessonId") Long lessonId) {
 
         return ResponseEntity.ok(studyService.getLessonDetail(lessonId));
@@ -66,8 +67,8 @@ public class StudyController {
     public ResponseEntity<QuizResponse> getQuiz(
             @PathVariable("lessonId") Long lessonId) {
 
-        return ResponseEntity.ok(
-                studyService.getQuiz(lessonId));
+        return studyService.getQuiz(lessonId).map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping("/lessons/{lessonId}/quiz/{quizId}/questions/{questionId}/answer")
@@ -78,28 +79,28 @@ public class StudyController {
             @RequestParam("optionId") Long optionId) {
 
         return ResponseEntity.ok(
-                studyService.answerQuestion(lessonId,quizId,questionId,optionId));
-        }
+                studyService.answerQuestion(lessonId, quizId, questionId, optionId));
+    }
 
-        @PostMapping("/lessons/{lessonId}/progress")
-        public ResponseEntity<LessonProgressResponse> updateLessonProgress(
-                @PathVariable("lessonId") Long lessonId,
-                @Valid @RequestBody ReqUpdateLessonProgress request) {
+    @PostMapping("/lessons/{lessonId}/progress")
+    public ResponseEntity<LessonProgressResponse> updateLessonProgress(
+            @PathVariable("lessonId") Long lessonId,
+            @Valid @RequestBody ReqUpdateLessonProgress request) {
 
-        return ResponseEntity.ok(studyService.updateLessonProgress(lessonId,request));
-        }
+        return ResponseEntity.ok(studyService.updateLessonProgress(lessonId, request));
+    }
 
-        @GetMapping("/lessons/{lessonId}/progress")
-        public ResponseEntity<LessonProgressResponse> getLessonProgress(
-                @PathVariable("lessonId") Long lessonId) {
+    @GetMapping("/lessons/{lessonId}/progress")
+    public ResponseEntity<LessonProgressResponse> getLessonProgress(
+            @PathVariable("lessonId") Long lessonId) {
 
         return ResponseEntity.ok(studyService.getLessonProgress(lessonId));
-        }
+    }
 
-        @GetMapping("/courses/{courseId}/progress")
-        public ResponseEntity<CourseProgressResponse> getCourseProgress(
-                @PathVariable("courseId") Long courseId) {
+    @GetMapping("/courses/{courseId}/progress")
+    public ResponseEntity<CourseProgressResponse> getCourseProgress(
+            @PathVariable("courseId") Long courseId) {
 
         return ResponseEntity.ok(studyService.getCourseProgress(courseId));
-        }
+    }
 }

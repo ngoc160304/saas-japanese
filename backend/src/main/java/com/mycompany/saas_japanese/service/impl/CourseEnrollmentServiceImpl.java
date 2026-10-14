@@ -130,7 +130,8 @@ public class CourseEnrollmentServiceImpl implements CourseEnrollmentService{
     public Page<CourseEnrollmentResponse> getMyCourses(CourseEnrollmentQuery query){
 
         User user = getCurrentUser();
-        PredicateSpecification<CourseEnrollment> spec = CourseEnrolmentSpecs.hasUserId(user.getId());
+        PredicateSpecification<CourseEnrollment> spec = CourseEnrolmentSpecs.hasUserId(user.getId())
+            .and(CourseEnrolmentSpecs.hasActiveCourse());
 
         if (query.getCourseTitle() != null && !query.getCourseTitle().trim().isEmpty()) {
             spec = spec.and(

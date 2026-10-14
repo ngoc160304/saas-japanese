@@ -127,10 +127,12 @@ class LessonContentIntegrationTest extends AuthTestSupport {
     }
 
     @Test
-    void mutationsRequireAdminAndReadsKeepExistingAuthenticatedPolicy() throws Exception {
+    void managementReadsAndWritesRequireAdmin() throws Exception {
         for (String path : new String[] {"/api/v1/vocabularies", "/api/v1/kanjis"}) {
             mvc.perform(get(path)).andExpect(status().isUnauthorized());
-            mvc.perform(get(path).with(jwt())).andExpect(status().isOk());
+            mvc.perform(get(path).with(jwt())).andExpect(status().isForbidden());
+            mvc.perform(get(path).with(jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
             mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isUnauthorized());
             mvc.perform(post(path).with(jwt()).contentType(MediaType.APPLICATION_JSON).content("{}"))

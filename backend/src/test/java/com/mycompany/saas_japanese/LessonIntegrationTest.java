@@ -111,12 +111,12 @@ class LessonIntegrationTest extends AuthTestSupport {
         assertThat(persisted.getDeletedAt()).isNotNull();
         assertThat(lessons.countByCourseIdAndIsDeletedFalse(course.getId())).isEqualTo(1);
         assertThat(lessons.findByIdAndIsDeletedFalse(other.getId())).isPresent();
-        mvc.perform(get("/api/v1/lessons").with(jwt()).param("courseId", course.getId().toString()))
+        mvc.perform(get("/api/v1/lessons").with(admin).param("courseId", course.getId().toString()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.data.totalElements").value(1))
             .andExpect(jsonPath("$.data.content[0].id").value(kept.getId()));
-        mvc.perform(get("/api/v1/lessons").with(jwt()).param("search", "Removed"))
+        mvc.perform(get("/api/v1/lessons").with(admin).param("search", "Removed"))
             .andExpect(status().isOk()).andExpect(jsonPath("$.data.totalElements").value(0));
-        mvc.perform(get("/api/v1/lessons/{id}", id).with(jwt())).andExpect(status().isNotFound());
+        mvc.perform(get("/api/v1/lessons/{id}", id).with(admin)).andExpect(status().isNotFound());
         mvc.perform(delete("/api/v1/lessons/{id}", id).with(admin)).andExpect(status().isNotFound());
         mvc.perform(delete("/api/v1/lessons/{id}", Long.MAX_VALUE).with(admin))
             .andExpect(status().isNotFound());
@@ -419,16 +419,17 @@ class LessonIntegrationTest extends AuthTestSupport {
             .secureUrl("https://example.test/read-video").fileType(FileTypeEnum.VIDEO).isUsed(true).build());
         Lesson lesson = lessons.save(Lesson.builder().course(course).title("Readable lesson")
             .slug("readable-lesson").videoMedia(video).build());
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
 
         try {
-            mvc.perform(get("/api/v1/lessons/{id}", lesson.getId()).with(jwt()))
+            mvc.perform(get("/api/v1/lessons/{id}", lesson.getId()).with(admin))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(lesson.getId()))
                 .andExpect(jsonPath("$.data.courseId").value(course.getId()))
                 .andExpect(jsonPath("$.data.videoMediaId").value(video.getId()))
                 .andExpect(jsonPath("$.data.videoUrl").value(video.getSecureUrl()));
 
-            mvc.perform(get("/api/v1/lessons").with(jwt())
+            mvc.perform(get("/api/v1/lessons").with(admin)
                     .param("courseId", course.getId().toString())
                     .param("page", "0")
                     .param("size", "12"))
@@ -455,8 +456,9 @@ class LessonIntegrationTest extends AuthTestSupport {
         mvc.perform(delete("/api/v1/lessons/course/{id}", lesson.getCourse().getId()))
             .andExpect(status().isUnauthorized());
         assertThat(lessons.findByIdAndIsDeletedFalse(lesson.getId())).isPresent();
+        var admin = jwt().authorities(new SimpleGrantedAuthority("ROLE_ADMIN"));
         for (String size : new String[] {"0", "13"}) {
-            mvc.perform(get("/api/v1/lessons").with(jwt()).param("size", size))
+            mvc.perform(get("/api/v1/lessons").with(admin).param("size", size))
                 .andExpect(status().isBadRequest());
         }
     }

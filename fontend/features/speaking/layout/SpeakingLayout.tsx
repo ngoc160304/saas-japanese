@@ -1,47 +1,20 @@
-interface SpeakingLayoutProps {
-  children: React.ReactNode;
-}
+import type { ReactNode } from 'react';
 
-export default function SpeakingLayout({ children }: SpeakingLayoutProps) {
+export default function SpeakingLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="min-h-screen bg-[#F4F6F9] p-4 md:p-6">
-      <div
-        className="
-          mx-auto
-          max-w-7xl
-          rounded-[16px]
-          border
-          border-[#E2E8F0]
-          bg-white
-          p-4
-          shadow-[0px_4px_20px_rgba(0,0,0,0.03)]
-          md:p-5
-        "
+    <div className="mx-auto min-w-0 max-w-6xl">
+      <header className="mb-6">
+        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
+          Hội thoại với AI
+        </h1>
+        <p className="mt-1 text-sm text-slate-500">Luyện nói tiếng Nhật theo chủ đề.</p>
+      </header>
+      <section
+        aria-label="Luyện hội thoại"
+        className="rounded-3xl border border-slate-100 bg-white p-4 shadow-soft md:p-6"
       >
-        {/* Header */}
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-xl font-semibold text-[#1E293B]">HỘI THOẠI VỚI AI</h1>
-
-            <p className="mt-1 text-xs text-[#64748B]">Luyện nói tiếng Nhật với AI</p>
-          </div>
-
-          <span className="text-xl font-semibold text-[#2B4C7E]">THEO CHỦ ĐỀ</span>
-        </div>
-
-        {/* Content */}
-        <div
-          className="
-            rounded-[16px]
-            border
-            border-[#E2E8F0]
-            bg-white
-            p-0
-          "
-        >
-          {children}
-        </div>
-      </div>
-    </main>
+        {children}
+      </section>
+    </div>
   );
 }

@@ -1,81 +1,76 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
+import { AnimatePresence, useReducedMotion } from 'motion/react';
+import type { TrackReferenceOrPlaceholder } from '@livekit/components-react';
+import { Bot } from 'lucide-react';
+import type { TranscriptMessage } from '../types';
 import MessageBubble from './MessageBubble';
 import SpeakingWaveform from './SpeakingWaveform';
 import SpeakingControls from './SpeakingControls';
-import { Bot } from 'lucide-react';
 
 interface ConversationProps {
-  trackRef: any;
-  messages: {
-    id: string;
-    role: 'user' | 'ai';
-    message: string;
-  }[];
+  trackRef: TrackReferenceOrPlaceholder;
+  messages: TranscriptMessage[];
+  pendingAi: boolean;
+  microphoneEnabled: boolean;
+  microphonePending: boolean;
+  onToggleMicrophone: () => void;
   onEnd: () => void;
 }
 
-export default function Conversation({ trackRef, messages, onEnd }: ConversationProps) {
-  const shouldReduceMotion = useReducedMotion();
-  const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-
+export default function Conversation({
+  trackRef,
+  messages,
+  pendingAi,
+  microphoneEnabled,
+  microphonePending,
+  onToggleMicrophone,
+  onEnd,
+}: ConversationProps) {
+  const reduceMotion = useReducedMotion();
+  const containerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if (!messagesContainerRef.current) return;
-    const container = messagesContainerRef.current;
-    const behavior = shouldReduceMotion ? 'auto' : 'smooth';
-
-    const scrollToBottom = () => {
-      container.scrollTo({ top: container.scrollHeight, behavior });
-    };
-
-    if (behavior === 'smooth') {
-      requestAnimationFrame(scrollToBottom);
-    } else {
-      scrollToBottom();
-    }
-  }, [messages, shouldReduceMotion]);
-
+    const container = containerRef.current;
+    container?.scrollTo({
+      top: container.scrollHeight,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  }, [messages, pendingAi, reduceMotion]);
   return (
-    <div className="flex h-full w-full flex-col p-0">
-      {/* Header */}
-      <div className="flex justify-center border-b border-slate-100 py-4">
-        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-blue-50 text-[#2B4C7E] ring-4 ring-blue-50/50">
-          <Bot className="h-8 w-8" strokeWidth={1.8} />
-        </div>
-
+    <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex shrink-0 items-center justify-center gap-2 border-b border-slate-100 py-3 text-primary">
+        <Bot className="size-6" aria-hidden="true" />
+        <h2 className="font-semibold">Hội thoại trực tiếp</h2>
       </div>
-
-      {/* Messages Container (Tự động phình to h-full để chiếm hết khoảng trống) */}
       <div
-        ref={messagesContainerRef}
-        className="
-          flex-1 space-y-4 overflow-y-auto py-4 pr-2
-          [&::-webkit-scrollbar]:w-1.5
-          [&::-webkit-scrollbar-thumb]:rounded-full
-          [&::-webkit-scrollbar-thumb]:bg-slate-200
-        "
+        ref={containerRef}
+        role="log"
+        aria-label="Nội dung hội thoại"
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-2 py-4"
       >
-        {messages.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center text-slate-400">
-            <span className="text-3xl mb-2">🎙️</span>
-            <p className="text-sm font-medium">Hãy bắt đầu nói để AI phản hồi...</p>
-          </div>
-        ) : (
-          <AnimatePresence initial={false}>
-            {messages.map((message) => (
-              <MessageBubble key={message.id} role={message.role} message={message.message} />
-            ))}
-          </AnimatePresence>
+        {!messages.length && (
+          <p className="py-8 text-center text-sm text-slate-500">Hãy bắt đầu nói để AI phản hồi.</p>
+        )}
+        <AnimatePresence initial={false}>
+          {messages.map((message) => (
+            <MessageBubble key={message.id} role={message.role} message={message.message} />
+          ))}
+        </AnimatePresence>
+        {pendingAi && (
+          <p role="status" className="text-sm text-slate-500">
+            AI đang chuẩn bị phản hồi…
+          </p>
         )}
       </div>
-
-      {/* Bottom Area (Sóng âm + Nút bấm ghim chặt xuống đáy) */}
-      <div className="mt-auto border-t border-slate-100 py-6 flex flex-col items-center gap-4">
-
+      <div className="flex shrink-0 flex-col items-center gap-3 border-t border-slate-100 py-4">
         <SpeakingWaveform trackRef={trackRef} />
-        <SpeakingControls onEnd={onEnd} />
+        <SpeakingControls
+          onEnd={onEnd}
+          microphoneEnabled={microphoneEnabled}
+          microphonePending={microphonePending}
+          onToggleMicrophone={onToggleMicrophone}
+        />
       </div>
     </div>
   );

@@ -1,0 +1,62 @@
+.grammar {
+  contain: content;
+  isolation: isolate;
+  overflow-wrap: anywhere;
+  font-size: 0.9375rem;
+  line-height: 1.9;
+  color: #334155;
+}
+.grammar :is(p, ul, ol, blockquote, pre, table) {
+  margin-block: 1rem;
+}
+.grammar :is(h1, h2, h3, h4, h5, h6) {
+  margin-block: 1.5rem 0.75rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+.grammar :is(h1, h2) {
+  font-size: 1.25rem;
+}
+.grammar h3 {
+  font-size: 1.125rem;
+}
+.grammar ul {
+  list-style: disc;
+  padding-inline-start: 1.5rem;
+}
+.grammar ol {
+  list-style: decimal;
+  padding-inline-start: 1.5rem;
+}
+.grammar blockquote {
+  border-inline-start: 3px solid #bae6fd;
+  padding-inline-start: 1rem;
+}
+.grammar a {
+  color: #0369a1;
+  text-decoration: underline;
+}
+.grammar a:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 3px;
+}
+.grammar pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  background: #f1f5f9;
+  padding: 1rem;
+}
+.grammar table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+.grammar :is(th, td) {
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 0.75rem;
+}
+.grammar hr {
+  margin-block: 1.5rem;
+  border-color: #e2e8f0;
+}

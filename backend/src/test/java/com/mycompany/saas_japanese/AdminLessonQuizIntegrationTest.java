@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -39,16 +40,21 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.CourseCategory;
+import com.mycompany.saas_japanese.domain.CourseEnrollment;
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.Quiz;
 import com.mycompany.saas_japanese.domain.QuizQuestion;
+import com.mycompany.saas_japanese.domain.User;
+import com.mycompany.saas_japanese.repository.CourseEnrollmentRepository;
 import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
 import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.QuizOptionRepository;
 import com.mycompany.saas_japanese.repository.QuizQuestionRepository;
 import com.mycompany.saas_japanese.repository.QuizRepository;
+import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.util.constant.QuizQuestionTypeEnum;
+import com.mycompany.saas_japanese.util.constant.UserRoleEnum;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -66,8 +72,11 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
   @Autowired private QuizOptionRepository options;
   @Autowired private PlatformTransactionManager transactions;
   @Autowired private JdbcTemplate jdbc;
+  @Autowired private UserRepository users;
+  @Autowired private CourseEnrollmentRepository enrollments;
   private MockMvc mvc;
   private Lesson lesson;
+  private User enrolledStudent;
 
   @BeforeEach
   void setup() {
@@ -75,8 +84,21 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
     String slug = UUID.randomUUID().toString();
     CourseCategory category = categories.save(CourseCategory.builder().name("Quiz tests").slug(slug).build());
     Course course = courses.save(Course.builder().category(category).title("Quiz tests").slug(slug)
-        .price(BigDecimal.ZERO).build());
+        .price(BigDecimal.ZERO).isPublished(true).build());
     lesson = lessons.save(Lesson.builder().course(course).title("Draft").slug(slug).grammar("Keep draft").build());
+    enrolledStudent = new User();
+    enrolledStudent.setEmail("quiz-student-" + slug + "@example.test");
+    enrolledStudent.setRole(UserRoleEnum.student);
+    enrolledStudent.setActive(true);
+    enrolledStudent.setVerified(true);
+    enrolledStudent = users.save(enrolledStudent);
+    enrollments.save(CourseEnrollment.builder().user(enrolledStudent).course(course).build());
+  }
+
+  @AfterEach
+  void removeStudentFixture() {
+    jdbc.update("delete from user_course_enrollments where user_id = ?", enrolledStudent.getId());
+    users.deleteById(enrolledStudent.getId());
   }
 
   @Test
@@ -254,7 +276,7 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
     String study = "/api/v1/study/lessons/" + lesson.getId() + "/quiz";
     String answer = study + "/" + id + "/questions/" + questionId + "/answer";
     publication(id, true).andExpect(status().isOk());
-    mvc.perform(get(study).with(student())).andExpect(status().isBadRequest());
+    mvc.perform(get(study).with(student())).andExpect(status().isNotFound());
     lesson.setIsPublished(true);
     lessons.saveAndFlush(lesson);
     mvc.perform(get(study).with(student())).andExpect(status().isOk())
@@ -268,12 +290,12 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
     mvc.perform(post(answer).with(student()).param("optionId", Long.toString(incorrect)))
         .andExpect(status().isOk()).andExpect(jsonPath("$.data.correct").value(false));
     publication(id, false).andExpect(status().isOk());
-    mvc.perform(get(study).with(student())).andExpect(status().isNotFound());
+    mvc.perform(get(study).with(student())).andExpect(status().isNoContent());
     mvc.perform(post(answer).with(student()).param("optionId", Long.toString(correct)))
         .andExpect(status().isNotFound());
     publication(id, true).andExpect(status().isOk());
     admin(delete(path(id)), null).andExpect(status().isNoContent());
-    mvc.perform(get(study).with(student())).andExpect(status().isNotFound());
+    mvc.perform(get(study).with(student())).andExpect(status().isNoContent());
     mvc.perform(post(answer).with(student()).param("optionId", Long.toString(correct)))
         .andExpect(status().isNotFound());
   }
@@ -333,7 +355,7 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
         .param("optionId", firstOptions.get(1).getId().toString()))
         .andExpect(status().isOk()).andExpect(jsonPath("$.data.correct").value(true));
     publication(quizId, false).andExpect(status().isOk());
-    mvc.perform(get(study + "/quiz").with(student())).andExpect(status().isNotFound());
+    mvc.perform(get(study + "/quiz").with(student())).andExpect(status().isNoContent());
     admin(delete(path(quizId)), null).andExpect(status().isNoContent());
     admin(get(lessonPath), null).andExpect(status().isOk())
         .andExpect(jsonPath("$.data.grammar").value("<p>Saved grammar</p>"))
@@ -492,7 +514,8 @@ class AdminLessonQuizIntegrationTest extends AuthTestSupport {
   }
 
   private RequestPostProcessor student() {
-    return jwt().authorities(new SimpleGrantedAuthority("ROLE_USER"));
+    return jwt().jwt(token -> token.subject(enrolledStudent.getEmail()))
+        .authorities(new SimpleGrantedAuthority("ROLE_STUDENT"));
   }
 
   private long createQuiz() throws Exception {

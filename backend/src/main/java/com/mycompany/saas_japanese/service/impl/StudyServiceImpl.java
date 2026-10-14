@@ -3,17 +3,24 @@ package com.mycompany.saas_japanese.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mycompany.saas_japanese.domain.Course;
 import com.mycompany.saas_japanese.domain.CourseEnrollment;
 import com.mycompany.saas_japanese.domain.Lesson;
 import com.mycompany.saas_japanese.domain.LessonProgress;
+import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.Quiz;
 import com.mycompany.saas_japanese.domain.QuizOption;
 import com.mycompany.saas_japanese.domain.QuizQuestion;
@@ -22,17 +29,20 @@ import com.mycompany.saas_japanese.domain.request.ReqUpdateLessonProgress;
 import com.mycompany.saas_japanese.domain.response.CourseProgressResponse;
 import com.mycompany.saas_japanese.domain.response.KanjiResponse;
 import com.mycompany.saas_japanese.domain.response.LessonProgressResponse;
-import com.mycompany.saas_japanese.domain.response.LessonResponse;
 import com.mycompany.saas_japanese.domain.response.QuizAnswerResponse;
 import com.mycompany.saas_japanese.domain.response.QuizResponse;
+import com.mycompany.saas_japanese.domain.response.StudentLessonResponse;
+import com.mycompany.saas_japanese.domain.response.StudentLessonSummaryResponse;
 import com.mycompany.saas_japanese.domain.response.VocabularyResponse;
 import com.mycompany.saas_japanese.repository.CourseEnrollmentRepository;
+import com.mycompany.saas_japanese.repository.CourseRepository;
 import com.mycompany.saas_japanese.repository.KanjiRepository;
 import com.mycompany.saas_japanese.repository.LessonProgressRepository;
 import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.QuizOptionRepository;
 import com.mycompany.saas_japanese.repository.QuizQuestionRepository;
 import com.mycompany.saas_japanese.repository.QuizRepository;
+import com.mycompany.saas_japanese.repository.StudyCourseStatistics;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.repository.VocabularyRepository;
 import com.mycompany.saas_japanese.service.StudyService;
@@ -42,547 +52,228 @@ import com.mycompany.saas_japanese.service.mapper.LessonProgressMapper;
 import com.mycompany.saas_japanese.service.mapper.QuizMapper;
 import com.mycompany.saas_japanese.service.mapper.VocabularyMapper;
 import com.mycompany.saas_japanese.util.SecurityUtil;
+import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
-import com.mycompany.saas_japanese.util.error.NotFoundException;
 import com.mycompany.saas_japanese.util.error.ConflictException;
+import com.mycompany.saas_japanese.util.error.ForbiddenException;
+import com.mycompany.saas_japanese.util.error.NotFoundException;
 
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class StudyServiceImpl implements StudyService {
-    
-    UserRepository userRepository;
-
-    LessonProgressRepository lessonProgressRepository;
-
-    LessonRepository lessonRepository;
-
-    VocabularyRepository vocabularyRepository;
-
-    KanjiRepository kanjiRepository;
-
-    QuizRepository quizRepository;
-
-    QuizQuestionRepository quizQuestionRepository;
-
-    QuizOptionRepository quizOptionRepository;
-
-    CourseEnrollmentRepository courseEnrollmentRepository;
-
-    LessonMapper lessonMapper;
-
-    VocabularyMapper vocabularyMapper;
-
-    KanjiMapper kanjiMapper;
-
-    QuizMapper quizMapper;
-    
-    LessonProgressMapper lessonProgressMapper;
+    private final UserRepository userRepository;
+    private final LessonProgressRepository lessonProgressRepository;
+    private final LessonRepository lessonRepository;
+    private final CourseRepository courseRepository;
+    private final VocabularyRepository vocabularyRepository;
+    private final KanjiRepository kanjiRepository;
+    private final QuizRepository quizRepository;
+    private final QuizQuestionRepository quizQuestionRepository;
+    private final QuizOptionRepository quizOptionRepository;
+    private final CourseEnrollmentRepository courseEnrollmentRepository;
+    private final LessonMapper lessonMapper;
+    private final VocabularyMapper vocabularyMapper;
+    private final KanjiMapper kanjiMapper;
+    private final QuizMapper quizMapper;
+    private final LessonProgressMapper lessonProgressMapper;
 
     @Override
-    public List<LessonResponse> getLessonsByCourse(
-            Long courseId) {
+    public List<StudentLessonSummaryResponse> getLessonsByCourse(Long courseId) {
         User user = getCurrentUser();
-        Long userId = user.getId();
-
-        checkEnrollment(userId,courseId);
-
-        List<Lesson> lessons = lessonRepository
-                .findAllByCourseIdAndIsDeletedFalse(courseId);
-
-        return lessons.stream()
-                .filter(lesson -> Boolean.TRUE.equals(
-                        lesson.getIsPublished()))
-                .map(lessonMapper::toResponse)
-                .toList();
+        availableCourse(courseId);
+        requireEnrollment(user.getId(), courseId);
+        return lessonRepository.findStudyLessons(courseId, user.getId());
     }
 
     @Override
-    public LessonResponse getLessonDetail(
-            Long lessonId) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        if (lesson.getCourse() == null) {
-            throw new BadRequestException(
-                    "Lesson chưa thuộc course");
-        }
-
+    public StudentLessonResponse getLessonDetail(Long lessonId) {
         User user = getCurrentUser();
-        Long userId = user.getId();
-
-        checkEnrollment(
-                userId,
-                lesson.getCourse().getId());
-
-        checkPublished(lesson);
-
-        return lessonMapper.toResponse(lesson);
+        return lessonMapper.toStudentResponse(authorizedLesson(user.getId(), lessonId));
     }
 
     @Override
-    public List<VocabularyResponse> getVocabularies(
-            Long lessonId) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        checkPublished(lesson);
-
-        return vocabularyRepository
-                .findAllByLessonIdAndDeletedAtIsNull(lessonId)
-                .stream()
-                .map(vocabularyMapper::toResponse)
-                .toList();
+    public List<VocabularyResponse> getVocabularies(Long lessonId) {
+        authorizedLesson(getCurrentUser().getId(), lessonId);
+        return vocabularyRepository.findAllByLessonIdAndDeletedAtIsNull(lessonId).stream()
+                .map(vocabularyMapper::toResponse).toList();
     }
 
     @Override
-    public List<KanjiResponse> getKanjis(
-            Long lessonId) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        checkPublished(lesson);
-
-        return kanjiRepository
-                .findAllByLessonIdAndDeletedAtIsNull(lessonId)
-                .stream()
-                .map(kanjiMapper::toResponse)
-                .toList();
+    public List<KanjiResponse> getKanjis(Long lessonId) {
+        authorizedLesson(getCurrentUser().getId(), lessonId);
+        return kanjiRepository.findAllByLessonIdAndDeletedAtIsNull(lessonId).stream()
+                .map(kanjiMapper::toResponse).toList();
     }
 
     @Override
-    public QuizResponse getQuiz(
-            Long lessonId) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        checkPublished(lesson);
-
-        Quiz quiz = publishedQuiz(lessonId);
-        List<QuizQuestion> questions = quizQuestionRepository
-                .findByQuizIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(quiz.getId());
-        Map<Long, List<QuizOption>> optionsByQuestionId = questions.isEmpty() ? Map.of()
-                : quizOptionRepository.findByQuestionIdInOrderBySortOrderAscIdAsc(
-                        questions.stream().map(QuizQuestion::getId).toList())
-                        .stream().collect(Collectors.groupingBy(option -> option.getQuestion().getId()));
-
-        return quizMapper.toResponse(
-                quiz,
-                questions,
-                optionsByQuestionId);
+    public Optional<QuizResponse> getQuiz(Long lessonId) {
+        authorizedLesson(getCurrentUser().getId(), lessonId);
+        return publishedQuiz(lessonId).map(quiz -> {
+            List<QuizQuestion> questions = quizQuestionRepository
+                    .findByQuizIdAndDeletedAtIsNullOrderBySortOrderAscIdAsc(quiz.getId());
+            Map<Long, List<QuizOption>> optionsByQuestionId = questions.isEmpty() ? Map.of()
+                    : quizOptionRepository.findByQuestionIdInOrderBySortOrderAscIdAsc(
+                            questions.stream().map(QuizQuestion::getId).toList()).stream()
+                            .collect(Collectors.groupingBy(option -> option.getQuestion().getId()));
+            return quizMapper.toResponse(quiz, questions, optionsByQuestionId);
+        });
     }
 
     @Override
-    public QuizAnswerResponse answerQuestion(
-            Long lessonId,
-            Long quizId,
-            Long questionId,
-            Long optionId) {
-
-        // Use the same stable parent lock as administration while evaluating an answer.
+    @Transactional
+    public QuizAnswerResponse answerQuestion(Long lessonId, Long quizId, Long questionId, Long optionId) {
+        User user = getCurrentUser();
+        // Match the administration lock so option replacement cannot race answer evaluation.
         Lesson lesson = lessonRepository.findActiveForUpdate(lessonId)
-                .orElseThrow(() -> new NotFoundException("Lesson không tồn tại"));
-        checkPublished(lesson);
-        Quiz quiz = publishedQuiz(lessonId);
-        if (!quiz.getId().equals(quizId)) {
-            throw new NotFoundException("Quiz không tồn tại trong lesson này");
+                .orElseThrow(() -> new NotFoundException("Lesson not found"));
+        Course course = lesson.getCourse();
+        if (!Boolean.TRUE.equals(lesson.getIsPublished()) || lesson.getDeletedAt() != null
+                || course == null || !Boolean.TRUE.equals(course.getIsPublished()) || course.getDeletedAt() != null) {
+            throw new NotFoundException("Lesson not found");
         }
-
-        QuizQuestion question = quizQuestionRepository
-                .findByIdAndDeletedAtIsNull(questionId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Câu hỏi không tồn tại"));
-
-        if (question.getQuiz() == null
-                || !question.getQuiz()
-                        .getId()
-                        .equals(quizId)) {
-
-            throw new BadRequestException(
-                    "Câu hỏi không thuộc quiz này");
+        requireEnrollment(user.getId(), course.getId());
+        Quiz quiz = publishedQuiz(lessonId).filter(item -> item.getId().equals(quizId))
+                .orElseThrow(() -> new NotFoundException("Quiz not found in this lesson"));
+        QuizQuestion question = quizQuestionRepository.findByIdAndDeletedAtIsNull(questionId)
+                .orElseThrow(() -> new NotFoundException("Question not found"));
+        if (question.getQuiz() == null || !question.getQuiz().getId().equals(quiz.getId())) {
+            throw new BadRequestException("Question does not belong to this quiz");
         }
-
-        QuizOption option = quizOptionRepository
-                .findById(optionId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Đáp án không tồn tại"));
-
-        if (option.getQuestion() == null
-                || !option.getQuestion()
-                        .getId()
-                        .equals(questionId)) {
-
-            throw new BadRequestException(
-                    "Đáp án không thuộc câu hỏi này");
+        QuizOption option = quizOptionRepository.findById(optionId)
+                .orElseThrow(() -> new NotFoundException("Option not found"));
+        if (option.getQuestion() == null || !option.getQuestion().getId().equals(questionId)) {
+            throw new BadRequestException("Option does not belong to this question");
         }
-
-        boolean correct = Boolean.TRUE.equals(
-                option.getIsCorrect());
-
-        Long correctOptionId = quizOptionRepository
-                .findByQuestionIdOrderBySortOrderAsc(
-                        questionId)
-                .stream()
-                .filter(o -> Boolean.TRUE.equals(
-                        o.getIsCorrect()))
-                .map(QuizOption::getId)
-                .findFirst()
-                .orElse(null);
-
-        return QuizAnswerResponse.builder()
-                .correct(correct)
-                .correctOptionId(correctOptionId)
-                .message(
-                        correct
-                                ? "Chính xác!"
-                                : "Đáp án chưa chính xác!")
-                .build();
+        boolean correct = Boolean.TRUE.equals(option.getIsCorrect());
+        Long correctOptionId = quizOptionRepository.findByQuestionIdOrderBySortOrderAsc(questionId).stream()
+                .filter(item -> Boolean.TRUE.equals(item.getIsCorrect())).map(QuizOption::getId)
+                .findFirst().orElse(null);
+        return QuizAnswerResponse.builder().correct(correct).correctOptionId(correctOptionId)
+                .message(correct ? "Chính xác!" : "Đáp án chưa chính xác!").build();
     }
 
     @Override
-    public LessonProgressResponse updateLessonProgress(
-                Long lessonId,
-                ReqUpdateLessonProgress request) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-
-        if (lesson.getCourse() == null) {
-                throw new BadRequestException(
-                        "Lesson chưa thuộc course");
-        }
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public LessonProgressResponse updateLessonProgress(Long lessonId, ReqUpdateLessonProgress request) {
         User user = getCurrentUser();
-        Long userId = user.getId();
+        Lesson lesson = lessonRepository.findAvailableForStudy(lessonId)
+                .orElseThrow(() -> new NotFoundException("Lesson not found"));
         Long courseId = lesson.getCourse().getId();
-        checkPublished(lesson);
-        checkEnrollment(userId, courseId);
-
-        Integer watchDuration =
-                request.getWatchDuration();
-
-        Integer videoDuration =
-                request.getVideoDuration();
-
-        if (watchDuration == null || watchDuration < 0) {
-                throw new BadRequestException(
-                        "Watch duration không hợp lệ");
+        // Serialize all lesson updates for this enrollment, including the first insert and course totals.
+        // READ_COMMITTED ensures queries after waiting on the lock see the preceding writer's changes on MySQL.
+        CourseEnrollment enrollment = courseEnrollmentRepository.findForStudyUpdate(user.getId(), courseId)
+                .orElseThrow(() -> new ForbiddenException("Course enrollment required"));
+        validateVideoProgress(lesson, request);
+        int videoDuration = request.getVideoDuration();
+        LessonProgress progress = lessonProgressRepository.findByUserIdAndLessonId(user.getId(), lessonId)
+                .orElseGet(() -> LessonProgress.builder().user(user).lesson(lesson).watchDuration(0)
+                        .isCompleted(false).build());
+        int previousWatch = progress.getWatchDuration() == null ? 0 : progress.getWatchDuration();
+        int watched = Math.min(videoDuration, Math.max(previousWatch, request.getWatchDuration()));
+        progress.setWatchDuration(watched);
+        progress.setVideoDuration(videoDuration);
+        progress.setProgressPercent(percentage(watched, videoDuration));
+        Instant now = Instant.now();
+        progress.setLastWatchedAt(now);
+        // Evaluate the exact boundary before display rounding. Completion is sticky across later updates.
+        if ((long) watched * 100 >= (long) videoDuration * 80 && !Boolean.TRUE.equals(progress.getIsCompleted())) {
+            progress.setIsCompleted(true);
+            progress.setCompletedAt(now);
         }
-
-        if (videoDuration == null || videoDuration <= 0) {
-                throw new BadRequestException(
-                        "Video duration không hợp lệ");
+        lessonProgressRepository.saveAndFlush(progress);
+        BigDecimal coursePercent = coursePercentage(lessonRepository.summarizeStudyProgress(courseId, user.getId()));
+        enrollment.setProgressPercent(coursePercent);
+        if (coursePercent.compareTo(BigDecimal.valueOf(100)) == 0 && enrollment.getCompletedAt() == null) {
+            enrollment.setCompletedAt(now);
         }
-
-        if (watchDuration > videoDuration) {
-                watchDuration = videoDuration;
-        }
-
-        LessonProgress progress =
-                lessonProgressRepository
-                        .findByUserIdAndLessonId(userId, lessonId)
-                        .orElse(null);
-
-        if (progress == null) {
-
-        progress = LessonProgress.builder()
-                .user(user)
-                .lesson(lesson)
-                .watchDuration(watchDuration)
-                .videoDuration(videoDuration)
-                .progressPercent(BigDecimal.ZERO)
-                .isCompleted(false)
-                .build();
-
-        } else {
-
-                Integer oldWatchDuration =
-                        progress.getWatchDuration();
-
-                if (oldWatchDuration == null) {
-                oldWatchDuration = 0;
-                }
-
-                progress.setWatchDuration(
-                        Math.max(oldWatchDuration, watchDuration));
-                progress.setVideoDuration(videoDuration);
-        }
-
-        BigDecimal progressPercent =
-                BigDecimal.valueOf(progress.getWatchDuration())
-                        .multiply(BigDecimal.valueOf(100))
-                        .divide(BigDecimal.valueOf(
-                                progress.getVideoDuration()),
-                                2,
-                                RoundingMode.HALF_UP);
-
-        if (progressPercent.compareTo(
-                BigDecimal.valueOf(100)) > 0) {
-
-                progressPercent =
-                        BigDecimal.valueOf(100);
-        }
-
-        progress.setProgressPercent(progressPercent);
-        progress.setLastWatchedAt(Instant.now());
-
-        if (progressPercent.compareTo(
-                BigDecimal.valueOf(80)) >= 0) {
-
-                if (!Boolean.TRUE.equals(progress.getIsCompleted())) {
-
-                progress.setIsCompleted(true);
-                progress.setCompletedAt(
-                        Instant.now());
-                }
-
-        }
-
-        progress =lessonProgressRepository.save(progress);
-
-        BigDecimal courseProgressPercent =
-                calculateCourseProgress(userId, courseId);
-
-        CourseEnrollment enrollment =
-                courseEnrollmentRepository
-                        .findByUserIdAndCourseId(userId, courseId)
-                        .orElseThrow(
-                                () -> new BadRequestException(
-                                "Không tìm thấy đăng ký chương trình"));
-
-        enrollment.setProgressPercent(courseProgressPercent);
-
-        if (courseProgressPercent.compareTo(
-                BigDecimal.valueOf(100)) >= 0) {
-
-                if (enrollment.getCompletedAt() == null) {
-
-                enrollment.setCompletedAt(
-                        Instant.now());
-                }
-        }
-
-        courseEnrollmentRepository.save(
-                enrollment);
-
-        return lessonProgressMapper.toResponse(
-                progress,
-                courseProgressPercent);
-        }
-
-    @Override
-    @Transactional(readOnly = true)
-    public LessonProgressResponse getLessonProgress(
-                Long lessonId) {
-
-        Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
-                .orElseThrow(
-                        () -> new NotFoundException(
-                                "Lesson không tồn tại"));
-
-        if (lesson.getCourse() == null) {
-                throw new BadRequestException(
-                        "Lesson chưa thuộc course");
-        }
-
-        Long courseId =lesson.getCourse().getId();
-        User user = getCurrentUser();
-        Long userId = user.getId();
-        checkEnrollment(userId, courseId);
-
-        checkPublished(lesson);
-
-        LessonProgress progress =lessonProgressRepository
-                .findByUserIdAndLessonId(userId, lessonId)
-                .orElse(null);
-
-        // Chưa từng xem
-        if (progress == null) {
-
-                return LessonProgressResponse.builder()
-                        .lessonId(lessonId)
-                        .watchDuration(0)
-                        .videoDuration(0)
-                        .progressPercent(BigDecimal.ZERO)
-                        .isCompleted(false)
-                        .lastWatchedAt(null)
-                        .completedAt(null)
-                        .courseProgressPercent(
-                                calculateCourseProgress(
-                                        userId,
-                                        courseId))
-                        .build();
-        }
-
-        BigDecimal courseProgressPercent =calculateCourseProgress(userId, courseId);
-
-        return lessonProgressMapper.toResponse(
-                progress,
-                courseProgressPercent);
-        }
-
-    @Override
-    @Transactional(readOnly = true)
-    public CourseProgressResponse getCourseProgress(
-        Long courseId) {
-        User user = getCurrentUser();
-        Long userId = user.getId();
-        CourseEnrollment enrollment = courseEnrollmentRepository
-                        .findByUserIdAndCourseId(userId, courseId)
-                        .orElseThrow(
-                                () -> new BadRequestException(
-                                        "Bạn chưa đăng ký chương trình này"));
-
-        List<Lesson> lessons = lessonRepository
-                        .findAllByCourseIdAndIsDeletedFalse(courseId)
-                        .stream()
-                        .filter(lesson ->Boolean.TRUE.equals(
-                                lesson.getIsPublished()))
-                        .toList();
-
-        long totalLessons = lessons.size();
-
-        long completedLessons = lessonProgressRepository
-                        .countByUserIdAndLessonCourseIdAndIsCompletedTrue(
-                                userId,
-                                courseId);
-
-        BigDecimal progressPercent;
-
-        if (totalLessons == 0) {
-
-                progressPercent = BigDecimal.ZERO;
-
-        } else {
-                progressPercent = BigDecimal.valueOf(completedLessons)
-                                .multiply(BigDecimal.valueOf(100))
-                                .divide(BigDecimal.valueOf(totalLessons),
-                                        2,
-                                        RoundingMode.HALF_UP);
-        }
-
-
-        Course course = enrollment.getCourse();
-        enrollment.setProgressPercent(progressPercent);
-        if (progressPercent.compareTo(
-                BigDecimal.valueOf(100)) >= 0) {
-                if (enrollment.getCompletedAt() == null) {
-                enrollment.setCompletedAt(Instant.now());
-                }
-
-        }
-
         courseEnrollmentRepository.save(enrollment);
+        return lessonProgressMapper.toResponse(progress, coursePercent);
+    }
 
-        return CourseProgressResponse.builder()
-                .courseId(courseId)
-                .courseTitle(course.getTitle())
-                .totalLessons(totalLessons)
-                .completedLessons(completedLessons)
-                .progressPercent(progressPercent)
-                .completedAt(
-                        enrollment.getCompletedAt())
-                .build();
-}
+    @Override
+    public LessonProgressResponse getLessonProgress(Long lessonId) {
+        User user = getCurrentUser();
+        Lesson lesson = authorizedLesson(user.getId(), lessonId);
+        BigDecimal coursePercent = coursePercentage(
+                lessonRepository.summarizeStudyProgress(lesson.getCourse().getId(), user.getId()));
+        return lessonProgressRepository.findByUserIdAndLessonId(user.getId(), lessonId)
+                .map(progress -> lessonProgressMapper.toResponse(progress, coursePercent))
+                .orElseGet(() -> LessonProgressResponse.builder().lessonId(lessonId).watchDuration(0).videoDuration(0)
+                        .progressPercent(BigDecimal.ZERO).isCompleted(false)
+                        .courseProgressPercent(coursePercent).build());
+    }
 
-    private Quiz publishedQuiz(Long lessonId) {
+    @Override
+    public CourseProgressResponse getCourseProgress(Long courseId) {
+        User user = getCurrentUser();
+        Course course = availableCourse(courseId);
+        CourseEnrollment enrollment = requireEnrollment(user.getId(), courseId);
+        StudyCourseStatistics statistics = lessonRepository.summarizeStudyProgress(courseId, user.getId());
+        return CourseProgressResponse.builder().courseId(courseId).courseTitle(course.getTitle())
+                .totalLessons(statistics.getTotalLessons()).completedLessons(statistics.getCompletedLessons())
+                .progressPercent(coursePercentage(statistics)).completedAt(enrollment.getCompletedAt()).build();
+    }
+
+    private Course availableCourse(Long courseId) {
+        return courseRepository.findAvailableForStudy(courseId)
+                .orElseThrow(() -> new NotFoundException("Course not found"));
+    }
+
+    private Lesson authorizedLesson(Long userId, Long lessonId) {
+        Lesson lesson = lessonRepository.findAvailableForStudy(lessonId)
+                .orElseThrow(() -> new NotFoundException("Lesson not found"));
+        requireEnrollment(userId, lesson.getCourse().getId());
+        return lesson;
+    }
+
+    private CourseEnrollment requireEnrollment(Long userId, Long courseId) {
+        return courseEnrollmentRepository.findByUserIdAndCourseId(userId, courseId)
+                .orElseThrow(() -> new ForbiddenException("Course enrollment required"));
+    }
+
+    private Optional<Quiz> publishedQuiz(Long lessonId) {
         List<Quiz> active = quizRepository.findByLessonIdAndDeletedAtIsNull(lessonId);
         if (active.size() > 1) {
             throw new ConflictException("Multiple active quizzes exist for this lesson; administrator repair required");
         }
-        return active.stream().filter(quiz -> Boolean.TRUE.equals(quiz.getIsPublished())).findFirst()
-                .orElseThrow(() -> new NotFoundException("Không tìm thấy quiz của lesson"));
+        return active.stream().filter(quiz -> Boolean.TRUE.equals(quiz.getIsPublished())).findFirst();
     }
 
-    private void checkEnrollment(
-            Long userId,
-            Long courseId) {
-
-        boolean isEnrolled =
-                courseEnrollmentRepository
-                        .existsByUserIdAndCourseId(
-                                userId,
-                                courseId);
-
-        if (!isEnrolled) {
-            throw new BadRequestException(
-                    "Bạn chưa đăng ký chương trình này");
+    private void validateVideoProgress(Lesson lesson, ReqUpdateLessonProgress request) {
+        Media video = lesson.getVideoMedia();
+        if (video == null || !Boolean.FALSE.equals(video.getIsDeleted()) || video.getDeletedAt() != null
+                || video.getFileType() != FileTypeEnum.VIDEO || video.getSecureUrl() == null
+                || video.getSecureUrl().isBlank()) {
+            throw new BadRequestException("This lesson has no available video to track");
+        }
+        if (request == null || request.getWatchDuration() == null || request.getWatchDuration() < 0
+                || request.getVideoDuration() == null || request.getVideoDuration() <= 0) {
+            throw new BadRequestException("watchDuration must be non-negative and videoDuration positive (seconds)");
         }
     }
 
-    private void checkPublished(
-            Lesson lesson) {
-
-        if (!Boolean.TRUE.equals(
-                lesson.getIsPublished())) {
-
-            throw new BadRequestException(
-                    "Lesson chưa được công khai");
-        }
+    private BigDecimal coursePercentage(StudyCourseStatistics statistics) {
+        return percentage(statistics.getCompletedLessons(), statistics.getTotalLessons());
     }
 
-        private BigDecimal calculateCourseProgress(
-                Long userId,
-                Long courseId) {
+    private BigDecimal percentage(long completed, long total) {
+        return total == 0 ? BigDecimal.ZERO : BigDecimal.valueOf(completed).multiply(BigDecimal.valueOf(100))
+                .divide(BigDecimal.valueOf(total), 2, RoundingMode.HALF_UP).max(BigDecimal.ZERO)
+                .min(BigDecimal.valueOf(100));
+    }
 
-        long totalLessons =lessonRepository
-                .countByCourseIdAndIsDeletedFalse(courseId);
-
-        if (totalLessons == 0) {
-                return BigDecimal.ZERO;
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new InsufficientAuthenticationException("Authentication required");
         }
-
-        long completedLessons =lessonProgressRepository
-                .countByUserIdAndLessonCourseIdAndIsCompletedTrue(userId, courseId);
-
-        return BigDecimal.valueOf(
-                completedLessons)
-                .multiply(BigDecimal.valueOf(100))
-                .divide(
-                        BigDecimal.valueOf(totalLessons),
-                        2,
-                        RoundingMode.HALF_UP);
-        }
-
-        private User getCurrentUser() {
-
-                String email = SecurityUtil
-                        .getCurrentUserLogin()
-                        .orElseThrow(
-                                () -> new BadRequestException(
-                                        "Người dùng chưa đăng nhập"));
-
-                return userRepository
-                        .findByEmail(email)
-                        .orElseThrow(
-                                () -> new NotFoundException(
-                                        "Người dùng không tồn tại"));
-}
+        String email = SecurityUtil.getCurrentUserLogin()
+                .orElseThrow(() -> new InsufficientAuthenticationException("Authentication required"));
+        return userRepository.findByEmail(email).filter(user -> user.isActive() && user.isVerified())
+                .orElseThrow(() -> new InsufficientAuthenticationException("Authenticated user unavailable"));
+    }
 }
