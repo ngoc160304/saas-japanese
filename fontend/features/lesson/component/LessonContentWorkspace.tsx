@@ -41,7 +41,7 @@ export function LessonContentWorkspace({
     tabParam === 'vocabulary' || tabParam === 'kanji' || tabParam === 'quiz' ? tabParam : 'grammar';
   const curriculumQuery = useQuery({
     queryKey: ['lessons', 'curriculum', courseId],
-    queryFn: () => lessonAPI.getCourseCurriculum(courseId),
+    queryFn: ({ signal }) => lessonAPI.getCourseCurriculum(courseId, signal),
     retry: false,
   });
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -96,6 +96,8 @@ export function LessonContentWorkspace({
   function discardAndLeave() {
     if (!pendingDestination || video.isBusy) return;
     const destination = pendingDestination;
+    actions.discardDraft();
+    video.discardPrepared();
     setPendingDestination(null);
     router.push(destination, { scroll: false });
   }
@@ -168,8 +170,13 @@ export function LessonContentWorkspace({
                 lessonId={lessonId}
                 grammarDraft={actions.draft}
                 onGrammarChange={actions.setDraft}
+                onGrammarSave={() => void actions.saveGrammar()}
+                onGrammarCancel={actions.discardDraft}
+                grammarDirty={actions.dirty}
+                grammarSaving={actions.isSaving}
+                grammarSaveError={actions.saveError ? getApiErrorMessage(actions.saveError) : null}
                 video={video}
-                videoDisabled={actions.isSaving || actions.isChangingPublication}
+                videoDisabled={actions.isSaving || actions.isChangingPublication || video.isBusy}
                 onReloadVideo={() => void queryClient.invalidateQueries({ queryKey: ['lessons', 'detail', lesson.id] })}
                 onQuizBusyChange={setQuizBusy}
               />

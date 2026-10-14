@@ -18,6 +18,11 @@ interface LessonContentTabsProps {
   lessonId: number;
   grammarDraft: string;
   onGrammarChange: (value: string) => void;
+  onGrammarSave: () => void;
+  onGrammarCancel: () => void;
+  grammarDirty: boolean;
+  grammarSaving: boolean;
+  grammarSaveError: string | null;
   video: LessonVideoControls;
   videoDisabled: boolean;
   onReloadVideo: () => void;
@@ -31,6 +36,11 @@ export function LessonContentTabs({
   lessonId,
   grammarDraft,
   onGrammarChange,
+  onGrammarSave,
+  onGrammarCancel,
+  grammarDirty,
+  grammarSaving,
+  grammarSaveError,
   video,
   videoDisabled,
   onReloadVideo,
@@ -151,6 +161,7 @@ export function LessonContentTabs({
         hidden={activeTab !== 'grammar'}
       >
         {activeTab === 'grammar' && <GrammarSection lesson={lesson} draft={grammarDraft} onDraftChange={onGrammarChange}
+          onSave={onGrammarSave} onCancel={onGrammarCancel} dirty={grammarDirty} isSaving={grammarSaving} saveError={grammarSaveError}
           video={video} videoDisabled={videoDisabled} onReloadVideo={onReloadVideo} />}
       </div>
       <div

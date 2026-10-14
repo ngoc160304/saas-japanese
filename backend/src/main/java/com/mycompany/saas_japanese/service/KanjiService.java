@@ -10,11 +10,11 @@ public interface KanjiService {
 
   KanjiResponse create(ReqKanji request);
 
-  KanjiResponse findById(Long id);
+  KanjiResponse findById(Long id, Long lessonId);
 
   Page<KanjiResponse> findAll(KanjiQuery query);
 
-  KanjiResponse update(Long id, ReqKanji request);
+  KanjiResponse update(Long id, ReqKanji request, Long lessonId);
 
-  void delete(Long id);
+  void delete(Long id, Long lessonId);
 }

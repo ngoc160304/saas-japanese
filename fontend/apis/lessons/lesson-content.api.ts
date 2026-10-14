@@ -96,10 +96,10 @@ const kanjiPath = '/kanjis';
 export const vocabularyAPI = {
   listByLesson: (lessonId: number, signal?: AbortSignal) =>
     listAll<VocabularyItem>(vocabularyPath, lessonId, signal),
-  getById: async (id: number): Promise<VocabularyItem> => {
+  getById: async (id: number, lessonId: number): Promise<VocabularyItem> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<VocabularyItem>>(
       `${vocabularyPath}/${id}`,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
@@ -118,26 +118,26 @@ export const vocabularyAPI = {
     );
     return response.data.data;
   },
-  update: async ({ id, data }: { id: number; data: VocabularyInput }) => {
+  update: async ({ id, data, lessonId }: { id: number; data: VocabularyInput; lessonId: number }) => {
     const response = await authorizeAxiosInstance.put<ApiResponse<VocabularyItem>>(
       `${vocabularyPath}/${id}`,
       data,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
-  deleteById: async (id: number) => {
-    await authorizeAxiosInstance.delete(`${vocabularyPath}/${id}`, { localErrorHandling: true });
+  deleteById: async (id: number, lessonId: number) => {
+    await authorizeAxiosInstance.delete(`${vocabularyPath}/${id}`, { params: { lessonId }, localErrorHandling: true });
   },
 };
 
 export const kanjiAPI = {
   listByLesson: (lessonId: number, signal?: AbortSignal) =>
     listAll<KanjiItem>(kanjiPath, lessonId, signal),
-  getById: async (id: number): Promise<KanjiItem> => {
+  getById: async (id: number, lessonId: number): Promise<KanjiItem> => {
     const response = await authorizeAxiosInstance.get<ApiResponse<KanjiItem>>(
       `${kanjiPath}/${id}`,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
@@ -154,16 +154,16 @@ export const kanjiAPI = {
     });
     return response.data.data;
   },
-  update: async ({ id, data }: { id: number; data: KanjiInput }) => {
+  update: async ({ id, data, lessonId }: { id: number; data: KanjiInput; lessonId: number }) => {
     const response = await authorizeAxiosInstance.put<ApiResponse<KanjiItem>>(
       `${kanjiPath}/${id}`,
       data,
-      { localErrorHandling: true },
+      { params: { lessonId }, localErrorHandling: true },
     );
     return response.data.data;
   },
-  deleteById: async (id: number) => {
-    await authorizeAxiosInstance.delete(`${kanjiPath}/${id}`, { localErrorHandling: true });
+  deleteById: async (id: number, lessonId: number) => {
+    await authorizeAxiosInstance.delete(`${kanjiPath}/${id}`, { params: { lessonId }, localErrorHandling: true });
   },
 };
 

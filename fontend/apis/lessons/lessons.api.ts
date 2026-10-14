@@ -3,8 +3,9 @@ import type { ApiResponse } from '@/types/api';
 import type { PageResponse } from '@/types/pagination';
 import type { AttachLessonVideoRequest, CreateLessonRequest, Lesson, LessonQuery, UpdateLessonGrammarRequest, UpdateLessonPublicationRequest, UpdateLessonRequest } from './lessons.type';
 
-async function getLessons({ courseId, page, size, search, sortKey, sortType }: LessonQuery) {
+async function getLessons({ courseId, page, size, search, sortKey, sortType }: LessonQuery, signal?: AbortSignal) {
   const response = await authorizeAxiosInstance.get<ApiResponse<PageResponse<Lesson>>>('/lessons', {
+    signal,
     params: {
       courseId,
       page: page - 1,
@@ -18,18 +19,19 @@ async function getLessons({ courseId, page, size, search, sortKey, sortType }: L
   return response.data.data;
 }
 
-async function getCourseCurriculum(courseId: number) {
-  const first = await getLessons({ courseId, page: 1, size: 12, sortKey: 'id', sortType: 'ASC' });
+async function getCourseCurriculum(courseId: number, signal?: AbortSignal) {
+  const first = await getLessons({ courseId, page: 1, size: 12, sortKey: 'id', sortType: 'ASC' }, signal);
   const lessons = [...first.content];
   for (let page = 2; page <= first.totalPages; page += 1) {
-    const next = await getLessons({ courseId, page, size: 12, sortKey: 'id', sortType: 'ASC' });
+    const next = await getLessons({ courseId, page, size: 12, sortKey: 'id', sortType: 'ASC' }, signal);
     lessons.push(...next.content);
   }
   return lessons;
 }
 
-async function getById(id: number) {
+async function getById(id: number, signal?: AbortSignal) {
   const response = await authorizeAxiosInstance.get<ApiResponse<Lesson>>(`/lessons/${id}`, {
+    signal,
     localErrorHandling: true,
   });
   return response.data.data;

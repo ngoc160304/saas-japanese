@@ -16,7 +16,7 @@ export function LessonGrammarPage({ courseId, lessonId }: { courseId: number; le
   });
   const lessonQuery = useQuery({
     queryKey: ['lessons', 'detail', lessonId],
-    queryFn: () => lessonAPI.getById(lessonId),
+    queryFn: ({ signal }) => lessonAPI.getById(lessonId, signal),
     retry: false,
   });
   const course = courseQuery.data;
@@ -31,6 +31,8 @@ export function LessonGrammarPage({ courseId, lessonId }: { courseId: number; le
     );
 
   if (
+    courseQuery.isError ||
+    lessonQuery.isError ||
     !course ||
     !lesson ||
     course.id !== courseId ||

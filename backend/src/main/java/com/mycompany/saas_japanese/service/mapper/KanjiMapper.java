@@ -14,7 +14,7 @@ public class KanjiMapper {
 
   public Kanji toEntity(ReqKanji request) {
     return Kanji.builder()
-        .kanji(request.getKanji())
+        .kanji(request.getKanji().trim())
         .onyomi(request.getOnyomi())
         .kunyomi(request.getKunyomi())
         .meaningVi(request.getMeaningVi())
@@ -26,7 +26,7 @@ public class KanjiMapper {
   public void updateEntity(
       Kanji entity,
       ReqKanji request) {
-    entity.setKanji(request.getKanji());
+    entity.setKanji(request.getKanji().trim());
     entity.setOnyomi(request.getOnyomi());
     entity.setKunyomi(request.getKunyomi());
     entity.setMeaningVi(request.getMeaningVi());

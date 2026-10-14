@@ -20,7 +20,6 @@ export interface CreateLessonRequest {
   durationMinutes?: number | null;
   isPublished?: boolean;
   videoMediaId?: number | null;
-  sortOrder?: number;
 }
 
 export interface LessonQuery {
@@ -35,9 +34,9 @@ export interface LessonQuery {
 export interface UpdateLessonRequest {
   title: string;
   courseId: number;
-  slug: string;
-  grammar: string | null;
-  durationMinutes: number;
+  slug?: string;
+  grammar?: string | null;
+  durationMinutes: number | null;
   isPublished: boolean;
 }
 

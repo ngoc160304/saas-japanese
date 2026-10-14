@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -14,9 +14,20 @@ import { Button } from '@/components/ui/button';
 import { getApiErrorMessage } from '@/lib/api-error';
 import { LessonForm } from './LessonForm';
 import type { LessonFormValues } from '../schemas/lesson.schema';
+import { useAppStore } from '@/store/hooks';
 
 export function LessonCreatePage({ courseId }: { courseId: number }) {
+  return <LessonCreateForm key={courseId} courseId={courseId} />;
+}
+
+function LessonCreateForm({ courseId }: { courseId: number }) {
   const router = useRouter();
+  const store = useAppStore();
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
   const queryClient = useQueryClient();
   const submitting = useRef(false);
   const courseQuery = useQuery({
@@ -30,15 +41,19 @@ export function LessonCreatePage({ courseId }: { courseId: number }) {
   const submit = async (values: LessonFormValues) => {
     if (submitting.current) return;
     submitting.current = true;
+    const revision = store.getState().auth.revision;
     try {
       await creation.mutateAsync({ ...values, courseId });
+      if (store.getState().auth.revision !== revision) return;
+      void queryClient.invalidateQueries({ queryKey: ['lessons', 'curriculum', courseId] });
       void queryClient.invalidateQueries({ queryKey: ['courses'] });
       void queryClient.invalidateQueries({ queryKey: ['categories-course'] });
+      if (!active.current) return;
       toast.success('Đã tạo bài học.');
       router.push(backHref);
     } catch (error) {
       submitting.current = false;
-      toast.error(getApiErrorMessage(error));
+      if (active.current && store.getState().auth.revision === revision) toast.error(getApiErrorMessage(error));
       throw error;
     }
   };

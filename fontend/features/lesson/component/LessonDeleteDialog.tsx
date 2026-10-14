@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
@@ -8,6 +8,7 @@ import { lessonAPI } from '@/apis/lessons/lessons.api';
 import type { Lesson } from '@/apis/lessons/lessons.type';
 import { useCrudDelete } from '@/hooks/crud/useCrudDelete';
 import { getApiErrorMessage } from '@/lib/api-error';
+import { useAppStore } from '@/store/hooks';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,12 @@ export function LessonDeleteDialog({
   onDeleted: () => void;
 }) {
   const queryClient = useQueryClient();
+  const store = useAppStore();
+  const active = useRef(true);
+  useEffect(() => {
+    active.current = true;
+    return () => { active.current = false; };
+  }, []);
   const deletion = useCrudDelete({
     queryKey: ['lessons', lesson.courseId],
     mutationFn: lessonAPI.deleteById,
@@ -39,15 +46,22 @@ export function LessonDeleteDialog({
     if (submitting.current) return;
     submitting.current = true;
     setPending(true);
+    const revision = store.getState().auth.revision;
     try {
       await deletion.mutateAsync(lesson.id);
+      if (store.getState().auth.revision !== revision) return;
+      void queryClient.invalidateQueries({ queryKey: ['lessons', 'curriculum', lesson.courseId] });
       void queryClient.invalidateQueries({ queryKey: ['courses'] });
       void queryClient.invalidateQueries({ queryKey: ['categories-course'] });
+      queryClient.removeQueries({ queryKey: ['lessons', 'detail', lesson.id] });
+      queryClient.removeQueries({ queryKey: ['admin', 'lessons', lesson.id] });
+      queryClient.removeQueries({ queryKey: ['admin', 'lesson-draft', lesson.courseId, lesson.id] });
+      if (!active.current) return;
       toast.success('Đã xóa bài học.');
       onDeleted();
       onClose();
     } catch (error) {
-      toast.error(getApiErrorMessage(error));
+      if (active.current && store.getState().auth.revision === revision) toast.error(getApiErrorMessage(error));
     } finally {
       submitting.current = false;
       setPending(false);

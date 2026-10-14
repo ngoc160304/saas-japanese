@@ -31,7 +31,12 @@ export function useLessonVideo(lesson: Lesson) {
 
   const currentSession = (revision: number) => store.getState().auth.revision === revision;
 
-  function updateVideoCache(saved: Lesson, lessonId: number, courseId: number) {
+  async function updateVideoCache(saved: Lesson, lessonId: number, courseId: number, revision: number) {
+    await Promise.all([
+      queryClient.cancelQueries({ queryKey: ['lessons', 'detail', lessonId] }),
+      queryClient.cancelQueries({ queryKey: ['lessons', 'curriculum', courseId] }),
+    ]);
+    if (!currentSession(revision)) return;
     const merge = (current: Lesson): Lesson => ({
       ...current,
       videoMediaId: saved.videoMediaId,
@@ -42,6 +47,7 @@ export function useLessonVideo(lesson: Lesson) {
     queryClient.setQueryData<Lesson[]>(['lessons', 'curriculum', courseId], (current) =>
       current?.map((item) => item.id === lessonId ? merge(item) : item),
     );
+    void queryClient.invalidateQueries({ queryKey: ['client-courses'] });
     void queryClient.invalidateQueries({ queryKey: ['lessons', courseId] });
   }
 
@@ -49,7 +55,7 @@ export function useLessonVideo(lesson: Lesson) {
     try {
       const saved = await lessonAPI.getById(lessonId);
       if (!currentSession(revision)) return false;
-      updateVideoCache(saved, lessonId, courseId);
+      await updateVideoCache(saved, lessonId, courseId, revision);
       return saved.videoMediaId === expectedId;
     } catch {
       return false;
@@ -96,7 +102,7 @@ export function useLessonVideo(lesson: Lesson) {
       try {
         const saved = await lessonAPI.attachVideo({ id: lessonId, data: { videoMediaId: media.id } });
         if (!currentSession(revision)) return;
-        updateVideoCache(saved, lessonId, courseId);
+        await updateVideoCache(saved, lessonId, courseId, revision);
       } catch (attachError) {
         if (!currentSession(revision)) return;
         if (!(await reconcile(lessonId, courseId, revision, media.id))) {
@@ -104,7 +110,7 @@ export function useLessonVideo(lesson: Lesson) {
           return;
         }
       }
-      if (active.current) {
+      if (active.current && currentSession(revision)) {
         setUploaded(null);
         setFile(null);
         setProgress(null);
@@ -130,7 +136,7 @@ export function useLessonVideo(lesson: Lesson) {
       try {
         const saved = await lessonAPI.detachVideo(lessonId);
         if (!currentSession(revision)) return;
-        updateVideoCache(saved, lessonId, courseId);
+        await updateVideoCache(saved, lessonId, courseId, revision);
       } catch (detachError) {
         if (!currentSession(revision)) return;
         if (!(await reconcile(lessonId, courseId, revision, null))) {
@@ -138,7 +144,7 @@ export function useLessonVideo(lesson: Lesson) {
           return;
         }
       }
-      if (active.current) toast.success('Đã gỡ video khỏi bài học.');
+      if (active.current && currentSession(revision)) toast.success('Đã gỡ video khỏi bài học.');
     } finally {
       busy.current = false;
       if (active.current) setPhase('idle');

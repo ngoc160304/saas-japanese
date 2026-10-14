@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useRef, type FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { LoaderCircle } from 'lucide-react';
@@ -16,6 +17,7 @@ interface LessonFormProps {
   initialValues?: LessonFormValues;
   submitLabel?: string;
   submittingLabel?: string;
+  grammarHref?: string;
   onSubmit: (values: LessonFormValues) => Promise<void>;
 }
 
@@ -24,13 +26,14 @@ export function LessonForm({
   initialValues,
   submitLabel = 'Tạo bài học',
   submittingLabel = 'Đang lưu…',
+  grammarHref,
   onSubmit,
 }: LessonFormProps) {
   const {
     register,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<LessonFormValues>({
     resolver: zodResolver(lessonSchema),
     defaultValues: initialValues ?? {
@@ -40,17 +43,43 @@ export function LessonForm({
       grammar: '',
     },
   });
-  const submit = handleSubmit(async (values) => {
-    try {
-      await onSubmit(values);
-    } catch (error) {
-      const failure = getApiError(error);
-      for (const field of ['title', 'durationMinutes', 'isPublished', 'grammar'] as const) {
-        if (failure.fieldErrors[field]) setError(field, { message: failure.fieldErrors[field] });
-      }
-      setError('root', { message: failure.message });
+  const busy = useRef(false);
+  useEffect(() => {
+    if (!isDirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [isDirty]);
+  function guardNavigation(event: { preventDefault(): void }) {
+    if (isSubmitting || (isDirty && !window.confirm('Bỏ thay đổi chưa lưu?')))
+      event.preventDefault();
+  }
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    if (busy.current) {
+      event.preventDefault();
+      return;
     }
-  });
+    busy.current = true;
+    try {
+      await handleSubmit(async (values) => {
+        try {
+          await onSubmit(values);
+        } catch (error) {
+          const failure = getApiError(error);
+          for (const field of ['title', 'durationMinutes', 'isPublished', 'grammar'] as const) {
+            if (failure.fieldErrors[field])
+              setError(field, { message: failure.fieldErrors[field] });
+          }
+          setError('root', { message: failure.message });
+        }
+      })(event);
+    } finally {
+      busy.current = false;
+    }
+  };
   const inputClass =
     'h-12 rounded-2xl border-input bg-slate-50 px-4 text-sm text-slate-800 focus-visible:ring-sky-500';
   const backHref = `/admin/courses/${course.id}`;
@@ -130,20 +159,35 @@ export function LessonForm({
             )}
           </div>
         </div>
-        <div>
-          <label htmlFor="lesson-grammar" className="mb-1.5 block text-xs font-bold text-slate-700">
-            Giới thiệu / ghi chú bài học
-          </label>
-          <Textarea
-            id="lesson-grammar"
-            rows={3}
-            disabled={isSubmitting}
-            placeholder="Giới thiệu mục tiêu bài học hoặc kiến thức trọng tâm..."
-            className="rounded-2xl border-input bg-slate-50 px-4 py-3 text-sm text-slate-800"
-            {...register('grammar')}
-          />
-          {errors.grammar && <p className="mt-1 text-xs text-rose-600">{errors.grammar.message}</p>}
-        </div>
+        {grammarHref ? (
+          <Link
+            href={grammarHref}
+            onNavigate={guardNavigation}
+            className="text-sm text-sky-700 underline"
+          >
+            Chỉnh sửa nội dung ngữ pháp trong bài học
+          </Link>
+        ) : (
+          <div>
+            <label
+              htmlFor="lesson-grammar"
+              className="mb-1.5 block text-xs font-bold text-slate-700"
+            >
+              Nội dung ngữ pháp
+            </label>
+            <Textarea
+              id="lesson-grammar"
+              rows={3}
+              disabled={isSubmitting}
+              placeholder="Giới thiệu mục tiêu bài học hoặc kiến thức trọng tâm..."
+              className="rounded-2xl border-input bg-slate-50 px-4 py-3 text-sm text-slate-800"
+              {...register('grammar')}
+            />
+            {errors.grammar && (
+              <p className="mt-1 text-xs text-rose-600">{errors.grammar.message}</p>
+            )}
+          </div>
+        )}
         {errors.root && (
           <p role="alert" className="rounded-2xl bg-rose-50 p-3 text-sm text-rose-700">
             {errors.root.message}
@@ -152,6 +196,7 @@ export function LessonForm({
         <div className="flex flex-col-reverse justify-between gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center">
           <Link
             href={backHref}
+            onNavigate={guardNavigation}
             className="rounded-2xl border border-slate-300 px-5 py-2.5 text-center text-xs font-bold text-slate-700 hover:bg-slate-50"
           >
             Hủy

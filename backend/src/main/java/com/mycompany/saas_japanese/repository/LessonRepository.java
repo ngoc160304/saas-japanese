@@ -18,8 +18,11 @@ import java.util.Optional;
 public interface LessonRepository extends JpaRepository<Lesson, Long>, JpaSpecificationExecutor<Lesson> {
   Optional<Lesson> findByIdAndIsDeletedFalse(Long id);
 
+  Optional<Lesson> findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(Long id);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query("select lesson from Lesson lesson where lesson.id = :id and lesson.isDeleted = false")
+  @Query("select lesson from Lesson lesson where lesson.id = :id "
+      + "and lesson.isDeleted = false and lesson.course.isDeleted = false")
   Optional<Lesson> findActiveForUpdate(@Param("id") Long id);
 
   boolean existsByVideoMediaIdAndIsDeletedFalse(Long videoMediaId);

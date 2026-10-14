@@ -16,10 +16,10 @@ export function useLessonContentMutation<T extends ContentItem, I extends { less
   lessonId: number,
   domain: 'vocabularies' | 'kanjis',
   api: {
-    getById: (id: number) => Promise<T>;
+    getById: (id: number, lessonId: number) => Promise<T>;
     create: (data: I) => Promise<T>;
-    update: (variables: { id: number; data: I }) => Promise<T>;
-    deleteById: (id: number) => Promise<void>;
+    update: (variables: { id: number; data: I; lessonId: number }) => Promise<T>;
+    deleteById: (id: number, lessonId: number) => Promise<void>;
   },
   matchesFilter: (item: T) => boolean,
   items: readonly T[] | undefined,
@@ -55,17 +55,17 @@ export function useLessonContentMutation<T extends ContentItem, I extends { less
     mutationFn: async ({ captured, data }: { captured: Target<T>; data?: I }) => {
       if (!sameSession(captured)) throw new Error('Phiên đăng nhập đã thay đổi.');
       if (captured.item) {
-        const current = await api.getById(captured.item.id);
+        const current = await api.getById(captured.item.id, lessonId);
         if (current.lessonId !== lessonId) {
           throw { status: 404, message: 'Nội dung không còn thuộc bài học này.', fieldErrors: {} };
         }
       }
       // A session change during the preflight must not send a write using the next account.
       if (!sameSession(captured) || !mounted.current) return;
-      if (captured.mode === 'delete') return api.deleteById(captured.item.id);
+      if (captured.mode === 'delete') return api.deleteById(captured.item.id, lessonId);
       if (!data || data.lessonId !== lessonId) throw new Error('Bài học không hợp lệ.');
       return captured.mode === 'edit'
-        ? api.update({ id: captured.item.id, data })
+        ? api.update({ id: captured.item.id, data, lessonId })
         : api.create(data);
     },
   });

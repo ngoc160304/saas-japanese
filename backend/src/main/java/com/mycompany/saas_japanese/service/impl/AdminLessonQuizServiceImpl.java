@@ -49,7 +49,8 @@ public class AdminLessonQuizServiceImpl implements AdminLessonQuizService {
   @Override
   @Transactional(readOnly = true)
   public Optional<AdminLessonQuizResponse> findCurrent(Long lessonId) {
-    lessons.findByIdAndIsDeletedFalse(lessonId).orElseThrow(() -> new NotFoundException("Lesson not found"));
+    lessons.findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
+        .orElseThrow(() -> new NotFoundException("Lesson not found"));
     return single(quizzes.findByLessonIdAndDeletedAtIsNull(lessonId)).map(this::response);
   }
 

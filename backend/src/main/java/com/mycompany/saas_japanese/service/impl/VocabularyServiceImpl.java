@@ -1,5 +1,7 @@
 package com.mycompany.saas_japanese.service.impl;
 
+import java.util.Objects;
+
 import java.time.Instant;
 
 import org.springframework.data.domain.Page;
@@ -9,6 +11,7 @@ import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -44,7 +47,7 @@ public class VocabularyServiceImpl implements VocabularyService {
     if (request.getLessonId() != null) {
 
       Lesson lesson = lessonRepository
-          .findByIdAndIsDeletedFalse(request.getLessonId())
+          .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(request.getLessonId())
           .orElseThrow(() -> new NotFoundException(
               "Không tìm thấy lesson: "
                   + request.getLessonId()));
@@ -63,6 +66,10 @@ public class VocabularyServiceImpl implements VocabularyService {
   @Transactional(readOnly = true)
   public Page<VocabularyResponse> findAll(
       VocabularyQuery query) {
+    if (query.getLessonId() != null) {
+      requireLesson(query.getLessonId());
+    }
+
 
     PredicateSpecification<Vocabulary> spec = (root, builder) -> null;
 
@@ -105,13 +112,14 @@ public class VocabularyServiceImpl implements VocabularyService {
   @Override
   @Transactional(readOnly = true)
   public VocabularyResponse findById(
-      Long id) {
+      Long id, Long lessonId) {
 
     Vocabulary vocabulary = vocabularyRepository
         .findByIdAndDeletedAtIsNull(id)
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
+    requireScope(vocabulary.getLesson(), lessonId);
 
     return vocabularyMapper.toResponse(
         vocabulary);
@@ -121,18 +129,22 @@ public class VocabularyServiceImpl implements VocabularyService {
   @Transactional
   public VocabularyResponse update(
       Long id,
-      ReqVocabulary request) {
+      ReqVocabulary request, Long lessonId) {
 
     Vocabulary vocabulary = vocabularyRepository
-        .findByIdAndDeletedAtIsNull(id)
+        .findActiveForUpdate(id)
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
+    requireScope(vocabulary.getLesson(), lessonId);
+    if (lessonId != null && !Objects.equals(lessonId, request.getLessonId())) {
+      throw new BadRequestException("Cannot move content from the requested lesson");
+    }
 
     if (request.getLessonId() != null) {
 
       Lesson lesson = lessonRepository
-          .findByIdAndIsDeletedFalse(request.getLessonId())
+          .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(request.getLessonId())
           .orElseThrow(() -> new NotFoundException(
               "Không tìm thấy lesson: "
                   + request.getLessonId()));
@@ -155,13 +167,14 @@ public class VocabularyServiceImpl implements VocabularyService {
 
   @Override
   @Transactional
-  public void delete(Long id) {
+  public void delete(Long id, Long lessonId) {
 
     Vocabulary vocabulary = vocabularyRepository
-        .findByIdAndDeletedAtIsNull(id)
+        .findActiveForUpdate(id)
         .orElseThrow(() -> new NotFoundException(
             "Không tìm thấy vocabulary: "
                 + id));
+    requireScope(vocabulary.getLesson(), lessonId);
 
     vocabulary.setDeletedAt(
         Instant.now());
@@ -196,6 +209,21 @@ public class VocabularyServiceImpl implements VocabularyService {
         }
 
         return Sort.by(direction, field);
+    }
+
+    private void requireLesson(Long lessonId) {
+        lessonRepository.findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
+            .orElseThrow(() -> new NotFoundException("Lesson not found"));
+    }
+
+    private void requireScope(Lesson parent, Long lessonId) {
+        if (lessonId == null) {
+            return;
+        }
+        requireLesson(lessonId);
+        if (parent == null || !Objects.equals(parent.getId(), lessonId)) {
+            throw new NotFoundException("Content not found in this lesson");
+        }
     }
 
 }

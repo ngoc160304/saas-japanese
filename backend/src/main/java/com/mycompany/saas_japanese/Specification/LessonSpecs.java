@@ -25,9 +25,9 @@ public class LessonSpecs {
 
   public static PredicateSpecification<Lesson> isNotDeleted() {
 
-    return (root, builder) -> builder.equal(
-        root.get("isDeleted"),
-        false);
+    return (root, builder) -> builder.and(
+        builder.equal(root.get("isDeleted"), false),
+        builder.equal(root.get("course").get("isDeleted"), false));
   }
 
    public static PredicateSpecification<Lesson> hasSearch(String search) {

@@ -29,27 +29,30 @@ public class KanjiController {
 
   @GetMapping
   public Page<KanjiResponse> findAll(
-      @ModelAttribute KanjiQuery query) {
+      @Valid @ModelAttribute KanjiQuery query) {
     return kanjiService.findAll(query);
   }
 
   @GetMapping("/{id}")
   public KanjiResponse findById(
-      @PathVariable("id") Long id) {
-    return kanjiService.findById(id);
+      @PathVariable("id") Long id,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
+    return kanjiService.findById(id, lessonId);
   }
 
   @PutMapping("/{id}")
   public KanjiResponse update(
       @PathVariable("id") Long id,
-      @Valid @RequestBody ReqKanji request) {
-    return kanjiService.update(id, request);
+      @Valid @RequestBody ReqKanji request,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
+    return kanjiService.update(id, request, lessonId);
   }
 
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(
-      @PathVariable("id") Long id) {
-    kanjiService.delete(id);
+      @PathVariable("id") Long id,
+      @RequestParam(value = "lessonId", required = false) Long lessonId) {
+    kanjiService.delete(id, lessonId);
   }
 }

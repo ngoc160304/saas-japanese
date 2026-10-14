@@ -108,7 +108,7 @@ public class LessonServiceImpl implements LessonService {
                         Long id) {
 
                 Lesson lesson = lessonRepository
-                                .findByIdAndIsDeletedFalse(id)
+                                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(id)
                                 .orElseThrow(
                                                 () -> new NotFoundException(
                                                                 "Lesson không tồn tại"));
@@ -165,21 +165,16 @@ public class LessonServiceImpl implements LessonService {
                                                 () -> new NotFoundException(
                                                                 "Lesson không tồn tại"));
 
-                lesson.setTitle(
-                                request.getTitle().trim());
-
-                lesson.setSlug(
-                                SlugUtil.toSlug(
-                                                lesson.getTitle()));
-
-                lesson.setGrammar(
-                                grammarHtmlSanitizer.sanitize(request.getGrammar()));
-
-                lesson.setDurationMinutes(
-                                request.getDurationMinutes());
-
-                lesson.setIsPublished(
-                                request.getIsPublished());
+                if (!Objects.equals(lesson.getCourse().getId(), request.getCourseId())) {
+                        throw new NotFoundException("Lesson not found in this course");
+                }
+                lesson.setTitle(request.getTitle().trim());
+                lesson.setSlug(SlugUtil.toSlug(lesson.getTitle()));
+                if (request.isGrammarProvided()) {
+                        lesson.setGrammar(grammarHtmlSanitizer.sanitize(request.getGrammar()));
+                }
+                lesson.setDurationMinutes(request.getDurationMinutes());
+                lesson.setIsPublished(request.getIsPublished());
 
                 // A null videoMediaId in the established PUT contract means leave video unchanged.
                 if (request.getVideoMediaId() != null) {

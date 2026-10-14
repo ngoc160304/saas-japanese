@@ -21,6 +21,7 @@ java {
 	}
 }
 
+
 checkstyle {
   toolVersion = "10.12.4"
 	configFile = file("${rootDir}/checkstyle.xml")

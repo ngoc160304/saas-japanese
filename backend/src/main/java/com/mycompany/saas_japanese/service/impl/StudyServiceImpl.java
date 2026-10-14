@@ -107,7 +107,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -134,7 +134,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -153,7 +153,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -172,7 +172,7 @@ public class StudyServiceImpl implements StudyService {
             Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -268,7 +268,7 @@ public class StudyServiceImpl implements StudyService {
                 ReqUpdateLessonProgress request) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));
@@ -402,7 +402,7 @@ public class StudyServiceImpl implements StudyService {
                 Long lessonId) {
 
         Lesson lesson = lessonRepository
-                .findByIdAndIsDeletedFalse(lessonId)
+                .findByIdAndIsDeletedFalseAndCourseIsDeletedFalse(lessonId)
                 .orElseThrow(
                         () -> new NotFoundException(
                                 "Lesson không tồn tại"));

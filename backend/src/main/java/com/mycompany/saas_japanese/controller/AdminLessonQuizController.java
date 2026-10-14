@@ -35,66 +35,67 @@ public class AdminLessonQuizController {
 
   @GetMapping
   @ApiMessage("Fetch admin lesson quiz")
-  public ResponseEntity<AdminLessonQuizResponse> findCurrent(@Positive @PathVariable Long lessonId) {
+  public ResponseEntity<AdminLessonQuizResponse> findCurrent(@Positive @PathVariable("lessonId") Long lessonId) {
     return service.findCurrent(lessonId).map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.noContent().build());
   }
 
   @PostMapping
   @ApiMessage("Create lesson quiz")
-  public ResponseEntity<AdminLessonQuizResponse> create(@Positive @PathVariable Long lessonId,
+  public ResponseEntity<AdminLessonQuizResponse> create(@Positive @PathVariable("lessonId") Long lessonId,
       @Valid @RequestBody ReqAdminLessonQuiz request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.create(lessonId, request));
   }
 
   @PutMapping("/{quizId}")
   @ApiMessage("Update lesson quiz metadata")
-  public ResponseEntity<AdminLessonQuizResponse> update(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Valid @RequestBody ReqAdminLessonQuiz request) {
+  public ResponseEntity<AdminLessonQuizResponse> update(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Valid @RequestBody ReqAdminLessonQuiz request) {
     return ResponseEntity.ok(service.update(lessonId, quizId, request));
   }
 
   @PatchMapping("/{quizId}/publication")
   @ApiMessage("Update quiz publication")
-  public ResponseEntity<AdminLessonQuizResponse> publish(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Valid @RequestBody ReqQuizPublication request) {
+  public ResponseEntity<AdminLessonQuizResponse> publish(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Valid @RequestBody ReqQuizPublication request) {
     return ResponseEntity.ok(service.publish(lessonId, quizId, request.isPublished()));
   }
 
   @DeleteMapping("/{quizId}")
   @ApiMessage("Delete lesson quiz")
-  public ResponseEntity<Void> delete(@Positive @PathVariable Long lessonId, @Positive @PathVariable Long quizId) {
+  public ResponseEntity<Void> delete(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId) {
     service.delete(lessonId, quizId);
     return ResponseEntity.noContent().build();
   }
 
   @PostMapping("/{quizId}/questions")
   @ApiMessage("Create quiz question")
-  public ResponseEntity<AdminLessonQuizResponse> createQuestion(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Valid @RequestBody ReqQuizQuestion request) {
+  public ResponseEntity<AdminLessonQuizResponse> createQuestion(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Valid @RequestBody ReqQuizQuestion request) {
     return ResponseEntity.status(HttpStatus.CREATED).body(service.createQuestion(lessonId, quizId, request));
   }
 
   @PutMapping("/{quizId}/questions/{questionId}")
   @ApiMessage("Update quiz question")
-  public ResponseEntity<AdminLessonQuizResponse> updateQuestion(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Positive @PathVariable Long questionId,
+  public ResponseEntity<AdminLessonQuizResponse> updateQuestion(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Positive @PathVariable("questionId") Long questionId,
       @Valid @RequestBody ReqQuizQuestion request) {
     return ResponseEntity.ok(service.updateQuestion(lessonId, quizId, questionId, request));
   }
 
   @DeleteMapping("/{quizId}/questions/{questionId}")
   @ApiMessage("Delete quiz question")
-  public ResponseEntity<Void> deleteQuestion(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Positive @PathVariable Long questionId) {
+  public ResponseEntity<Void> deleteQuestion(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Positive @PathVariable("questionId") Long questionId) {
     service.deleteQuestion(lessonId, quizId, questionId);
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping("/{quizId}/questions/order")
   @ApiMessage("Reorder quiz questions")
-  public ResponseEntity<AdminLessonQuizResponse> reorder(@Positive @PathVariable Long lessonId,
-      @Positive @PathVariable Long quizId, @Valid @RequestBody ReqQuizQuestionOrder request) {
+  public ResponseEntity<AdminLessonQuizResponse> reorder(@Positive @PathVariable("lessonId") Long lessonId,
+      @Positive @PathVariable("quizId") Long quizId, @Valid @RequestBody ReqQuizQuestionOrder request) {
     return ResponseEntity.ok(service.reorder(lessonId, quizId, request.questionIds()));
   }
 }

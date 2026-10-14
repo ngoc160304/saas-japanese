@@ -6,16 +6,18 @@ import { toast } from 'sonner';
 import { lessonAPI } from '@/apis/lessons/lessons.api';
 import type { Lesson } from '@/apis/lessons/lessons.type';
 import { useAppStore } from '@/store/hooks';
-import { comparableGrammar, draftReducer } from './grammarDraft';
+import { comparableGrammar, draftReducer, type DraftState } from './grammarDraft';
 
 export function useLessonWorkspaceActions(lesson: Lesson) {
   const queryClient = useQueryClient();
   const store = useAppStore();
-  const [draftState, dispatch] = useReducer(draftReducer, lesson.grammar ?? '', (grammar) => ({
-    draft: grammar,
-    baseline: grammar,
-    server: grammar,
-  }));
+  const draftKey = ['admin', 'lesson-draft', lesson.courseId, lesson.id];
+  const [draftState, dispatch] = useReducer(draftReducer, lesson.grammar ?? '', (grammar) =>
+    queryClient.getQueryData<DraftState>(draftKey) ?? {
+      draft: grammar,
+      baseline: grammar,
+      server: grammar,
+    });
   const active = useRef(true);
   const submitting = useRef(false);
   const draftRef = useRef(draftState.draft);
@@ -32,7 +34,26 @@ export function useLessonWorkspaceActions(lesson: Lesson) {
 
   useEffect(() => {
     draftRef.current = draftState.draft;
-  }, [draftState.draft]);
+    queryClient.setQueryData(['admin', 'lesson-draft', lesson.courseId, lesson.id], draftState);
+  }, [draftState, lesson.courseId, lesson.id, queryClient]);
+
+  async function cancelReads() {
+    await Promise.all([
+      queryClient.cancelQueries({ queryKey: ['lessons', 'detail', lesson.id] }),
+      queryClient.cancelQueries({ queryKey: ['lessons', 'curriculum', lesson.courseId] }),
+    ]);
+  }
+
+  function reconcile(saved: Lesson, field: 'grammar' | 'isPublished') {
+    const merge = (current: Lesson) => ({ ...current, [field]: saved[field], updatedAt: saved.updatedAt });
+    queryClient.setQueryData<Lesson>(['lessons', 'detail', lesson.id], current => current ? merge(current) : saved);
+    queryClient.setQueryData<Lesson[]>(['lessons', 'curriculum', lesson.courseId], current =>
+      current?.map(item => item.id === lesson.id ? merge(item) : item));
+    void queryClient.invalidateQueries({ queryKey: ['client-courses'] });
+    void queryClient.invalidateQueries({ queryKey: ['lessons', lesson.courseId] });
+    void queryClient.invalidateQueries({ queryKey: ['admin', 'lessons', lesson.id, 'preview'] });
+    void queryClient.invalidateQueries({ queryKey: ['study'] });
+  }
 
   const grammarMutation = useMutation({ mutationFn: lessonAPI.updateGrammar, retry: false });
   const publicationMutation = useMutation({ mutationFn: lessonAPI.updatePublication, retry: false });
@@ -45,6 +66,7 @@ export function useLessonWorkspaceActions(lesson: Lesson) {
   function discardDraft() {
     draftRef.current = draftState.server;
     dispatch({ type: 'discard' });
+    queryClient.setQueryData(draftKey, draftReducer(draftState, { type: 'discard' }));
   }
 
   async function saveGrammar(): Promise<boolean> {
@@ -53,12 +75,19 @@ export function useLessonWorkspaceActions(lesson: Lesson) {
     const submitted = draftRef.current;
     const authRevision = store.getState().auth.revision;
     try {
+      await cancelReads();
+      if (store.getState().auth.revision !== authRevision) return false;
       const saved = await grammarMutation.mutateAsync({
         id: lesson.id,
         data: { grammar: comparableGrammar(submitted) ? submitted : '' },
       });
-      if (!active.current || store.getState().auth.revision !== authRevision) return false;
-      queryClient.setQueryData(['lessons', 'detail', lesson.id], saved);
+      if (store.getState().auth.revision !== authRevision) return false;
+      await cancelReads();
+      if (store.getState().auth.revision !== authRevision) return false;
+      reconcile(saved, 'grammar');
+      queryClient.setQueryData<DraftState>(draftKey, current => current &&
+        draftReducer(current, { type: 'saved', submitted, saved: saved.grammar ?? '' }));
+      if (!active.current) return false;
       draftRef.current = comparableGrammar(draftRef.current) === comparableGrammar(submitted)
         ? saved.grammar ?? ''
         : draftRef.current;
@@ -79,17 +108,18 @@ export function useLessonWorkspaceActions(lesson: Lesson) {
     submitting.current = true;
     const authRevision = store.getState().auth.revision;
     try {
+      await cancelReads();
+      if (store.getState().auth.revision !== authRevision) return false;
       const saved = await publicationMutation.mutateAsync({
         id: lesson.id,
         data: { isPublished },
       });
-      if (!active.current || store.getState().auth.revision !== authRevision) return false;
-      queryClient.setQueryData(['lessons', 'detail', lesson.id], saved);
-      queryClient.setQueryData<Lesson[]>(['lessons', 'curriculum', lesson.courseId], (current) =>
-        current?.map((item) => item.id === lesson.id ? saved : item),
-      );
+      if (store.getState().auth.revision !== authRevision) return false;
+      await cancelReads();
+      if (store.getState().auth.revision !== authRevision) return false;
+      reconcile(saved, 'isPublished');
       void queryClient.invalidateQueries({ queryKey: ['lessons', 'curriculum', lesson.courseId] });
-      void queryClient.invalidateQueries({ queryKey: ['lessons', lesson.courseId] });
+      if (!active.current) return false;
       toast.success(isPublished ? 'Đã xuất bản bài học.' : 'Đã ẩn bài học.');
       return true;
     } catch {
