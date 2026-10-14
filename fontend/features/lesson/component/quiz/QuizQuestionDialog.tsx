@@ -58,8 +58,14 @@ export function QuizQuestionDialog({
       dirty={isDirty}
       pending={busy}
       onClose={onClose}
+      actions={
+        <Button type="submit" form="quiz-question-form" disabled={disabled} className="bg-primary text-white hover:bg-primary/90">
+          {busy ? 'Đang lưu…' : 'Lưu câu hỏi'}
+        </Button>
+      }
     >
       <form
+        id="quiz-question-form"
         noValidate
         className="space-y-4"
         onSubmit={handleSubmit(async (data) => {
@@ -187,13 +193,6 @@ export function QuizQuestionDialog({
             {errors.root.message}
           </p>
         )}
-        <Button
-          type="submit"
-          disabled={disabled}
-          className="w-full bg-primary text-white hover:bg-primary/90"
-        >
-          {busy ? 'Đang lưu…' : 'Lưu câu hỏi'}
-        </Button>
       </form>
     </LessonContentFormDialog>
   );

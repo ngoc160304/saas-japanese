@@ -37,8 +37,14 @@ export function QuizMetadataDialog({
       dirty={isDirty}
       pending={busy}
       onClose={onClose}
+      actions={
+        <Button type="submit" form="quiz-metadata-form" disabled={busy || unavailable} className="bg-primary text-white hover:bg-primary/90">
+          {busy ? 'Đang lưu…' : quiz ? 'Lưu thông tin Quiz' : 'Tạo Quiz nháp'}
+        </Button>
+      }
     >
       <form
+        id="quiz-metadata-form"
         noValidate
         className="space-y-4"
         onSubmit={handleSubmit(async (values) => {
@@ -94,13 +100,6 @@ export function QuizMetadataDialog({
             {errors.root.message}
           </p>
         )}
-        <Button
-          type="submit"
-          disabled={busy || unavailable}
-          className="w-full bg-primary text-white hover:bg-primary/90"
-        >
-          {busy ? 'Đang lưu…' : quiz ? 'Lưu thông tin Quiz' : 'Tạo Quiz nháp'}
-        </Button>
       </form>
     </LessonContentFormDialog>
   );

@@ -127,16 +127,25 @@ export function LessonContentWorkspace({
   };
 
   return (
-    <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
+    <>
       <div className="fixed inset-0 flex min-h-0 flex-col overflow-hidden bg-[#f3f6fa] text-slate-800 antialiased">
-        <LessonWorkspaceHeader
-          courseId={courseId}
-          courseTitle={course.title}
-          lessonTitle={lesson.title}
-          onNavigate={guardNavigation}
-          onPreview={() => { if (actions.dirty || video.hasPendingWork) setPreviewGuard(true); else setPreviewOpen(true); }}
-          previewDisabled={quizBusy || actions.isSaving || actions.isChangingPublication || video.isBusy}
-        />
+        <Dialog open={drawerOpen} onOpenChange={setDrawerOpen}>
+          <LessonWorkspaceHeader
+            courseId={courseId}
+            courseTitle={course.title}
+            lessonTitle={lesson.title}
+            onNavigate={guardNavigation}
+            onPreview={() => { if (actions.dirty || video.hasPendingWork) setPreviewGuard(true); else setPreviewOpen(true); }}
+            previewDisabled={quizBusy || actions.isSaving || actions.isChangingPublication || video.isBusy}
+          />
+          <DialogContent
+            showCloseButton={false}
+            className="top-0 left-0 flex h-dvh w-80 max-w-[calc(100%-1rem)] translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none bg-white p-0 text-slate-800 sm:max-w-80"
+          >
+            <DialogTitle className="sr-only">Lesson curriculum</DialogTitle>
+            <LessonCurriculumSidebar {...sidebarProps} mobile />
+          </DialogContent>
+        </Dialog>
         <div className="flex min-h-0 flex-1 overflow-hidden">
           <aside
             aria-label="Lesson curriculum"
@@ -184,13 +193,6 @@ export function LessonContentWorkspace({
           </main>
         </div>
       </div>
-      <DialogContent
-        showCloseButton={false}
-        className="top-0 left-0 flex h-dvh w-80 max-w-[calc(100%-1rem)] translate-x-0 translate-y-0 flex-col gap-0 overflow-hidden rounded-none bg-white p-0 text-slate-800 sm:max-w-80"
-      >
-        <DialogTitle className="sr-only">Lesson curriculum</DialogTitle>
-        <LessonCurriculumSidebar {...sidebarProps} mobile />
-      </DialogContent>
       <AlertDialog open={pendingDestination !== null} onOpenChange={(open) => { if (!open) setPendingDestination(null); }}>
         <AlertDialogContent className="max-w-md rounded-3xl border border-slate-100 bg-white p-6 text-slate-900 shadow-2xl">
           <AlertDialogHeader>
@@ -205,7 +207,7 @@ export function LessonContentWorkspace({
                   : 'Thay đổi ngữ pháp đã được lưu. Bạn có thể rời bài học.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-row flex-wrap justify-end">
             <AlertDialogCancel>Ở lại</AlertDialogCancel>
             <AlertDialogAction disabled={actions.isSaving || video.isBusy} onClick={discardAndLeave} className="bg-rose-700 text-white hover:bg-rose-800">
               {actions.dirty || video.hasPendingWork ? 'Bỏ thay đổi và rời đi' : 'Rời đi'}
@@ -227,7 +229,7 @@ export function LessonContentWorkspace({
           </AlertDialogHeader>
           {showPublicationError && actions.publicationError && <p role="alert" className="text-sm text-rose-700">{getApiErrorMessage(actions.publicationError)}</p>}
           {!lesson.isPublished && actions.dirty && actions.saveError && <p role="alert" className="text-sm text-rose-700">{getApiErrorMessage(actions.saveError)}</p>}
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-row flex-wrap justify-end">
             <AlertDialogCancel disabled={actions.isSaving || actions.isChangingPublication}>Ở lại</AlertDialogCancel>
             {!lesson.isPublished && actions.dirty ? (
               <>
@@ -245,7 +247,7 @@ export function LessonContentWorkspace({
           <AlertDialogHeader><AlertDialogTitle>Xem trước nội dung đã lưu</AlertDialogTitle>
             <AlertDialogDescription>{video.hasPendingWork ? 'Video đang chọn chưa được lưu. Hãy hoàn tất hoặc hủy thao tác video trước khi xem trước.' : 'Ngữ pháp có thay đổi chưa lưu. Bạn có thể lưu, bỏ thay đổi hoặc xem bản đã lưu và giữ nguyên bản nháp.'}</AlertDialogDescription></AlertDialogHeader>
           {actions.saveError && <p role="alert" className="text-rose-700">{getApiErrorMessage(actions.saveError)}</p>}
-          <AlertDialogFooter>
+          <AlertDialogFooter className="flex-row flex-wrap justify-end">
             <Button variant="outline" disabled={actions.isSaving} onClick={() => setPreviewGuard(false)}>Hủy</Button>
             {!video.hasPendingWork && <>
               <Button variant="outline" disabled={actions.isSaving} onClick={() => { setPreviewGuard(false); setPreviewOpen(true); }}>Xem bản đã lưu</Button>
@@ -256,6 +258,6 @@ export function LessonContentWorkspace({
         </AlertDialogContent>
       </AlertDialog>
       {previewOpen && <LessonPreviewDialog lessonId={lessonId} courseId={courseId} onClose={() => setPreviewOpen(false)} />}
-    </Dialog>
+    </>
   );
 }
