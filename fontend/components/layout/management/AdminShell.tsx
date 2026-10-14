@@ -1,11 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useSelectedLayoutSegments } from 'next/navigation';
+import { usePathname, useSelectedLayoutSegments } from 'next/navigation';
 
 export function AdminShell({ children, sidebar }: { children: ReactNode; sidebar: ReactNode }) {
   const segments = useSelectedLayoutSegments();
+  const pathname = usePathname();
   const isLessonContent =
+    pathname.startsWith('/admin/') &&
     segments.length === 4 &&
     segments[0] === 'courses' &&
     /^\d+$/.test(segments[1]) &&
