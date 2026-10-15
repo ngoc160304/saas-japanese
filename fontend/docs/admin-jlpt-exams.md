@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend tasks 1–6
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–7
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -6,6 +6,133 @@ mapper, validator, `SecurityConfiguration`, `WebConfiguration`, upload và error
 đối chiếu thêm [tài liệu backend](../../backend/docs/admin-jlpt-exams-api.md) và
 [Postman collection](../../backend/docs/admin-jlpt-exams.postman_collection.json).
 Không dùng GitHub hoặc HTML để suy ra API. Backend/UI chỉ được đọc.
+
+## Task 7 — Kết quả tích hợp cuối ngày 2026-10-15
+
+Nhánh `feature/course-client`, HEAD `176ddc8`; working tree sạch trước task 7.
+Tasks 1–6 đã có implementation thực tế. Task 7 giữ nguyên routes/API/auth/dependencies,
+chỉ sửa hai lỗi được tái hiện, thêm regression và cập nhật bàn giao. Các mục xác minh
+tasks 1–6 bên dưới là lịch sử; kết quả task 7 ở đây thay thế các blocker phiên ADMIN cũ.
+Chưa tuyên bố hoàn tất xác minh toàn feature do các giới hạn media/access bên dưới.
+
+### Hai lỗi đã sửa
+
+1. **Readiness cũ đến sau content save:** bắt đầu GET validation, lưu metadata rồi
+   hoàn thành GET cũ có thể làm cache hiển thị ready như dữ liệu mới. Regression Node
+   thất bại trước sửa. `invalidateAdminJlptValidation` hiện cancel request đang chạy
+   trước khi mark stale, dùng cả khi mutation và detail refetch phát hiện thay đổi.
+   Không tự lấy readiness mới hoặc dùng cached ready để bypass publish. Node và
+   browser kiểm tra delayed response sau metadata save đều pass.
+2. **Reload ongoing attempt sau unpublish/archive:** backend giữ quyền save/submit
+   attempt nhưng public exam detail trả 404, khiến taking page hiện Exam unavailable.
+   Taking page hiện lưu public exam metadata trong snapshot sessionStorage hiện có
+   khi start thành công, giữ metadata qua answer saves, và dùng lại chỉ cho đúng
+   active attempt/exam khi public detail trả **404**. Không fallback 401/403/5xx,
+   không cấp quyền start mới, không đọc admin data/caches hoặc thay timer/scoring.
+   Legacy snapshot được bổ sung metadata khi public detail vẫn đọc được. Backend
+   vẫn kiểm tra ownership cho mọi save/submit/result/review.
+
+### Môi trường và dữ liệu thật đã kiểm tra
+
+- Next dev `localhost:3000`, backend `localhost:8080` có sẵn; production Next `3001`
+  được bật riêng để chạy browser regressions với API intercept. Dùng phiên đăng nhập
+  được cung cấp qua UI; không lưu credential vào test, tài liệu hoặc artifact.
+- Chỉ tạo/sửa exam **10**, title **JLPT-T7-2026-10-15T12-36-04-665Z**. Kết thúc ở
+  **ARCHIVED**, giữ hai attempt **32/33 COMPLETED** để đối chiếu. Không sửa đề có sẵn,
+  không sửa DB, không tạo account và không gọi provider upload thật.
+- UI thật: tạo DRAFT, tạo/sửa sessions/parts, atomic question create/edit + Save & Next,
+  retained/new/deleted answer IDs, answer order, batch reorder đủ siblings ba cấp,
+  reload persistence, xóa temporary session subtree với confirmation đúng 1 part /
+  1 question / 3 answers. Kết quả 3 sessions, 4 parts, 5 questions, **95 phút** từ
+  session durations. Live callback dùng `tests/admin-jlpt-live.playwright.mjs`;
+  đây là callback opt-in tạo fixture mới, cần kiểm tra/hoàn tất lifecycle rồi archive
+  fixture đã tạo, không chạy lại tùy tiện trên exam khác.
+- Readiness thật đủ điều kiện; publish/unpublish/republish trả 200, archive DELETE
+  trả 204. Published khóa content; unpublish trước attempts mở lại content. Sau khi
+  có attempts, unpublish vẫn khóa content; republish và archive vẫn được phép.
+- Hai attempts được bắt đầu hợp lệ từ learner UI bằng chính account được cấp
+  (không phải fixture ROLE_STUDENT riêng). Start trả **200**; response không lộ
+  correctness/explanation. Attempt 32 submit trước archive, attempt 33 tiếp tục save
+  sau unpublish, reload/save/submit sau archive đều thành công. Result/review/history
+  completed vẫn đọc được; tab mới không start được exam đã ẩn. Pass/fail hiển thị
+  theo backend (fixture ngắn có `isPassed:false`), không tính threshold ở frontend.
+- Lỗi reload được quan sát trước sửa trên attempt 33. Để nâng snapshot cũ trong phép
+  thử, exam test đã được republish hợp lệ, public detail được đọc lại rồi unpublish;
+  không bypass lock hoặc tạo attempt thay thế. Attempt mới sau bản sửa tự lưu metadata.
+
+### Ma trận xác minh
+
+| Phạm vi | Kết quả / bằng chứng |
+| --- | --- |
+| List, URL search/level/status/page/size, back/forward, stats independence, metadata errors/dirty/cache | Mock browser metadata + CDP pass; live create/list/builder được dùng |
+| Ownership, structure CRUD/delete/reorder, counts/duration | Mock builder pass (16 writes); luồng authoring backend thật pass |
+| Atomic answers/IDs, Save & Next, failed saves/dirty forms/read-only | Mock editor pass (12 writes); happy path authoring thật pass |
+| Media validation/multipart/progress/cancel/stale responses/null removal/ID reuse/object URL cleanup | Mock provider/browser pass (14 uploads, 12 resource writes); **chưa live upload/attachment** |
+| Validation issue navigation, stale results, publish rejection sau precheck, lock/lifecycle độc lập | Mock lifecycle pass (8 writes, 11 validation reads); delayed readiness regression pass; lifecycle backend thật pass |
+| Question/full preview, no solutions, transient selection, không attempt/upload/mutation | Mock lifecycle + review pass, kiểm tra network allowlist và authoring state |
+| Access bootstrap/anonymous/401/403 | CDP/mock pass; login ADMIN thật pass; **chưa phiên non-admin/expired thật riêng** |
+| Ongoing/completed attempt qua unpublish/archive | Backend thật pass với attempts 32/33; public-snapshot regression pass; **media history chưa xác minh thật** |
+| Responsive/keyboard/long Japanese content | Playwright 1440×1000, 820×1000, 390×1000 pass; list/builder/editor/preview, 24 answers, bảng dài; không horizontal page overflow sau layout ổn định |
+
+Đã xem screenshots synthetic ở `%TEMP%/admin-jlpt-task7-review`; không đưa ảnh/log
+generated vào repository. Có visible focus, ordering/correct-answer keyboard, Escape
+và dialog scroll; question preview giữ dirty input và correct answer. Không có per-card
+detail requests hoặc preview attempt writes. Console/network có lỗi mock chủ động
+400/401/403/409/413/500; shell còn `/admin/users` prefetch 404 và CSS preload warnings
+có sẵn. Không tuyên bố toàn console/network sạch lỗi.
+
+### Lệnh và browser regressions đã chạy trong task 7
+
+- `node --test tests/admin-jlpt-exams.test.mjs tests/category-course.test.mjs`:
+  **33/33 pass** (25 JLPT, 8 category).
+- `pnpm exec eslint features/admin-jlpt-exams apis/admin-jlpt-exams features/jlpt-exams/components/taking/JlptExamTakingPage.tsx features/jlpt-exams/taking/attempt-storage.ts tests/admin-jlpt-*.mjs`: **pass**.
+- `pnpm exec tsc --noEmit --incremental false`: **pass**.
+- `pnpm lint`: **fail**, lỗi có sẵn `components/common/card/CardItem.tsx:42` eqeqeq
+  và 6 warnings ngoài phạm vi. Không sửa file đó hoặc tắt check.
+- `pnpm build`: **pass**, gồm list/builder/editor/preview routes.
+- Playwright MCP callbacks metadata, builder, question, media, lifecycle: **pass**
+  trên dev 3000, API/provider đều mock. Callback mới
+  `admin-jlpt-review.playwright.mjs`: **pass** trên production 3001 (và dev 3000),
+  `admin-jlpt-history.playwright.mjs`: **pass** trên production 3001 (và dev 3000),
+  một start, hai saves, 404 resume, fresh tab bị chặn, 403 không fallback.
+- `ADMIN_JLPT_TEST_ORIGIN=http://localhost:3001 node tests/admin-jlpt-exams.browser.mjs`:
+  **pass**. `JLPT_TEST_ORIGIN=http://localhost:3001 node tests/jlpt-taking.browser.mjs`:
+  **pass**. Dùng cú pháp env tương ứng PowerShell khi chạy trên Windows.
+- `JLPT_TEST_ORIGIN=http://localhost:3001 node tests/jlpt-flow.browser.mjs`: lần đầu
+  fail assertion question visible ở dòng 226 khi smooth scroll; chạy lại riêng **pass**,
+  bản chẩn đoán thêm vị trí cũng pass. Đây là test timing chưa ổn định; không đổi
+  student navigation hoặc bỏ assertion để che lỗi. Nếu tái hiện, ghi viewport và pane /
+  card bounds tại assertion trước khi kết luận regression.
+- Backend tests **không chạy lại** trong task frontend này. Đã đọc báo cáo local:
+  workflow 8/8, lifecycle 36/36; full suite cũ 328 total / 326 pass / 1 failure / 1 skip,
+  có static-check findings nền. Không coi backend build là xanh.
+
+### Blocker còn lại và cách xác minh tiếp
+
+1. **Upload integration:** local upload gọi provider thật, chưa xác nhận provider
+   test/stub. Cần cấu hình local test provider theo backend, tạo fixture DRAFT riêng,
+   thực hiện image/audio upload → save → reload → replace/remove, rồi attachment save
+   failure/retry và media history. Không dùng dịch vụ production/paid để hoàn tất check.
+2. **Learner delivery contract:** start-attempt hiện trả prompt/options nhưng thiếu
+   passage/image/audio playback URLs; public detail chỉ có audioMediaId. Đây là giới
+   hạn đã ghi trong backend handoff mục Existing learner limitations. Repro: tạo đề
+   test có passage/media bằng admin, publish, bắt đầu attempt hợp lệ và kiểm tra public
+   DTO/taking view. Admin preview có media nhưng không thể dùng admin DTO cho student.
+   Cần backend/learner task riêng cho delivery contract; chưa xác minh được referenced
+   media trong student history bằng live fixture không media ở trên.
+3. **Legacy resume:** tab cũ không có public metadata, đã mất query cache và exam đã
+   ẩn trước lần đọc nâng cấp vẫn hiện Exam unavailable. Start DTO không có duration,
+   backend chưa có GET active-attempt metadata để khôi phục an toàn. Repro với legacy
+   snapshot chỉ `{attempt,savedAnswers}`, reload sau unpublish. Cần contract resume
+   được bảo vệ bằng ownership; không lấy admin endpoint, bịa duration hoặc auto start.
+4. **Access contract/security:** user model chưa có role, tiếp tục kiểm quyền qua
+   protected admin responses. Cần fixture non-admin và session expiry thực để lặp lại
+   mock 403/refresh tests. Backend handoff còn ghi public registration mặc định ADMIN
+   là **security release blocker**; cần sửa tại auth domain trước triển khai. Task này
+   không đổi role provisioning hoặc auth strategy. MySQL concurrency verification và
+   các lỗi backend baseline vẫn thuộc backend follow-up.
+
+Các thay đổi task 7 được để uncommitted. Không sửa backend/UI/lockfile/generated files.
 
 ## Ranh giới truy cập và điểm chênh lệch quan trọng
 
@@ -230,6 +357,11 @@ ownership hoặc DB conflict/lock. Upload có thể 413, 415; unsupported method
 | apis/upload | upload.api/upload.type | Multipart upload dùng client hiện có; signal, progress number/null, timeout, giữ legacy return shapes |
 | apis/admin-jlpt-exams | .api/.type/.keys + admin-jlpt-media | Contract, unwrap, ownership paths, read AbortSignal, media validation |
 | features/admin-jlpt-exams/hooks | useAdminJlptExams | Query/mutation lifecycle |
+| app/admin/exams/[id]/preview/page.tsx | AdminJlptExamPreviewPage | Persisted admin-readable preview, direct navigation/refresh và ADMIN boundary |
+| features/admin-jlpt-exams/components | LifecycleActions/LifecycleDialog/ValidationPanel | Confirm publish/unpublish/archive, mọi issues, stale/error/retry và resource navigation |
+| features/admin-jlpt-exams/components | QuestionPreview/PreviewContent | Unsaved question preview và full exam presentation; safe view model, local selection |
+| features/admin-jlpt-exams | admin-jlpt-policy/validation/preview | Lock vs lifecycle permissions, ownership-aware destinations, presentation allowlist |
+| features/jlpt-exams/taking/attempt-storage.ts | restoredAttemptExam + public metadata snapshot | Resume attempt đã có sau public 404; không cấp quyền start mới hoặc dùng admin data |
 
 Reuse: AdminShell/sidebar/AuthGuard/AuthBootstrap, authorized Axios/session refresh,
 QueryProvider, getApiError, Header (showProfile=false), PageSection, StatCard,
@@ -250,6 +382,8 @@ và detail/validation của exam bị tác động. Trên lỗi 400/404/409 cũn
 này để cập nhật snapshot/lock/membership. Không thay cache bằng nested response một
 phần, không optimistic structural update. Upload độc lập chưa attach không invalidate.
 Từ task 6, validation chỉ mark stale (`refetchType:none`), Check mới lấy lại snapshot;
+task 7 cancel validation request đang chạy trước mark stale để late response không
+chứng nhận lại nội dung đã đổi.
 list/stats/detail vẫn refetch bình thường. Xem mục task 6 để biết lifecycle seeding.
 Archive refetch detail để hiện archived thay vì xóa lịch sử trong cache.
 Student query cache không bị mutation admin thay thế.

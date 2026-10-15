@@ -65,6 +65,33 @@ const questionEditor = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-
 const preview = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-preview'));
 const { adminJlptCanTransition } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-policy'));
 const { adminJlptIssueDestination } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-validation'));
+const attemptStorage = load(resolve(root, 'features/jlpt-exams/taking/attempt-storage'));
+
+test('public attempt snapshots survive answer saves and restore after catalog 404 without authorizing new starts', () => {
+  const previousStorage = globalThis.sessionStorage;
+  const memory = new Map();
+  globalThis.sessionStorage = { getItem: (key) => memory.get(key) ?? null, setItem: (key, value) => memory.set(key, value), removeItem: (key) => memory.delete(key) };
+  try {
+    const key = attemptStorage.attemptStorageKey(1, 701, 'full', null);
+    const exam = { id: 701, title: 'Public exam', totalTimeMinutes: 95, sessions: [] };
+    const attempt = { attemptId: 32, examId: 701, sessions: [] };
+    attemptStorage.writeStoredAttempt(key, { attempt, exam, savedAnswers: {} });
+    attemptStorage.writeStoredAttempt(key, { attempt, savedAnswers: { 31: 310 } });
+    const stored = attemptStorage.readStoredAttempt(key);
+    assert.deepEqual(stored.exam, exam);
+    assert.equal(stored.savedAnswers[31], 310);
+    assert.deepEqual(attemptStorage.restoredAttemptExam(701, stored, null, 404), exam);
+    for (const status of [401, 403, 500, null]) assert.equal(attemptStorage.restoredAttemptExam(701, stored, null, status), null);
+    assert.equal(attemptStorage.restoredAttemptExam(701, null, exam, 404), null);
+    assert.equal(attemptStorage.restoredAttemptExam(702, stored, exam, 404), null);
+    assert.equal(attemptStorage.restoredAttemptExam(701, { ...stored, exam: { ...exam, id: 702 } }, exam, 404), null);
+    attemptStorage.writeStoredAttempt(key, { attempt: { ...attempt, attemptId: 33 }, savedAnswers: {} });
+    assert.equal(attemptStorage.readStoredAttempt(key).exam, undefined, 'No metadata leaks into another attempt');
+  } finally {
+    if (previousStorage === undefined) delete globalThis.sessionStorage;
+    else globalThis.sessionStorage = previousStorage;
+  }
+});
 
 test('lifecycle permissions are independent from content/metadata attempt locks', () => {
   for (const hasAttempts of [false, true]) {
@@ -122,6 +149,28 @@ test('content invalidation makes a previously valid readiness snapshot stale wit
   await invalidateAdminJlptExam(queryClient, 701);
   assert.equal(queryClient.getQueryState(key).isInvalidated, true);
   assert.equal(queryClient.getQueryData(key).canPublish, true); // retained history is not fresh proof
+  queryClient.clear();
+});
+
+test('a readiness request started before an edit cannot overwrite the invalidated snapshot', async () => {
+  const queryClient = new QueryClient();
+  const key = keys.validation(701);
+  queryClient.setQueryData(key, { canPublish: true, issues: [] });
+  let complete;
+  let readSignal;
+  const request = queryClient.fetchQuery({
+    queryKey: key,
+    staleTime: 0,
+    queryFn: ({ signal }) => {
+      readSignal = signal;
+      return new Promise((resolve) => { complete = resolve; });
+    },
+  }).catch(() => undefined);
+  await invalidateAdminJlptExam(queryClient, 701);
+  complete({ canPublish: true, issues: [] });
+  await request;
+  assert.equal(readSignal.aborted, true, 'Superseded readiness request must be canceled');
+  assert.equal(queryClient.getQueryState(key).isInvalidated, true, 'Late ready response cannot certify changed content');
   queryClient.clear();
 });
 

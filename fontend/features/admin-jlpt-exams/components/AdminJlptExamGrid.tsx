@@ -66,11 +66,11 @@ export function AdminJlptExamGrid({
                   className="text-xs"
                   onClick={() => onEdit(exam.id)}
                   disabled={Boolean(lock)}
-                  aria-label={`Sửa metadata: ${exam.title}`}
+                  aria-label={`Sửa : ${exam.title}`}
                   title={lock ?? 'Sửa tiêu đề, cấp độ và mô tả'}
                 >
                   <Pencil aria-hidden="true" />
-                  Sửa metadata
+                  Sửa
                 </Button>
               </div>
               {lock && (

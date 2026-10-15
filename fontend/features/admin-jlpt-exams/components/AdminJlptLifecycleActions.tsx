@@ -191,8 +191,7 @@ export function AdminJlptLifecycleDialog({
             <AdminJlptStatus status={exam.status} />
             {exam.hasAttempts && (
               <p className="text-sm text-amber-900">
-                Đề đã có lượt làm: vẫn có thể chuyển trạng thái, nhưng nội dung và metadata không
-                được sửa.
+                Đề đã có lượt làm: vẫn có thể chuyển trạng thái, nhưng nội dung không được sửa.
               </p>
             )}
             {!adminJlptCanTransition(exam, action) && (

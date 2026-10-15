@@ -56,7 +56,7 @@ export function useAdminJlptExamDetail(examId: number, freshOnMount = false) {
       const previous = client.getQueryData<AdminJlptExamDetail>(keys.detail(examId));
       // A background read may discover another admin's changes. There is no server revision token.
       if (previous && JSON.stringify(previous) !== JSON.stringify(data))
-        await client.invalidateQueries({ queryKey: keys.validation(examId), refetchType: 'none' });
+        await invalidateAdminJlptValidation(client, examId);
       return data;
     },
     enabled: ready && Number.isSafeInteger(examId) && examId > 0,
@@ -78,6 +78,13 @@ export function useAdminJlptExamValidation(examId: number, enabled = true) {
   });
 }
 
+async function invalidateAdminJlptValidation(client: QueryClient, examId: number) {
+  const queryKey = keys.validation(examId);
+  // A late read snapshot must not turn changed content back into a fresh "ready" result.
+  await client.cancelQueries({ queryKey });
+  await client.invalidateQueries({ queryKey, refetchType: 'none' });
+}
+
 export async function invalidateAdminJlptExam(client: QueryClient, examId?: number) {
   await Promise.all([
     client.invalidateQueries({ queryKey: keys.lists() }),
@@ -86,7 +93,7 @@ export async function invalidateAdminJlptExam(client: QueryClient, examId?: numb
       ? []
       : [
           client.invalidateQueries({ queryKey: keys.detail(examId) }),
-          client.invalidateQueries({ queryKey: keys.validation(examId), refetchType: 'none' }),
+          invalidateAdminJlptValidation(client, examId),
         ]),
   ]);
 }
