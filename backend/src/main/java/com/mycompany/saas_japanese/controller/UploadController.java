@@ -55,4 +55,19 @@ public class UploadController {
     response.setSecureUrl(result.getSecureUrl());
     return ResponseEntity.ok(response);
   }
+
+  @PostMapping(value = "/audios", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<MediaResponse> uploadAudio(
+      @RequestParam("file") MultipartFile file) {
+
+    Media result = uploadService.uploadAudio(file);
+
+    MediaResponse response = new MediaResponse();
+    response.setId(result.getId());
+    response.setOriginalName(result.getOriginalName());
+    response.setPublicId(result.getPublicId());
+    response.setSecureUrl(result.getSecureUrl());
+
+    return ResponseEntity.ok(response);
+  }
 }

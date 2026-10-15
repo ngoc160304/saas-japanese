@@ -7,15 +7,19 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,6 +45,7 @@ import com.mycompany.saas_japanese.domain.JlptExamAnswer;
 import com.mycompany.saas_japanese.domain.JlptExamPart;
 import com.mycompany.saas_japanese.domain.JlptExamQuestion;
 import com.mycompany.saas_japanese.domain.JlptExamSession;
+import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.UserJlptAttempt;
 import com.mycompany.saas_japanese.domain.UserJlptAttemptAnswer;
@@ -47,22 +53,26 @@ import com.mycompany.saas_japanese.domain.UserJlptAttemptPart;
 import com.mycompany.saas_japanese.domain.UserJlptAttemptSession;
 import com.mycompany.saas_japanese.domain.query.JlptAttemptHistoryQuery;
 import com.mycompany.saas_japanese.domain.request.ReqSaveJlptAnswer;
+import com.mycompany.saas_japanese.domain.request.ReqStartJjptAttempt;
 import com.mycompany.saas_japanese.domain.response.JlptAttemptHistoryResponse;
 import com.mycompany.saas_japanese.domain.response.JlptAttemptReviewResponse;
 import com.mycompany.saas_japanese.domain.response.JlptAttemptResultResponse;
 import com.mycompany.saas_japanese.domain.response.SaveJlptAnswerResponse;
+import com.mycompany.saas_japanese.domain.response.StartJlptAttemptResponse;
 import com.mycompany.saas_japanese.domain.response.SubmitJlptAttemptResponse;
 import com.mycompany.saas_japanese.repository.JlptExamAnswerRepository;
 import com.mycompany.saas_japanese.repository.JlptExamPartRepository;
 import com.mycompany.saas_japanese.repository.JlptExamQuestionRepository;
 import com.mycompany.saas_japanese.repository.JlptExamRepository;
 import com.mycompany.saas_japanese.repository.JlptExamSessionRepository;
+import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptAnswerRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptPartRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptSessionRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.mapper.JlptExamMapper;
+import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 import com.mycompany.saas_japanese.util.constant.JlptAttemptStatusEnum;
 import com.mycompany.saas_japanese.util.constant.JlptLevelEnum;
 import com.mycompany.saas_japanese.util.constant.JlptSessionEnum;
@@ -102,6 +112,9 @@ class JlptExamServiceImplTest {
     private JlptExamQuestionRepository jlptExamQuestionRepository;
 
     @Mock
+    private MediaRepository mediaRepository;
+
+    @Mock
     private UserJlptAttemptSessionRepository userJlptAttemptSessionRepository;
 
     @Mock
@@ -126,6 +139,70 @@ class JlptExamServiceImplTest {
     @AfterEach
     void clearAuthentication() {
         SecurityContextHolder.clearContext();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"full", "session"})
+    void startAttemptMapsOnlyActiveAudioMediaForPartsInSelectedSessions(String mode) {
+        JlptExam exam = startExam();
+        JlptExamSession firstSession = startSession(exam, EXAM_SESSION_ID);
+        JlptExamSession secondSession = startSession(exam, 41L);
+        List<JlptExamPart> firstParts = List.of(
+                startPart(firstSession, 100L, 201L),
+                startPart(firstSession, 101L, null),
+                startPart(firstSession, 102L, 202L),
+                startPart(firstSession, 103L, 203L),
+                startPart(firstSession, 104L, 204L));
+        List<JlptExamPart> secondParts = List.of(startPart(secondSession, 105L, 205L));
+        stubStartAttempt(mode, exam, firstSession, firstParts, secondSession, secondParts);
+        when(mediaRepository.findAllById(any())).thenReturn(List.of(
+                startMedia(201L, FileTypeEnum.AUDIO, false),
+                startMedia(203L, FileTypeEnum.AUDIO, true),
+                startMedia(204L, FileTypeEnum.IMAGE, false),
+                startMedia(205L, FileTypeEnum.AUDIO, false)));
+
+        StartJlptAttemptResponse response = jlptExamService.startAttempt(1L, startRequest(mode));
+
+        assertEquals(mode, response.getMode());
+        assertEquals("JLPT practice exam", response.getExamTitle());
+        assertEquals("Part 100", response.getSessions().get(0).getParts().get(0).getPartName());
+        assertPartAudio(response, 0, 0, 201L, "https://example.com/audio/201.mp3");
+        assertPartAudio(response, 0, 1, null, null);
+        assertPartAudio(response, 0, 2, 202L, null);
+        assertPartAudio(response, 0, 3, 203L, null);
+        assertPartAudio(response, 0, 4, 204L, null);
+        if ("full".equals(mode)) {
+            assertEquals(2, response.getSessions().size());
+            assertPartAudio(response, 1, 0, 205L, "https://example.com/audio/205.mp3");
+        } else {
+            assertEquals(1, response.getSessions().size());
+            verify(jlptExamPartRepository, never())
+                    .findByJlptExamSession_IdOrderBySortOrderAsc(secondSession.getId());
+        }
+
+        Set<Long> expectedIds = "full".equals(mode)
+                ? Set.of(201L, 202L, 203L, 204L, 205L)
+                : Set.of(201L, 202L, 203L, 204L);
+        verify(mediaRepository, times(1)).findAllById(argThat(ids -> {
+            List<Long> requestedIds = new ArrayList<>();
+            ids.forEach(requestedIds::add);
+            return requestedIds.size() == expectedIds.size()
+                    && Set.copyOf(requestedIds).equals(expectedIds);
+        }));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"full", "session"})
+    void startAttemptDoesNotLoadMediaWhenPartsHaveNoAudio(String mode) {
+        JlptExam exam = startExam();
+        JlptExamSession session = startSession(exam, EXAM_SESSION_ID);
+        stubStartAttempt(mode, exam, session,
+                List.of(startPart(session, 100L, null)), null, List.of());
+
+        StartJlptAttemptResponse response = jlptExamService.startAttempt(1L, startRequest(mode));
+
+        assertPartAudio(response, 0, 0, null, null);
+        verify(mediaRepository, never()).findAllById(any());
     }
 
     @Test
@@ -1066,6 +1143,102 @@ class JlptExamServiceImplTest {
             case N4 -> BigDecimal.valueOf(90);
             case N5 -> BigDecimal.valueOf(80);
         };
+    }
+
+    private JlptExam startExam() {
+        User user = stubCurrentUser();
+        JlptExam exam = JlptExam.builder()
+                .id(1L)
+                .title("JLPT practice exam")
+                .isPublished(true)
+                .build();
+        when(jlptExamRepository.findByIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(exam));
+        when(userJlptAttemptRepository.save(any(UserJlptAttempt.class)))
+                .thenAnswer(invocation -> {
+                    UserJlptAttempt attempt = invocation.getArgument(0);
+                    attempt.setId(ATTEMPT_ID);
+                    assertSame(user, attempt.getUser());
+                    return attempt;
+                });
+        when(userJlptAttemptSessionRepository.save(any(UserJlptAttemptSession.class)))
+                .thenAnswer(invocation -> {
+                    UserJlptAttemptSession session = invocation.getArgument(0);
+                    session.setId(session.getJlptExamSession().getId() + 100L);
+                    return session;
+                });
+        when(userJlptAttemptPartRepository.save(any(UserJlptAttemptPart.class)))
+                .thenAnswer(invocation -> {
+                    UserJlptAttemptPart part = invocation.getArgument(0);
+                    part.setId(part.getJlptExamPart().getId() + 100L);
+                    return part;
+                });
+        return exam;
+    }
+
+    private JlptExamSession startSession(JlptExam exam, Long id) {
+        return JlptExamSession.builder()
+                .id(id)
+                .jlptExam(exam)
+                .name("Session " + id)
+                .sortOrder(id.intValue())
+                .build();
+    }
+
+    private JlptExamPart startPart(JlptExamSession session, Long id, Long audioMediaId) {
+        return JlptExamPart.builder()
+                .id(id)
+                .jlptExamSession(session)
+                .name("Part " + id)
+                .sortOrder(id.intValue())
+                .audioMediaId(audioMediaId)
+                .build();
+    }
+
+    private Media startMedia(Long id, FileTypeEnum fileType, boolean isDeleted) {
+        return Media.builder()
+                .id(id)
+                .fileType(fileType)
+                .isDeleted(isDeleted)
+                .secureUrl("https://example.com/audio/" + id + ".mp3")
+                .build();
+    }
+
+    private void stubStartAttempt(String mode, JlptExam exam,
+            JlptExamSession firstSession, List<JlptExamPart> firstParts,
+            JlptExamSession secondSession, List<JlptExamPart> secondParts) {
+        if ("full".equals(mode)) {
+            List<JlptExamSession> sessions = secondSession == null
+                    ? List.of(firstSession) : List.of(firstSession, secondSession);
+            when(jlptExamSessionRepository.findByJlptExam_IdOrderBySortOrderAsc(exam.getId()))
+                    .thenReturn(sessions);
+        } else {
+            when(jlptExamSessionRepository.findById(firstSession.getId()))
+                    .thenReturn(Optional.of(firstSession));
+        }
+        when(jlptExamPartRepository.findByJlptExamSession_IdOrderBySortOrderAsc(firstSession.getId()))
+                .thenReturn(firstParts);
+        if ("full".equals(mode) && secondSession != null) {
+            when(jlptExamPartRepository.findByJlptExamSession_IdOrderBySortOrderAsc(secondSession.getId()))
+                    .thenReturn(secondParts);
+        }
+    }
+
+    private ReqStartJjptAttempt startRequest(String mode) {
+        ReqStartJjptAttempt request = new ReqStartJjptAttempt();
+        request.setUserId(USER_ID);
+        request.setMode(mode);
+        if ("session".equals(mode)) {
+            request.setSessionId(EXAM_SESSION_ID);
+        }
+        return request;
+    }
+
+    private void assertPartAudio(StartJlptAttemptResponse response,
+            int sessionIndex, int partIndex, Long mediaId, String audioUrl) {
+        StartJlptAttemptResponse.AttemptPartResponse part = response.getSessions()
+                .get(sessionIndex).getParts().get(partIndex);
+        assertEquals(mediaId, part.getAudioMediaId());
+        assertEquals(audioUrl, part.getAudioUrl());
     }
 
     private User stubCurrentUser() {
