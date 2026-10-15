@@ -409,7 +409,7 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     Map<Long, List<AdminJlptExamDetailResponse.QuestionResponse>> questionsByPart = questions.stream()
         .map(question -> mapper.toQuestion(
             question,
-            mediaById.get(question.getImageMediaId()),
+            question.getImageMediaId() == null ? null : mediaById.get(question.getImageMediaId()),
             answersByQuestion.getOrDefault(question.getId(), List.of()).stream()
                 .map(mapper::toAnswer)
                 .toList()))
@@ -418,7 +418,7 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     Map<Long, List<AdminJlptExamDetailResponse.PartResponse>> partsBySession = parts.stream()
         .map(part -> mapper.toPart(
             part,
-            mediaById.get(part.getAudioMediaId()),
+            part.getAudioMediaId() == null ? null : mediaById.get(part.getAudioMediaId()),
             questionsByPart.getOrDefault(part.getId(), List.of())))
         .collect(Collectors.groupingBy(response -> requirePartSessionId(parts, response.getId())));
 

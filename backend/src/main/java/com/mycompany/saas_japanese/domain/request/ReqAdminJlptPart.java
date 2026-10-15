@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
@@ -17,6 +18,7 @@ public class ReqAdminJlptPart {
   @Size(max = 10000, message = "Instructions must not exceed 10000 characters")
   private String instructions;
 
+  @NotNull(message = "Sort order is required")
   @PositiveOrZero(message = "Sort order must be zero or greater")
   private Integer sortOrder = 0;
 
