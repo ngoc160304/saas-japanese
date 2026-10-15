@@ -48,6 +48,10 @@ public class StartJlptAttemptResponse {
 
         private Integer partOrder;
 
+        private Long audioMediaId;
+
+        private String audioUrl;
+
         private List<QuestionResponse> questions;
     }
 

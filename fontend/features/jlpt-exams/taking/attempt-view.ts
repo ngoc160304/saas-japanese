@@ -1,5 +1,6 @@
 import type {
   JlptAttemptQuestion,
+  JlptExamSession,
   JlptExamStructure,
   StartedJlptAttempt,
 } from '@/apis/jlpt-exams/jlpt-exams.type';
@@ -13,6 +14,8 @@ export interface AttemptViewPart {
   id: number;
   name: string;
   instructions: string | null;
+  audioMediaId: number | null;
+  audioUrl: string | null;
   questions: NumberedQuestion[];
 }
 
@@ -21,6 +24,7 @@ export interface AttemptViewSession {
   attemptSessionId: number;
   title: string;
   timeLimitMinutes: number | null;
+  sessionType: JlptExamSession['sessionType'] | null;
   parts: AttemptViewPart[];
 }
 
@@ -33,10 +37,13 @@ export function buildAttemptView(attempt: StartedJlptAttempt, exam: JlptExamStru
       attemptSessionId: session.attemptSessionId,
       title: session.sessionTitle,
       timeLimitMinutes: detailSession?.timeLimitMinutes ?? null,
+      sessionType: detailSession?.sessionType ?? null,
       parts: session.parts.map((part) => ({
         id: part.partId,
         name: part.partName,
         instructions: detailSession?.parts.find((item) => item.id === part.partId)?.instructions ?? null,
+        audioMediaId: part.audioMediaId ?? null,
+        audioUrl: part.audioUrl ?? null,
         questions: part.questions.map((question) => ({ number: ++questionNumber, question })),
       })),
     };

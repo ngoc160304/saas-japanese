@@ -164,6 +164,86 @@ public class UploadServiceImpl implements UploadService {
     }
   }
 
+  private static final long MAX_AUDIO_SIZE = 20 * 1024 * 1024; // 20MB
+
+  public void validateAudio(MultipartFile file) {
+    validateNotEmpty(file);
+
+    if (file.getSize() > MAX_AUDIO_SIZE) {
+      throw new BadRequestException(
+          "Audio size must not exceed 20 MB");
+    }
+
+    String filename = file.getOriginalFilename();
+
+    String extension = filename == null || !filename.contains(".")
+        ? ""
+        : filename.substring(filename.lastIndexOf('.') + 1)
+            .toLowerCase(Locale.ROOT);
+
+    if (!"mp3".equals(extension)) {
+      throw new BadRequestException("Unsupported audio type");
+    }
+
+    String mime = file.getContentType();
+
+    if (!"audio/mpeg".equals(mime) && !"audio/mp3".equals(mime)) {
+      throw new BadRequestException("Invalid audio MIME type");
+    }
+
+    try (InputStream stream = file.getInputStream()) {
+      byte[] header = stream.readNBytes(3);
+
+      boolean hasId3 = header.length == 3
+          && header[0] == 'I'
+          && header[1] == 'D'
+          && header[2] == '3';
+
+      boolean hasFrameSync = header.length >= 2
+          && (header[0] & 0xFF) == 0xFF
+          && (header[1] & 0xE0) == 0xE0;
+
+      if (!hasId3 && !hasFrameSync) {
+        throw new BadRequestException("Invalid MP3 file");
+      }
+
+    } catch (IOException e) {
+      throw new BadRequestException("Cannot read audio file");
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Media uploadAudio(MultipartFile file) {
+    validateAudio(file);
+
+    try {
+      Map<String, Object> result = cloudinary.uploader().upload(
+          file.getBytes(),
+          ObjectUtils.asMap(
+              "resource_type", "video",
+              "folder", "audios"));
+
+      Media media = Media.builder()
+          .fileName(file.getOriginalFilename())
+          .originalName(file.getOriginalFilename())
+          .publicId((String) result.get("public_id"))
+          .secureUrl((String) result.get("secure_url"))
+          .fileType(FileTypeEnum.AUDIO)
+          .mimeType(file.getContentType())
+          .fileSize(file.getSize())
+          .filePath(null)
+          .isDeleted(false)
+          .isUsed(false)
+          .build();
+
+      return mediaRepository.save(media);
+
+    } catch (IOException e) {
+      throw new BadRequestException("Audio upload failed");
+    }
+  }
+
   @Override
   public Media getMediaById(Long id) {
     // TODO Auto-generated method stub
