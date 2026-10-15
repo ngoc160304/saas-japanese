@@ -1,7 +1,4 @@
 import type { AuthUser } from '@/apis/auth/auth.type';
-import type { ApiResponse } from '@/types/api';
-import type { PageResponse } from '@/types/pagination';
-import authorizeAxiosInstance from '@/lib/authorize-axios';
 import speakingAxios, { requireSpeakingApiUrl } from '@/lib/speaking-axios';
 import {
   createRoomSchema,
@@ -23,7 +20,7 @@ export function serializeSpeakingIdentity(
     room_name: roomName,
     user_id: String(user.id),
     user_name: user.name,
-    topic: { id: String(topic.id), title: topic.title, description: topic.description },
+    topic: { id: topic.id, title: topic.title, description: topic.description },
   };
 }
 function protocolError() {
@@ -73,18 +70,4 @@ async function endRoom(request: EndRoomRequest) {
     throw new Error('Chưa thể kết thúc phiên và lấy đánh giá. Vui lòng thử lại.');
   return parsed.data;
 }
-async function getTopics(page: number, signal?: AbortSignal) {
-  const response = await authorizeAxiosInstance.get<ApiResponse<PageResponse<SpeakingTopic>>>(
-    '/speaking/topics',
-    {
-      params: { page, size: 12 },
-      signal,
-      localErrorHandling: true,
-    },
-  );
-  return response.data.data;
-}
-export const speakingQueryKeys = {
-  topics: (userId: number, page: number) => ['speaking', userId, 'topics', page] as const,
-};
-export const speakingAPI = { createRoom, joinRoom, endRoom, getTopics };
+export const speakingAPI = { createRoom, joinRoom, endRoom };

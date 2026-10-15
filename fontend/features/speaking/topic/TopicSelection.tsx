@@ -4,97 +4,68 @@ import { useState } from 'react';
 import type { SpeakingTopic } from '@/apis/speaking/speaking.type';
 import { Button } from '@/components/ui/button';
 import TopicCard from './TopicCard';
+import { SPEAKING_TOPICS } from './topics';
 
 interface TopicSelectionProps {
-  topics: SpeakingTopic[];
-  loading: boolean;
   pending: boolean;
-  error: string | null;
-  page: number;
-  totalPages: number;
-  onRetry: () => void;
-  onPageChange: (page: number) => void;
   onStart: (topic: SpeakingTopic) => void;
 }
 
-export default function TopicSelection({
-  topics,
-  loading,
-  pending,
-  error,
-  page,
-  totalPages,
-  onRetry,
-  onPageChange,
-  onStart,
-}: TopicSelectionProps) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const selected = topics.find((topic) => topic.id === selectedId);
+export default function TopicSelection({ pending, onStart }: TopicSelectionProps) {
+  const [selectedTopic, setSelectedTopic] = useState<SpeakingTopic | null>(null);
+
+  const handleStart = () => {
+    if (!selectedTopic || pending) return;
+    onStart(selectedTopic);
+  };
+
   return (
-    <div>
-      <div className="mb-6 text-center">
-        <h2 className="text-lg font-semibold text-primary">
+    <div className="mx-auto max-w-5xl px-0 py-6 sm:px-6 sm:py-10">
+      <div className="mb-8 text-center">
+        <h2 className="text-xl font-semibold text-[#2B4C7E]">
           Chọn một chủ đề để bắt đầu cuộc hội thoại với AI
         </h2>
-        <p className="mt-2 text-sm text-slate-500">
+        <p className="mt-2 text-sm text-[#64748B]">
           Luyện nói tiếng Nhật theo những tình huống thực tế
         </p>
       </div>
-      {error ? (
-        <div role="alert" className="space-y-3 py-8 text-center">
-          <p>{error}</p>
-          <Button onClick={onRetry} disabled={loading}>
-            Thử tải lại
-          </Button>
-        </div>
-      ) : loading ? (
-        <p role="status" className="py-12 text-center text-slate-500">
-          Đang tải chủ đề…
-        </p>
-      ) : !topics.length ? (
-        <p className="py-12 text-center text-slate-500">Chưa có chủ đề hội thoại được công bố.</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {topics.map((topic) => (
-            <TopicCard
-              key={topic.id}
-              title={topic.title}
-              description={topic.description}
-              selected={selectedId === topic.id}
-              disabled={pending}
-              onClick={() => setSelectedId(topic.id)}
-            />
-          ))}
-        </div>
-      )}
-      {totalPages > 1 && (
-        <div className="mt-5 flex items-center justify-center gap-3">
-          <Button
-            variant="outline"
-            disabled={page === 0 || pending || loading}
-            onClick={() => onPageChange(page - 1)}
-          >
-            Trước
-          </Button>
-          <span className="text-sm">
-            {page + 1} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            disabled={page + 1 >= totalPages || pending || loading}
-            onClick={() => onPageChange(page + 1)}
-          >
-            Sau
-          </Button>
-        </div>
-      )}
-      <div className="mt-6 flex justify-center">
+
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {SPEAKING_TOPICS.map((topic) => (
+          <TopicCard
+            key={topic.id}
+            id={topic.id}
+            title={topic.title}
+            description={topic.description}
+            selected={selectedTopic?.id === topic.id}
+            disabled={pending}
+            onClick={() => setSelectedTopic(topic)}
+          />
+        ))}
+      </div>
+
+      <div className="mt-8 flex justify-center">
         <Button
-          disabled={!selected || pending || loading || Boolean(error)}
-          onClick={() => {
-            if (selected) onStart(selected);
-          }}
-          className="h-10 rounded-xl bg-primary px-6 text-white hover:bg-primary/90"
+          type="button"
+          size="lg"
+          disabled={!selectedTopic || pending}
+          onClick={handleStart}
+          className="
+            h-11 min-w-[200px]
+            rounded-xl
+            bg-[#2F80ED]
+            px-8
+            text-sm
+            font-semibold
+            text-white
+            shadow-sm
+            transition-all
+            hover:bg-[#2B4C7E]
+            hover:shadow-md
+            disabled:bg-slate-200
+            disabled:text-slate-400
+            disabled:opacity-100
+          "
         >
           {pending ? 'Đang kết nối…' : 'Bắt đầu hội thoại'}
         </Button>

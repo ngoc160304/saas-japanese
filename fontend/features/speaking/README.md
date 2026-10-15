@@ -25,15 +25,11 @@ Production server authorization requires a separate change to ai-service.
 
 ## Topic catalog
 
-ai-service has no topic list endpoint or persisted topic catalog.
-Spring provides GET /api/v1/speaking/topics?page=0&size=12 for authenticated users,
-using its standard data/Page wrapper and numeric topic IDs.
-POST /api/v1/admin/speaking/topics accepts { title, description } for ROLE_ADMIN,
-returns 201 with the saved topic, and populates the persisted catalog.
-The numeric topic ID is serialized to a string when sent to FastAPI.
-
-Apply backend/database/20261014_speaking_topics.sql to the application database.
-The migration is additive and starts empty. No frontend topic fallback is used.
+The page uses only the typed local SPEAKING_TOPICS constant in topic/topics.ts.
+Its six original topics are work, study, travel, daily-life, shopping, and conversation.
+Their string IDs, Vietnamese titles, and descriptions are sent unchanged to join-room.
+No topic-list API, server pagination, database records, or catalog seeding is required.
+Creating, joining, and ending an actual conversation still use the existing runtime APIs.
 
 ## Configuration
 

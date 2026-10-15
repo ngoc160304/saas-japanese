@@ -38,6 +38,18 @@ function createLoader() {
 }
 const encode = (data) => new TextEncoder().encode(JSON.stringify(data));
 
+test('local topics retain the original ordered IDs, titles, and descriptions', () => {
+  const { SPEAKING_TOPICS } = createLoader()('features/speaking/topic/topics');
+  assert.deepEqual(SPEAKING_TOPICS, [
+    { id: 'work', title: 'Công việc', description: 'Luyện giao tiếp trong môi trường công sở' },
+    { id: 'study', title: 'Học tập', description: 'Nói chuyện về trường học và việc học' },
+    { id: 'travel', title: 'Du lịch', description: 'Luyện hội thoại khi đi du lịch' },
+    { id: 'daily-life', title: 'Đời sống', description: 'Những tình huống giao tiếp hàng ngày' },
+    { id: 'shopping', title: 'Mua sắm', description: 'Luyện giao tiếp tại cửa hàng' },
+    { id: 'conversation', title: 'Giao tiếp', description: 'Hội thoại tiếng Nhật thông thường' },
+  ]);
+});
+
 test('missing scores stay unavailable while genuine zero is preserved', () => {
   const load = createLoader();
   const { formatScore } = load('features/speaking/utils/session-events');
@@ -74,9 +86,10 @@ test('ai-service paths and identity match main.py without Spring credentials or 
   process.env.NEXT_PUBLIC_SPEAKING_API_URL = 'https://speaking.example.test';
   const load = createLoader();
   const client = load('lib/speaking-axios').default;
-  const { speakingAPI, serializeSpeakingIdentity, speakingQueryKeys } = load(
+  const { speakingAPI, serializeSpeakingIdentity } = load(
     'apis/speaking/speaking.api',
   );
+  const { SPEAKING_TOPICS } = load('features/speaking/topic/topics');
   const calls = [];
   client.defaults.adapter = async (config) => {
     calls.push(config);
@@ -90,12 +103,12 @@ test('ai-service paths and identity match main.py without Spring credentials or 
   const room = await speakingAPI.createRoom();
   const payload = serializeSpeakingIdentity(
     { id: 42, name: 'Actual Student', email: 'student@example.test' },
-    { id: 7, title: 'Persisted topic', description: 'From catalog' },
+    SPEAKING_TOPICS[0],
     room.name,
   );
   assert.equal(payload.user_id, '42');
   assert.equal(payload.user_name, 'Actual Student');
-  assert.equal(payload.topic.id, '7');
+  assert.deepEqual(payload.topic, SPEAKING_TOPICS[0]);
   await speakingAPI.joinRoom(payload);
   const ended = await speakingAPI.endRoom({ room_name: room.name });
   assert.equal(ended.session_result.overall, 0);
@@ -114,7 +127,40 @@ test('ai-service paths and identity match main.py without Spring credentials or 
     assert.ok(!call.url.includes('/api/v1'));
   }
   assert.deepEqual(JSON.parse(calls[1].data), payload);
-  assert.notDeepEqual(speakingQueryKeys.topics(42, 0), speakingQueryKeys.topics(43, 0));
+});
+
+test('every static topic reaches join-room unchanged with the current account identity', async () => {
+  process.env.NEXT_PUBLIC_SPEAKING_API_URL = 'https://speaking.example.test';
+  const load = createLoader();
+  const client = load('lib/speaking-axios').default;
+  const { speakingAPI, serializeSpeakingIdentity } = load('apis/speaking/speaking.api');
+  const { SPEAKING_TOPICS } = load('features/speaking/topic/topics');
+  const requests = [];
+  client.defaults.adapter = async (config) => {
+    requests.push(JSON.parse(config.data));
+    return {
+      data: { serverUrl: 'wss://livekit.example.test', participantToken: 'test-participant' },
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+    };
+  };
+  for (const user of [
+    { id: 42, name: 'First Student', email: 'first@example.test' },
+    { id: 43, name: 'Second Student', email: 'second@example.test' },
+  ]) {
+    for (const topic of SPEAKING_TOPICS) {
+      await speakingAPI.joinRoom(serializeSpeakingIdentity(user, topic, 'selected-room'));
+      assert.deepEqual(requests.at(-1), {
+        room_name: 'selected-room',
+        user_id: String(user.id),
+        user_name: user.name,
+        topic,
+      });
+    }
+  }
+  assert.equal(requests.length, 12);
 });
 
 test('missing Speaking URL and malformed connection responses fail with actionable errors', async () => {
