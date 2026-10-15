@@ -10,6 +10,7 @@ import com.mycompany.saas_japanese.domain.JlptExam;
 import com.mycompany.saas_japanese.domain.JlptExamAnswer;
 import com.mycompany.saas_japanese.domain.JlptExamPart;
 import com.mycompany.saas_japanese.domain.JlptExamQuestion;
+import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.UserJlptAttempt;
 import com.mycompany.saas_japanese.domain.UserJlptAttemptAnswer;
 import com.mycompany.saas_japanese.domain.query.JlptAttemptHistoryQuery;
@@ -31,6 +32,7 @@ import com.mycompany.saas_japanese.repository.JlptExamPartRepository;
 import com.mycompany.saas_japanese.repository.JlptExamQuestionRepository;
 import com.mycompany.saas_japanese.repository.JlptExamRepository;
 import com.mycompany.saas_japanese.repository.JlptExamSessionRepository;
+import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptPartRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptAnswerRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptRepository;
@@ -40,6 +42,7 @@ import com.mycompany.saas_japanese.service.JlptExamService;
 import com.mycompany.saas_japanese.service.mapper.JlptExamMapper;
 import com.mycompany.saas_japanese.specification.JlptExamSpecs;
 import com.mycompany.saas_japanese.util.SecurityUtil;
+import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
 import com.mycompany.saas_japanese.util.constant.JlptAttemptStatusEnum;
 import com.mycompany.saas_japanese.util.constant.JlptScoringRule;
 import com.mycompany.saas_japanese.util.constant.JlptScoringRule.ScoringSectionRule;
@@ -76,6 +79,7 @@ public class JlptExamServiceImpl implements JlptExamService {
         private final JlptExamPartRepository jlptExamPartRepository;
         private final JlptExamAnswerRepository jlptExamAnswerRepository;
         private final JlptExamQuestionRepository jlptExamQuestionRepository;
+        private final MediaRepository mediaRepository;
         private final UserJlptAttemptSessionRepository userJlptAttemptSessionRepository;
         private final UserJlptAttemptPartRepository userJlptAttemptPartRepository;
         private final UserJlptAttemptAnswerRepository userJlptAttemptAnswerRepository;
@@ -252,6 +256,28 @@ public class JlptExamServiceImpl implements JlptExamService {
                                         "This exam has no sessions");
                 }
 
+                Map<Long, List<JlptExamPart>> partsBySession = new HashMap<>();
+                for (JlptExamSession session : sessions) {
+                        partsBySession.put(session.getId(), jlptExamPartRepository
+                                        .findByJlptExamSession_IdOrderBySortOrderAsc(session.getId()));
+                }
+
+                List<Long> audioMediaIds = partsBySession.values().stream()
+                                .flatMap(List::stream)
+                                .map(JlptExamPart::getAudioMediaId)
+                                .filter(Objects::nonNull)
+                                .distinct()
+                                .toList();
+                Map<Long, String> audioUrlsByMediaId = new HashMap<>();
+                if (!audioMediaIds.isEmpty()) {
+                        for (Media media : mediaRepository.findAllById(audioMediaIds)) {
+                                if (Boolean.FALSE.equals(media.getIsDeleted())
+                                                && media.getFileType() == FileTypeEnum.AUDIO) {
+                                        audioUrlsByMediaId.put(media.getId(), media.getSecureUrl());
+                                }
+                        }
+                }
+
                 UserJlptAttempt attempt = UserJlptAttempt.builder()
                                 .user(user)
                                 .jlptExam(exam)
@@ -273,9 +299,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                         attemptSession = userJlptAttemptSessionRepository
                                         .save(attemptSession);
 
-                        List<JlptExamPart> parts = jlptExamPartRepository
-                                        .findByJlptExamSession_IdOrderBySortOrderAsc(
-                                                        examSession.getId());
+                        List<JlptExamPart> parts = partsBySession.get(examSession.getId());
 
                         List<StartJlptAttemptResponse.AttemptPartResponse> partResponses = new ArrayList<>();
 
@@ -326,6 +350,9 @@ public class JlptExamServiceImpl implements JlptExamService {
                                                                 .partId(examPart.getId())
                                                                 .partName(examPart.getName())
                                                                 .partOrder(examPart.getSortOrder())
+                                                                .audioMediaId(examPart.getAudioMediaId())
+                                                                .audioUrl(audioUrlsByMediaId.get(
+                                                                                examPart.getAudioMediaId()))
                                                                 .questions(questionResponses)
                                                                 .build());
                         }

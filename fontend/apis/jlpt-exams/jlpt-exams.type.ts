@@ -73,6 +73,8 @@ export interface JlptAttemptPart {
   partId: number;
   partName: string;
   partOrder: number;
+  audioMediaId: number | null;
+  audioUrl: string | null;
   questions: JlptAttemptQuestion[];
 }
 

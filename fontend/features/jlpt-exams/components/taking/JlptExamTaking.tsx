@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { JlptExamStructure, StartedJlptAttempt } from '@/apis/jlpt-exams/jlpt-exams.type';
 import { buildAttemptView } from '../../taking/attempt-view';
 import { useAttemptProgress } from '../../taking/use-attempt-progress';
@@ -11,16 +11,29 @@ import { ExamSessionHeader } from './ExamSessionHeader';
 
 export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey }: { attempt: StartedJlptAttempt; exam: JlptExamStructure; initialSavedAnswers: Record<number, number>; storageKey: string | null }) {
   const sessions = buildAttemptView(attempt, exam);
+  const audioElements = useRef(new Map<number, HTMLAudioElement>());
+  const activeAudio = useRef<HTMLAudioElement | null>(null);
   const [selectedSessionId, setSelectedSessionId] = useState(sessions[0]?.id ?? 0);
   const [currentQuestionId, setCurrentQuestionId] = useState<number | null>(sessions[0]?.parts[0]?.questions[0]?.question.questionId ?? null);
   const [flaggedIds, setFlaggedIds] = useState<ReadonlySet<number>>(new Set());
   const [navigationOpen, setNavigationOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [audioErrors, setAudioErrors] = useState<ReadonlySet<number>>(new Set());
   const selectedSession = sessions.find((session) => session.id === selectedSessionId) ?? sessions[0];
   const timeLimitMinutes = attempt.mode === 'session' ? selectedSession?.timeLimitMinutes ?? exam.totalTimeMinutes : exam.totalTimeMinutes;
   const { answers, statuses, selectAnswer, retryAnswer, submit, submitting, submitError, remainingSeconds } = useAttemptProgress(attempt, timeLimitMinutes, initialSavedAnswers, storageKey);
   const allQuestions = sessions.flatMap((session) => session.parts.flatMap((part) => part.questions));
   const answeredCount = allQuestions.filter(({ question }) => answers[question.questionId] !== undefined).length;
+
+  useEffect(() => () => {
+    activeAudio.current?.pause();
+    activeAudio.current = null;
+  }, []);
+
+  function stopActiveAudio() {
+    activeAudio.current?.pause();
+    activeAudio.current = null;
+  }
 
   function selectValidAnswer(questionId: number, answerId: number) {
     const session = sessions.find((item) => item.parts.some((part) => part.questions.some(({ question }) => question.questionId === questionId && question.answers.some((answer) => answer.answerId === answerId))));
@@ -37,6 +50,7 @@ export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey 
   function selectSession(sessionId: number) {
     const session = sessions.find((item) => item.id === sessionId);
     if (!session) return;
+    stopActiveAudio();
     setSelectedSessionId(sessionId);
     setCurrentQuestionId(session.parts[0]?.questions[0]?.question.questionId ?? null);
     setNavigationOpen(false);
@@ -46,6 +60,7 @@ export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey 
   function selectQuestion(sessionId: number, questionId: number) {
     const session = sessions.find((item) => item.id === sessionId);
     if (!session?.parts.some((part) => part.questions.some((item) => item.question.questionId === questionId))) return;
+    if (selectedSessionId !== sessionId) stopActiveAudio();
     setSelectedSessionId(sessionId);
     setCurrentQuestionId(questionId);
     setNavigationOpen(false);
@@ -57,6 +72,22 @@ export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey 
       const maxScrollTop = Math.max(0, panel.scrollHeight - panel.clientHeight);
       panel.scrollTo({ top: Math.min(Math.max(0, questionTop), maxScrollTop), behavior: 'smooth' });
     });
+  }
+
+  function retryAudio(partId: number) {
+    const audio = audioElements.current.get(partId);
+    if (!audio) return;
+    setAudioErrors((current) => {
+      const next = new Set(current);
+      next.delete(partId);
+      return next;
+    });
+    audio.load();
+  }
+
+  function handleAudioPlay(audio: HTMLAudioElement) {
+    if (activeAudio.current && activeAudio.current !== audio) activeAudio.current.pause();
+    activeAudio.current = audio;
   }
 
   function toggleFlag(questionId: number) {
@@ -90,6 +121,35 @@ export function JlptExamTaking({ attempt, exam, initialSavedAnswers, storageKey 
                     <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                       <h3 className="font-bold text-slate-800">{part.name}</h3>
                       {part.instructions?.trim() && <p className="mt-2 whitespace-pre-line leading-relaxed text-slate-600">{part.instructions}</p>}
+                      {selectedSession.sessionType === 'listening' && part.audioUrl && (
+                        <div className="mt-4">
+                          <audio
+                            ref={(audio) => {
+                              if (audio) audioElements.current.set(part.id, audio);
+                              else audioElements.current.delete(part.id);
+                            }}
+                            aria-label={`Audio for ${part.name}`}
+                            controls
+                            preload="none"
+                            src={part.audioUrl}
+                            onPlay={(event) => handleAudioPlay(event.currentTarget)}
+                            onPause={(event) => {
+                              if (activeAudio.current === event.currentTarget) activeAudio.current = null;
+                            }}
+                            onEnded={(event) => {
+                              if (activeAudio.current === event.currentTarget) activeAudio.current = null;
+                            }}
+                            onError={() => setAudioErrors((current) => new Set(current).add(part.id))}
+                            className="w-full"
+                          />
+                          {audioErrors.has(part.id) && (
+                            <div role="alert" className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm text-red-700">
+                              <span>Audio could not be loaded. Check your connection and try again.</span>
+                              <button type="button" onClick={() => retryAudio(part.id)} className="font-bold text-sky-700 underline focus-visible:outline-2 focus-visible:outline-sky-500">Retry audio</button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                     {part.questions.length === 0 && <p className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-600">No questions are available for this part.</p>}
                     {part.questions.map((item) => (
