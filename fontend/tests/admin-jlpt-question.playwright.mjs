@@ -110,6 +110,17 @@ export default async function runAdminJlptQuestionSmoke(
     if (state.mode === 'denied') return fail(403, 'Access denied');
     if (path.endsWith('/stats'))
       return ok({ totalExams: 1, draftExams: 1, publishedExams: 0, archivedExams: 0 });
+    if (path.endsWith('/701/validation') && method === 'GET')
+      return ok({
+        examId: 701,
+        status: exam.status,
+        contentValid: true,
+        canPublish: exam.status !== 'ARCHIVED',
+        hasAttempts: exam.hasAttempts,
+        contentLocked: exam.contentLocked,
+        totalTimeMinutes: exam.totalTimeMinutes,
+        issues: [],
+      });
     if (path === '/api/v1/admin/jlpt-exams/701' && method === 'GET')
       return state.detailError ? fail(500, 'Unavailable') : ok(exam);
     const match =
@@ -391,7 +402,9 @@ export default async function runAdminJlptQuestionSmoke(
   );
   await fillNew('続けて作成');
   await page.getByLabel('Giải thích đáp án', { exact: true }).fill('前の説明');
-  const readsBeforeCreateNext = state.calls.filter((c) => c.method === 'GET' && c.path === '/api/v1/admin/jlpt-exams/701').length;
+  const readsBeforeCreateNext = state.calls.filter(
+    (c) => c.method === 'GET' && c.path === '/api/v1/admin/jlpt-exams/701',
+  ).length;
   await next().click();
   await page.waitForFunction(
     () =>
@@ -403,7 +416,12 @@ export default async function runAdminJlptQuestionSmoke(
       (await page.getByLabel('Giải thích đáp án', { exact: true }).inputValue()) === '',
     'Create Save & Next resets explanation/context without navigation duplicate',
   );
-  check(state.calls.filter((c) => c.method === 'GET' && c.path === '/api/v1/admin/jlpt-exams/701').length === readsBeforeCreateNext + 1, 'Save & Next reuses the mutation detail refetch');
+  check(
+    state.calls.filter((c) => c.method === 'GET' && c.path === '/api/v1/admin/jlpt-exams/701')
+      .length ===
+      readsBeforeCreateNext + 1,
+    'Save & Next reuses the mutation detail refetch',
+  );
   await fillNew('応答が途切れた問題');
   state.failNext = 'after-commit';
   await save().click();

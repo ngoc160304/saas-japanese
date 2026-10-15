@@ -83,10 +83,15 @@ export default async function runAdminJlptBuilderSmoke(page, origin = 'http://lo
   };
   recalculate();
   // Builder now includes a native audio player; keep its fixture fully offline.
-  await page.route('https://example.test/audio.mp3', (route) => route.fulfill({
-    contentType: 'audio/wav',
-    body: Buffer.from('524946462c00000057415645666d74201000000001000100401f0000401f00000100080064617461080000008080808080808080', 'hex'),
-  }));
+  await page.route('https://example.test/audio.mp3', (route) =>
+    route.fulfill({
+      contentType: 'audio/wav',
+      body: Buffer.from(
+        '524946462c00000057415645666d74201000000001000100401f0000401f00000100080064617461080000008080808080808080',
+        'hex',
+      ),
+    }),
+  );
   await page.unroute('**/api/v1/**');
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request(),
@@ -114,6 +119,17 @@ export default async function runAdminJlptBuilderSmoke(page, origin = 'http://lo
     if (state.mode === 'denied') return fail(403, 'Access denied');
     if (path.endsWith('/stats'))
       return ok({ totalExams: 1, draftExams: 1, publishedExams: 0, archivedExams: 0 });
+    if (path.endsWith('/701/validation') && method === 'GET')
+      return ok({
+        examId: 701,
+        status: exam.status,
+        contentValid: true,
+        canPublish: exam.status !== 'ARCHIVED',
+        hasAttempts: exam.hasAttempts,
+        contentLocked: exam.contentLocked,
+        totalTimeMinutes: exam.totalTimeMinutes,
+        issues: [],
+      });
     if (path.endsWith('/jlpt-exams/701') && method === 'GET')
       return state.detailFailure ? fail(500, 'Internal error') : ok(exam);
     if (path.endsWith('/jlpt-exams/701') && method === 'PUT') {
@@ -246,7 +262,9 @@ export default async function runAdminJlptBuilderSmoke(page, origin = 'http://lo
     // Reorder all three hierarchy levels; focus stays on the moved resource.
     // Returning from the question editor reveals a hash context once; later
     // user collapse choices must still survive authoritative tree refetches.
-    await page.evaluate(() => { window.location.hash = 'part-22'; });
+    await page.evaluate(() => {
+      window.location.hash = 'part-22';
+    });
     await page.getByRole('button', { name: 'Thu gọn phần thi 部分 22', exact: true }).click();
     await page
       .getByRole('button', { name: 'Chuyển xuống phiên thi Session 11', exact: true })

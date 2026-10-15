@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { adminJlptEditLock } from './admin-jlpt-policy';
 import type {
   AdminJlptExamInput,
   AdminJlptExamSummary,
@@ -24,12 +25,5 @@ export function adminJlptMetadataPayload(values: AdminJlptMetadataValues): Admin
 export function adminJlptMetadataLock(
   exam: Pick<AdminJlptExamSummary, 'status' | 'hasAttempts' | 'contentLocked'>,
 ): string | null {
-  if (exam.status === 'ARCHIVED')
-    return 'Đề thi đã lưu trữ, chỉ được xem và giữ lại lịch sử làm bài.';
-  if (exam.hasAttempts)
-    return 'Đề thi đã có lượt làm bài. Metadata bị khóa kể cả sau khi hủy xuất bản.';
-  if (exam.status === 'PUBLISHED') return 'Cần hủy xuất bản đề thi trước khi sửa metadata.';
-  if (exam.contentLocked)
-    return 'Backend đã khóa nội dung đề thi. Vui lòng tải lại trạng thái mới nhất.';
-  return null;
+  return adminJlptEditLock(exam, 'metadata');
 }

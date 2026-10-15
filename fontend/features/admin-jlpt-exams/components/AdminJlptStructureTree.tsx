@@ -16,6 +16,7 @@ import {
 import { AdminJlptSafeText } from './AdminJlptSafeText';
 import { AdminJlptMediaPreview } from './AdminJlptMediaPreview';
 import { adminJlptQuestionUrl } from '../admin-jlpt-question';
+import { useAdminJlptHashFocus } from '../hooks/useAdminJlptHashFocus';
 
 interface Props {
   exam: AdminJlptExamDetail;
@@ -75,16 +76,22 @@ export function AdminJlptStructureTree({
 }: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
   const revealedHash = useRef<string | null>(null);
+  useAdminJlptHashFocus(`exam-${exam.id}`);
   useEffect(() => {
-    const revealContext = () => {
+    const revealContext = (event?: Event) => {
+      if (event?.type === 'hashchange') revealedHash.current = null;
       if (revealedHash.current === window.location.hash) return;
       const partId = /^#part-(\d+)$/.exec(window.location.hash)?.[1];
-      const session = exam.sessions.find((s) => s.parts.some((p) => String(p.id) === partId));
-      if (!partId) revealedHash.current = window.location.hash;
-      if (!session || !partId) return;
+      const sessionId = /^#session-(\d+)$/.exec(window.location.hash)?.[1];
+      const session = exam.sessions.find(
+        (s) => String(s.id) === sessionId || s.parts.some((p) => String(p.id) === partId),
+      );
+      if (!partId && !sessionId) revealedHash.current = window.location.hash;
+      if (!session) return;
       revealedHash.current = window.location.hash;
       setCollapsed((previous) => {
-        if (!previous.has(`session-${session.id}`) && !previous.has(`part-${partId}`)) return previous;
+        if (!previous.has(`session-${session.id}`) && !previous.has(`part-${partId}`))
+          return previous;
         const next = new Set(previous);
         next.delete(`session-${session.id}`);
         next.delete(`part-${partId}`);
@@ -164,6 +171,7 @@ export function AdminJlptStructureTree({
         return (
           <section
             key={session.id}
+            id={`session-${session.id}`}
             data-session-id={session.id}
             className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-soft"
           >
@@ -276,7 +284,11 @@ export function AdminJlptStructureTree({
                         {!disabled && (
                           <Link
                             className={buttonVariants({ variant: 'outline' })}
-                            href={adminJlptQuestionUrl({ examId: exam.id, sessionId: session.id, partId: part.id })}
+                            href={adminJlptQuestionUrl({
+                              examId: exam.id,
+                              sessionId: session.id,
+                              partId: part.id,
+                            })}
                           >
                             <Plus />
                             Thêm câu hỏi
@@ -297,7 +309,13 @@ export function AdminJlptStructureTree({
                       hidden={!partOpen}
                       className="mt-4 space-y-3 border-t border-slate-200 pt-4"
                     >
-                      {partOpen && part.audio && <AdminJlptMediaPreview kind="audio" url={part.audio.secureUrl} name={part.audio.originalName} />}
+                      {partOpen && part.audio && (
+                        <AdminJlptMediaPreview
+                          kind="audio"
+                          url={part.audio.secureUrl}
+                          name={part.audio.originalName}
+                        />
+                      )}
                       {part.questions.length === 0 && (
                         <p className="py-3 text-center text-sm text-slate-600">
                           Phần thi chưa có câu hỏi.

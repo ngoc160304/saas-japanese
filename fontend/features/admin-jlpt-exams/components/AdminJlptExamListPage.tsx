@@ -14,12 +14,18 @@ import { AdminJlptExamStats } from './AdminJlptExamStats';
 import { AdminJlptExamFilters } from './AdminJlptExamFilters';
 import { AdminJlptExamGrid } from './AdminJlptExamGrid';
 import { AdminJlptMetadataDialog, type AdminJlptMetadataTarget } from './AdminJlptMetadataDialog';
+import { AdminJlptLifecycleDialog } from './AdminJlptLifecycleActions';
+import type { AdminJlptLifecycleAction } from '../admin-jlpt-policy';
 
 export function AdminJlptExamListPage() {
   const { params, searchText, setSearch, setFilters, setPage, reset } = useAdminJlptExamsUrlState();
   const list = useAdminJlptExamList(params);
   const stats = useAdminJlptExamStats(params);
   const [dialog, setDialog] = useState<AdminJlptMetadataTarget | null>(null);
+  const [lifecycle, setLifecycle] = useState<{
+    examId: number;
+    action: AdminJlptLifecycleAction;
+  } | null>(null);
   const data = list.data;
   const lastPage = data ? Math.max(0, data.totalPages - 1) : 0;
   const correctingPage = Boolean(data && !list.isError && params.page > lastPage);
@@ -79,6 +85,7 @@ export function AdminJlptExamListPage() {
                 <AdminJlptExamGrid
                   exams={data.content}
                   onEdit={(examId) => setDialog({ mode: 'edit', examId })}
+                  onLifecycle={(examId, action) => setLifecycle({ examId, action })}
                 />
               ) : (
                 <div role="status" className="space-y-3 py-10 text-center">
@@ -128,6 +135,7 @@ export function AdminJlptExamListPage() {
           onClose={() => setDialog(null)}
         />
       )}
+      {lifecycle && <AdminJlptLifecycleDialog {...lifecycle} onClose={() => setLifecycle(null)} />}
     </>
   );
 }

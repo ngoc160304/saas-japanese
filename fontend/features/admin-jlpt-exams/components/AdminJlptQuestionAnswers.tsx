@@ -62,6 +62,7 @@ export function AdminJlptQuestionAnswers({
           return (
             <div
               key={field.id}
+              id={field.answerId === undefined ? undefined : `answer-resource-${field.answerId}`}
               data-answer-key={field.id}
               className={`min-w-0 space-y-3 rounded-2xl border p-4 ${correct ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-slate-50'}`}
             >

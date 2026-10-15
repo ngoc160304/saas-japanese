@@ -4,13 +4,17 @@ import type { AdminJlptExamSummary } from '@/apis/admin-jlpt-exams/admin-jlpt-ex
 import { Button } from '@/components/ui/button';
 import { adminJlptMetadataLock } from '../admin-jlpt-metadata';
 import { AdminJlptStatus } from './AdminJlptStatus';
+import { AdminJlptLifecycleActions } from './AdminJlptLifecycleActions';
+import type { AdminJlptLifecycleAction } from '../admin-jlpt-policy';
 
 export function AdminJlptExamGrid({
   exams,
   onEdit,
+  onLifecycle,
 }: {
   exams: AdminJlptExamSummary[];
   onEdit: (examId: number) => void;
+  onLifecycle: (examId: number, action: AdminJlptLifecycleAction) => void;
 }) {
   return (
     <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -82,6 +86,10 @@ export function AdminJlptExamGrid({
                 <PanelsTopLeft className="size-4" aria-hidden="true" />
                 Mở Exam Builder<span className="sr-only">: {exam.title}</span>
               </Link>
+              <AdminJlptLifecycleActions
+                exam={exam}
+                onAction={(action) => onLifecycle(exam.id, action)}
+              />
             </div>
           </article>
         );

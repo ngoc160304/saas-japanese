@@ -13,7 +13,11 @@ import {
   type AdminJlptEditorTarget,
   type AdminJlptStructureTarget,
 } from '../admin-jlpt-structure';
-import { useAdminJlptExamDetail } from '../hooks/useAdminJlptExams';
+import {
+  useAdminJlptExamDetail,
+  useAdminJlptExamValidation,
+  useAdminJlptExamWriting,
+} from '../hooks/useAdminJlptExams';
 import { useAdminJlptStructure } from '../hooks/useAdminJlptStructure';
 import { AdminJlptLoading, AdminJlptQueryError } from './AdminJlptState';
 import { AdminJlptStatus } from './AdminJlptStatus';
@@ -21,6 +25,8 @@ import { AdminJlptMetadataDialog } from './AdminJlptMetadataDialog';
 import { AdminJlptStructureTree } from './AdminJlptStructureTree';
 import { AdminJlptStructureDialog } from './AdminJlptStructureDialog';
 import { AdminJlptStructureDeleteDialog } from './AdminJlptStructureDeleteDialog';
+import { AdminJlptLifecycleActions } from './AdminJlptLifecycleActions';
+import { AdminJlptValidationPanel } from './AdminJlptValidationPanel';
 
 export function AdminJlptExamDetailPage({ examId }: { examId: number }) {
   return <Builder key={examId} examId={examId} />;
@@ -29,6 +35,8 @@ export function AdminJlptExamDetailPage({ examId }: { examId: number }) {
 function Builder({ examId }: { examId: number }) {
   const query = useAdminJlptExamDetail(examId);
   const structure = useAdminJlptStructure(examId);
+  const validation = useAdminJlptExamValidation(examId);
+  const writing = useAdminJlptExamWriting(examId);
   const [editor, setEditor] = useState<AdminJlptEditorTarget | null>(null);
   const [deleting, setDeleting] = useState<AdminJlptStructureTarget | null>(null);
   const [metadata, setMetadata] = useState(false);
@@ -46,7 +54,7 @@ function Builder({ examId }: { examId: number }) {
   const exam = query.data;
   const lock = adminJlptContentLock(exam);
   const blocked = Boolean(lock || query.isError || query.isFetching);
-  const disabled = blocked || structure.pending;
+  const disabled = blocked || structure.pending || writing;
   const openEditor = (target: AdminJlptEditorTarget) => {
     if (!disabled) setEditor(target);
   };
@@ -79,7 +87,11 @@ function Builder({ examId }: { examId: number }) {
               <AdminJlptStatus status={exam.status} />
               <span className="text-xs text-slate-600">Mã đề #{exam.id}</span>
             </div>
-            <h2 className="break-words text-xl font-bold text-slate-900 [overflow-wrap:anywhere] md:text-2xl">
+            <h2
+              id="exam-overview"
+              tabIndex={-1}
+              className="break-words text-xl font-bold text-slate-900 outline-none focus-visible:ring-2 focus-visible:ring-primary [overflow-wrap:anywhere] md:text-2xl"
+            >
               {exam.title}
             </h2>
             <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600 [overflow-wrap:anywhere]">
@@ -87,6 +99,12 @@ function Builder({ examId }: { examId: number }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/admin/exams/${exam.id}/preview`}
+              className="self-center px-2 text-sm font-semibold text-primary underline"
+            >
+              Student Preview
+            </Link>
             <Button
               variant="outline"
               disabled={
@@ -131,6 +149,22 @@ function Builder({ examId }: { examId: number }) {
           </p>
         )}
       </PageSection>
+      <AdminJlptLifecycleActions
+        exam={exam}
+        disabled={
+          query.isError ||
+          query.isFetching ||
+          structure.pending ||
+          metadata ||
+          editor !== null ||
+          deleting !== null
+        }
+      />
+      <AdminJlptValidationPanel
+        exam={exam}
+        query={validation}
+        disabled={writing || metadata || editor !== null || deleting !== null}
+      />
       {query.isError && (
         <div
           role="alert"
@@ -174,7 +208,7 @@ function Builder({ examId }: { examId: number }) {
         <AdminJlptStructureTree
           exam={exam}
           disabled={disabled}
-          questionNavigationDisabled={structure.pending}
+          questionNavigationDisabled={structure.pending || writing}
           onEdit={openEditor}
           onDelete={openDelete}
           onMove={(target, direction) => {

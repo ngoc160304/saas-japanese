@@ -18,6 +18,7 @@ import {
 import { getAdminJlptError } from '../admin-jlpt-error';
 import {
   invalidateAdminJlptExam,
+  adminJlptWriteFilter,
   useCreateAdminJlptQuestionWithAnswers,
   useUpdateAdminJlptQuestionWithAnswers,
 } from './useAdminJlptExams';
@@ -36,7 +37,7 @@ export function useAdminJlptQuestionSave(examId: number) {
     target: AdminJlptQuestionTarget;
     values: AdminJlptQuestionValues;
   }) => {
-    if (inFlight.current) throw rejected('Câu hỏi đang được lưu.');
+    if (inFlight.current || client.isMutating(adminJlptWriteFilter(examId))) throw rejected('Đề thi đang được cập nhật.');
     inFlight.current = true;
     let dispatched = false;
     try {

@@ -172,6 +172,17 @@ export default async function runAdminJlptMediaSmoke(
     if (state.mode === 'denied') return fail(403);
     if (path.endsWith('/stats'))
       return ok({ totalExams: 1, draftExams: 1, publishedExams: 0, archivedExams: 0 });
+    if (path.endsWith('/701/validation') && method === 'GET')
+      return ok({
+        examId: 701,
+        status: exam.status,
+        contentValid: true,
+        canPublish: exam.status !== 'ARCHIVED',
+        hasAttempts: exam.hasAttempts,
+        contentLocked: exam.contentLocked,
+        totalTimeMinutes: exam.totalTimeMinutes,
+        issues: [],
+      });
     if (method === 'GET' && path === '/api/v1/admin/jlpt-exams/701') return ok(exam);
     if (isUpload && method === 'POST') {
       check(

@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend tasks 1–5
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–6
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -246,9 +246,11 @@ và authenticated, đặt trong feature access boundary. Không tạo nested que
 
 Create exam seed detail mới + invalidate mọi list/stats. Metadata, lifecycle và mọi
 nested create/update/delete/sort/atomic/batch mutation invalidate tất cả list/stats
-và detail/validation của exam bị tác động. Trên lỗi 400/404/409 cũng refetch các query
+và detail/validation của exam bị tác động. Trên lỗi 400/404/409 cũng reconcile các query
 này để cập nhật snapshot/lock/membership. Không thay cache bằng nested response một
 phần, không optimistic structural update. Upload độc lập chưa attach không invalidate.
+Từ task 6, validation chỉ mark stale (`refetchType:none`), Check mới lấy lại snapshot;
+list/stats/detail vẫn refetch bình thường. Xem mục task 6 để biết lifecycle seeding.
 Archive refetch detail để hiện archived thay vì xóa lịch sử trong cache.
 Student query cache không bị mutation admin thay thế.
 
@@ -466,6 +468,141 @@ và question create/edit chưa triển khai.
   validators task 1 đã có. Cần thiết kế rõ staged upload vs attach và explicit remove,
   tránh null/omitted làm mất association khi lưu unrelated fields.
 - Chưa làm lifecycle/publish-validation UI, preview (task 6), hoặc media controls.
+
+## Task 6 — Lifecycle, validation và preview
+
+### Contract và quyền đã đối chiếu lại
+
+- GET `E/validation` trả `{examId,status,contentValid,canPublish,hasAttempts,
+  contentLocked,totalTimeMinutes,issues[]}`. Mỗi issue có `code,message,path,
+  category: CONTENT|LIFECYCLE,resourceIds`; IDs gồm exam/session/part/question/
+  answer/media khi có. Bracket trong readiness path là **resource ID**, khác index
+  trong Bean Validation `answers[1].answerText` của request atomic.
+- POST `E/publish` và POST `E/unpublish` không body, trả full ExamDetail. Publish
+  kiểm tra lại trong transaction/root lock; lỗi 400 giữ standard error fields và
+  thêm toàn bộ `issues[]`. Readiness thành công trước đó không bỏ qua bước này.
+- DELETE `E` là archive mềm, 204 không body: set isDeleted/deletedAt, hủy xuất bản,
+  giữ lịch sử và admin read detail. Không có restore endpoint. Archived writers,
+  kể cả archive lần nữa, trả 404. UI chỉ cung cấp chuyển trạng thái phù hợp hiện tại;
+  backend còn hỗ trợ publish PUBLISHED/unpublish DRAFT lặp lại.
+- **Attempt lock chỉ cấm content/metadata writers**. Exam có attempts vẫn được
+  publish nếu valid, unpublish và archive. DRAFT có attempts vẫn readonly sau unpublish.
+  Published cần unpublish trước sửa, archived luôn readonly. Không dùng contentLocked
+  làm điều kiện chặn lifecycle hoặc preview. Metadata DTO không có ngoại lệ theo field.
+- Unpublish/archive ngăn **new starts**; attempts/history đã có được giữ và tiếp tục
+  theo contract learner hiện có. Task này không gọi hoặc thay đổi learner APIs.
+
+### Route / component map và hành vi
+
+- Giữ list `/admin/exams`, builder `/admin/exams/[id]`, editor routes task 4.
+  Thêm `/admin/exams/[id]/preview`: thin server route, validate positive safe ID,
+  nằm trong ADMIN boundary hiện có; direct navigation/refresh/error/404/403/login.
+- `AdminJlptLifecycleActions` dùng chung list/builder; `AdminJlptLifecycleDialog`
+  chỉ tải detail mới nhất cho exam được chọn. List giữ dialog ngoài card grid để
+  không mất error/uncertainty khi archive làm card biến mất hoặc đổi pagination.
+  Publish mở readiness mới; unpublish/archive xác nhận đúng tên, lịch sử và lock.
+  Không mở lifecycle từ builder khi đang có metadata/session/part/delete dialog.
+- `AdminJlptValidationPanel` tự kiểm tra lúc mở builder, có Check/retry độc lập,
+  pending/error/stale/ready và danh sách toàn bộ issues. Publish rejection dùng lại
+  `AdminJlptValidationIssues`, giữ code/path/IDs thực tế. Văn bản nêu rõ chỉ kiểm tra
+  dữ liệu persisted; dirty form không tự lưu hay bị bỏ.
+- `admin-jlpt-validation.ts` xác minh IDs qua full detail trước khi tạo link.
+  Session/part issues mở/expand/focus builder `#session-ID` / `#part-ID`;
+  question/answer issues mở đúng editor và focus field/`#answer-resource-ID`.
+  Root issues đến `#exam-overview` để sửa metadata/cấu trúc. ID đã mất/mismatched
+  được đưa về mục cha gần nhất kèm giải thích. Không diễn giải bracket ID như index.
+  Same-page hash dùng native hash navigation để phát sự kiện expand/focus; dùng
+  Next Link cho route khác. Explicit issue navigation mở lại mục vừa collapse,
+  structural refetch vẫn giữ expansion choices theo stable IDs.
+- `admin-jlpt-policy.ts` là nguồn chung của content/metadata lock và lifecycle
+  transition visibility. Hooks writer có mutation key admin/write + filter examId;
+  lifecycle và structural/editor/metadata handlers kiểm tra write đang chạy. Không
+  optimistic status/content, không thêm client hoặc Redux state.
+- Lifecycle pending khóa double submit/đóng/issue navigation. Confirmed success
+  mới toast. Network/5xx giữ uncertainty, tự đọc lại detail trước khi cho phép người
+  dùng đối chiếu và quay lại thao tác; không auto retry. 400 issues, 401/403, 404/409
+  hiển thị lỗi và refresh state. Đóng modal/error không reset form đang dirty.
+- `AdminJlptQuestionPreview`: modal lấy snapshot `form.getValues()` tại Preview,
+  gồm passage/prompt/options và ảnh candidate local hoặc uploaded/persisted theo
+  staged selection; explicit null không hiện ảnh. Không upload khi preview. Part
+  audio chỉ là context readonly. Form/upload hook vẫn mounted; preview không own
+  hay revoke blob URL. Đóng/Escape về editor giữ values/correctness/dirty baseline,
+  focus về nút Preview. Mỗi lần mở starts unselected, lựa chọn preview là local.
+- `admin-jlpt-preview.ts` chuyển full admin detail hoặc form snapshot sang explicit
+  allowlist view model. **Không có isCorrect, explanation, points, scoring metadata
+  hoặc lock flags** ở presentation boundary. Session/part/question/answer sorted
+  bằng sortOrder rồi ID, không sửa arrays nguồn. Full preview chỉ đọc persisted
+  admin detail nên DRAFT/PUBLISHED/ARCHIVED đều xem được khi có quyền.
+- `AdminJlptExamPreviewPage` / `AdminJlptPreviewContent`: exam/duration, session/
+  part/question navigation, instructions, passage/image/options, native part audio
+  không autoplay, incomplete/empty states, transient selection reset khi đổi câu
+  hoặc reload. Không timer, grading, result, attempt, answer-save, submit, upload,
+  lifecycle request; không ghi student query caches. Reuse SafeText React allowlist
+  và MediaPreview; không đưa full admin object sang student components. Student
+  AttemptQuestionCard gắn save/flag/runtime contract, nên không ép dùng hoặc refactor.
+
+### Cache và giới hạn đồng thời
+
+- Giữ keys task 1: lists/stats/detail/validation riêng admin. Content/media/lifecycle
+  mutations invalidate detail, list, stats; **validation dùng refetchType:none** để
+  giữ snapshot cũ nhưng đánh dấu stale, ẩn ready/issues cũ cho đến lần check mới.
+  Validation staleTime Infinity chỉ dùng với explicit invalidation và refetchOnMount
+  always; panel chưa bao giờ dùng cached ready để bypass publish endpoint.
+- Publish/unpublish seed full detail response trước invalidate/refetch, dùng status
+  máy chủ ngay cả khi lần reconciliation tiếp theo lỗi. Archive không bịa response.
+  Detail read phát hiện snapshot thay đổi còn invalidate readiness, kể cả thay đổi
+  từ quản trị viên khác được phát hiện qua background refetch. Dirty form không reset.
+- Backend chưa có revision/version token, push updates hoặc idempotency key. Không
+  thể chứng minh snapshot không thay đổi giữa hai GET hoặc khi client offline; publish
+  transaction vẫn là quyết định cuối cùng. Preview không được dùng làm readiness proof.
+- Khác HTML: không Save Structure giả, status dropdown, restore hoặc xóa vĩnh viễn.
+  Dùng lifecycle endpoint riêng và panel validation. Giữ shell hiện tại; preview modal
+  và route protected thay standalone shell/toggle giả. Không hiển thị đáp án đúng/
+  giải thích trong preview, không thêm question audio/status hay scoring threshold.
+
+### Bàn giao task 7
+
+- Không thiếu endpoint cho task 6. Các gap cũ: user model không có role (boundary
+  kiểm chứng qua protected stats), thiếu revision/idempotency và dangling media ID.
+- Tiếp tục verification tích hợp với session ADMIN/test fixtures được cấp: lifecycle
+  thật, validation/error navigation, attempts/history regression và provider test/stub.
+  Không tạo attempts bằng preview. Chưa tuyên bố toàn feature hoàn tất.
+- Lặp lại responsive/keyboard/visual review toàn luồng; sidebar mobile là shell hiện
+  có, chưa refactor. Có callback regression mới `tests/admin-jlpt-lifecycle.playwright.mjs`
+  cùng callbacks builder/question/media và CDP script đã đồng bộ readiness endpoint.
+
+## Xác minh task 6
+
+- Node JLPT **23/23**, category regression **8/8**: pass. Thêm lifecycle độc lập lock,
+  preview allowlist/no correctness/explanation, form option copy, resource navigation/
+  ownership/fallback và readiness invalidation. Focused ESLint: pass; TypeScript
+  noEmit incremental=false: pass; `pnpm build`: pass, preview route dynamic.
+- `pnpm lint`: fail vì eqeqeq có sẵn `components/common/card/CardItem.tsx:42` và 6
+  warnings ngoài phạm vi; không sửa file đó để làm xanh lint.
+- Playwright lifecycle callback: **pass trên dev 3000 và production 3001**, 8 write
+  attempts + 11 readiness reads, fixture synthetic exam 701; tất cả API/media intercept.
+  Kiểm tra nhiều issues, stale/deleted resources, expand/focus answer ID, safe unsaved
+  preview/local candidate image/parent audio, giữ correct answer và dirty form, không
+  upload/attempt/mutation trong preview, full preview navigation/empty/reload, validation
+  failure/retry, metadata mutation làm readiness stale, publish 400 sau precheck valid,
+  double submit, publish/unpublish/republish với attempts, content vẫn khóa, archive
+  response 500 sau commit/refetch status và list filter/pagination context, archived
+  404 khi state đổi sau mở confirm, archive 204 với attempts,
+  readonly preview, 403/anonymous. Không page exception.
+- Regression Playwright builder **pass** (16 structural attempts), question **pass**
+  (12 atomic attempts), media **pass** (14 uploads +12 resource write attempts), chạy
+  dev 3000 với mocked API/provider. CDP auth/list/stats/URL/empty/errors/desktop/mobile:
+  **pass**; bỏ assertion task 1 cũ cấm lifecycle/preview vì task 6 đã triển khai.
+- Đã xem ảnh preview/lifecycle desktop 1440px và mobile 390px; không horizontal
+  overflow, controls wrap, dialog cuộn trong viewport, tiếng Nhật xuống dòng. Console/
+  network có mock 400/500/403/401 chủ động; shell còn prefetch `/admin/users` 404 và
+  CSS preload warning có sẵn. Không tuyên bố console hoàn toàn không có lỗi.
+- Backend local 8080/dev 3000 có sẵn, nhưng chưa có session ADMIN hoặc isolated
+  attempt fixtures được cấp; **blocked live authenticated lifecycle/history verification**.
+  Không sửa exam thật, không tạo attempts/account và không gọi provider production/paid.
+  Các persistence assertions ở browser là mock, không thay thế live integration.
+  Smoke thật GET validation không đăng nhập trả 401; route `/admin/exams/1/preview`
+  trên dev 3000 chuyển đúng `/login?next=%2Fadmin%2Fexams%2F1%2Fpreview`.
 
 ## Task 5 — Media upload và attachment
 

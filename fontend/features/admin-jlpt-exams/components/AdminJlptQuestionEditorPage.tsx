@@ -44,6 +44,13 @@ import { AdminJlptQuestionAnswers } from './AdminJlptQuestionAnswers';
 import { useAdminJlptMediaUpload } from '../hooks/useAdminJlptMediaUpload';
 import { AdminJlptMediaControl } from './AdminJlptMediaControl';
 import { AdminJlptMediaPreview } from './AdminJlptMediaPreview';
+import {
+  adminJlptPreviewMedia,
+  adminJlptQuestionPreview,
+  type AdminJlptPreviewQuestion,
+} from '../admin-jlpt-preview';
+import { AdminJlptQuestionPreview } from './AdminJlptQuestionPreview';
+import { useAdminJlptHashFocus } from '../hooks/useAdminJlptHashFocus';
 
 export function AdminJlptQuestionEditorPage({ target }: { target: AdminJlptQuestionTarget }) {
   return <EditorLoader key={adminJlptQuestionUrl(target)} target={target} />;
@@ -115,6 +122,9 @@ function QuestionForm({
   query: DetailQuery;
 }) {
   const router = useRouter();
+  useAdminJlptHashFocus(adminJlptQuestionUrl(target));
+  const [preview, setPreview] = useState<AdminJlptPreviewQuestion | null>(null);
+  const previewTrigger = useRef<HTMLButtonElement>(null);
   const [saved, setSaved] = useState<AdminJlptQuestion | null>(null);
   const currentTarget = { ...target, questionId: saved?.id ?? target.questionId };
   const latest = query.data ?? initial;
@@ -356,6 +366,23 @@ function QuestionForm({
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
+            ref={previewTrigger}
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              const candidate = media.candidate;
+              const previewImage = candidate
+                ? { url: candidate.url, name: candidate.file.name, local: true }
+                : imageSelection === null
+                  ? null
+                  : adminJlptPreviewMedia(media.staged ?? image);
+              setPreview(adminJlptQuestionPreview(form.getValues(), previewImage));
+            }}
+          >
+            Preview câu hỏi
+          </Button>
+          <Button
             type="button"
             disabled={formDisabled || media.unresolved}
             onClick={() => void submit(false)}
@@ -488,14 +515,16 @@ function QuestionForm({
       >
         <div className="min-w-0 space-y-6">
           <AdminJlptQuestionFields form={form} maximum={maximum} disabled={formDisabled}>
-            <AdminJlptMediaControl
-              kind="image"
-              persisted={image}
-              selection={imageSelection}
-              upload={media}
-              disabled={formDisabled}
-              fieldError={form.formState.errors.imageMediaId?.message}
-            />
+            <div id="question-image">
+              <AdminJlptMediaControl
+                kind="image"
+                persisted={image}
+                selection={imageSelection}
+                upload={media}
+                disabled={formDisabled}
+                fieldError={form.formState.errors.imageMediaId?.message}
+              />
+            </div>
             {partAudio && (
               <div className="space-y-2 rounded-2xl border border-slate-200 p-4">
                 <p className="text-xs text-slate-600">
@@ -516,6 +545,17 @@ function QuestionForm({
           </fieldset>
         </div>
       </form>
+      {preview && (
+        <AdminJlptQuestionPreview
+          question={preview}
+          audio={adminJlptPreviewMedia(partAudio)}
+          dirty={dirty}
+          onClose={() => {
+            setPreview(null);
+            requestAnimationFrame(() => previewTrigger.current?.focus());
+          }}
+        />
+      )}
       <AlertDialog
         open={exit.destination !== null}
         onOpenChange={(open) => {

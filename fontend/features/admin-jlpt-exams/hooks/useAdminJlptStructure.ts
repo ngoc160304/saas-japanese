@@ -16,6 +16,7 @@ import {
 } from '../admin-jlpt-structure';
 import {
   invalidateAdminJlptExam,
+  adminJlptWriteFilter,
   useCreateAdminJlptPart,
   useCreateAdminJlptSession,
   useDeleteAdminJlptPart,
@@ -48,7 +49,7 @@ export function useAdminJlptStructure(examId: number) {
 
   const run = async (action: AdminJlptStructureAction) => {
     // An exam-wide gate also covers synchronous double clicks before React renders.
-    if (inFlight.current) throw rejected('Một thay đổi cấu trúc đang được lưu.');
+    if (inFlight.current || client.isMutating(adminJlptWriteFilter(examId))) throw rejected('Một thay đổi đề thi đang được lưu.');
     inFlight.current = true;
     setPending(true);
     setError(null);

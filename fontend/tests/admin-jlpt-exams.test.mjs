@@ -62,6 +62,68 @@ const {
   adminJlptMoveIds,
 } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-structure'));
 const questionEditor = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-question'));
+const preview = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-preview'));
+const { adminJlptCanTransition } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-policy'));
+const { adminJlptIssueDestination } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-validation'));
+
+test('lifecycle permissions are independent from content/metadata attempt locks', () => {
+  for (const hasAttempts of [false, true]) {
+    const draft = { status: 'DRAFT', hasAttempts, contentLocked: hasAttempts };
+    assert.equal(adminJlptCanTransition(draft, 'publish'), true);
+    assert.equal(adminJlptCanTransition(draft, 'archive'), true);
+    assert.equal(adminJlptCanTransition(draft, 'unpublish'), false);
+    const published = { ...draft, status: 'PUBLISHED', contentLocked: true };
+    assert.equal(adminJlptCanTransition(published, 'unpublish'), true);
+    assert.equal(adminJlptCanTransition(published, 'archive'), true);
+    assert.equal(Boolean(adminJlptContentLock(draft)), hasAttempts);
+    assert.equal(Boolean(adminJlptMetadataLock(draft)), hasAttempts);
+    for (const action of ['publish', 'unpublish', 'archive'])
+      assert.equal(adminJlptCanTransition({ ...draft, status: 'ARCHIVED' }, action), false);
+  }
+});
+
+test('preview allowlists presentation fields, orders data and copies form options without authoring secrets', () => {
+  const media = { id: 4, secureUrl: 'https://example.test/image.png', originalName: '画像', fileType: 'IMAGE' };
+  const question = { id: 31, sortOrder: 0, questionText: '<u>日本語</u>', passageText: '本文', image: media,
+    explanation: 'SECRET_EXPLANATION', points: 90, questionType: 'single_choice',
+    answers: [{ id: 312, answerText: '乙', isCorrect: false, sortOrder: 1 }, { id: 311, answerText: '甲', isCorrect: true, sortOrder: 0 }] };
+  const exam = { id: 1, title: '試験', description: null, level: 'N3', totalTimeMinutes: 40,
+    status: 'DRAFT', contentLocked: false, sessions: [{ id: 11, name: '読む', sortOrder: 0, timeLimitMinutes: 40,
+      parts: [{ id: 21, name: '問題', instructions: '選ぶ', sortOrder: 0, audio: null, questions: [question] }] }] };
+  const model = preview.adminJlptExamPreview(exam);
+  const json = JSON.stringify(model);
+  for (const secret of ['isCorrect', 'explanation', 'SECRET_EXPLANATION', 'points', 'contentLocked', 'questionType'])
+    assert.equal(json.includes(secret), false);
+  assert.deepEqual(model.sessions[0].parts[0].questions[0].options.map((a) => a.id), ['311', '312']);
+  const values = questionEditor.adminJlptQuestionValues(question);
+  const baseline = structuredClone(values);
+  const draft = preview.adminJlptQuestionPreview(values, { url: 'blob:owned', name: 'local', local: true });
+  draft.options[0].text = 'preview only';
+  assert.deepEqual(values, baseline);
+  assert.equal(JSON.stringify(draft).includes('isCorrect'), false);
+  assert.equal(draft.image.url, 'blob:owned');
+  assert.equal(preview.adminJlptQuestionPreview(questionEditor.adminJlptQuestionValues(), null).image, null);
+});
+
+test('validation destinations use resource IDs, verify ownership and fall back after deletion', () => {
+  const exam = { id: 1, sessions: [{ id: 11, name: '読む', parts: [{ id: 21, name: '問題', questions: [{ id: 31, answers: [{ id: 311 }] }] }] }] };
+  const issue = { path: 'sessions[11].parts[21].questions[31].answers[311].answerText', resourceIds: { examId: 1, sessionId: 11, partId: 21, questionId: 31, answerId: 311 } };
+  assert.equal(adminJlptIssueDestination(exam, issue).href, '/admin/exams/1/sessions/11/parts/21/questions/31#answer-resource-311');
+  assert.equal(adminJlptIssueDestination(exam, { ...issue, resourceIds: { ...issue.resourceIds, answerId: 999 } }).missing, true);
+  assert.equal(adminJlptIssueDestination(exam, { ...issue, resourceIds: { ...issue.resourceIds, questionId: 99 } }).href, '/admin/exams/1#part-21');
+  assert.equal(adminJlptIssueDestination(exam, { ...issue, resourceIds: { ...issue.resourceIds, partId: 99 } }).href, '/admin/exams/1#session-11');
+  assert.equal(adminJlptIssueDestination(exam, { ...issue, resourceIds: { examId: 2 } }).href, '/admin/exams/1#exam-overview');
+});
+
+test('content invalidation makes a previously valid readiness snapshot stale without auto-certifying it', async () => {
+  const queryClient = new QueryClient();
+  const key = keys.validation(701);
+  queryClient.setQueryData(key, { canPublish: true, issues: [] });
+  await invalidateAdminJlptExam(queryClient, 701);
+  assert.equal(queryClient.getQueryState(key).isInvalidated, true);
+  assert.equal(queryClient.getQueryData(key).canPublish, true); // retained history is not fresh proof
+  queryClient.clear();
+});
 
 test('single-choice editor validates text, scores, positions, correctness and duplicate identities', () => {
   const values = questionEditor.adminJlptQuestionValues();

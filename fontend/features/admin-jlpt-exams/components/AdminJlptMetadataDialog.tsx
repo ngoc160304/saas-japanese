@@ -4,6 +4,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 import type { AdminJlptExamDetail } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.type';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import {
@@ -30,6 +31,7 @@ import {
   useAdminJlptExamDetail,
   useCreateAdminJlptExam,
   useUpdateAdminJlptExam,
+  adminJlptWriteFilter,
 } from '../hooks/useAdminJlptExams';
 
 export type AdminJlptMetadataTarget = { mode: 'create' } | { mode: 'edit'; examId: number };
@@ -111,6 +113,7 @@ function MetadataFormDialog({
   onReload?: () => void;
   onClose: () => void;
 }) {
+  const client = useQueryClient();
   const form = useForm<AdminJlptMetadataValues>({
     resolver: zodResolver(adminJlptMetadataSchema),
     defaultValues: {
@@ -139,7 +142,13 @@ function MetadataFormDialog({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     void form.handleSubmit(async (values) => {
-      if (submitting.current || pending || blocked) return;
+      if (
+        submitting.current ||
+        pending ||
+        blocked ||
+        (initial && client.isMutating(adminJlptWriteFilter(initial.id)))
+      )
+        return;
       submitting.current = true;
       setSaveError(null);
       form.clearErrors();

@@ -170,6 +170,8 @@ try {
           if (mode === 'denied') status = 403;
           else if (mode === 'stats-error') status = 500;
           else data = { totalExams: 21, draftExams: 10, publishedExams: 8, archivedExams: 3 };
+        } else if (path.endsWith('/admin/jlpt-exams/1/validation')) {
+          data = { examId: 1, status: mode === 'archived' ? 'ARCHIVED' : detail.status, contentValid: false, canPublish: false, hasAttempts: mode === 'archived', contentLocked: mode === 'archived', totalTimeMinutes: detail.totalTimeMinutes, issues: [] };
         } else if (path.endsWith('/admin/jlpt-exams/1')) {
           if (mode === 'missing') status = 404;
           else if (mode === 'detail-denied' || mode === 'denied') status = 403;
@@ -327,10 +329,11 @@ try {
   await screenshot('detail-mobile', 390);
   assert.equal(
     await evaluate(
-      '[...document.querySelectorAll("button")].some(b => /Save Structure|Lưu đề|Xuất bản|Preview/.test(b.innerText))',
+      '[...document.querySelectorAll("button")].some(b => /Save Structure|Lưu đề/.test(b.innerText))',
     ),
     false,
   );
+  assert.equal(await evaluate('[...document.querySelectorAll("a")].some(a => a.textContent === "Student Preview" && a.pathname === "/admin/exams/1/preview")'), true);
   await waitFor(
     '[...document.querySelectorAll("button")].some(b => b.textContent.includes("Thêm phiên thi") && !b.disabled)',
   );

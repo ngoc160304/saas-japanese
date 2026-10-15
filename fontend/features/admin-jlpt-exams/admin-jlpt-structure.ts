@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { adminJlptEditLock } from './admin-jlpt-policy';
 import type {
   AdminJlptExamSummary,
   AdminJlptPart,
@@ -60,12 +61,7 @@ export type AdminJlptStructureAction =
 export function adminJlptContentLock(
   exam: Pick<AdminJlptExamSummary, 'status' | 'hasAttempts' | 'contentLocked'>,
 ): string | null {
-  if (exam.status === 'ARCHIVED')
-    return 'Đề thi đã lưu trữ. Chỉ được xem; lịch sử làm bài được giữ lại.';
-  if (exam.hasAttempts)
-    return 'Đề thi đã có lượt làm bài. Nội dung bị khóa kể cả sau khi hủy xuất bản; cần tạo phiên bản đề khác.';
-  if (exam.status === 'PUBLISHED') return 'Cần hủy xuất bản đề thi trước khi sửa nội dung.';
-  return exam.contentLocked ? 'Máy chủ đã khóa nội dung. Hãy tải lại trạng thái mới nhất.' : null;
+  return adminJlptEditLock(exam, 'nội dung');
 }
 
 /** UI positions are one based; all structural API payloads are zero based here. */

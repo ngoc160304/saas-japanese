@@ -1,10 +1,17 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
+import {
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from '@tanstack/react-query';
 import { adminJlptExamsAPI as api } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.api';
 import { adminJlptExamKeys as keys } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.keys';
 import type {
   AdminJlptExamPath,
+  AdminJlptExamDetail,
   AdminJlptExamQuery,
   AdminJlptExamStatsQuery,
 } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.type';
@@ -41,9 +48,17 @@ export function useAdminJlptExamStats(params: AdminJlptExamStatsQuery, verifyAcc
 
 export function useAdminJlptExamDetail(examId: number, freshOnMount = false) {
   const ready = useSessionReady();
+  const client = useQueryClient();
   return useQuery({
     queryKey: keys.detail(examId),
-    queryFn: ({ signal }) => api.detail(examId, signal),
+    queryFn: async ({ signal }) => {
+      const data = await api.detail(examId, signal);
+      const previous = client.getQueryData<AdminJlptExamDetail>(keys.detail(examId));
+      // A background read may discover another admin's changes. There is no server revision token.
+      if (previous && JSON.stringify(previous) !== JSON.stringify(data))
+        await client.invalidateQueries({ queryKey: keys.validation(examId), refetchType: 'none' });
+      return data;
+    },
     enabled: ready && Number.isSafeInteger(examId) && examId > 0,
     retry: false,
     ...(freshOnMount ? { staleTime: 0, refetchOnMount: 'always' as const } : {}),
@@ -57,6 +72,9 @@ export function useAdminJlptExamValidation(examId: number, enabled = true) {
     queryFn: ({ signal }) => api.validation(examId, signal),
     enabled: ready && enabled && Number.isSafeInteger(examId) && examId > 0,
     retry: false,
+    // Content mutations explicitly mark this snapshot stale. Only a new check can certify it.
+    staleTime: Infinity,
+    refetchOnMount: 'always',
   });
 }
 
@@ -68,7 +86,7 @@ export async function invalidateAdminJlptExam(client: QueryClient, examId?: numb
       ? []
       : [
           client.invalidateQueries({ queryKey: keys.detail(examId) }),
-          client.invalidateQueries({ queryKey: keys.validation(examId) }),
+          client.invalidateQueries({ queryKey: keys.validation(examId), refetchType: 'none' }),
         ]),
   ]);
 }
@@ -77,18 +95,39 @@ export async function invalidateAdminJlptExam(client: QueryClient, examId?: numb
 // Do not splice partial hierarchy responses or optimistically reorder cached data.
 function useExamMutation<Variables extends AdminJlptExamPath, Result>(
   mutationFn: (v: Variables) => Promise<Result>,
+  detailResult?: (result: Result) => AdminJlptExamDetail,
 ) {
   const client = useQueryClient();
   return useMutation({
+    mutationKey: [...keys.all, 'write'],
     mutationFn,
     retry: false,
-    onSuccess: (_data, variables) => invalidateAdminJlptExam(client, variables.examId),
+    onSuccess: (data, variables) => {
+      if (detailResult) client.setQueryData(keys.detail(variables.examId), detailResult(data));
+      return invalidateAdminJlptExam(client, variables.examId);
+    },
     onError: (error, variables) => {
       const status = getApiError(error).status;
       if (status === 400 || status === 404 || status === 409)
         return invalidateAdminJlptExam(client, variables.examId);
     },
   });
+}
+
+export function adminJlptWriteFilter(examId: number) {
+  return {
+    mutationKey: [...keys.all, 'write'],
+    predicate: (mutation: { state: { variables?: unknown } }) => {
+      const value = mutation.state.variables;
+      return (
+        typeof value === 'object' && value !== null && 'examId' in value && value.examId === examId
+      );
+    },
+  };
+}
+
+export function useAdminJlptExamWriting(examId: number) {
+  return useIsMutating(adminJlptWriteFilter(examId)) > 0;
 }
 
 export function useCreateAdminJlptExam() {
@@ -105,8 +144,8 @@ export function useCreateAdminJlptExam() {
 
 export const useUpdateAdminJlptExam = () => useExamMutation(api.update);
 export const useArchiveAdminJlptExam = () => useExamMutation(api.archive);
-export const usePublishAdminJlptExam = () => useExamMutation(api.publish);
-export const useUnpublishAdminJlptExam = () => useExamMutation(api.unpublish);
+export const usePublishAdminJlptExam = () => useExamMutation(api.publish, (detail) => detail);
+export const useUnpublishAdminJlptExam = () => useExamMutation(api.unpublish, (detail) => detail);
 export const useCreateAdminJlptSession = () => useExamMutation(api.createSession);
 export const useUpdateAdminJlptSession = () => useExamMutation(api.updateSession);
 export const useSortAdminJlptSession = () => useExamMutation(api.sortSession);
