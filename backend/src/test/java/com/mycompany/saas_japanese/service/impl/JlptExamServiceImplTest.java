@@ -271,6 +271,7 @@ class JlptExamServiceImplTest {
     @Test
     void submitAttemptCalculatesAndAggregatesResultsIncludingUnansweredQuestions() {
         UserJlptAttempt attempt = stubInProgressAttempt();
+        attempt.setJlptExam(JlptExam.builder().jlptLevel(JlptLevelEnum.N3).build());
         attempt.setStartedAt(Instant.now().minusSeconds(300));
 
         JlptExamSession firstExamSession = JlptExamSession.builder()
@@ -385,6 +386,7 @@ class JlptExamServiceImplTest {
 
         assertEquals(JlptAttemptStatusEnum.COMPLETED, attempt.getStatus());
         assertEquals(new BigDecimal("2.00"), attempt.getTotalScore());
+        assertFalse(attempt.getIsPassed());
         assertTrue(attempt.getDurationSeconds() >= 0);
         assertEquals(new BigDecimal("2.00"), response.getTotalScore());
         assertEquals(new BigDecimal("9.00"), response.getMaxScore());
@@ -730,16 +732,25 @@ class JlptExamServiceImplTest {
     void getAttemptHistoryMapsFullModeSummary() {
         stubCurrentUser();
         JlptAttemptHistoryQuery query = historyQuery(0, 10);
-        UserJlptAttempt attempt = historyAttempt(ATTEMPT_ID, Instant.now(), true);
+        // Legacy stored pass flags can be stale; history must agree with the canonical result calculation.
+        UserJlptAttempt attempt = historyAttempt(ATTEMPT_ID, Instant.now(), false);
         attempt.setTotalScore(new BigDecimal("100.00"));
         UserJlptAttemptSession languageKnowledge = historySession(
-                attempt, ATTEMPT_SESSION_ID, EXAM_SESSION_ID, "Language Knowledge", "60.00", 20, 30);
+                attempt, ATTEMPT_SESSION_ID, EXAM_SESSION_ID, "Language Knowledge", "40.00", 10, 20);
+        UserJlptAttemptSession reading = historySession(
+                attempt, 32L, 42L, "Reading", "40.00", 10, 20);
         UserJlptAttemptSession listening = historySession(
-                attempt, 31L, 41L, "Listening", "60.00", 15, 30);
+                attempt, 31L, 41L, "Listening", "40.00", 15, 20);
+        languageKnowledge.getJlptExamSession().setSessionType(JlptSessionEnum.language_knowledge);
+        reading.getJlptExamSession().setSessionType(JlptSessionEnum.reading);
+        listening.getJlptExamSession().setSessionType(JlptSessionEnum.listening);
+        languageKnowledge.setScore(new BigDecimal("40.00"));
+        reading.setScore(new BigDecimal("40.00"));
+        listening.setScore(new BigDecimal("20.00"));
         when(userJlptAttemptRepository.findHistoryByUserId(eq(USER_ID), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(List.of(attempt)));
         when(userJlptAttemptSessionRepository.findHistorySessionsByAttemptIds(List.of(ATTEMPT_ID)))
-                .thenReturn(List.of(languageKnowledge, listening));
+                .thenReturn(List.of(languageKnowledge, reading, listening));
 
         JlptAttemptHistoryResponse response = jlptExamService.getAttemptHistory(query).getContent().get(0);
 
@@ -749,6 +760,7 @@ class JlptExamServiceImplTest {
         assertEquals(35, response.getCorrectCount());
         assertEquals(60, response.getTotalQuestions());
         assertTrue(response.getIsPassed());
+        assertFalse(attempt.getIsPassed());
         assertNull(response.getSessionId());
         assertNull(response.getSessionName());
     }

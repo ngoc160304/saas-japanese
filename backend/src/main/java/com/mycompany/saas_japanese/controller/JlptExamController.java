@@ -43,7 +43,7 @@ public class JlptExamController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<JlptExamResponse>> fetchAllJlptExam(JlptExamQuery query) {
+    public ResponseEntity<Page<JlptExamResponse>> fetchAllJlptExam(@Valid JlptExamQuery query) {
         Page<JlptExamResponse> jlptExam = jlptExamService.fetchAllJlptExam(query);
         return ResponseEntity.ok(jlptExam);
     }

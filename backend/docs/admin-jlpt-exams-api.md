@@ -3,6 +3,13 @@
 Verified against the local `feature/course-client` implementation on 2026-10-15.
 This describes implemented behavior. Deferred work is listed separately below.
 
+Frontend handoff: use the endpoint inventory and the **Frontend follow-up contract**
+below. The importable [Postman collection](admin-jlpt-exams.postman_collection.json)
+contains an ordered, disposable authoring-to-attempt workflow. Its JSON, variable
+references, request bodies and test-script syntax have been validated; the
+collection has **not** been executed in Postman. Verification uses automated
+Spring/H2 integration tests, with external upload providers mocked.
+
 ## Routing and authorization
 
 Base path **B** = `/api/v1/admin/jlpt-exams`. `WebConfiguration` supplies `/api/v1`;
@@ -361,6 +368,16 @@ The saved response uses the existing `QuestionResponse`, for example:
    Null/omitted audio on part PUT removes it. Shared legacy/archived references
    keep `isUsed=true` until their last valid reference is removed.
 
+Image upload accepts `.jpeg` / `image/jpeg`, `.png` / `image/png`, `.webp` /
+`image/webp`, and `.gif` / `image/gif`, up to **10 MiB (10,485,760 bytes)**.
+Extensions and MIME types are case insensitive; MIME parameters are accepted.
+A nonblank filename of at most 255 characters, matching MIME and image signature
+are required. Empty, oversized, unreadable or obviously disguised files return
+400 before the provider is called. These are signature checks, not a full image
+decode. The existing `.jpeg` convention remains; `.jpg` is not supported.
+The image route retains its existing permissions and wrapped Media response;
+use ADMIN authentication in the builder and consume only `data.id` / `secureUrl`.
+
 ```http
 POST /api/v1/upload/audios
 Authorization: Bearer <access-token>
@@ -400,7 +417,7 @@ question-level audio fields are added.
 
 ## Hierarchy ordering and batch reorder
 
-All 34 admin JLPT endpoints, including these four PATCH routes, require ADMIN:
+All 35 admin JLPT endpoints, including these four PATCH routes, require ADMIN:
 
 | Collection | Exact path after `/api/v1/admin/jlpt-exams` | Response `data` |
 | --- | --- | --- |
@@ -722,7 +739,80 @@ can still be unpublished, republished if valid, and archived. Invalidate list,
 detail, statistics and readiness queries after lifecycle mutations. A successful
 GET report is advisory; publication always validates again under the database lock.
 
-## Deferred behavior (not implemented by Tasks 1-5)
+## Learner workflow used for final verification
+
+These existing routes are included in the Postman workflow. They retain the
+`RestResponse` wrapper; learner successes use the default message
+`CALL API SUCCESS !`. Use the learner's access token. Start requires `userId`
+matching the authenticated account (obtain `data.id` from
+`GET /api/v1/auth/myProfile`). Another user's attempts cannot be answered,
+submitted, read as results, or reviewed (403).
+
+| Method | Path after `/api/v1/jlpt-exams` | Request / response `data` |
+| --- | --- | --- |
+| GET | empty path | Existing Page of published active exams; `search`, `jlptLevel`, `title`, `page`, `size`, `sortKey`, `sortType` |
+| GET | `/{examId}` | Exam metadata (`jlptLevel`, not admin `level`) |
+| GET | `/{examId}/detail` | Session/part summaries, counts and `audioMediaId`; no solutions |
+| GET | `/{examId}/sessions/{sessionId}` | One session summary; no solutions |
+| POST | `/{examId}/attempts` | `{"userId":7,"mode":"full"}` or `{"userId":7,"mode":"session","sessionId":12}`; returns `attemptId` and `sessions[].attemptSessionId` / `parts[].questions[].questionId` / `answers[].answerId` |
+| PUT | `/attempts/{attemptId}/sessions/{attemptSessionId}/answers` | `{"questionId":31,"answerId":53}`; saved selection/timestamp, no correctness |
+| POST | `/attempts/{attemptId}/submit` | No body; completed scores/counts/session results |
+| GET | `/attempts/{attemptId}/result` | Completed owner's score, existing section thresholds and full-exam pass result |
+| GET | `/attempts/{attemptId}/review` | Completed owner's selected/correct answer IDs, correctness and explanations |
+| GET | `/attempts/history` | Owner's existing Page, zero-based pagination, stable `startedAt DESC, id DESC` |
+
+Learner catalog pagination now validates the same `page >= 0`, `size = 1..12`
+bounds/defaults and rejects explicit empty values with 400. Invalid start modes
+or contradictory session fields return 400; a missing session returns 404, and
+a foreign session returns 400. Invalid starts do not create attempt rows.
+Result/review before completion returns 400. Published/active requirements apply
+to new starts and catalog/detail reads; existing attempts continue independently
+after unpublish/archive, as described in the lifecycle section.
+
+Submission persists the pass flag using the **existing** overall and section
+threshold calculation. History computes that same result from stored scores and
+batched attempt sessions, so legacy stale flags do not cause disagreement with
+the result API. History GET does not rewrite those legacy database flags. Session
+practice still omits an overall pass result. No thresholds, point totals, or
+learner scoring formulas are changed.
+
+Existing learner limitations: mode is inferred from the number of attempted
+sessions in result/history (one means `session`, including a full start on a
+one-session exam). The learner start DTO currently exposes question text/options
+but not passage text, image metadata, part audio playback URLs, or session time
+limits; detail exposes the audio media ID. This admin handoff does not add a
+learner delivery/media API or change the existing timing rules. A richer learner
+player needs a separate contract extension; do not substitute the admin detail
+endpoint, which intentionally exposes solutions.
+
+## Postman setup and frontend checklist
+
+Import [admin-jlpt-exams.postman_collection.json](admin-jlpt-exams.postman_collection.json).
+Use a disposable local/test database and upload provider configuration. Set
+`baseUrl` to the server origin (default `http://localhost:8080`, no `/api/v1` or
+trailing slash). Authenticate using the existing login/CSRF/cookie flow and paste
+access tokens into `adminToken` and `studentToken`; both are empty in the file.
+No credentials are stored. Tokens may need manual refresh during a run.
+
+Select actual local files in the two **SELECT LOCAL FILE** multipart requests;
+Postman supplies the boundary. Run folders 00–06 in order, once per new exam.
+Scripts capture profile, media, hierarchy, answer, attempt and attempt-session IDs.
+The workflow contains expected 400/401/403/404 responses and two attempts for the
+same learner, one submitted before archive and another after archive. All writes
+change data; physical draft-content deletion and soft archive are explicitly
+labeled. Archive has no restore API. JSON/variable/body/script validation is
+separate from executing the requests; this collection was **not executed**.
+
+| Frontend surface | Required integration |
+| --- | --- |
+| List | Existing Page wrapper, zero-based pages, size 1–12, enum filters, allowed sort keys; stats keyed only by search/level |
+| Builder | Ordered hierarchy and counts; duration/passing score are derived; preserve all sibling IDs when reordering; refresh shifted siblings after writes |
+| Question editor | One aggregate save with the complete answer array, retained IDs, at least two visible answers and exactly one correct; use returned IDs/order |
+| Uploads | Validate supported format/size locally, upload first, attach by media ID, retain existing IDs on PUT or send null to detach; failed attach does not undo upload |
+| Lifecycle | Fetch readiness, display every located issue, handle fresh publication errors, distinguish content lock from lifecycle permissions; refresh detail/list/stats/readiness |
+| Errors/auth | Bearer ADMIN access; preserve `fieldErrors` and publication `issues`; handle 401/403/400/404/409/413/415 without assuming every error has `data` |
+
+## Known limitations and deferred behavior
 
 - Existing role-provisioning security gap: `User` initializes role to `admin` and
   its pre-persist callback also assigns `admin` for null roles. Public
@@ -732,8 +822,9 @@ GET report is advisory; publication always validates again under the database lo
   a follow-up; Task 1 does not change role provisioning or existing accounts.
 - Cloning and revision creation. The attempt-lock error suggests a new revision,
   but no revision/clone endpoint exists.
-- Task 6 final full-flow verification and handoff, including verification against
-  MySQL; the current transaction regression tests use H2 in MySQL compatibility mode.
+- MySQL-specific locking behavior remains unverified: all transaction regression
+  tests use disposable H2 in MySQL compatibility mode. No production/shared
+  database or real paid upload provider was called.
 - Additional authoring features outside the documented API.
 
 ## Task 1 verification record
@@ -959,6 +1050,106 @@ main Checkstyle findings, existing main/test SpotBugs findings, and
 `LessonIntegrationTest.courseDeletionIsScopedAndRetainsPreviouslyDeletedTimestamp`
 at line 137. Its `LessonServiceImpl.deleteByCourseId` implementation is unchanged.
 `AdminLessonWorkspaceBrowserTest` remains skipped without its opt-in running
-frontend/browser environment. No checks were disabled. Task 6 retains final
-full-flow handoff and MySQL verification; no frontend, dependency, schema, scoring,
+frontend/browser environment. No checks were disabled. At that checkpoint Task 6
+still retained full-flow handoff and MySQL verification; no frontend, dependency, schema, scoring,
 upload, or revision changes were introduced by Task 5.
+
+## Task 6 verification and handoff record
+
+The local `feature/course-client` working tree was clean at the start. Tasks 1–5
+were inspected locally; their implementation, tests and API compatibility were
+preserved. No commits or pushes were made.
+
+Corrections made during final verification:
+
+- Learner catalog pagination now invokes Bean Validation, preventing invalid/empty
+  page and size values from reaching `PageRequest` and rejecting oversized pages.
+- Attempt-start mode/session errors use existing 400/404 domain exceptions rather
+  than falling through to 500. Failed starts leave attempt data unchanged.
+- Submission persists the existing calculated pass result; history derives that
+  same result from stored scores and batched sessions, including older attempts
+  whose stored pass flag is stale. No legacy rows are rewritten by a history GET,
+  and no scoring formula or threshold changes.
+- Image upload checks filename bounds, MIME and content signatures before remote
+  upload; malformed images now produce validation errors instead of a null-name
+  failure or accepting an obvious format mismatch. Existing supported extensions,
+  response fields, upload permissions and the 10 MiB limit are preserved.
+
+`AdminJlptWorkflowIntegrationTest` adds eight cases: seven pagination boundaries
+and one complete HTTP workflow with independently committed service transactions.
+The workflow authors three sessions, four parts and five aggregate questions,
+uploads image/audio through mocked Cloudinary, retains/removes/adds answer IDs,
+reorders all four levels, and verifies fresh persisted reads, media flags, counts,
+duration, passing score and status-independent statistics. It resolves initial
+readiness errors, publishes, takes and submits a passing full exam, and checks
+result/history consistency and completed-owner review. A separate in-progress
+attempt continues saving after unpublish and again after archive, then submits.
+Failed writes, first-attempt content locking, ownership, premature solution
+privacy, blocked new starts and retained history/media are asserted.
+
+`UploadServiceImageValidationTest` adds three cases for supported signatures,
+missing/oversized filenames, MIME/content mismatch, empty/oversized/unreadable
+files and no provider/database calls on validation failure. Existing learner unit
+tests now also verify stale history flags without mutating the attempt. New tests
+first reproduced the relevant failures before fixes; an existing submit fixture
+was supplied its required exam/level when pass persistence was added.
+
+Existing suites cover the remaining authorization matrix, every hierarchy
+ownership level, malformed inputs, incomplete/foreign/duplicate reorders,
+aggregate answer rules/IDs, media ownership, subtree deletion, transaction
+rollback, publication issues and content locks. Existing separate-transaction
+H2 tests exercise membership/order/media contention and nine lifecycle/edit/start
+interleavings. No JVM-local synchronization was added to production operations.
+
+Commands ran from `backend/` with Java 17 and the Windows Gradle Wrapper:
+
+```powershell
+.\gradlew.bat test --tests '*AdminJlpt*Test' --tests '*JlptExamPublishValidatorTest' --tests '*JlptExamServiceImplTest' --tests '*UploadService*Test'
+.\gradlew.bat test --tests '*AdminJlpt*Test' --tests '*JlptExamPublishValidatorTest' --tests '*JlptExamServiceImplTest' --tests '*UploadService*Test' --tests '*BaseQueryValidationTest' --tests '*ErrorHandlingTest' --tests '*Auth*Test' checkstyleTest --continue
+.\gradlew.bat test --tests '*AdminJlptWorkflowIntegrationTest' --tests '*UploadServiceImageValidationTest' --tests '*JlptExamServiceImplTest'
+.\gradlew.bat test check build --continue
+```
+
+The full command includes tests, Checkstyle, SpotBugs and packaging, with no
+exclusions or disabled checks. It was repeated after correcting new test-only
+SpotBugs findings (specific checked exception declarations and a stable local
+cleanup ID instead of dereferencing nullable instance state in lambdas).
+
+| Check | Final actual result |
+| --- | --- |
+| Pre-edit admin/learner/upload baseline | 160 passed |
+| Focused admin, learner, upload, query, error and auth regression run | 231 passed; test Checkstyle passed |
+| Final changed-test rerun after test-only static fixes | 40 passed: workflow 8, image validation 3, learner service 29 |
+| Full backend suite, including final rerun | 328 total: 326 passed, 1 existing failure, 1 existing skip, 0 errors |
+| Checkstyle | Main 65 existing findings in 46 files, no additions/removals; test sources 0 |
+| SpotBugs | Main 224 (two existing findings removed), test 13 unchanged; no added warning descriptions |
+| `bootJar`, `jar`, `assemble` | Packaging succeeded; final repeat up-to-date |
+| Overall `test check build --continue` | Failed on the existing lesson test and static findings; **not a green backend build** |
+| Contract route comparison, Postman JSON/body/variable/script validation, `git diff --check` | Passed |
+
+The existing failure remains
+`LessonIntegrationTest.courseDeletionIsScopedAndRetainsPreviouslyDeletedTimestamp`
+at line 137: `LessonServiceImpl.deleteByCourseId` is still an empty TODO. That
+unrelated implementation was not changed. `AdminLessonWorkspaceBrowserTest` is
+still skipped without its opt-in running frontend/browser environment. The two
+removed main SpotBugs descriptions concerned an intentional generic runtime
+exception and the redundant image extension null check; all other retained
+warning descriptions match the pre-task reports. Four new test-only warnings
+were corrected without suppressions before the final full checks.
+
+The admin workflow is verified on H2, but repository-wide verification remains
+blocked by those baseline failures. The existing public-registration ADMIN
+default described above remains a separate security release blocker; trusted role
+provisioning must be addressed in the auth domain before deployment.
+
+MySQL locking is **not verified**. The configured local Docker Desktop context
+points to `npipe:////./pipe/dockerDesktopLinuxEngine`, but `docker info` failed
+because that daemon pipe is unavailable. No disposable MySQL instance was started
+and no production/shared database or real paid provider was contacted.
+
+The Postman collection has 62 requests with empty admin/student token variables,
+captured resource IDs, manual file-selection/authentication instructions, and
+explicit destructive/soft-archive labels. JSON parsing, variable references,
+substituted raw JSON bodies and JavaScript test-script syntax were checked.
+All 35 implemented admin method/path pairs match the contract inventory exactly.
+The collection was generated and validated, **not executed**.

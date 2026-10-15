@@ -136,13 +136,33 @@ public class UploadServiceImpl implements UploadService {
     }
 
     String filename = file.getOriginalFilename();
-
-    String fileType = filename.substring(
-        filename.lastIndexOf(".") + 1);
-
-    if (fileType == null || !ALLOWED_IMAGE_TYPES.contains(fileType)) {
-      throw new BadRequestException(
-          "Unsupported image type: " + fileType);
+    if (filename == null || filename.isBlank() || filename.length() > 255) {
+      throw new BadRequestException("Image filename is required and must not exceed 255 characters");
+    }
+    String extension = filename.contains(".")
+        ? filename.substring(filename.lastIndexOf('.') + 1).toLowerCase(Locale.ROOT) : "";
+    String mime = file.getContentType();
+    mime = mime == null ? "" : mime.split(";", 2)[0].trim().toLowerCase(Locale.ROOT);
+    if (!ALLOWED_IMAGE_TYPES.contains(extension) || !mime.equals("image/" + extension)) {
+      throw new BadRequestException("Unsupported image type");
+    }
+    try (InputStream stream = file.getInputStream()) {
+      byte[] header = stream.readNBytes(12);
+      boolean matches = header.length >= 12 && switch (extension) {
+        case "png" -> header[0] == (byte) 0x89 && header[1] == 'P' && header[2] == 'N' && header[3] == 'G'
+            && header[4] == 13 && header[5] == 10 && header[6] == 26 && header[7] == 10;
+        case "jpeg" -> header[0] == (byte) 0xff && header[1] == (byte) 0xd8 && header[2] == (byte) 0xff;
+        case "gif" -> header[0] == 'G' && header[1] == 'I' && header[2] == 'F' && header[3] == '8'
+            && (header[4] == '7' || header[4] == '9') && header[5] == 'a';
+        case "webp" -> header[0] == 'R' && header[1] == 'I' && header[2] == 'F' && header[3] == 'F'
+            && header[8] == 'W' && header[9] == 'E' && header[10] == 'B' && header[11] == 'P';
+        default -> false;
+      };
+      if (!matches) {
+        throw new BadRequestException("Image content does not match its declared format");
+      }
+    } catch (IOException exception) {
+      throw new BadRequestException("Cannot read image file");
     }
   }
 
