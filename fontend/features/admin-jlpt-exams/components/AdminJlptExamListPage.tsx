@@ -1,143 +1,133 @@
 'use client';
 
-import Link from 'next/link';
-import { useEffect } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { StatCard } from '@/components/common/stats/StatCard';
+import { useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { DataTablePagination } from '@/components/common/table/DataTablePagination';
 import Header from '@/components/layout/management/header/Header';
 import PageSection from '@/components/layout/management/page-section/PageSection';
-import { parseAdminJlptExamQuery } from '../admin-jlpt-route';
+import { Button } from '@/components/ui/button';
+import { getApiError } from '@/lib/api-error';
 import { useAdminJlptExamList, useAdminJlptExamStats } from '../hooks/useAdminJlptExams';
+import { useAdminJlptExamsUrlState } from '../hooks/useAdminJlptExamsUrlState';
 import { AdminJlptLoading, AdminJlptQueryError } from './AdminJlptState';
-import { AdminJlptStatus } from './AdminJlptStatus';
+import { AdminJlptExamStats } from './AdminJlptExamStats';
+import { AdminJlptExamFilters } from './AdminJlptExamFilters';
+import { AdminJlptExamGrid } from './AdminJlptExamGrid';
+import { AdminJlptMetadataDialog, type AdminJlptMetadataTarget } from './AdminJlptMetadataDialog';
 
 export function AdminJlptExamListPage() {
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
-  const params = parseAdminJlptExamQuery(searchParams);
+  const { params, searchText, setSearch, setFilters, setPage, reset } = useAdminJlptExamsUrlState();
   const list = useAdminJlptExamList(params);
   const stats = useAdminJlptExamStats(params);
+  const [dialog, setDialog] = useState<AdminJlptMetadataTarget | null>(null);
   const data = list.data;
-  const lastPage = data ? Math.max(1, data.totalPages) : 1;
-  const currentPage = (params.page ?? 0) + 1;
-  const correctingPage = Boolean(data && !list.isError && currentPage > lastPage);
-
-  function setPage(page: number) {
-    const next = new URLSearchParams(searchParams.toString());
-    next.set('page', String(page));
-    router.push(`${pathname}?${next}`, { scroll: false });
-  }
+  const lastPage = data ? Math.max(0, data.totalPages - 1) : 0;
+  const correctingPage = Boolean(data && !list.isError && params.page > lastPage);
+  const filtered = Boolean(params.search || params.level || params.status);
 
   useEffect(() => {
-    if (!correctingPage) return;
-    const next = new URLSearchParams(searchParams.toString());
-    next.set('page', String(lastPage));
-    router.replace(`${pathname}?${next}`, { scroll: false });
-  }, [correctingPage, lastPage, pathname, router, searchParams]);
+    if (correctingPage) setPage(lastPage, 'replace');
+  }, [correctingPage, lastPage, setPage]);
 
-  // A revoked permission must take precedence over any previously cached rows.
-  if (list.isError)
-    return <AdminJlptQueryError error={list.error} onRetry={() => void list.refetch()} />;
-  if (stats.isError)
-    return <AdminJlptQueryError error={stats.error} onRetry={() => void stats.refetch()} />;
+  const listStatus = list.isError ? getApiError(list.error).status : null;
+  const statsStatus = stats.isError ? getApiError(stats.error).status : null;
+  if (listStatus === 401 || listStatus === 403 || statsStatus === 401 || statsStatus === 403)
+    return (
+      <AdminJlptQueryError
+        error={listStatus === 401 || listStatus === 403 ? list.error : stats.error}
+        onRetry={() => {
+          void list.refetch();
+          void stats.refetch();
+        }}
+      />
+    );
 
   return (
     <>
       <Header
         title="Đề thi JLPT"
-        description="Xem danh sách và cấu trúc đề thi JLPT."
+        description="Quản lý đề thi, thông tin tổng quan và mở trình biên soạn cấu trúc."
         showProfile={false}
-      />
-      {stats.data && (
-        <StatCard
-          items={[
-            {
-              label: 'Tổng đề thi',
-              value: stats.data.totalExams,
-              description: 'Gồm cả đề đã lưu trữ',
-            },
-            { label: 'Đã xuất bản', value: stats.data.publishedExams },
-            { label: 'Bản nháp', value: stats.data.draftExams },
-            { label: 'Đã lưu trữ', value: stats.data.archivedExams },
-          ]}
-        />
-      )}
+      >
+        <Button
+          className="h-10 rounded-2xl px-4"
+          disabled={!list.isSuccess}
+          onClick={() => setDialog({ mode: 'create' })}
+        >
+          <Plus aria-hidden="true" />
+          Thêm đề thi
+        </Button>
+      </Header>
+      <AdminJlptExamStats query={stats} />
       <PageSection>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-slate-900">Danh sách đề thi</h2>
-          <p className="text-xs text-slate-600">Chế độ chỉ đọc</p>
-        </div>
-        {(params.search || params.level || params.status) && (
-          <p className="break-words text-sm text-slate-600">
-            Bộ lọc: {[params.search, params.level, params.status].filter(Boolean).join(' · ')}.{' '}
-            <Link href="/admin/exams" className="text-primary underline">
-              Xóa bộ lọc
-            </Link>
-          </p>
-        )}
-        {list.isPending || stats.isPending || correctingPage ? (
+        <h2 className="sr-only">Danh sách đề thi</h2>
+        <AdminJlptExamFilters
+          params={params}
+          search={searchText}
+          onSearch={setSearch}
+          onFilters={setFilters}
+          onReset={reset}
+        />
+        {list.isError ? (
+          <AdminJlptQueryError error={list.error} onRetry={() => void list.refetch()} />
+        ) : list.isPending || correctingPage ? (
           <AdminJlptLoading />
         ) : (
           data && (
-            <div aria-busy={list.isFetching} className="space-y-5">
-              {data.content.length === 0 ? (
-                <p role="status" className="py-8 text-center text-sm text-slate-600">
-                  Chưa có đề thi phù hợp.
-                </p>
+            <section aria-label="Kết quả đề thi" aria-busy={list.isFetching} className="space-y-5">
+              {data.content.length > 0 ? (
+                <AdminJlptExamGrid
+                  exams={data.content}
+                  onEdit={(examId) => setDialog({ mode: 'edit', examId })}
+                />
               ) : (
-                <ul className="divide-y divide-slate-100">
-                  {data.content.map((exam) => (
-                    <li
-                      key={exam.id}
-                      className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <div className="min-w-0 space-y-2">
-                        <Link
-                          className="break-words text-sm font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-2"
-                          href={`/admin/exams/${exam.id}`}
-                        >
-                          {exam.title}
-                        </Link>
-                        <p className="text-xs text-slate-600">
-                          {exam.level} · {exam.questionCount} câu hỏi · {exam.totalTimeMinutes} phút
-                          · Điểm đỗ: {exam.passingScore}
-                        </p>
-                        {exam.description && (
-                          <p className="line-clamp-2 break-words text-sm text-slate-600">
-                            {exam.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex shrink-0 flex-wrap items-center gap-2">
-                        <AdminJlptStatus status={exam.status} />
-                        {exam.contentLocked && (
-                          <span className="text-xs text-slate-600">Nội dung đã khóa</span>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
+                <div role="status" className="space-y-3 py-10 text-center">
+                  <h3 className="font-semibold text-slate-900">
+                    {filtered
+                      ? 'Không tìm thấy đề thi phù hợp'
+                      : stats.data?.totalExams === 0
+                        ? 'Thư viện chưa có đề thi'
+                        : 'Chưa có đề thi đang hoạt động'}
+                  </h3>
+                  <p className="text-sm text-slate-600">
+                    {filtered
+                      ? 'Thử đổi từ khóa, cấp độ hoặc trạng thái.'
+                      : 'Bạn có thể tạo đề thi nháp mới hoặc chọn trạng thái Đã lưu trữ để xem lịch sử.'}
+                  </p>
+                  {filtered && (
+                    <Button variant="outline" onClick={reset}>
+                      Xóa bộ lọc
+                    </Button>
+                  )}
+                </div>
               )}
-              <p aria-live="polite" className="text-xs text-slate-600">
-                {list.isFetching
-                  ? 'Đang cập nhật…'
-                  : `Tổng ${data.totalElements} đề thi · Trang ${data.number + 1}/${Math.max(1, data.totalPages)}`}
-              </p>
-              {data.totalPages > 1 && (
-                <nav aria-label="Phân trang đề thi">
-                  <DataTablePagination
-                    page={data.number + 1}
-                    totalPages={data.totalPages}
-                    onPageChange={setPage}
-                  />
-                </nav>
-              )}
-            </div>
+              <div className="flex flex-col justify-between gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:items-center">
+                <p aria-live="polite" className="text-xs text-slate-600">
+                  {list.isFetching
+                    ? 'Đang cập nhật…'
+                    : `Hiển thị ${data.numberOfElements ? data.number * data.size + 1 : 0}–${data.number * data.size + data.numberOfElements} / ${data.totalElements} đề thi · Trang ${data.number + 1}/${Math.max(1, data.totalPages)}`}
+                </p>
+                {data.totalPages > 1 && (
+                  <nav aria-label="Phân trang đề thi">
+                    <DataTablePagination
+                      page={params.page + 1}
+                      totalPages={data.totalPages}
+                      onPageChange={(page) => setPage(page - 1)}
+                    />
+                  </nav>
+                )}
+              </div>
+            </section>
           )
         )}
       </PageSection>
+      {dialog && (
+        <AdminJlptMetadataDialog
+          key={dialog.mode === 'create' ? 'create' : dialog.examId}
+          target={dialog}
+          onClose={() => setDialog(null)}
+        />
+      )}
     </>
   );
 }

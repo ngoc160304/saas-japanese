@@ -45,10 +45,13 @@ const { invalidateAdminJlptExam } = load(
   resolve(root, 'features/admin-jlpt-exams/hooks/useAdminJlptExams'),
 );
 const { getAdminJlptError } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-error'));
-const { parseAdminJlptExamId, parseAdminJlptExamQuery } = load(
+const { parseAdminJlptExamId, parseAdminJlptExamQuery, writeAdminJlptExamQuery } = load(
   resolve(root, 'features/admin-jlpt-exams/admin-jlpt-route'),
 );
 const { validateAdminJlptMedia } = load(resolve(root, 'apis/admin-jlpt-exams/admin-jlpt-media'));
+const { adminJlptMetadataSchema, adminJlptMetadataPayload, adminJlptMetadataLock } = load(
+  resolve(root, 'features/admin-jlpt-exams/admin-jlpt-metadata'),
+);
 const response = (config, data, status = 200) => ({
   config,
   data,
@@ -246,6 +249,87 @@ test('route IDs and URL pagination reject malformed, unsafe, negative and fracti
     new URLSearchParams('page=-1&size=13&level=N6&status=BAD&sortKey=password'),
   );
   assert.deepEqual(invalid, { page: 0, size: 10, sortKey: 'updatedAt', sortType: 'DESC' });
+});
+
+test('list URL round trips filters, indexing and size; canonicalization/reset preserve unrelated state', () => {
+  const original = new URLSearchParams(
+    'tab=library&page=3&size=12&search=%20日本語%20&level=N3&status=DRAFT&sortKey=title&sortType=ASC',
+  );
+  const state = parseAdminJlptExamQuery(original);
+  assert.equal(state.page, 2);
+  const canonical = writeAdminJlptExamQuery(original, state);
+  assert.equal(canonical.get('tab'), 'library');
+  assert.equal(canonical.get('page'), '3');
+  assert.deepEqual(parseAdminJlptExamQuery(canonical), state);
+  const reset = writeAdminJlptExamQuery(canonical, {
+    ...state,
+    search: undefined,
+    level: undefined,
+    status: undefined,
+    page: 0,
+    size: 10,
+  });
+  assert.equal(reset.has('search'), false);
+  assert.equal(reset.has('level'), false);
+  assert.equal(reset.has('status'), false);
+  assert.equal(reset.has('page'), false);
+  assert.equal(reset.has('size'), false);
+  assert.equal(reset.get('sortKey'), 'title');
+  assert.equal(reset.get('tab'), 'library');
+  const malformed = new URLSearchParams('tab=keep&page=1e2&size=99&level=N6&status=published');
+  const fixed = writeAdminJlptExamQuery(malformed, parseAdminJlptExamQuery(malformed));
+  assert.equal(fixed.toString(), 'tab=keep');
+  for (const size of [1, 5, 10, 12])
+    assert.equal(parseAdminJlptExamQuery(new URLSearchParams(`size=${size}`)).size, size);
+});
+
+test('metadata schema validates backend bounds and payload excludes lifecycle/derived fields', () => {
+  assert.equal(
+    adminJlptMetadataSchema.safeParse({ title: '   ', level: 'N3', description: '' }).success,
+    false,
+  );
+  assert.equal(
+    adminJlptMetadataSchema.safeParse({ title: 'x'.repeat(201), level: 'N3', description: '' })
+      .success,
+    false,
+  );
+  assert.equal(
+    adminJlptMetadataSchema.safeParse({ title: 'Test', level: 'N6', description: '' }).success,
+    false,
+  );
+  assert.equal(
+    adminJlptMetadataSchema.safeParse({ title: 'Test', level: 'N3', description: 'x'.repeat(501) })
+      .success,
+    false,
+  );
+  const parsed = adminJlptMetadataSchema.parse({
+    title: '  日本語  ',
+    level: 'N3',
+    description: '  ',
+    status: 'PUBLISHED',
+    passingScore: 1,
+    totalTimeMinutes: 10,
+  });
+  assert.deepEqual(adminJlptMetadataPayload(parsed), {
+    title: '日本語',
+    level: 'N3',
+    description: null,
+  });
+});
+
+test('metadata permissions follow whole-exam PUT restrictions, including inconsistent/stale flags', () => {
+  assert.equal(
+    adminJlptMetadataLock({ status: 'DRAFT', hasAttempts: false, contentLocked: false }),
+    null,
+  );
+  assert.ok(
+    adminJlptMetadataLock({ status: 'PUBLISHED', hasAttempts: false, contentLocked: false }),
+  );
+  assert.ok(
+    adminJlptMetadataLock({ status: 'ARCHIVED', hasAttempts: false, contentLocked: false }),
+  );
+  assert.ok(adminJlptMetadataLock({ status: 'DRAFT', hasAttempts: true, contentLocked: false }));
+  assert.ok(adminJlptMetadataLock({ status: 'DRAFT', hasAttempts: false, contentLocked: true }));
 });
 
 test('media rejects invalid MIME, extension and size before upload and reuses one authorized client', async () => {

@@ -39,13 +39,14 @@ export function useAdminJlptExamStats(params: AdminJlptExamStatsQuery, verifyAcc
   });
 }
 
-export function useAdminJlptExamDetail(examId: number) {
+export function useAdminJlptExamDetail(examId: number, freshOnMount = false) {
   const ready = useSessionReady();
   return useQuery({
     queryKey: keys.detail(examId),
     queryFn: ({ signal }) => api.detail(examId, signal),
     enabled: ready && Number.isSafeInteger(examId) && examId > 0,
     retry: false,
+    ...(freshOnMount ? { staleTime: 0, refetchOnMount: 'always' as const } : {}),
   });
 }
 

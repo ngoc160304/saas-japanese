@@ -172,7 +172,7 @@ try {
           else data = { totalExams: 21, draftExams: 10, publishedExams: 8, archivedExams: 3 };
         } else if (path.endsWith('/admin/jlpt-exams/1')) {
           if (mode === 'missing') status = 404;
-          else if (mode === 'detail-denied') status = 403;
+          else if (mode === 'detail-denied' || mode === 'denied') status = 403;
           else if (mode === 'expired') status = 401;
           else if (mode === 'empty-structure')
             data = {
@@ -190,7 +190,7 @@ try {
                 : detail;
         } else if (path.endsWith('/admin/jlpt-exams')) {
           if (mode === 'list-error') status = 500;
-          else if (mode === 'list-denied') status = 403;
+          else if (mode === 'list-denied' || mode === 'denied') status = 403;
           else {
             const number = Number(url.searchParams.get('page') ?? 0),
               size = Number(url.searchParams.get('size') ?? 10);
@@ -339,7 +339,7 @@ try {
   await waitFor(hasText('Đề thi chưa có phiên thi.'));
   mode = 'empty';
   await navigate('/admin/exams');
-  await waitFor(hasText('Chưa có đề thi phù hợp.'));
+  await waitFor(hasText('Chưa có đề thi đang hoạt động'));
   mode = 'missing';
   await navigate('/admin/exams/1');
   await waitFor(hasText('Không tìm thấy đề thi'));
@@ -354,17 +354,16 @@ try {
     requests.length = 0;
     await navigate(nextMode === 'detail-denied' ? '/admin/exams/1' : '/admin/exams');
     await waitFor(hasText('Không có quyền truy cập'));
-    if (nextMode === 'denied')
-      assert.equal(contentCalls().length, 0, 'Non-admin must not fetch list/detail');
     assert.equal(await evaluate(hasText(summary.title)), false);
   }
   for (const nextMode of ['stats-error', 'list-error']) {
     mode = nextMode;
     await navigate('/admin/exams');
-    await waitFor(hasText('Chưa thể tải dữ liệu đề thi'));
+    await waitFor(hasText(nextMode === 'stats-error' ? 'Chưa thể tải thống kê.' : 'Chưa thể tải dữ liệu đề thi'));
+    if (nextMode === 'stats-error') await waitFor(hasText(summary.title));
     mode = 'admin';
     await evaluate(
-      '[...document.querySelectorAll("button")].find(b => b.textContent.trim() === "Thử lại").click()',
+      `[...document.querySelectorAll("button")].find(b => b.textContent.trim() === ${JSON.stringify(nextMode === 'stats-error' ? 'Thử lại thống kê' : 'Thử lại')}).click()`,
     );
     await waitFor(hasText(summary.title));
   }

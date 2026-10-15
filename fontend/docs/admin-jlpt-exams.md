@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend task 1
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–2
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -16,13 +16,12 @@ Không dùng GitHub hoặc HTML để suy ra API. Backend/UI chỉ được đ�
   `AuthUser` chỉ có `id`, `email`, `name`. `/auth/myProfile` cũng không có role/permissions.
   Do đó chưa thể thực hiện check ADMIN trực tiếp từ authenticated user model.
   Không thêm role giả, không giải mã JWT, không sửa backend hoặc auth strategy.
-- Foundation dùng GET stats không filter làm kiểm tra truy cập do backend quyết định:
-  mọi endpoint admin JLPT đều yêu cầu `ROLE_ADMIN`, kể cả stats. Chỉ mount feature con
-  khi request này thành công; 403 hiển thị trạng thái từ chối, 401 đi qua refresh và
-  redirect sẵn có. Không request list/detail khi probe bị từ chối. Boundary kiểm tra
-  lại khi mount, không cấp truy cập chỉ dựa vào cache stats cũ. Refetch stats nền sau
-  khi đã kiểm tra quyền không unmount form/editor; 401/403 vẫn chặn ngay. Request nghiệp vụ cũng
-  xử lý 401/403 và ưu tiên error hơn dữ liệu cache. Lỗi mạng/5xx cho phép thử lại.
+- Boundary vẫn kiểm tra GET stats không filter, được backend bảo vệ bằng ROLE_ADMIN.
+  Task 2 sửa việc serialize list/detail sau stats: sau auth initialization, các GET
+  được phép chạy song song, mỗi endpoint tự yêu cầu ADMIN. Stats loading/network/5xx
+  không chặn catalog hoặc unmount editor; list phải thành công mới bật Add Exam.
+  Stats/list/detail 401/403 ưu tiên hơn dữ liệu cache; 401 dùng refresh/redirect hiện có,
+  403 hiển thị từ chối truy cập. Không cấp quyền từ JWT hoặc role giả trên frontend.
 - Đây là cách dùng contract đang hỗ trợ. Muốn check role từ user model ở task sau
   cần backend cung cấp role/authorities trong login/refresh hoặc một endpoint session
   được xác thực; chưa có contract đó để frontend sử dụng. Backend vẫn quyết định quyền.
@@ -102,7 +101,10 @@ Spring Page gồm `content`, `number`, `size`, `numberOfElements`, `totalElement
 `totalPages`, `first`, `last`, `empty`, `pageable`, `sort`; reuse `PageResponse<T>`.
 URL frontend dùng page one based, chuyển sang API zero based. Parser giữ default hợp
 lệ khi URL malformed; sửa page vượt trang cuối bằng replace và giữ filter/sort.
-Task 1 đọc filter/search/sort từ URL; toolbar chỉnh filter thuộc task sau.
+Task 2 có toolbar chỉnh search/level/status/size, debounce search 350ms; mọi thay đổi
+filter/size reset page. Browser history native tích hợp Next giữ refresh/back/forward
+và hash. URL malformed được replace bằng canonical URL. Reset xóa search/level/status,
+đưa page/size về default, giữ sort và query params không thuộc feature.
 
 StatsQuery chỉ có `search`, `level`. API layer và stats key chủ động loại bỏ status,
 page, size, sort dù truyền list object vào. Stats gồm `totalExams`, `draftExams`,
@@ -206,10 +208,14 @@ ownership hoặc DB conflict/lock. Upload có thể 413, 415; unsupported method
 | Layer | File/component | Trách nhiệm |
 | --- | --- | --- |
 | app/admin/exams/layout.tsx | AdminJlptAccessBoundary | Chờ session và server ADMIN check trước khi mount con |
-| app/admin/exams/page.tsx | Suspense → AdminJlptExamListPage | Thin route; real stats, read-only list, pagination |
+| app/admin/exams/page.tsx | Suspense → AdminJlptExamListPage | Thin route; list/statistics orchestration và metadata dialog |
 | app/admin/exams/[id]/page.tsx | parseAdminJlptExamId → AdminJlptExamDetailPage | Await params theo Next.js cài local, validate ID, notFound |
 | app/admin/exams/loading/error/not-found.tsx | AdminJlptState | Route loading, recovery (Next 16.3 retry), invalid ID state |
-| features/admin-jlpt-exams/components | List/Detail/Status/AccessBoundary/State | Orchestration, error/access/empty states; summary và session/part đọc |
+| features/admin-jlpt-exams/components | List/Detail/Status/AccessBoundary/State | Orchestration, error/access/empty states; builder còn chỉ đọc |
+| features/admin-jlpt-exams/components | ExamFilters/ExamGrid/ExamStats | Toolbar, responsive cards, thống kê có loading/error/retry độc lập |
+| features/admin-jlpt-exams/components | MetadataDialog | Create/edit RHF + Zod, fresh detail, pending/dirty-close, field errors, conflict |
+| features/admin-jlpt-exams/hooks | useAdminJlptExamsUrlState | URL state, debounce, canonicalization, filter/reset/page |
+| features/admin-jlpt-exams/admin-jlpt-metadata.ts | schema/payload/lock helper | Bounds backend, writable payload và lý do read-only cho metadata |
 | apis/admin-jlpt-exams | .api/.type/.keys + admin-jlpt-media | Contract, unwrap, ownership paths, read AbortSignal, media validation |
 | features/admin-jlpt-exams/hooks | useAdminJlptExams | Query/mutation lifecycle |
 
@@ -255,14 +261,60 @@ Khác contract phải giữ cho tasks 2–7:
 
 Task 1 cung cấp API/types/hooks, quyền truy cập theo contract có thật, minimal routes,
 đọc list/detail/stats, loading/error/empty/not-found/access-denied, tài liệu và tests.
-Task 2 tiếp tục list gallery, search/filter/sort toolbar và metadata workflow theo
-kế hoạch frontend; dùng types/query/mutations đã có, không mở rộng scope ở task 1.
+Task 2 hoàn thiện card gallery theo HTML (1 cột mobile, 2 tablet, 3 desktop), bốn
+statistics thật, server search/level/status/size/page và form create/edit metadata.
+Card dùng summary; không fetch detail mỗi card. Chỉ khi mở Edit mới GET detail với
+freshOnMount để kiểm tra metadata/quyền mới nhất. Form chỉ có title (nonblank <=200),
+level N1–N5 và description (<=500); create mặc định N3 và backend tạo DRAFT.
+Để tránh chặn nhập tiếng Nhật, không transform dữ liệu đang gõ; trim khi validate/save.
+Form có field/server errors, giữ input sau failure, chống submit lặp, không đóng khi
+pending, xác nhận dirty qua AlertDialog, thông báo success qua Sonner. Snapshot mới
+đổi quyền save nhưng không reset dirty fields. 409 refresh authority/lock và giữ input;
+401/403/404 chặn save; archived/published/attempted không có ngoại lệ field-level PUT.
+Create/update dùng hook task 1 và invalidate list/stats/detail/validation đúng phạm vi;
+giữ filters URL. Nếu edit làm record không còn khớp filter, record rời gallery sau refetch.
+
+Contract gap: Summary/Detail chưa có maximum score; card chỉ hiện passingScore từ API,
+không thêm `/180` hoặc tự tính maximum. Không dùng sample exams/mock statistics trong UI.
+Default status cố ý ghi “Đang hoạt động (nháp và xuất bản)” vì API không gồm archive.
+Không đưa status dropdown vào metadata hoặc editable duration/passingScore từ HTML.
+Không có nút publish/unpublish/archive/preview giả ở task 2.
+
+Task 3 có thể reuse API/nested path types/query keys, mutation invalidation, detail query
+(freshOnMount tùy chọn), lock explanations, URL/card/metadata flow vừa hoàn thiện.
 Các task 3–7 còn hierarchy editing/reorder, atomic question/answer editor, media UI,
 validation/lifecycle controls và preview theo kế hoạch được giao riêng. Không có
 endpoint admin CRUD/reorder/lifecycle/upload nào bị thiếu; hạn chế cần phối hợp backend
-là role trong authenticated user model nêu đầu tài liệu.
+là role trong authenticated user model nêu đầu tài liệu. Task 2 chưa triển khai task 3.
 
-## Xác minh
+## Xác minh task 2
+
+- `node --test tests/admin-jlpt-exams.test.mjs`: 10/10 pass, gồm URL roundtrip/reset/
+  bounds, stats query independence, payload whitelist/schema và các trạng thái lock.
+- Focused ESLint trên feature/tests pass; TypeScript noEmit incremental=false pass.
+- `pnpm build`: pass. `pnpm lint`: còn lỗi eqeqeq có sẵn CardItem.tsx:42 cùng 6 warning
+  ngoài phạm vi, không chỉnh sửa để làm xanh lint.
+- Playwright MCP có trong session task 2. Đã chạy browser kiểm tra create/edit success,
+  cache/gallery cập nhật, duplicate submit, validation 400 giữ input, dirty confirmation,
+  409 giữ input và khóa save, debounce/reset race, URL/back/forward/reload/page correction,
+  stats loading/error độc lập, stale cards khi filter fail, archived read-only,
+  403/anonymous, focus/Escape và mobile/desktop không overflow. API được intercept bằng
+  dữ liệu test; không coi đây là authenticated live integration.
+- Reusable Playwright script: `tests/admin-jlpt-metadata.playwright.mjs` export callback
+  nhận `(page, origin)`. Runner Playwright có thể import trực tiếp. Với Playwright MCP
+  không hỗ trợ dynamic import, đọc file và bỏ `export default ` rồi truyền source vào
+  `browser_run_code_unsafe` (default origin localhost:3001). Không thêm dependency.
+- Script Playwright đã chạy pass trên production build tại localhost:3001; không có
+  page exception. Console/network 400/409/500/403/401 được chủ động tạo ở test error paths.
+  Đã xem ảnh desktop 1440px/mobile 390px; đo các mẫu title/input/textarea/submit dialog
+  có contrast >4.5:1. Không có horizontal overflow sau responsive layout settle.
+- Smoke Chrome/CDP task 1 được cập nhật cho empty state và stats failure độc lập,
+  đã chạy lại pass cùng 10 unit/contract tests.
+- Backend 8080 vẫn chạy; browser thật không có phiên ADMIN và chuyển về login đúng
+  `next` URL. Không có credential test được cung cấp, nên create/edit/search live với
+  tài khoản ADMIN chưa xác minh; không tự tạo tài khoản hoặc thay dữ liệu backend.
+
+## Xác minh task 1 (lịch sử)
 
 Lệnh focused: `node --test tests/admin-jlpt-exams.test.mjs`, ESLint các file mới và
 upload module, TypeScript noEmit với incremental=false (không sửa tsbuildinfo).
