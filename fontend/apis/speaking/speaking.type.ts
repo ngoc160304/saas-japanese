@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export interface SpeakingTopic {
-  id: number;
+  id: string;
   title: string;
   description: string;
 }

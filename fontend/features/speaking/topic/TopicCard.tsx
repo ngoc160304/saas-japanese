@@ -1,6 +1,17 @@
-import { MessageCircle } from 'lucide-react';
+import {
+  BriefcaseBusiness,
+  BookOpen,
+  Plane,
+  Utensils,
+  ShoppingBag,
+  MessageCircle,
+  type LucideIcon,
+} from 'lucide-react';
+
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 interface TopicCardProps {
+  id: string;
   title: string;
   description: string;
   selected: boolean;
@@ -8,30 +19,122 @@ interface TopicCardProps {
   onClick: () => void;
 }
 
+interface TopicStyle {
+  icon: LucideIcon;
+  iconBg: string;
+  iconColor: string;
+  hoverBg: string;
+}
+
+const topicStyles: Record<string, TopicStyle> = {
+  work: {
+    icon: BriefcaseBusiness,
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-[#2B4C7E]',
+    hoverBg: 'group-hover:bg-blue-100',
+  },
+
+  study: {
+    icon: BookOpen,
+    iconBg: 'bg-sky-50',
+    iconColor: 'text-sky-600',
+    hoverBg: 'group-hover:bg-sky-100',
+  },
+
+  travel: {
+    icon: Plane,
+    iconBg: 'bg-cyan-50',
+    iconColor: 'text-cyan-600',
+    hoverBg: 'group-hover:bg-cyan-100',
+  },
+
+  'daily-life': {
+    icon: Utensils,
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600',
+    hoverBg: 'group-hover:bg-emerald-100',
+  },
+
+  shopping: {
+    icon: ShoppingBag,
+    iconBg: 'bg-amber-50',
+    iconColor: 'text-amber-600',
+    hoverBg: 'group-hover:bg-amber-100',
+  },
+
+  conversation: {
+    icon: MessageCircle,
+    iconBg: 'bg-blue-50',
+    iconColor: 'text-[#2F80ED]',
+    hoverBg: 'group-hover:bg-blue-100',
+  },
+};
+
 export default function TopicCard({
+  id,
   title,
   description,
   selected,
   disabled,
   onClick,
 }: TopicCardProps) {
+  const topicStyle = topicStyles[id] ?? topicStyles.conversation;
+
+  const Icon = topicStyle.icon;
+
   return (
     <button
       type="button"
       disabled={disabled}
       aria-pressed={selected}
       onClick={onClick}
-      className={`flex h-full items-start gap-4 rounded-2xl border p-5 text-left shadow-soft transition-colors focus-visible:outline-2 focus-visible:outline-sky-500 disabled:opacity-60 ${selected ? 'border-sky-500 bg-sky-50 ring-2 ring-sky-200' : 'border-slate-200 bg-white hover:border-sky-300'}`}
+      className="group w-full text-left outline-none focus-visible:rounded-2xl focus-visible:ring-2 focus-visible:ring-[#2F80ED] focus-visible:ring-offset-2 disabled:opacity-60"
     >
-      <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-primary">
-        <MessageCircle className="size-6" aria-hidden="true" />
-      </span>
-      <span className="min-w-0">
-        <span className="block break-words text-base font-semibold text-slate-900">{title}</span>
-        <span className="mt-1 block break-words text-sm leading-5 text-slate-500">
-          {description}
-        </span>
-      </span>
+      <Card
+        className={`
+          h-full rounded-[16px] border p-6
+          transition-all duration-200
+          ${
+            selected
+              ? 'border-[#2F80ED] bg-blue-50/40 shadow-[0px_4px_20px_rgba(47,128,237,0.12)] ring-2 ring-[#2F80ED]/20'
+              : 'border-[#E2E8F0] bg-white shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:-translate-y-0.5 hover:border-[#56CCF2] hover:shadow-[0px_6px_24px_rgba(47,128,237,0.08)]'
+          }
+        `}
+      >
+        <div className="flex items-start gap-4">
+          {/* Icon */}
+          <div
+            className={`
+              flex h-14 w-14 shrink-0 items-center justify-center
+              rounded-2xl
+              transition-all duration-200
+              ${
+                selected
+                  ? 'bg-[#2F80ED] text-white shadow-sm'
+                  : `${topicStyle.iconBg} ${topicStyle.iconColor} ${topicStyle.hoverBg}`
+              }
+            `}
+          >
+            <Icon className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
+          </div>
+
+          {/* Content */}
+          <CardHeader className="min-w-0 flex-1 p-0">
+            <CardTitle
+              className={`
+                text-base font-semibold
+                ${selected ? 'text-[#2B4C7E]' : 'text-[#1E293B]'}
+              `}
+            >
+              {title}
+            </CardTitle>
+
+            <CardDescription className="mt-1 text-sm leading-5 text-[#64748B]">
+              {description}
+            </CardDescription>
+          </CardHeader>
+        </div>
+      </Card>
     </button>
   );
 }

@@ -78,8 +78,8 @@ try {
   };
   const errors = [];
   let authenticated = false;
-  let topicState = 'error';
   let createRequests = 0;
+  const joinRequests = [];
   const apiRequests = [];
   listeners.set('Runtime.exceptionThrown', (event) => errors.push(event.exceptionDetails.text));
   listeners.set('Runtime.consoleAPICalled', (event) => {
@@ -149,23 +149,17 @@ try {
           },
         };
       else if (url.pathname.endsWith('/speaking/topics')) {
-        await delay(200);
-        if (topicState === 'error') status = 503;
-        else
-          body = {
-            data: {
-              content:
-                topicState === 'empty'
-                  ? []
-                  : [{ id: 7, title: 'Chủ đề từ API', description: 'Nội dung chủ đề được lưu' }],
-              totalPages: topicState === 'empty' ? 0 : 1,
-              totalElements: topicState === 'empty' ? 0 : 1,
-            },
-          };
+        // The local catalog must render even while the former endpoint is unavailable.
+        status = 503;
       } else if (url.pathname === '/create-room') {
         createRequests++;
         assert.equal(request.headers.Authorization, undefined);
+        body = { name: 'browser-room-1' };
+      } else if (url.pathname === '/join-room') {
+        joinRequests.push(JSON.parse(request.postData));
         status = 503;
+      } else if (url.pathname === '/end-room') {
+        body = { success: true, session_result: null };
       } else status = 404;
       if (status >= 400)
         body = {
@@ -253,14 +247,20 @@ try {
   await screenshot('dashboard-mobile', 390, 844);
 
   await navigate('/student/speaking');
-  await waitFor('document.body.innerText.includes("Thử tải lại")');
+  await waitFor('document.querySelectorAll("main button[aria-pressed]").length === 6');
   assert.equal(await evaluate('document.querySelectorAll("main").length'), 1);
-  await screenshot('speaking-topic-error-mobile', 390, 844);
-  topicState = 'ok';
-  await evaluate(
-    '[...document.querySelectorAll("button")].find(button => button.textContent.includes("Thử tải lại")).click()',
+  assert.deepEqual(
+    await evaluate(
+      '[...document.querySelectorAll("main button[aria-pressed]")].map(button => button.querySelector(\'[data-slot="card-title"]\').textContent)',
+    ),
+    ['Công việc', 'Học tập', 'Du lịch', 'Đời sống', 'Mua sắm', 'Giao tiếp'],
   );
-  await waitFor('document.body.innerText.includes("Chủ đề từ API")');
+  assert.equal(
+    await evaluate(
+      '[...document.querySelectorAll("button")].find(button => button.textContent.includes("Bắt đầu hội thoại")).disabled',
+    ),
+    true,
+  );
   assert.equal(
     await evaluate(
       'document.querySelector(\'a[href="/student/speaking"][aria-current="page"]\') !== null',
@@ -271,37 +271,49 @@ try {
   await screenshot('speaking-topics-desktop', 1440, 1000);
   assert.equal(createRequests, 0);
   await evaluate(
-    '[...document.querySelectorAll("button")].find(button => button.textContent.includes("Chủ đề từ API")).click()',
+    '[...document.querySelectorAll("main button[aria-pressed]")].find(button => button.textContent.includes("Công việc")).click()',
   );
   await evaluate(
     `const button = [...document.querySelectorAll("button")].find(button => button.textContent.includes("Bắt đầu hội thoại")); button.click(); button.click();`,
   );
   await waitFor('document.body.innerText.includes("Không kết nối được dịch vụ hội thoại")');
   assert.equal(createRequests, 1, 'Duplicate start requests');
+  assert.deepEqual(joinRequests, [
+    {
+      room_name: 'browser-room-1',
+      user_id: '42',
+      user_name: 'Browser Student',
+      topic: {
+        id: 'work',
+        title: 'Công việc',
+        description: 'Luyện giao tiếp trong môi trường công sở',
+      },
+    },
+  ]);
   await waitFor(
     'window.__speakingTracks.length > 0 && window.__speakingTracks.every(track => track.readyState === "ended")',
   );
   await screenshot('speaking-session-error-desktop', 1440, 1000);
 
-  topicState = 'empty';
   await navigate('/student/speaking');
-  await waitFor('document.body.innerText.includes("Chưa có chủ đề hội thoại được công bố")');
-  await screenshot('speaking-topics-empty', 390, 844);
+  await waitFor('document.querySelectorAll("main button[aria-pressed]").length === 6');
   await evaluate(
     '[...document.querySelectorAll("button")].find(button => button.textContent.includes("Đăng xuất")).click()',
   );
   await waitFor('location.pathname === "/login"');
-  assert.ok(
+  assert.equal(
     apiRequests.some(
       (request) => request.path === '/api/v1/speaking/topics' && request.method === 'GET',
     ),
+    false,
+    'Static topics must not request the topic-list endpoint',
   );
   assert.ok(
     apiRequests.some((request) => request.path === '/create-room' && request.method === 'POST'),
   );
   assert.deepEqual(errors, []);
   process.stdout.write(
-    'PASS: canonical redirect/auth protection, real-response profile/course rendering, desktop/mobile overflow, Speaking navigation/active state, topics error/retry/empty states, duplicate-start guard, microphone release on API failure, and logout.\nScreenshots: ' +
+    'PASS (mocked APIs): canonical redirect/auth protection, profile/course rendering, desktop/mobile overflow, Speaking navigation/active state, six static topics without topic API requests, current-user join identity, duplicate-start guard, microphone release on API failure, and logout.\nScreenshots: ' +
       profile +
       '\n',
   );

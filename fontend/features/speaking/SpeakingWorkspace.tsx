@@ -1,14 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { RoomContext } from '@livekit/components-react';
 import '@livekit/components-styles';
 import type { AuthUser } from '@/apis/auth/auth.type';
-import { speakingAPI, speakingQueryKeys } from '@/apis/speaking/speaking.api';
 import type { SpeakingTopic } from '@/apis/speaking/speaking.type';
 import { Button } from '@/components/ui/button';
-import { getApiErrorMessage } from '@/lib/api-error';
 import { selectAuthInitialized, selectCurrentUser, selectIsAuthenticated } from '@/store/authSlice';
 import { useAppSelector } from '@/store/hooks';
 import { useSpeakingSession } from './hooks/useSpeakingSession';
@@ -19,13 +16,7 @@ import { SpeakingLiveSession } from './conversation/SpeakingLiveSession';
 import MessageBubble from './conversation/MessageBubble';
 
 function AuthenticatedSpeakingWorkspace({ user }: { user: AuthUser }) {
-  const [page, setPage] = useState(0);
   const [selectedTopic, setSelectedTopic] = useState<SpeakingTopic | null>(null);
-  const topics = useQuery({
-    queryKey: speakingQueryKeys.topics(user.id, page),
-    queryFn: ({ signal }) => speakingAPI.getTopics(page, signal),
-    retry: false,
-  });
   const session = useSpeakingSession(user);
   function start(topic: SpeakingTopic) {
     setSelectedTopic(topic);
@@ -34,17 +25,7 @@ function AuthenticatedSpeakingWorkspace({ user }: { user: AuthUser }) {
   return (
     <SpeakingLayout>
       {session.phase === 'idle' || session.phase === 'starting' ? (
-        <TopicSelection
-          topics={topics.data?.content ?? []}
-          loading={topics.isPending || topics.isFetching}
-          error={topics.isError ? getApiErrorMessage(topics.error) : null}
-          pending={session.phase === 'starting'}
-          onStart={start}
-          onRetry={() => void topics.refetch()}
-          page={page}
-          totalPages={topics.data?.totalPages ?? 0}
-          onPageChange={setPage}
-        />
+        <TopicSelection pending={session.phase === 'starting'} onStart={start} />
       ) : session.phase === 'active' && session.room ? (
         <RoomContext.Provider value={session.room}>
           <SpeakingLiveSession
