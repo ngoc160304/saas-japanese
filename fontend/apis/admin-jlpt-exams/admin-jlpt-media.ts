@@ -12,6 +12,9 @@ const audioFormats: Record<string, readonly string[]> = {
   wav: ['audio/wav', 'audio/x-wav', 'audio/wave'],
 };
 
+export const ADMIN_JLPT_IMAGE_ACCEPT = '.jpeg,.png,.webp,.gif';
+export const ADMIN_JLPT_AUDIO_ACCEPT = '.mp3,.wav';
+
 export function validateAdminJlptMedia(
   file: Pick<File, 'name' | 'type' | 'size'>,
   kind: 'image' | 'audio',
@@ -20,7 +23,9 @@ export function validateAdminJlptMedia(
     return 'Tệp phải có tên hợp lệ và có nội dung.';
   const max = kind === 'image' ? ADMIN_JLPT_IMAGE_MAX_BYTES : ADMIN_JLPT_AUDIO_MAX_BYTES;
   if (file.size > max) return `Tệp vượt quá giới hạn ${kind === 'image' ? 10 : 20} MiB.`;
-  const extension = file.name.toLowerCase().split('.').pop() ?? '';
+  const separator = file.name.lastIndexOf('.');
+  const extension =
+    separator < (kind === 'audio' ? 1 : 0) ? '' : file.name.slice(separator + 1).toLowerCase();
   const mime = file.type.split(';')[0].trim().toLowerCase();
   const formats = kind === 'image' ? imageFormats : audioFormats;
   if (!Object.hasOwn(formats, extension) || !formats[extension].includes(mime))

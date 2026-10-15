@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend tasks 1–4
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–5
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -225,6 +225,9 @@ ownership hoặc DB conflict/lock. Upload có thể 413, 415; unsupported method
 | features/admin-jlpt-exams/components | QuestionEditorPage/QuestionFields/QuestionAnswers | Snapshot form, settings/prompt/context/explanation, dynamic answer array, save/next/recovery |
 | features/admin-jlpt-exams/admin-jlpt-question.ts | schema/payload/context/navigation | Single-choice, existing/new IDs, ảnh, vị trí, next sibling và nested field errors |
 | features/admin-jlpt-exams/hooks | useAdminJlptQuestionSave/useAdminJlptQuestionExit | Atomic mutation guard, lock/ownership, dirty link/exit confirmation và beforeunload |
+| features/admin-jlpt-exams/components | MediaControl/MediaPreview | Chọn tệp, progress/cancel/retry, trạng thái staged, ảnh và native audio player |
+| features/admin-jlpt-exams/hooks | useAdminJlptMediaUpload | File/blob URL local, abort/generation guard, stage ID trong RHF, cleanup khi lưu/unmount |
+| apis/upload | upload.api/upload.type | Multipart upload dùng client hiện có; signal, progress number/null, timeout, giữ legacy return shapes |
 | apis/admin-jlpt-exams | .api/.type/.keys + admin-jlpt-media | Contract, unwrap, ownership paths, read AbortSignal, media validation |
 | features/admin-jlpt-exams/hooks | useAdminJlptExams | Query/mutation lifecycle |
 
@@ -463,6 +466,120 @@ và question create/edit chưa triển khai.
   validators task 1 đã có. Cần thiết kế rõ staged upload vs attach và explicit remove,
   tránh null/omitted làm mất association khi lưu unrelated fields.
 - Chưa làm lifecycle/publish-validation UI, preview (task 6), hoặc media controls.
+
+## Task 5 — Media upload và attachment
+
+### Contract đã xác minh
+
+| Loại | Upload | Tệp được nhận | Giới hạn | Liên kết |
+| --- | --- | --- | --- | --- |
+| Ảnh | POST `/api/v1/upload/images`, multipart `file` | `.jpeg` + image/jpeg; `.png` + image/png; `.webp` + image/webp; `.gif` + image/gif | 10 × 1024² bytes | Question `imageMediaId` trong atomic `with-answers` |
+| Audio | POST `/api/v1/upload/audios`, multipart `file` | `.mp3` + audio/mpeg; `.wav` + audio/wav, audio/x-wav hoặc audio/wave | 20 × 1024² bytes | Part `audioMediaId` trong POST/PUT part |
+
+- Không nhận `.jpg`, SVG, OGG hoặc audio/mp3. MIME/extension không phân biệt hoa
+  thường, MIME parameters được bỏ qua. Tên nonblank <=255 ký tự, tệp không rỗng;
+  audio phải có basename trước dấu chấm. Đã sửa validator frontend cũ nhận nhầm tên
+  ảnh thiếu dấu chấm và audio `.mp3` không có basename.
+- Multipart max-file/max-request trong cấu hình local là 100MB; không hạ các giới
+  hạn riêng 10/20 MiB ở trên. Service size rejection là 400, multipart overflow 413.
+- Backend ảnh còn kiểm tra magic header; audio kiểm tra ít nhất hai MP3 Layer III
+  frames hoặc WAV RIFF/fmt/data, 1–2 channels, 8–192 kHz, PCM 8/16/24/32 hoặc float32
+  theo validator. Client kiểm tra tên/MIME/kích thước, server quyết định nội dung.
+  Local player có thể không hỗ trợ mọi codec mà backend nhận; UI có lỗi/retry rõ ràng.
+- Success envelope `{statusCode,error,message,data}`. Image controller trả Media
+  entity bên trong data; audio trả DTO `{id,originalName,publicId,secureUrl}`. Admin
+  API unwrap về cùng bốn trường dùng được. Caller image cũ vẫn nhận envelope, audio
+  cũ vẫn nhận data và callback progress dạng number. Không expose provider credentials.
+- Upload không có exam/session/part/question context và tạo media unused. Lifecycle
+  locks được kiểm tra khi POST/PUT resource; frontend chặn upload khi exam đã readonly.
+  Backend `replaceMedia` kiểm tra active record, đúng IMAGE/AUDIO, ownership/usage;
+  media mới bị dùng chỗ khác trả 409. Backend quản lý isUsed và release theo remaining
+  references. Frontend không ghi flags này.
+- PUT omitted/null ID sẽ detach. DTO vẫn yêu cầu metadata/order và atomic answers
+  đầy đủ. UI dùng command **undefined = preserve latest**, **number = staged replace**,
+  **null = explicit removal**, rồi payload luôn gửi ID/null đúng contract. Không gửi
+  URL thay cho ID, không thêm audio tại question. Detach không xóa file.
+- Không tìm thấy endpoint cleanup/delete-upload được hỗ trợ; upload service gọi
+  provider trực tiếp. Không thêm speculative delete hoặc hứa tự cleanup orphan.
+  Hủy XHR không chứng minh provider đã hủy/xóa tệp.
+- Hạn chế dữ liệu cũ vẫn còn: detail chỉ trả media summary/null, không trả raw media
+  ID nếu record đã mất. Không thể phân biệt dangling reference với chưa gắn bằng
+  contract hiện có; valid existing associations được giữ khi sửa field khác.
+
+### Persistence và state
+
+- Reuse uploadAPI + authorized Axios/session-refresh, relative paths; không thêm
+  client hoặc prefix. Image/audio dùng timeout 120s theo upload convention hiện có;
+  không tự set multipart Content-Type, browser sinh boundary. Signal được truyền
+  xuống Axios; progress number/null phân biệt total chưa xác định. Retry chỉ do user.
+- Chọn tệp tạo object URL để xem/nghe trước upload. Tệp chưa tải/xảy ra lỗi/hủy vẫn
+  chặn Save/Save & Next; có thể retry, bỏ candidate hoặc hoàn tác. Upload thành công
+  stage ID trong RHF và đánh dấu dirty, hiển thị **chưa lưu liên kết**. Upload không
+  tự invalidate exam hoặc báo attached; resource Save mới persist association.
+- Nếu save bị từ chối, giữ File/ID mới và toàn bộ fields/answer IDs/correctness để
+  retry Save mà không upload lại. 4xx được giải thích là chưa lưu qua request này;
+  network/5xx giữ wording chưa rõ kết quả theo atomic editor task 4. Lock 409/archived
+  404 yêu cầu authoritative refetch và chặn repeat save theo state mới.
+- File/blob URL chỉ nằm trong hook local, không Redux/query/mutation cache. Hook
+  dùng API upload functions hiện có trực tiếp, tránh đưa File vào MutationCache.
+  Generation + AbortController chặn stale completion/progress sau replacement,
+  cancel, reset, đổi resource/unmount. Cleanup chỉ revoke URL do hook tạo; không
+  revoke remote URLs. Sau confirmed save/new draft reset upload state và dirty baseline.
+- Form được key theo resource. Question Save & Next không mang ảnh candidate/ID cũ
+  sang draft mới. Part giữ name/instructions/order; session fields không thêm media.
+  Dirty-close/reload warnings bao gồm local file chưa upload; đóng form hủy request.
+- Native audio controls không autoplay, pause/reset khi source/resource unmount.
+  Có persisted/local playback, load failure/retry; builder và parent audio context
+  trong question vẫn xem/nghe khi readonly. Part media controls đặt ngoài fieldset
+  metadata để playback/retry/cancel còn sử dụng được khi phần chỉnh sửa bị khóa.
+- Attachment success reuse invalidation task 1–4: admin detail/builder/validation,
+  list/statistics theo mutation convention có sẵn. Không ghi student caches. Background
+  refetch không reset các field đang dirty hoặc staged ID; preserve command lấy media
+  từ snapshot mới nhất tại Save. Question dùng returned image nếu reconciliation lỗi.
+- `useUploadImage` category chỉ đổi adapter sang `(file) => uploadAPI.uploadImage(file)`
+  để optional upload options không bị hiểu nhầm là TanStack mutation context. Shared
+  image return wrapper và video behavior được giữ cho các caller hiện có.
+
+### Bàn giao task 6
+
+UI dùng upload controls thay URL placeholders; ảnh ở question, audio ở part. Không
+thêm lifecycle controls, publish-validation panels hoặc question/exam preview mode.
+Task 6 có thể reuse MediaPreview cho read-only media và lock helper hiện có; publish
+validation phải đọc backend, không suy ra media đã gắn từ upload success. Các hạn chế
+role trong user model, version/idempotency token và dangling media IDs vẫn như trên.
+
+## Xác minh task 5
+
+- Node tests JLPT: **19/19 pass**, thêm exact upload limits/names/MIME pairs, explicit
+  preserve/replace/remove payload, wrapper compatibility, multipart field, signal,
+  timeout, indeterminate progress và không tự retry upload.
+- Regression category: **8/8 pass**. Focused ESLint và TypeScript noEmit
+  incremental=false: **pass**; `pnpm build`: **pass**.
+- `pnpm lint`: **fail** bởi eqeqeq có sẵn ở CardItem.tsx:42 và 6 warnings ngoài phạm vi.
+  Không sửa backend/UI/auth/dependencies để làm xanh kiểm tra.
+- Playwright `tests/admin-jlpt-media.playwright.mjs` dùng exam 701 synthetic và provider
+  responses mock; không upload đến provider thật. **Pass trên production origin 3001
+  và dev origin 3000**,
+  14 upload requests, 12 resource write attempts; không page exception. Gồm chọn/
+  validate/local preview, multipart boundary + file field, upload 500/413/403,
+  resource 400/409, ID reuse khi Save retry, retained answers/correctness/part fields,
+  replace/remove và refresh, cancel, stale completion sau đổi file/resource/unmount,
+  URL revoke, create question + Save & Next và revert media ở draft mới, create part,
+  native audio playback/stop/reset/error/retry/no-autoplay, dirty-close, published/
+  attempts/archived, long Japanese names, desktop/mobile/dialog scrolling.
+- Đã xem ảnh 1440px/390px cho question media và part audio dialog. Không horizontal
+  overflow, native player và controls wrap; dialog cuộn trong viewport. Cần chờ layout
+  ổn định sau resize trước khi đo chiều cao; không đổi shared Dialog để che timing test.
+- Regression Playwright builder **pass** (16 structural attempts), question editor
+  **pass** (12 atomic attempts); không page exception. Đã thêm offline audio fixture
+  cho builder vì task 5 bắt đầu render native player. CDP
+  `node tests/admin-jlpt-exams.browser.mjs`: **pass**. Console/network có các lỗi mock
+  400/409/413/500/403/401 và media 404 chủ động; shell `/admin/users` prefetch 404 và
+  CSS preload warnings đã có từ trước. Không coi toàn bộ console là sạch lỗi.
+- Backend local gọi provider thật; chưa có test/stub provider local được xác nhận
+  hoặc session ADMIN được cung cấp. **Blocked live provider + attachment integration**;
+  không gửi tệp thật, không sửa exam có sẵn hay tự tạo account. Không coi mock refresh
+  persistence là live backend verification. Không thêm endpoint cleanup giả.
 
 ## Xác minh task 4
 

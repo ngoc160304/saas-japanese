@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import type {
@@ -41,6 +41,9 @@ import { AdminJlptLoading, AdminJlptQueryError } from './AdminJlptState';
 import { AdminJlptStatus } from './AdminJlptStatus';
 import { AdminJlptQuestionFields, AdminJlptQuestionExplanation } from './AdminJlptQuestionFields';
 import { AdminJlptQuestionAnswers } from './AdminJlptQuestionAnswers';
+import { useAdminJlptMediaUpload } from '../hooks/useAdminJlptMediaUpload';
+import { AdminJlptMediaControl } from './AdminJlptMediaControl';
+import { AdminJlptMediaPreview } from './AdminJlptMediaPreview';
 
 export function AdminJlptQuestionEditorPage({ target }: { target: AdminJlptQuestionTarget }) {
   return <EditorLoader key={adminJlptQuestionUrl(target)} target={target} />;
@@ -129,6 +132,9 @@ function QuestionForm({
     defaultValues: adminJlptQuestionValues(initialQuestion, initialContext?.part.questions.length),
   });
   const save = useAdminJlptQuestionSave(target.examId);
+  const imageSelection = useWatch({ control: form.control, name: 'imageMediaId' });
+  // Virtual field registration also survives reset when Save & Next starts a draft.
+  form.register('imageMediaId');
   const gate = useRef(false);
   const [pending, setPending] = useState(false);
   const [navigating, setNavigating] = useState(false);
@@ -140,13 +146,26 @@ function QuestionForm({
   const [notice, setNotice] = useState<string | null>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const busy = pending || navigating;
-  const exit = useAdminJlptQuestionExit(form.formState.isDirty, busy);
   const lock = adminJlptContentLock(latest);
   const status = query.isError ? getAdminJlptError(query.error).status : null;
   const denied = status === 401 || status === 403 || [401, 403].includes(saveError?.status ?? 0);
   const blocked = Boolean(lock || !context || query.isError || query.isFetching || denied);
   const canChange = () =>
     !blocked && !busy && !gate.current && uncertain === null && nextSaved === null;
+  const media = useAdminJlptMediaUpload({
+    kind: 'image',
+    canEdit: canChange,
+    onStage: (id) => {
+      if (id === undefined) form.resetField('imageMediaId');
+      else form.setValue('imageMediaId', id, { shouldDirty: true, shouldValidate: true });
+    },
+    onAccessError: () => {
+      void query.refetch();
+    },
+  });
+  const dirty = form.formState.isDirty || media.dirty;
+  const exit = useAdminJlptQuestionExit(dirty, busy);
+  const formDisabled = blocked || busy || uncertain !== null || nextSaved !== null;
 
   const advance = (question: AdminJlptQuestion, detail: AdminJlptExamDetail) => {
     const savedContext = adminJlptQuestionContext(detail, { ...target, questionId: question.id });
@@ -166,7 +185,7 @@ function QuestionForm({
   };
 
   const submit = async (next: boolean) => {
-    if (!canChange()) return;
+    if (!canChange() || media.hasUnresolved()) return;
     gate.current = true;
     setPending(true);
     try {
@@ -199,6 +218,7 @@ function QuestionForm({
           const result = outcome.question;
           setSaved(result);
           form.reset(adminJlptQuestionValues(result));
+          media.reset();
           toast.success('Đã lưu câu hỏi và toàn bộ đáp án.');
           setNotice('Đã lưu câu hỏi và toàn bộ đáp án.');
           if (next) {
@@ -242,9 +262,13 @@ function QuestionForm({
       />
     );
   const parent = context ?? initialContext;
-  const image = context?.question
-    ? context.question.image
-    : (saved?.image ?? initialQuestion?.image ?? null);
+  const partAudio = parent?.part.audio;
+  const image =
+    saved && (query.isError || query.isFetching)
+      ? saved.image
+      : context?.question
+        ? context.question.image
+        : (saved?.image ?? initialQuestion?.image ?? null);
   return (
     <div className="min-w-0 space-y-6">
       <Header
@@ -326,14 +350,14 @@ function QuestionForm({
         <p role="status" className="text-xs text-slate-600">
           {busy
             ? 'Đang lưu / chuyển trang…'
-            : form.formState.isDirty
+            : dirty
               ? 'Có thay đổi chưa lưu'
               : 'Biểu mẫu chưa có thay đổi mới'}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button
             type="button"
-            disabled={blocked || busy || uncertain !== null || nextSaved !== null}
+            disabled={formDisabled || media.unresolved}
             onClick={() => void submit(false)}
           >
             Lưu câu hỏi
@@ -341,7 +365,7 @@ function QuestionForm({
           <Button
             type="button"
             variant="outline"
-            disabled={blocked || busy || uncertain !== null || nextSaved !== null}
+            disabled={formDisabled || media.unresolved}
             onClick={() => void submit(true)}
           >
             Lưu & tiếp →
@@ -389,6 +413,13 @@ function QuestionForm({
               ? 'Trạng thái hoặc quan hệ dữ liệu có thể đã thay đổi. Đã yêu cầu tải lại; nội dung nhập vẫn được giữ.'
               : 'Nội dung nhập vẫn được giữ để kiểm tra và sửa.'}
           </p>
+          {form.getValues('imageMediaId') !== undefined && (
+            <p>
+              {saveError.status !== null && saveError.status < 500
+                ? 'Liên kết ảnh chưa được lưu qua yêu cầu này. Tệp đã tải lên được giữ để kiểm tra và thử lưu lại.'
+                : 'Chưa xác nhận được thay đổi liên kết ảnh. Tệp đã tải lên được giữ; không cần tải lại tệp để thử lưu lại.'}
+            </p>
+          )}
           {Object.entries(saveError.fieldErrors)
             .filter(
               ([field]) => !adminJlptQuestionErrorPath(field, form.getValues('answers').length),
@@ -455,19 +486,35 @@ function QuestionForm({
           void submit(false);
         }}
       >
-        <fieldset
-          disabled={blocked || busy || uncertain !== null || nextSaved !== null}
-          className="min-w-0 space-y-6"
-        >
-          <legend className="sr-only">Nội dung câu hỏi trắc nghiệm</legend>
-          <AdminJlptQuestionFields form={form} maximum={maximum} image={image} />
-          <AdminJlptQuestionAnswers
-            form={form}
-            disabled={blocked || busy || uncertain !== null || nextSaved !== null}
-            canChange={canChange}
-          />
-          <AdminJlptQuestionExplanation form={form} />
-        </fieldset>
+        <div className="min-w-0 space-y-6">
+          <AdminJlptQuestionFields form={form} maximum={maximum} disabled={formDisabled}>
+            <AdminJlptMediaControl
+              kind="image"
+              persisted={image}
+              selection={imageSelection}
+              upload={media}
+              disabled={formDisabled}
+              fieldError={form.formState.errors.imageMediaId?.message}
+            />
+            {partAudio && (
+              <div className="space-y-2 rounded-2xl border border-slate-200 p-4">
+                <p className="text-xs text-slate-600">
+                  Audio của phần thi (chỉ xem; chỉnh audio trong phần thi).
+                </p>
+                <AdminJlptMediaPreview
+                  kind="audio"
+                  url={partAudio.secureUrl}
+                  name={partAudio.originalName}
+                />
+              </div>
+            )}
+          </AdminJlptQuestionFields>
+          <fieldset disabled={formDisabled} className="min-w-0 space-y-6">
+            <legend className="sr-only">Đáp án và giải thích</legend>
+            <AdminJlptQuestionAnswers form={form} disabled={formDisabled} canChange={canChange} />
+            <AdminJlptQuestionExplanation form={form} />
+          </fieldset>
+        </div>
       </form>
       <AlertDialog
         open={exit.destination !== null}

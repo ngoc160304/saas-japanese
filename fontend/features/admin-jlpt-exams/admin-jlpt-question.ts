@@ -31,6 +31,8 @@ export const adminJlptQuestionSchema = z
     questionText: requiredText(20000, 'Câu hỏi'),
     passageText: z.string().max(50000, 'Đoạn văn tối đa 50.000 ký tự.'),
     explanation: z.string().max(20000, 'Giải thích tối đa 20.000 ký tự.'),
+    // undefined preserves the latest server association; null explicitly detaches.
+    imageMediaId: z.number().int().positive().safe().nullable().optional(),
     points: z
       .number({ error: 'Nhập điểm hợp lệ.' })
       .min(0.01, 'Điểm tối thiểu 0,01.')
@@ -78,6 +80,7 @@ export function adminJlptQuestionValues(
   questionCount = 0,
 ): AdminJlptQuestionValues {
   return {
+    imageMediaId: undefined,
     questionText: question?.questionText ?? '',
     passageText: question?.passageText ?? '',
     explanation: question?.explanation ?? '',
@@ -126,7 +129,7 @@ export function adminJlptCreateQuestionPayload(
   if (values.answers.some((a) => a.answerId !== undefined))
     throw { status: 400, message: 'Câu hỏi mới không được chứa ID đáp án cũ.', fieldErrors: {} };
   return {
-    ...questionFields(values, null),
+    ...questionFields(values, values.imageMediaId ?? null),
     answers: values.answers.map((a, index) => ({
       answerText: a.answerText,
       isCorrect: a.isCorrect,
@@ -151,7 +154,10 @@ export function adminJlptUpdateQuestionPayload(
     };
   return {
     // PUT omission/null detaches an image: carry the latest association explicitly.
-    ...questionFields(values, existing.image?.id ?? null),
+    ...questionFields(
+      values,
+      values.imageMediaId === undefined ? (existing.image?.id ?? null) : values.imageMediaId,
+    ),
     answers: values.answers.map((a, index) => ({
       ...(a.answerId === undefined ? {} : { id: a.answerId }),
       answerText: a.answerText,
@@ -186,6 +192,7 @@ export function adminJlptQuestionErrorPath(
   | 'passageText'
   | 'explanation'
   | 'points'
+  | 'imageMediaId'
   | 'position'
   | 'answers'
   | `answers.${number}.answerText`
@@ -197,7 +204,8 @@ export function adminJlptQuestionErrorPath(
     field === 'questionText' ||
     field === 'passageText' ||
     field === 'explanation' ||
-    field === 'points'
+    field === 'points' ||
+    field === 'imageMediaId'
   )
     return field;
   const match = /^answers\[(\d+)\]\.(answerText|isCorrect|id|sortOrder)$/.exec(field);

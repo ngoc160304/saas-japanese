@@ -1,7 +1,7 @@
 'use client';
 
 import type { UseFormReturn } from 'react-hook-form';
-import type { AdminJlptMedia } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.type';
+import type { ReactNode } from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import PageSection from '@/components/layout/management/page-section/PageSection';
@@ -10,11 +10,13 @@ import type { AdminJlptQuestionValues } from '../admin-jlpt-question';
 export function AdminJlptQuestionFields({
   form,
   maximum,
-  image,
+  disabled,
+  children,
 }: {
   form: UseFormReturn<AdminJlptQuestionValues>;
   maximum: number;
-  image: AdminJlptMedia | null;
+  disabled: boolean;
+  children: ReactNode;
 }) {
   const errors = form.formState.errors;
   const textField = (
@@ -47,91 +49,70 @@ export function AdminJlptQuestionFields({
       )}
     </div>
   );
-  let imageUrl: string | null = null;
-  if (image) {
-    try {
-      const url = new URL(image.secureUrl);
-      if (url.protocol === 'https:' || url.protocol === 'http:') imageUrl = url.href;
-    } catch {
-      /* An unavailable URL must not hide the association ID. */
-    }
-  }
   return (
     <>
       <PageSection>
-        <div className="space-y-1 border-b border-slate-100 pb-4">
-          <h2 className="text-lg font-semibold text-slate-900">Thiết lập câu hỏi</h2>
-          <p className="text-sm text-slate-600">
-            Trắc nghiệm một lựa chọn · Chọn đúng một đáp án đúng.
-          </p>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <label htmlFor="question-position" className="text-sm font-semibold text-slate-700">
-              Vị trí câu hỏi
-            </label>
-            <Input
-              id="question-position"
-              type="number"
-              min={1}
-              max={maximum}
-              step={1}
-              {...form.register('position', { valueAsNumber: true })}
-              aria-invalid={Boolean(errors.position)}
-              aria-describedby="question-position-help question-position-error"
-              className="h-11 bg-slate-50 text-slate-900"
-            />
-            <p id="question-position-help" className="text-xs text-slate-600">
-              Vị trí trong phần thi: 1–{maximum}.
-            </p>
-            <p id="question-position-error" className="text-xs text-rose-700">
-              {errors.position?.message}
+        <fieldset disabled={disabled} className="min-w-0 space-y-4">
+          <div className="space-y-1 border-b border-slate-100 pb-4">
+            <h2 className="text-lg font-semibold text-slate-900">Thiết lập câu hỏi</h2>
+            <p className="text-sm text-slate-600">
+              Trắc nghiệm một lựa chọn · Chọn đúng một đáp án đúng.
             </p>
           </div>
-          <div className="space-y-2">
-            <label htmlFor="question-points" className="text-sm font-semibold text-slate-700">
-              Điểm câu hỏi *
-            </label>
-            <Input
-              id="question-points"
-              type="number"
-              min={0.01}
-              max={999.99}
-              step={0.01}
-              {...form.register('points', { valueAsNumber: true })}
-              aria-invalid={Boolean(errors.points)}
-              aria-describedby="question-points-error"
-              className="h-11 bg-slate-50 text-slate-900"
-            />
-            <p id="question-points-error" className="text-xs text-rose-700">
-              {errors.points?.message}
-            </p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <label htmlFor="question-position" className="text-sm font-semibold text-slate-700">
+                Vị trí câu hỏi
+              </label>
+              <Input
+                id="question-position"
+                type="number"
+                min={1}
+                max={maximum}
+                step={1}
+                {...form.register('position', { valueAsNumber: true })}
+                aria-invalid={Boolean(errors.position)}
+                aria-describedby="question-position-help question-position-error"
+                className="h-11 bg-slate-50 text-slate-900"
+              />
+              <p id="question-position-help" className="text-xs text-slate-600">
+                Vị trí trong phần thi: 1–{maximum}.
+              </p>
+              <p id="question-position-error" className="text-xs text-rose-700">
+                {errors.position?.message}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="question-points" className="text-sm font-semibold text-slate-700">
+                Điểm câu hỏi *
+              </label>
+              <Input
+                id="question-points"
+                type="number"
+                min={0.01}
+                max={999.99}
+                step={0.01}
+                {...form.register('points', { valueAsNumber: true })}
+                aria-invalid={Boolean(errors.points)}
+                aria-describedby="question-points-error"
+                className="h-11 bg-slate-50 text-slate-900"
+              />
+              <p id="question-points-error" className="text-xs text-rose-700">
+                {errors.points?.message}
+              </p>
+            </div>
           </div>
-        </div>
+        </fieldset>
       </PageSection>
       <PageSection>
-        <h2 className="text-lg font-semibold text-slate-900">Nội dung câu hỏi</h2>
-        {textField('questionText', 'Câu hỏi tiếng Nhật *', 20000, 5)}
-        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          {textField('passageText', 'Đoạn văn / ngữ cảnh (tùy chọn)', 50000, 7)}
-        </div>
-        {image && (
-          <figure className="space-y-3 rounded-2xl border border-slate-200 p-4">
-            <figcaption className="break-words text-sm text-slate-700">
-              Ảnh hiện có: {image.originalName} (#{image.id}). Liên kết được giữ khi lưu.
-            </figcaption>
-            {imageUrl && (
-              // Backend media can use any configured CDN; preserve its actual URL without a second upload client.
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={imageUrl}
-                alt={image.originalName}
-                className="max-h-64 max-w-full rounded-xl object-contain"
-                loading="lazy"
-              />
-            )}
-          </figure>
-        )}
+        <fieldset disabled={disabled} className="min-w-0 space-y-4">
+          <h2 className="text-lg font-semibold text-slate-900">Nội dung câu hỏi</h2>
+          {textField('questionText', 'Câu hỏi tiếng Nhật *', 20000, 5)}
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            {textField('passageText', 'Đoạn văn / ngữ cảnh (tùy chọn)', 50000, 7)}
+          </div>
+        </fieldset>
+        {children}
       </PageSection>
     </>
   );

@@ -1,7 +1,7 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useRef, useState } from 'react';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { AdminJlptExamDetail } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.type';
 import { Button } from '@/components/ui/button';
@@ -26,6 +26,8 @@ import {
   type AdminJlptStructureValues,
 } from '../admin-jlpt-structure';
 import { useAdminJlptExamDetail } from '../hooks/useAdminJlptExams';
+import { useAdminJlptMediaUpload } from '../hooks/useAdminJlptMediaUpload';
+import { AdminJlptMediaControl } from './AdminJlptMediaControl';
 
 interface Props {
   examId: number;
@@ -49,6 +51,7 @@ export function AdminJlptStructureDialog(props: Props) {
   if (initial)
     return (
       <StructureForm
+        key={`${props.examId}:${props.target.kind}:${props.target.sessionId ?? 'new'}:${props.target.kind === 'part' ? (props.target.partId ?? 'new') : ''}`}
         {...props}
         initial={initial}
         latest={query.data ?? initial}
@@ -140,6 +143,7 @@ function StructureForm({
           }
         : {
             kind: 'part',
+            audioMediaId: undefined,
             name: initialPart?.name ?? '',
             instructions: initialPart?.instructions ?? '',
             position: initialPart
@@ -147,7 +151,8 @@ function StructureForm({
               : (initialSession?.parts.length ?? 0) + 1,
           },
   });
-  const dirty = form.formState.isDirty;
+  const audioSelection = useWatch({ control: form.control, name: 'audioMediaId' });
+  if (target.kind === 'part') form.register('audioMediaId');
   const errors = form.formState.errors;
   const [discard, setDiscard] = useState(false);
   const [saveError, setSaveError] = useState<ReturnType<typeof getAdminJlptError> | null>(null);
@@ -161,6 +166,25 @@ function StructureForm({
     lock || missing || detailError || refreshing || [401, 403].includes(saveError?.status ?? 0),
   );
   const busy = pending || form.formState.isSubmitting;
+  const media = useAdminJlptMediaUpload({
+    kind: 'audio',
+    canEdit: () => target.kind === 'part' && !blocked && !busy && !submitting.current,
+    onStage: (id) => {
+      if (id === undefined) form.resetField('audioMediaId');
+      else form.setValue('audioMediaId', id, { shouldDirty: true, shouldValidate: true });
+    },
+    onAccessError: onReload,
+  });
+  const dirty = form.formState.isDirty || media.dirty;
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
   const requestClose = () => {
     if (busy || submitting.current) return;
     if (dirty) setDiscard(true);
@@ -224,7 +248,7 @@ function StructureForm({
           className="space-y-4"
           onSubmit={(event) =>
             void form.handleSubmit(async (values) => {
-              if (blocked || busy || submitting.current) return;
+              if (blocked || busy || submitting.current || media.hasUnresolved()) return;
               submitting.current = true;
               setSaveError(null);
               form.clearErrors();
@@ -239,6 +263,7 @@ function StructureForm({
                     values,
                   });
                 form.reset(values);
+                media.reset();
                 onClose();
               } catch (cause) {
                 const parsed = getAdminJlptError(cause);
@@ -249,6 +274,7 @@ function StructureForm({
                   'sessionType',
                   'timeLimitMinutes',
                   'instructions',
+                  'audioMediaId',
                 ] as const;
                 let first: (typeof fields)[number] | undefined;
                 for (const field of fields) {
@@ -260,7 +286,7 @@ function StructureForm({
                 }
                 const focus = first;
                 window.requestAnimationFrame(() => {
-                  if (focus) form.setFocus(focus);
+                  if (focus && focus !== 'audioMediaId') form.setFocus(focus);
                   else errorRef.current?.focus();
                 });
               } finally {
@@ -279,6 +305,10 @@ function StructureForm({
                   ? 'Máy chủ từ chối vì xung đột hoặc khóa nội dung. Đã yêu cầu tải lại trạng thái. '
                   : ''}
                 {saveError.message} Nội dung đang nhập vẫn được giữ lại.
+                {form.getValues('audioMediaId') !== undefined &&
+                  (saveError.status !== null && saveError.status < 500
+                    ? ' Liên kết audio chưa được lưu qua yêu cầu này. Tệp đã tải lên được giữ để kiểm tra và thử lưu lại.'
+                    : ' Chưa xác nhận được thay đổi liên kết audio. Không cần tải lại tệp để thử lưu lại.')}
               </p>
             )}
           </div>
@@ -349,11 +379,6 @@ function StructureForm({
                   />
                   {fieldError('instructions')}
                 </div>
-                <p className="break-words text-xs text-slate-600">
-                  {part?.audio
-                    ? `Audio hiện có: ${part.audio.originalName} (#${part.audio.id}). Liên kết được giữ nguyên khi lưu.`
-                    : 'Chưa gắn audio.'}
-                </p>
               </>
             )}
             <div className="space-y-1.5">
@@ -377,6 +402,16 @@ function StructureForm({
               {fieldError('position')}
             </div>
           </fieldset>
+          {target.kind === 'part' && (
+            <AdminJlptMediaControl
+              kind="audio"
+              persisted={part?.audio ?? null}
+              selection={audioSelection}
+              upload={media}
+              disabled={busy || blocked}
+              fieldError={form.getFieldState('audioMediaId', form.formState).error?.message}
+            />
+          )}
           {Object.keys(errors).length > 0 && (
             <p className="sr-only" role="status">
               Kiểm tra các trường có lỗi.
@@ -386,7 +421,7 @@ function StructureForm({
             <Button type="button" variant="outline" disabled={busy} onClick={requestClose}>
               Hủy
             </Button>
-            <Button type="submit" disabled={busy || blocked}>
+            <Button type="submit" disabled={busy || blocked || media.unresolved}>
               {busy ? 'Đang lưu…' : 'Lưu thay đổi'}
             </Button>
           </div>

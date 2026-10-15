@@ -14,6 +14,7 @@ import {
   type AdminJlptStructureTarget,
 } from '../admin-jlpt-structure';
 import { AdminJlptSafeText } from './AdminJlptSafeText';
+import { AdminJlptMediaPreview } from './AdminJlptMediaPreview';
 import { adminJlptQuestionUrl } from '../admin-jlpt-question';
 
 interface Props {
@@ -296,6 +297,7 @@ export function AdminJlptStructureTree({
                       hidden={!partOpen}
                       className="mt-4 space-y-3 border-t border-slate-200 pt-4"
                     >
+                      {partOpen && part.audio && <AdminJlptMediaPreview kind="audio" url={part.audio.secureUrl} name={part.audio.originalName} />}
                       {part.questions.length === 0 && (
                         <p className="py-3 text-center text-sm text-slate-600">
                           Phần thi chưa có câu hỏi.

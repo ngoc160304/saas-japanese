@@ -3,6 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 
 export function useUploadImage() {
   return useMutation({
-    mutationFn: uploadAPI.uploadImage,
+    mutationFn: (file: File) => uploadAPI.uploadImage(file),
   });
 }

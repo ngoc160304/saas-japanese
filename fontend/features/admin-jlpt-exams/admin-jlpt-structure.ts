@@ -35,6 +35,7 @@ export const adminJlptPartSchema = z.object({
   name,
   position,
   instructions: z.string().max(10000, 'Hướng dẫn tối đa 10.000 ký tự.'),
+  audioMediaId: z.number().int().positive().safe().nullable().optional(),
 });
 export const adminJlptStructureSchema = z.discriminatedUnion('kind', [
   adminJlptSessionSchema,
@@ -85,7 +86,8 @@ export function adminJlptPartPayload(
     instructions: values.instructions.trim() || null,
     sortOrder: values.position - 1,
     // PUT omission means detach on this backend. Preserve the current association.
-    audioMediaId: existing?.audio?.id ?? null,
+    audioMediaId:
+      values.audioMediaId === undefined ? (existing?.audio?.id ?? null) : values.audioMediaId,
   };
 }
 

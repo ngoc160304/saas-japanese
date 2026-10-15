@@ -1,6 +1,7 @@
 import authorizeAxios, { waitForSessionRefresh } from '@/lib/authorize-axios';
 import type { ApiResponse } from '@/types/api';
 import { uploadAPI } from '@/apis/upload/upload.api';
+import type { MediaUploadOptions } from '@/apis/upload/upload.type';
 import { validateAdminJlptMedia } from './admin-jlpt-media';
 import type {
   AdminJlptAnswer,
@@ -78,13 +79,13 @@ export function adminJlptStatsParams({
 }
 
 export const adminJlptExamsAPI = {
-  async uploadImage({ file }: { file: File }) {
+  async uploadImage({ file, ...options }: { file: File } & MediaUploadOptions) {
     requireValidMedia(file, 'image');
-    return (await uploadAPI.uploadImage(file)).data;
+    return (await uploadAPI.uploadImage(file, { ...options, localErrorHandling: true })).data;
   },
-  async uploadAudio({ file, onProgress }: { file: File; onProgress?: (percent: number) => void }) {
+  async uploadAudio({ file, ...options }: { file: File } & MediaUploadOptions) {
     requireValidMedia(file, 'audio');
-    return uploadAPI.uploadAudio(file, onProgress);
+    return uploadAPI.uploadAudio(file, undefined, options);
   },
   list: (params: AdminJlptExamQuery, signal?: AbortSignal) =>
     read<AdminJlptExamPage>(base, signal, params),

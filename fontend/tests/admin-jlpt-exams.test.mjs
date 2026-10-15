@@ -49,6 +49,7 @@ const { parseAdminJlptExamId, parseAdminJlptExamQuery, writeAdminJlptExamQuery }
   resolve(root, 'features/admin-jlpt-exams/admin-jlpt-route'),
 );
 const { validateAdminJlptMedia } = load(resolve(root, 'apis/admin-jlpt-exams/admin-jlpt-media'));
+const { uploadAPI } = load(resolve(root, 'apis/upload/upload.api'));
 const { adminJlptMetadataSchema, adminJlptMetadataPayload, adminJlptMetadataLock } = load(
   resolve(root, 'features/admin-jlpt-exams/admin-jlpt-metadata'),
 );
@@ -514,4 +515,74 @@ test('media rejects invalid MIME, extension and size before upload and reuses on
     43,
   );
   assert.equal(calls.at(-1).url, '/upload/images');
+});
+
+test('media validates exact MIME/extension pairs, names and byte bounds from the backend', () => {
+  for (const [name, type, kind, size] of [
+    ['a.jpeg', 'image/jpeg', 'image', 10 * 1024 * 1024],
+    ['a.png', 'image/png', 'image', 1], ['a.webp', 'image/webp', 'image', 1],
+    ['a.GIF', 'IMAGE/GIF; charset=binary', 'image', 1],
+    ['a.mp3', 'audio/mpeg', 'audio', 20 * 1024 * 1024],
+    ['a.wav', 'audio/wav', 'audio', 1], ['a.WAV', 'audio/x-wav', 'audio', 1],
+    ['a.wav', 'audio/wave; charset=binary', 'audio', 1],
+  ]) assert.equal(validateAdminJlptMedia({ name, type, size }, kind), null);
+  for (const [name, type, kind, size] of [
+    ['jpeg', 'image/jpeg', 'image', 1], ['.mp3', 'audio/mpeg', 'audio', 1],
+    ['a.jpg', 'image/jpeg', 'image', 1], ['a.png', 'image/jpeg', 'image', 1],
+    ['a.svg', 'image/svg+xml', 'image', 1], ['a.mp3', 'audio/mp3', 'audio', 1],
+    ['a.ogg', 'audio/ogg', 'audio', 1], ['a.png', 'image/png', 'image', 0],
+    ['a.png', 'image/png', 'image', 10 * 1024 * 1024 + 1],
+    ['a.wav', 'audio/wav', 'audio', 20 * 1024 * 1024 + 1],
+    ['x'.repeat(252) + '.png', 'image/png', 'image', 1],
+  ]) assert.ok(validateAdminJlptMedia({ name, type, size }, kind));
+});
+
+test('media attachment payloads distinguish preserve, replace and explicit null without changing other fields', () => {
+  const existing = { id: 31, questionText: '日本語', passageText: '文', explanation: '説明', points: 1.25, sortOrder: 2, image: { id: 43 }, answers: [
+    { id: 310, answerText: '正', isCorrect: true, sortOrder: 0 }, { id: 311, answerText: '他', isCorrect: false, sortOrder: 1 },
+  ] };
+  const values = questionEditor.adminJlptQuestionValues(existing);
+  const preserved = questionEditor.adminJlptUpdateQuestionPayload(values, existing);
+  for (const id of [null, 81]) {
+    const result = questionEditor.adminJlptUpdateQuestionPayload({ ...values, imageMediaId: id }, existing);
+    assert.deepEqual(result, { ...preserved, imageMediaId: id });
+  }
+  assert.equal(preserved.imageMediaId, 43);
+  assert.equal(questionEditor.adminJlptCreateQuestionPayload({ ...values, imageMediaId: 82, answers: values.answers.map(({ answerId: _answerId, ...a }) => a) }).imageMediaId, 82);
+  const part = { kind: 'part', name: '聴解', instructions: '説明', position: 3 };
+  const original = adminJlptPartPayload(part, { audio: { id: 42 } });
+  assert.equal(original.audioMediaId, 42);
+  for (const id of [null, 84]) assert.deepEqual(adminJlptPartPayload({ ...part, audioMediaId: id }, { audio: { id: 42 } }), { ...original, audioMediaId: id });
+});
+
+test('uploads preserve legacy image wrapper/audio callbacks and forward cancellation, timeout and indeterminate progress', async () => {
+  const controller = new AbortController();
+  const calls = [], progress = [], legacyProgress = [];
+  client.defaults.adapter = async (config) => {
+    calls.push(config);
+    config.onUploadProgress?.({ loaded: 10 });
+    config.onUploadProgress?.({ loaded: 10, total: 20 });
+    return response(config, { data: { id: 92, originalName: 'a.png', publicId: 'synthetic', secureUrl: 'https://example.test/a.png' } });
+  };
+  const file = new File(['synthetic'], 'a.png', { type: 'image/png' });
+  assert.equal((await uploadAPI.uploadImage(file)).data.id, 92);
+  const normalized = await api.uploadImage({ file, signal: controller.signal, onProgress: (p) => progress.push(p) });
+  assert.equal(normalized.id, 92);
+  assert.equal(normalized.secureUrl, 'https://example.test/a.png');
+  assert.deepEqual(progress, [null, 50]);
+  assert.equal(calls.at(-1).signal, controller.signal);
+  assert.equal(calls.at(-1).timeout, 120000);
+  assert.equal(calls.at(-1).localErrorHandling, true);
+  assert.deepEqual([...calls.at(-1).data.keys()], ['file']);
+  await uploadAPI.uploadAudio(new File(['synthetic'], 'a.wav', { type: 'audio/wav' }), (p) => legacyProgress.push(p), { signal: controller.signal });
+  assert.deepEqual(legacyProgress, [50]);
+  assert.equal(calls.at(-1).signal, controller.signal);
+  let attempts = 0;
+  client.defaults.adapter = async (config) => { attempts++; throw new AxiosError('synthetic failure', 'ERR_BAD_RESPONSE', config, null, response(config, {}, 500)); };
+  await assert.rejects(api.uploadImage({ file }));
+  assert.equal(attempts, 1, 'No automatic upload retry');
+  controller.abort();
+  attempts = 0;
+  await assert.rejects(api.uploadImage({ file, signal: controller.signal }), { code: 'ERR_CANCELED' });
+  assert.equal(attempts, 0, 'An already canceled signal must not start a request');
 });

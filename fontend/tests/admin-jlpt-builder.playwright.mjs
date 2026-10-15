@@ -82,6 +82,11 @@ export default async function runAdminJlptBuilderSmoke(page, origin = 'http://lo
     exam.totalTimeMinutes = exam.sessions.reduce((n, s) => n + s.timeLimitMinutes, 0);
   };
   recalculate();
+  // Builder now includes a native audio player; keep its fixture fully offline.
+  await page.route('https://example.test/audio.mp3', (route) => route.fulfill({
+    contentType: 'audio/wav',
+    body: Buffer.from('524946462c00000057415645666d74201000000001000100401f0000401f00000100080064617461080000008080808080808080', 'hex'),
+  }));
   await page.unroute('**/api/v1/**');
   await page.route('**/api/v1/**', async (route) => {
     const req = route.request(),
