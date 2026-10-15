@@ -14,13 +14,14 @@ import org.springframework.stereotype.Repository;
 public interface JlptExamAnswerRepository extends JpaRepository<JlptExamAnswer, Long> {
     List<JlptExamAnswer> findByJlptExamQuestionIdOrderBySortOrderAsc(
             Long questionId);
+    List<JlptExamAnswer> findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(Long questionId);
 
     @Query("""
             SELECT answer
             FROM JlptExamAnswer answer
             JOIN FETCH answer.jlptExamQuestion question
             WHERE question.id IN :questionIds
-            ORDER BY question.sortOrder, answer.sortOrder
+            ORDER BY question.sortOrder, question.id, answer.sortOrder, answer.id
             """)
     List<JlptExamAnswer> findAdminAnswersByQuestionIds(
             @Param("questionIds") Collection<Long> questionIds);

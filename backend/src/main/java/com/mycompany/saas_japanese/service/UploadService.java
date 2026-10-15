@@ -10,5 +10,7 @@ public interface UploadService {
 
   public Media uploadVideo(MultipartFile file);
 
+  Media uploadAudio(MultipartFile file);
+
   public Media getMediaById(Long id);
 }

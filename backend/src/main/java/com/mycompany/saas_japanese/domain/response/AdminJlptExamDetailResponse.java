@@ -24,6 +24,10 @@ public class AdminJlptExamDetailResponse {
   private AdminJlptExamStatus status;
   private boolean hasAttempts;
   private boolean contentLocked;
+  private long sessionCount;
+  private long partCount;
+  private long questionCount;
+  private BigDecimal passingScore;
   private Instant createdAt;
   private Instant updatedAt;
   private List<SessionResponse> sessions;

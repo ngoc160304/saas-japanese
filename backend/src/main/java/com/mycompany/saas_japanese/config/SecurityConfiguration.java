@@ -101,6 +101,8 @@ public class SecurityConfiguration {
                                                                 "/api/v1/admin/jlpt-exams/**")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/admin/**").permitAll()
+                                                .requestMatchers("/api/v1/upload/audios", "/api/v1/upload/audios/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/lessons")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}")

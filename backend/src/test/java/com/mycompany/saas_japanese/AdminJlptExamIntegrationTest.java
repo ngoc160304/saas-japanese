@@ -13,13 +13,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -35,10 +39,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.mycompany.saas_japanese.domain.JlptExam;
+import com.mycompany.saas_japanese.domain.JlptExamPart;
+import com.mycompany.saas_japanese.domain.JlptExamQuestion;
 import com.mycompany.saas_japanese.domain.JlptExamSession;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.User;
 import com.mycompany.saas_japanese.domain.UserJlptAttempt;
+import com.mycompany.saas_japanese.domain.query.AdminJlptExamQuery;
+import com.mycompany.saas_japanese.domain.query.AdminJlptExamStatsQuery;
 import com.mycompany.saas_japanese.repository.JlptExamAnswerRepository;
 import com.mycompany.saas_japanese.repository.JlptExamPartRepository;
 import com.mycompany.saas_japanese.repository.JlptExamQuestionRepository;
@@ -48,7 +56,10 @@ import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptRepository;
 import com.mycompany.saas_japanese.repository.UserRepository;
 import com.mycompany.saas_japanese.service.AuthTokenService;
+import com.mycompany.saas_japanese.service.AdminJlptExamService;
 import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
+import com.mycompany.saas_japanese.util.constant.JlptQuestionEnum;
+import com.mycompany.saas_japanese.util.constant.JlptLevelEnum;
 import com.mycompany.saas_japanese.util.constant.JlptSessionEnum;
 import com.mycompany.saas_japanese.util.constant.UserRoleEnum;
 
@@ -81,6 +92,7 @@ class AdminJlptExamIntegrationTest extends AuthTestSupport {
   @Autowired private UserRepository users;
   @Autowired private MediaRepository media;
   @Autowired private AuthTokenService tokens;
+  @Autowired private AdminJlptExamService adminExams;
   @Autowired private EntityManager entityManager;
   @Autowired private PlatformTransactionManager transactions;
 
@@ -156,7 +168,9 @@ class AdminJlptExamIntegrationTest extends AuthTestSupport {
 
     mvc.perform(post("/api/v1/admin/jlpt-exams/{examId}/publish", examId).with(adminJwt()))
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.message").value(
+        .andExpect(jsonPath("$.message").value("JLPT exam is not ready for publication"))
+        .andExpect(jsonPath("$.issues[0].code").value("CORRECT_ANSWER_COUNT"))
+        .andExpect(jsonPath("$.issues[0].message").value(
             "Each single-choice question must have exactly one correct answer"));
 
     mvc.perform(put(answerPath(), examId, sessionId, partId, questionId, secondAnswerId)
@@ -318,8 +332,8 @@ class AdminJlptExamIntegrationTest extends AuthTestSupport {
           .andExpect(status().isOk());
       if (index > 0) {
         mvc.perform(patch(paths.get(index) + "/sort-order").with(adminJwt())
-                .contentType(MediaType.APPLICATION_JSON).content("{\"sortOrder\":2}"))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.data.sortOrder").value(2));
+                .contentType(MediaType.APPLICATION_JSON).content("{\"sortOrder\":0}"))
+            .andExpect(status().isOk()).andExpect(jsonPath("$.data.sortOrder").value(0));
       }
     }
     for (int index = paths.size() - 1; index > 0; index--) {
@@ -520,6 +534,399 @@ class AdminJlptExamIntegrationTest extends AuthTestSupport {
             .contentType(MediaType.APPLICATION_JSON).content(PART_BODY)).andExpect(status().isNotFound());
   }
 
+  @Test
+  void examMetadataIsNormalizedAndCannotOverrideLifecycleOrDerivedValues() throws Exception {
+    String body = """
+        {"level":"N3","title":"  Practice  ","description":"  Overview  ",
+         "status":"PUBLISHED","isPublished":true,"isDeleted":true,"totalTimeMinutes":999,"passingScore":1}
+        """;
+    long examId = responseId(mvc.perform(post(BASE).with(adminJwt()).contentType(MediaType.APPLICATION_JSON)
+            .content(body)).andExpect(status().isCreated())
+        .andExpect(jsonPath("$.statusCode").value(201))
+        .andExpect(jsonPath("$.data.title").value("Practice"))
+        .andExpect(jsonPath("$.data.description").value("Overview"))
+        .andExpect(jsonPath("$.data.status").value("DRAFT"))
+        .andExpect(jsonPath("$.data.contentLocked").value(false))
+        .andExpect(jsonPath("$.data.hasAttempts").value(false))
+        .andExpect(jsonPath("$.data.totalTimeMinutes").value(0))
+        .andExpect(jsonPath("$.data.sessionCount").value(0))
+        .andExpect(jsonPath("$.data.partCount").value(0))
+        .andExpect(jsonPath("$.data.questionCount").value(0))
+        .andExpect(jsonPath("$.data.passingScore").value(95))
+        .andExpect(jsonPath("$.data.sessions").isEmpty()).andReturn().getResponse().getContentAsString());
+    long sessionId = createSession(examId, "Reading", "reading", 45, 0);
+    mvc.perform(put(BASE + "/{id}", examId).with(adminJwt()).contentType(MediaType.APPLICATION_JSON)
+            .content(body.replace("N3", "N2").replace("  Overview  ", "   ")))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.data.level").value("N2"))
+        .andExpect(jsonPath("$.data.description").isEmpty())
+        .andExpect(jsonPath("$.data.status").value("DRAFT"))
+        .andExpect(jsonPath("$.data.passingScore").value(90))
+        .andExpect(jsonPath("$.data.sessionCount").value(1))
+        .andExpect(jsonPath("$.data.totalTimeMinutes").value(45));
+    mvc.perform(put(BASE + "/{id}/sessions/{sessionId}", examId, sessionId).with(adminJwt())
+            .contentType(MediaType.APPLICATION_JSON).content(SESSION_BODY))
+        .andExpect(status().isOk());
+    assertThat(exams.findById(examId).orElseThrow().getTotalTimeMinutes()).isEqualTo(60);
+    mvc.perform(get(BASE).with(adminJwt())).andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.content[0].totalTimeMinutes").value(60));
+    mvc.perform(delete(BASE + "/{id}/sessions/{sessionId}", examId, sessionId).with(adminJwt()))
+        .andExpect(status().isNoContent());
+    mvc.perform(get(BASE + "/{id}", examId).with(adminJwt())).andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.totalTimeMinutes").value(0))
+        .andExpect(jsonPath("$.data.sessionCount").value(0));
+    assertThat(exams.findById(examId).orElseThrow().getTotalTimeMinutes()).isZero();
+  }
+
+  @ParameterizedTest
+  @CsvSource({"N1,100", "N2,90", "N3,95", "N4,90", "N5,80"})
+  void passingScoreMatchesExistingScoringRules(String level, int passingScore) throws Exception {
+    long examId = createExam("Passing score", level);
+    mvc.perform(get(BASE + "/{id}", examId).with(adminJwt())).andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.passingScore").value(passingScore));
+    mvc.perform(get(BASE).with(adminJwt()).param("level", level)).andExpect(status().isOk())
+        .andExpect(jsonPath("$.data.content[0].passingScore").value(passingScore));
+  }
+
+  @Test
+  void listAndStatisticsApplySearchAndLevelToEveryStatusBucket() throws Exception {
+    long draft = catalogExam(" Practice draft ", "N3", "DRAFT");
+    long published = catalogExam("Other title", "N3", "PUBLISHED");
+    long archived = catalogExam("Practice archived", "N3", "ARCHIVED");
+    long otherLevel = catalogExam("Practice N4", "N4", "DRAFT");
+    long unrelated = catalogExam("Unrelated", "N2", "PUBLISHED");
+    JlptExam descriptionMatch = exams.findById(published).orElseThrow();
+    descriptionMatch.setDescription("A PRACTICE description");
+    exams.findById(unrelated).orElseThrow().setDescription(null);
+
+    assertThat(listIds(get(BASE))).containsExactly(draft, published, otherLevel, unrelated);
+    assertThat(listIds(get(BASE).param("search", "  pRaCtIcE  "))).containsExactly(draft, published, otherLevel);
+    assertThat(listIds(get(BASE).param("search", "practice").param("level", "N3")))
+        .containsExactly(draft, published);
+    assertThat(listIds(get(BASE).param("search", "practice").param("level", "N3").param("status", "DRAFT")))
+        .containsExactly(draft);
+    assertThat(listIds(get(BASE).param("search", "practice").param("level", "N3").param("status", "PUBLISHED")))
+        .containsExactly(published);
+    assertThat(listIds(get(BASE).param("search", "practice").param("level", "N3").param("status", "ARCHIVED")))
+        .containsExactly(archived);
+    assertThat(listIds(get(BASE).param("status", "ARCHIVED").param("level", "N4"))).isEmpty();
+
+    assertStatistics(get(BASE + "/stats"), 5, 2, 2, 1);
+    assertStatistics(get(BASE + "/stats").param("search", "  pRaCtIcE  "), 4, 2, 1, 1);
+    assertStatistics(get(BASE + "/stats").param("level", "N3"), 3, 1, 1, 1);
+    for (String selectedStatus : List.of("DRAFT", "PUBLISHED", "ARCHIVED")) {
+      assertStatistics(get(BASE + "/stats").param("search", "practice").param("level", "N3")
+          .param("status", selectedStatus).param("page", "99").param("size", "1"), 3, 1, 1, 1);
+    }
+    assertStatistics(get(BASE + "/stats").param("search", " ").param("level", ""), 5, 2, 2, 1);
+    assertStatistics(get(BASE + "/stats").param("search", "absent"), 0, 0, 0, 0);
+    assertStatistics(get(BASE + "/stats").param("level", "N1"), 0, 0, 0, 0);
+    badRequest(get(BASE + "/stats").param("level", "N6"));
+    // Archived status takes precedence over a legacy publication flag in both APIs.
+    exams.findById(archived).orElseThrow().setIsPublished(true);
+    assertStatistics(get(BASE + "/stats"), 5, 2, 2, 1);
+    assertThat(listIds(get(BASE).param("status", "PUBLISHED"))).containsExactly(published, unrelated);
+  }
+
+  @Test
+  void paginationIsStableAcrossTiesAndKeepsAccurateTotals() throws Exception {
+    List<Long> ids = new ArrayList<>();
+    for (int index = 0; index < 5; index++) {
+      ids.add(createExam("Same title", "N3"));
+    }
+    entityManager.flush();
+    entityManager.createQuery("update JlptExam set createdAt = :time, updatedAt = :time")
+        .setParameter("time", Instant.parse("2026-01-01T00:00:00Z")).executeUpdate();
+    entityManager.clear();
+    List<Long> descending = new ArrayList<>(ids);
+    java.util.Collections.reverse(descending);
+    for (String sortKey : List.of("title", "level", "status", "totalTimeMinutes", "createdAt", "updatedAt", "id")) {
+      for (String direction : List.of("ASC", "DESC")) {
+        List<Long> pagedIds = new ArrayList<>();
+        for (int page = 0; page < 3; page++) {
+          JsonNode data = adminData(get(BASE).param("sortKey", sortKey).param("sortType", direction)
+              .param("page", Integer.toString(page)).param("size", "2"));
+          assertThat(data.get("totalElements").asLong()).isEqualTo(5);
+          assertThat(data.get("totalPages").asInt()).isEqualTo(3);
+          assertThat(data.get("number").asInt()).isEqualTo(page);
+          assertThat(data.get("size").asInt()).isEqualTo(2);
+          assertThat(data.get("first").asBoolean()).isEqualTo(page == 0);
+          assertThat(data.get("last").asBoolean()).isEqualTo(page == 2);
+          data.get("content").forEach(item -> pagedIds.add(item.get("id").asLong()));
+        }
+        assertThat(pagedIds).containsExactlyElementsOf(direction.equals("ASC") ? ids : descending);
+      }
+    }
+    JsonNode fallback = adminData(get(BASE).param("sortKey", "sessions.name").param("sortType", "bad"));
+    assertThat(jsonIds(fallback.get("content"))).containsExactlyElementsOf(descending);
+    assertThat(jsonIds(adminData(get(BASE)).get("content"))).containsExactlyElementsOf(descending);
+    JsonNode beyond = adminData(get(BASE).param("page", "3").param("size", "2"));
+    assertThat(beyond.get("content")).isEmpty();
+    assertThat(beyond.get("totalElements").asLong()).isEqualTo(5);
+  }
+
+  @Test
+  void emptyCatalogHasEmptyPagesAndZeroStatistics() throws Exception {
+    assertThat(exams.count()).isZero();
+    JsonNode data = adminData(get(BASE));
+    assertThat(data.get("content")).isEmpty();
+    assertThat(data.get("totalElements").asLong()).isZero();
+    assertThat(data.get("totalPages").asInt()).isZero();
+    assertThat(data.get("number").asInt()).isZero();
+    assertStatistics(get(BASE + "/stats"), 0, 0, 0, 0);
+    assertStatistics(get(BASE + "/stats").param("search", "anything").param("level", "N5"), 0, 0, 0, 0);
+  }
+
+  @Test
+  void statisticsEndpointRequiresAdminAndDoesNotBindStatsAsAnId() throws Exception {
+    mvc.perform(get(BASE + "/stats")).andExpect(status().isUnauthorized());
+    mvc.perform(get(BASE + "/stats").with(studentJwt())).andExpect(status().isForbidden());
+    mvc.perform(get(BASE + "/stats").with(adminJwt())).andExpect(status().isOk())
+        .andExpect(jsonPath("$.message").value("Fetch admin JLPT exam statistics"))
+        .andExpect(jsonPath("$.data.totalExams").isNumber());
+  }
+
+  @Test
+  void countsAndLocksMatchOrderedDetailAcrossDifferentHierarchySizes() throws Exception {
+    Hierarchy first = hierarchy();
+    Hierarchy second = hierarchy();
+    long empty = createExam("Empty", "N5");
+    // Seed legacy ties explicitly: new API writes now shift siblings into unique positions.
+    long extraSession = createSession(first.examId(), "Second", "listening", 20, 0);
+    long extraPart = responseId(mvc.perform(post(first.sessionPath() + "/parts").with(adminJwt())
+            .contentType(MediaType.APPLICATION_JSON).content(PART_BODY)).andExpect(status().isCreated())
+        .andReturn().getResponse().getContentAsString());
+    long extraQuestion = responseId(mvc.perform(post(first.partPath() + "/questions").with(adminJwt())
+            .contentType(MediaType.APPLICATION_JSON).content(QUESTION_BODY)).andExpect(status().isCreated())
+        .andReturn().getResponse().getContentAsString());
+    long extraAnswer = createAnswer(first.examId(), first.sessionId(), first.partId(), first.questionId(),
+        "Second", false, 0);
+    sessions.findByJlptExam_IdOrderBySortOrderAsc(first.examId()).forEach(item -> item.setSortOrder(0));
+    parts.findByJlptExamSession_IdOrderBySortOrderAsc(first.sessionId()).forEach(item -> item.setSortOrder(0));
+    questions.findByJlptExamPartIdOrderBySortOrderAsc(first.partId()).forEach(item -> item.setSortOrder(0));
+    answers.findByJlptExamQuestionIdOrderBySortOrderAsc(first.questionId()).forEach(item -> item.setSortOrder(0));
+    attempts.save(UserJlptAttempt.builder().user(user("counts@example.test"))
+        .jlptExam(exams.findById(first.examId()).orElseThrow()).build());
+    exams.findById(second.examId()).orElseThrow().setIsPublished(true);
+    entityManager.flush();
+    entityManager.clear();
+    JsonNode detail = adminData(get(first.examPath()));
+    assertCounts(detail, 2, 2, 2, 80, true, true);
+    assertThat(jsonIds(detail.get("sessions"))).containsExactly(first.sessionId(), extraSession);
+    JsonNode session = detail.get("sessions").get(0);
+    assertThat(jsonIds(session.get("parts"))).containsExactly(first.partId(), extraPart);
+    JsonNode part = session.get("parts").get(0);
+    assertThat(jsonIds(part.get("questions"))).containsExactly(first.questionId(), extraQuestion);
+    JsonNode question = part.get("questions").get(0);
+    assertThat(jsonIds(question.get("answers"))).containsExactly(first.answerId(), extraAnswer);
+    assertThat(question.get("answers").get(0).get("isCorrect").asBoolean()).isTrue();
+    assertThat(question.get("explanation").asString()).isEqualTo("Explanation");
+    assertThat(question.get("image").get("secureUrl").asString()).contains("image.png");
+    assertThat(part.get("audio").get("secureUrl").asString()).contains("audio.mp3");
+    JsonNode content = adminData(get(BASE).param("sortKey", "id").param("sortType", "ASC")).get("content");
+    assertCounts(content.get(0), 2, 2, 2, 80, true, true);
+    assertCounts(content.get(1), 1, 1, 1, 60, false, true);
+    assertCounts(content.get(2), 0, 0, 0, 0, false, false);
+    assertThat(content.get(2).get("id").asLong()).isEqualTo(empty);
+    for (int index = 0; index < 3; index++) {
+      JsonNode item = content.get(index);
+      JsonNode itemDetail = adminData(get(BASE + "/" + item.get("id").asLong()));
+      for (String field : List.of("sessionCount", "partCount", "questionCount", "hasAttempts", "contentLocked",
+          "totalTimeMinutes", "passingScore", "status")) {
+        assertThat(item.get(field)).isEqualTo(itemDetail.get(field));
+      }
+    }
+  }
+
+  @Test
+  void catalogReadsUseBoundedQueriesAsExamAndHierarchyCountsGrow() throws Exception {
+    Hierarchy hierarchy = hierarchy();
+    entityManager.flush();
+    entityManager.clear();
+    var statistics = entityManager.getEntityManagerFactory().unwrap(SessionFactory.class).getStatistics();
+    boolean previouslyEnabled = statistics.isStatisticsEnabled();
+    statistics.setStatisticsEnabled(true);
+    try {
+      AdminJlptExamQuery query = new AdminJlptExamQuery();
+      query.setSize(1);
+      statistics.clear();
+      assertThat(adminExams.findAll(query).getContent()).hasSize(1);
+      assertThat(statistics.getPrepareStatementCount()).isLessThanOrEqualTo(5);
+      entityManager.clear();
+      statistics.clear();
+      assertThat(adminExams.findById(hierarchy.examId()).getQuestionCount()).isEqualTo(1);
+      long detailQueries = statistics.getPrepareStatementCount();
+      assertThat(detailQueries).isLessThanOrEqualTo(7);
+      for (int examIndex = 0; examIndex < 12; examIndex++) {
+        JlptExam exam = exams.save(JlptExam.builder().title("Bulk " + examIndex).jlptLevel(JlptLevelEnum.N3).build());
+        addContent(exam, 4, 3, 5);
+      }
+      addContent(exams.findById(hierarchy.examId()).orElseThrow(), 4, 3, 5);
+      entityManager.flush();
+      entityManager.clear();
+      query.setSize(12);
+      query.setSortKey("id");
+      query.setSortType("ASC");
+      statistics.clear();
+      var page = adminExams.findAll(query);
+      assertThat(page.getContent()).hasSize(12);
+      assertThat(page.getTotalElements()).isEqualTo(13);
+      assertThat(statistics.getPrepareStatementCount()).isEqualTo(5);
+      assertThat(page.getContent().get(0).getSessionCount()).isEqualTo(5);
+      assertThat(page.getContent().get(0).getPartCount()).isEqualTo(13);
+      assertThat(page.getContent().get(0).getQuestionCount()).isEqualTo(61);
+      assertThat(page.getContent().get(0).getTotalTimeMinutes()).isEqualTo(100);
+      assertThat(page.getContent().subList(1, 12)).allSatisfy(item -> {
+        assertThat(item.getSessionCount()).isEqualTo(4);
+        assertThat(item.getPartCount()).isEqualTo(12);
+        assertThat(item.getQuestionCount()).isEqualTo(60);
+        assertThat(item.getTotalTimeMinutes()).isEqualTo(40);
+      });
+      entityManager.clear();
+      statistics.clear();
+      assertThat(adminExams.findById(hierarchy.examId()).getQuestionCount()).isEqualTo(61);
+      assertThat(statistics.getPrepareStatementCount()).isEqualTo(detailQueries);
+      entityManager.clear();
+      statistics.clear();
+      assertThat(adminExams.statistics(new AdminJlptExamStatsQuery()).totalExams()).isEqualTo(13);
+      assertThat(statistics.getPrepareStatementCount()).isEqualTo(1);
+      assertThat(statistics.getEntityLoadCount()).isZero();
+    } finally {
+      statistics.setStatisticsEnabled(previouslyEnabled);
+    }
+  }
+
+  @Test
+  void archivePreservesCompletedAttemptAnswersResultsHierarchyAndMedia() throws Exception {
+    Hierarchy hierarchy = hierarchy();
+    createAnswer(hierarchy.examId(), hierarchy.sessionId(), hierarchy.partId(), hierarchy.questionId(),
+        "Wrong", false, 1);
+    mvc.perform(post(hierarchy.examPath() + "/publish").with(adminJwt())).andExpect(status().isOk());
+    User learner = user("archive-history@example.test");
+    learner.setRole(UserRoleEnum.student);
+    JsonNode started = JSON.readTree(mvc.perform(post(hierarchy.examPath().replace("/admin", "") + "/attempts")
+            .with(studentJwt(learner.getEmail())).contentType(MediaType.APPLICATION_JSON)
+            .content("{\"userId\":" + learner.getId() + ",\"mode\":\"full\"}"))
+        .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("data");
+    long attemptId = started.get("attemptId").asLong();
+    long attemptSessionId = started.get("sessions").get(0).get("attemptSessionId").asLong();
+    String attemptPath = "/api/v1/jlpt-exams/attempts/" + attemptId;
+    mvc.perform(put(attemptPath + "/sessions/" + attemptSessionId + "/answers")
+            .with(studentJwt(learner.getEmail())).contentType(MediaType.APPLICATION_JSON)
+            .content("{\"questionId\":" + hierarchy.questionId() + ",\"answerId\":" + hierarchy.answerId() + "}"))
+        .andExpect(status().isOk());
+    mvc.perform(post(attemptPath + "/submit").with(studentJwt(learner.getEmail())))
+        .andExpect(status().isOk()).andExpect(jsonPath("$.data.totalScore").value(1));
+    // Compare persisted timestamps at database precision on both sides of archive.
+    entityManager.flush();
+    entityManager.clear();
+    List<String> learnerPaths = List.of(attemptPath + "/result", attemptPath + "/review",
+        "/api/v1/jlpt-exams/attempts/history");
+    List<JsonNode> before = new ArrayList<>();
+    for (String path : learnerPaths) {
+      before.add(learnerData(path, learner.getEmail()));
+    }
+    mvc.perform(post(hierarchy.examPath() + "/unpublish").with(adminJwt())).andExpect(status().isOk());
+    StoredState locked = storedState(hierarchy);
+    mvc.perform(put(hierarchy.examPath()).with(adminJwt()).contentType(MediaType.APPLICATION_JSON).content(EXAM_BODY))
+        .andExpect(status().isConflict());
+    assertThat(storedState(hierarchy)).isEqualTo(locked);
+    mvc.perform(delete(hierarchy.examPath()).with(adminJwt())).andExpect(status().isNoContent());
+    entityManager.flush();
+    entityManager.clear();
+    Instant deletedAt = exams.findById(hierarchy.examId()).orElseThrow().getDeletedAt();
+    assertThat(deletedAt).isNotNull();
+    assertThat(exams.findById(hierarchy.examId()).orElseThrow().getIsPublished()).isFalse();
+    JsonNode archived = adminData(get(hierarchy.examPath()));
+    assertCounts(archived, 1, 1, 1, 60, true, true);
+    assertThat(archived.get("status").asString()).isEqualTo("ARCHIVED");
+    assertThat(archived.get("sessions")).isEqualTo(locked.detail().get("sessions"));
+    assertThat(media.findAll()).allMatch(item -> Boolean.TRUE.equals(item.getIsUsed())
+        && !Boolean.TRUE.equals(item.getIsDeleted()));
+    assertThat(attempts.findById(attemptId).orElseThrow().getTotalScore()).isEqualByComparingTo(BigDecimal.ONE);
+    for (int index = 0; index < learnerPaths.size(); index++) {
+      assertThat(learnerData(learnerPaths.get(index), learner.getEmail())).isEqualTo(before.get(index));
+    }
+    assertThat(listIds(get(BASE))).isEmpty();
+    JsonNode summary = adminData(get(BASE).param("status", "ARCHIVED")).get("content").get(0);
+    assertCounts(summary, 1, 1, 1, 60, true, true);
+    for (String action : List.of("publish", "unpublish")) {
+      mvc.perform(post(hierarchy.examPath() + "/" + action).with(adminJwt())).andExpect(status().isNotFound());
+    }
+    mvc.perform(put(hierarchy.examPath()).with(adminJwt()).contentType(MediaType.APPLICATION_JSON).content(EXAM_BODY))
+        .andExpect(status().isNotFound());
+    mvc.perform(delete(hierarchy.examPath()).with(adminJwt())).andExpect(status().isNotFound());
+    assertThat(exams.findById(hierarchy.examId()).orElseThrow().getDeletedAt()).isEqualTo(deletedAt);
+    assertThat(storedState(hierarchy).counts()).isEqualTo(locked.counts());
+    assertThat(storedState(hierarchy).mediaUsage()).isEqualTo(locked.mediaUsage());
+  }
+
+  private JsonNode learnerData(String path, String subject) throws Exception {
+    return JSON.readTree(mvc.perform(get(path).with(studentJwt(subject))).andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString()).get("data");
+  }
+
+  private void addContent(JlptExam exam, int sessionCount, int partCount, int questionCount) {
+    for (int sessionIndex = 0; sessionIndex < sessionCount; sessionIndex++) {
+      JlptExamSession session = sessions.save(JlptExamSession.builder().jlptExam(exam).name("Bulk session")
+          .sessionType(JlptSessionEnum.reading).timeLimitMinutes(10).sortOrder(sessionIndex).build());
+      for (int partIndex = 0; partIndex < partCount; partIndex++) {
+        JlptExamPart part = parts.save(JlptExamPart.builder().jlptExamSession(session).name("Bulk part")
+            .sortOrder(partIndex).build());
+        for (int questionIndex = 0; questionIndex < questionCount; questionIndex++) {
+          questions.save(JlptExamQuestion.builder().jlptExamPart(part).questionText("Bulk question")
+              .questionType(JlptQuestionEnum.single_choice).sortOrder(questionIndex).build());
+        }
+      }
+    }
+  }
+
+  private long catalogExam(String title, String level, String status) throws Exception {
+    long id = createExam(title, level);
+    JlptExam exam = exams.findById(id).orElseThrow();
+    exam.setIsPublished(status.equals("PUBLISHED"));
+    if (status.equals("ARCHIVED")) {
+      exam.setIsDeleted(true);
+      exam.setDeletedAt(Instant.now());
+    }
+    return id;
+  }
+
+  private JsonNode adminData(MockHttpServletRequestBuilder builder) throws Exception {
+    return JSON.readTree(mvc.perform(builder.with(adminJwt())).andExpect(status().isOk())
+        .andReturn().getResponse().getContentAsString()).get("data");
+  }
+
+  private List<Long> listIds(MockHttpServletRequestBuilder builder) throws Exception {
+    return jsonIds(adminData(builder.param("sortKey", "id").param("sortType", "ASC")).get("content"));
+  }
+
+  private List<Long> jsonIds(JsonNode nodes) {
+    List<Long> ids = new ArrayList<>();
+    nodes.forEach(node -> ids.add(node.get("id").asLong()));
+    return ids;
+  }
+
+  private void assertCounts(JsonNode data, int sessionCount, int partCount, int questionCount, int duration,
+      boolean hasAttempts, boolean contentLocked) {
+    assertThat(data.get("sessionCount").asLong()).isEqualTo(sessionCount);
+    assertThat(data.get("partCount").asLong()).isEqualTo(partCount);
+    assertThat(data.get("questionCount").asLong()).isEqualTo(questionCount);
+    assertThat(data.get("totalTimeMinutes").asInt()).isEqualTo(duration);
+    assertThat(data.get("hasAttempts").asBoolean()).isEqualTo(hasAttempts);
+    assertThat(data.get("contentLocked").asBoolean()).isEqualTo(contentLocked);
+  }
+
+  private void assertStatistics(
+      MockHttpServletRequestBuilder builder, int total, int draft, int published, int archived) throws Exception {
+    JsonNode data = adminData(builder);
+    assertThat(data.get("totalExams").asLong()).isEqualTo(total);
+    assertThat(data.get("draftExams").asLong()).isEqualTo(draft);
+    assertThat(data.get("publishedExams").asLong()).isEqualTo(published);
+    assertThat(data.get("archivedExams").asLong()).isEqualTo(archived);
+    assertThat(data.get("totalExams").asLong()).isEqualTo(data.get("draftExams").asLong()
+        + data.get("publishedExams").asLong() + data.get("archivedExams").asLong());
+  }
+
   private void badRequest(MockHttpServletRequestBuilder builder) throws Exception {
     mvc.perform(builder.with(adminJwt()).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest()).andExpect(jsonPath("$.status").value(400))
@@ -573,6 +980,7 @@ class AdminJlptExamIntegrationTest extends AuthTestSupport {
   private List<Endpoint> endpoints(Hierarchy hierarchy) {
     List<Endpoint> result = new java.util.ArrayList<>();
     result.add(new Endpoint(HttpMethod.GET, BASE, ""));
+    result.add(new Endpoint(HttpMethod.GET, BASE + "/stats", ""));
     result.add(new Endpoint(HttpMethod.POST, BASE, EXAM_BODY));
     List<String> paths = hierarchy.paths();
     List<String> bodies = List.of(EXAM_BODY, SESSION_BODY, PART_BODY, QUESTION_BODY, ANSWER_BODY);

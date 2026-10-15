@@ -19,13 +19,14 @@ public interface JlptExamQuestionRepository
 
     long countByJlptExamPart_Id(Long partId);
     boolean existsByImageMediaId(Long mediaId);
+    List<JlptExamQuestion> findByJlptExamPartIdOrderBySortOrderAscIdAsc(Long partId);
 
     @Query("""
             SELECT question
             FROM JlptExamQuestion question
             JOIN FETCH question.jlptExamPart part
             WHERE part.id IN :partIds
-            ORDER BY part.sortOrder, question.sortOrder
+            ORDER BY part.sortOrder, part.id, question.sortOrder, question.id
             """)
     List<JlptExamQuestion> findAdminQuestionsByPartIds(
             @Param("partIds") Collection<Long> partIds);

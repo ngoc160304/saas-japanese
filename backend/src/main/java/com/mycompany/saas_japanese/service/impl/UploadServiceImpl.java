@@ -8,6 +8,8 @@ import java.util.Locale;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -15,6 +17,7 @@ import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.repository.MediaRepository;
 import com.mycompany.saas_japanese.service.UploadService;
 import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
+import com.mycompany.saas_japanese.util.AudioFileValidator;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,26 @@ public class UploadServiceImpl implements UploadService {
 
   private final Cloudinary cloudinary;
   private final MediaRepository mediaRepository;
+
+  @Override
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
+  public Media uploadAudio(MultipartFile file) {
+    byte[] bytes = AudioFileValidator.validate(file);
+    try {
+      Map<?, ?> result = cloudinary.uploader().upload(bytes,
+          ObjectUtils.asMap("resource_type", "video", "folder", "audios"));
+      // Cloudinary handles audio via resource_type=video; our domain retains AUDIO.
+      return mediaRepository.save(Media.builder()
+          .fileName(file.getOriginalFilename()).originalName(file.getOriginalFilename())
+          .publicId((String) result.get("public_id")).secureUrl((String) result.get("secure_url"))
+          .fileType(FileTypeEnum.AUDIO)
+          .mimeType(file.getContentType().split(";", 2)[0].trim().toLowerCase(Locale.ROOT))
+          .fileSize((long) bytes.length)
+          .isDeleted(false).isUsed(false).build());
+    } catch (IOException exception) {
+      throw new BadRequestException("Audio upload failed");
+    }
+  }
 
   @SuppressWarnings("unchecked")
   @Override

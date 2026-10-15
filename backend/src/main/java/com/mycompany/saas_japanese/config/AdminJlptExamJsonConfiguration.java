@@ -11,8 +11,10 @@ import com.mycompany.saas_japanese.domain.request.ReqAdminJlptAnswer;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptExam;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptPart;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptQuestion;
+import com.mycompany.saas_japanese.domain.request.ReqSaveAdminJlptQuestion;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptSession;
 import com.mycompany.saas_japanese.domain.request.ReqJlptSortOrder;
+import com.mycompany.saas_japanese.domain.request.ReqJlptReorder;
 
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.MapperFeature;
@@ -39,7 +41,8 @@ public class AdminJlptExamJsonConfiguration implements WebMvcConfigurer {
                 .setCoercion(CoercionInputShape.Boolean, CoercionAction.Fail))
             .build();
         for (Class<?> type : List.of(ReqAdminJlptExam.class, ReqAdminJlptSession.class,
-            ReqAdminJlptPart.class, ReqAdminJlptQuestion.class, ReqAdminJlptAnswer.class, ReqJlptSortOrder.class)) {
+            ReqAdminJlptPart.class, ReqAdminJlptQuestion.class, ReqAdminJlptAnswer.class,
+            ReqJlptSortOrder.class, ReqJlptReorder.class, ReqSaveAdminJlptQuestion.class)) {
           json.registerMappersForType(type, mappings -> json.getSupportedMediaTypes()
               .forEach(mediaType -> mappings.put(mediaType, strictMapper)));
         }

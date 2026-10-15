@@ -216,7 +216,8 @@ public class JlptExamServiceImpl implements JlptExamService {
                                         "sessionId must be null when mode = full");
                 }
 
-                JlptExam exam = jlptExamRepository.findByIdAndIsDeletedFalse(examId)
+                // Serialize attempt creation with admin lifecycle/content writes on the same exam.
+                JlptExam exam = jlptExamRepository.findActiveForUpdate(examId)
                                 .orElseThrow(() -> new NotFoundException("JLPT exam not found"));
                 requirePublished(exam);
 
