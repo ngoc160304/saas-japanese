@@ -174,6 +174,7 @@ function Builder({ examId }: { examId: number }) {
         <AdminJlptStructureTree
           exam={exam}
           disabled={disabled}
+          questionNavigationDisabled={structure.pending}
           onEdit={openEditor}
           onDelete={openDelete}
           onMove={(target, direction) => {

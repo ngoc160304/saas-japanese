@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend tasks 1–3
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–4
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -220,6 +220,11 @@ ownership hoặc DB conflict/lock. Upload có thể 413, 415; unsupported method
 | features/admin-jlpt-exams/components | StructureDialog/StructureDeleteDialog | Form session/part, fresh detail, dirty confirmation, cascade confirmation, giữ input khi lỗi |
 | features/admin-jlpt-exams/hooks | useAdminJlptStructure | Kiểm tra lock/ownership, serialize mutation, batch reorder và phục hồi authoritative state |
 | features/admin-jlpt-exams/admin-jlpt-structure.ts | schema/payload/order/lock | Contract session/part, UI position → API order, complete sibling lists |
+| app/admin/exams/[id]/sessions/[sessionId]/parts/[partId]/questions/new/page.tsx | AdminJlptQuestionEditorPage | Tạo câu hỏi, validate cả ba ancestor IDs |
+| app/admin/exams/[id]/sessions/[sessionId]/parts/[partId]/questions/[questionId]/page.tsx | AdminJlptQuestionEditorPage | Sửa/xem câu hỏi, validate bốn IDs và membership từ detail |
+| features/admin-jlpt-exams/components | QuestionEditorPage/QuestionFields/QuestionAnswers | Snapshot form, settings/prompt/context/explanation, dynamic answer array, save/next/recovery |
+| features/admin-jlpt-exams/admin-jlpt-question.ts | schema/payload/context/navigation | Single-choice, existing/new IDs, ảnh, vị trí, next sibling và nested field errors |
+| features/admin-jlpt-exams/hooks | useAdminJlptQuestionSave/useAdminJlptQuestionExit | Atomic mutation guard, lock/ownership, dirty link/exit confirmation và beforeunload |
 | apis/admin-jlpt-exams | .api/.type/.keys + admin-jlpt-media | Contract, unwrap, ownership paths, read AbortSignal, media validation |
 | features/admin-jlpt-exams/hooks | useAdminJlptExams | Query/mutation lifecycle |
 
@@ -365,6 +370,132 @@ và stable React keys. Chưa ấn định/thêm URL editor mới; task 4 phải 
 rồi mới gắn action vào part/question. Atomic save dùng complete answers set và union
 new/existing answer IDs của task 1; không biến thành nhiều write lẻ. Answer reorder
 và question create/edit chưa triển khai.
+
+## Task 4 — Question Editor
+
+### Routes và nguồn dữ liệu
+
+- Create: `/admin/exams/[id]/sessions/[sessionId]/parts/[partId]/questions/new`.
+- Edit/read-only: cùng prefix, thay `new` bằng `[questionId]`.
+- Routes await params, reuse parser positive safe integer; malformed ID dùng boundary
+  not-found hiện có. Chờ auth và fresh detail thành công rồi mới dựng form. Không
+  dựng edit như create trong khi loading. Xác minh exam → session → part → question
+  từ cây detail; ID đúng kiểu nhưng sai ownership hiển thị not-found riêng.
+- Builder có Add Question theo part và Edit/View theo question. Khi structural write
+  đang pending, không chuyển sang editor để bắt đầu mutation khác. Back/breadcrumbs
+  trả `/admin/exams/{id}#part-{partId}`; builder mở đúng session/part theo hash.
+- Một detail query cung cấp ngữ cảnh, question/answers và locks; không GET riêng mỗi
+  answer/question hay tạo cache chứa đáp án đúng trong namespace student.
+
+### Atomic contract đã kiểm tra lại từ implementation
+
+- POST `P/questions/with-answers` trả QuestionResponse + answers, 201.
+  PUT `Q/with-answers` trả cùng shape, 200; success envelope được unwrap bởi API task 1.
+- Payload chỉ gồm `questionText`, `passageText`, `questionType: single_choice`,
+  `explanation`, `points`, `sortOrder`, `imageMediaId`, complete `answers[]`.
+- Question text <=20.000; passage <=50.000; explanation <=20.000 ký tự. Answer text
+  nonblank <=500. Question/answer sau sanitize vẫn phải có text hiển thị. Points
+  0,01–999,99, tối đa hai số lẻ; question position chuyển UI 1-based sang API 0-based
+  tại payload helper, nằm trong sibling bounds hiện tại.
+- Tối thiểu hai options, đúng một correct; backend không giới hạn số option tối đa.
+  `answers[].id` chỉ gửi cho answer cũ thuộc đúng question; new answer bỏ hẳn ID;
+  retained IDs phải unique. Answer cũ không còn trong complete array bị xóa.
+  `sortOrder` mỗi answer bằng array index 0..N-1; không gọi batch reorder hay các
+  write answer lẻ khi đang soạn. Một lần save tương ứng một atomic HTTP write.
+- RHF `field.id` chỉ là client key; backend ID nằm trong `answerId`. Đổi thứ tự dùng
+  useFieldArray.move; correctness là thuộc tính option nên theo đúng option. Xóa
+  option đúng không tự chọn option khác. Form mặc định có hai option, chưa chọn đúng.
+- PUT omission/null imageMediaId tháo ảnh: payload lấy association từ question trong
+  cache detail mới nhất, gửi rõ ID hoặc null. Hiện tên/ID/ảnh đã có; không có upload,
+  replacement/removal hoặc input URL. Media summary không expose raw ID khi media
+  không còn tìm được, giữ hạn chế contract này cho task 5.
+- Backend `GrammarHtmlSanitizer` dùng Jsoup relaxed allowlist bỏ img, thêm hr/s/code,
+  lọc link protocols và chuẩn hóa HTML. Editor giữ textarea source như HTML reference,
+  gửi nguyên text/HTML Unicode, nhận lại bản sanitize làm baseline. Không ép sang
+  plain text hoặc tự render raw HTML. `<br>/<p>/<pre>` dùng khi cần line breaks được
+  giữ theo formatting contract; whitespace/markup có thể được máy chủ chuẩn hóa.
+  TinyMCE grammar hiện có gắn domain grammar và thiếu read-only contract phù hợp nên
+  không tái cấu trúc nó trong task này. SafeText từ builder tiếp tục render an toàn.
+- Bean Validation errors có index `answers[1].answerText/isCorrect/id/sortOrder`:
+  map đúng option hoặc form; `sortOrder` question → input position. Khác với publish
+  validation paths (resource IDs). Business 400 có thể chỉ có message. 409 published/
+  attempts/media conflict, archived write 404; refresh state và giữ input.
+
+### Save, navigation và recovery
+
+- Synchronous submission gate + pending fieldset chặn double save và add/remove/
+  reorder lúc đang gửi. Trước write kiểm tra cache success/idle, locks, ownership,
+  position bounds và answer membership. Server vẫn quyết định cuối cùng.
+- Reuse mutation hooks task 1, retry=false: invalidate admin detail/validation và mọi
+  list/stats; lỗi 400/404/409 cũng reconcile. Auth/network/5xx yêu cầu refresh thêm.
+  Không optimistic tree/answer changes, không thêm Redux/server-state copy.
+- Chỉ báo saved sau atomic response; reset form từ response có server IDs/sanitize.
+  Create + Save dùng replace sang URL edit; local saved ID/pending chặn POST lần hai
+  trong lúc chuyển route. Background detail refetch không reset dirty snapshot.
+- Save & Next edit: dùng authoritative tree đã refetch bởi mutation invalidation
+  (không GET trùng lần hai), sort order ASC rồi ID ASC,
+  mở sibling kế trong cùng part; hết sibling mở create. Create + Save & Next reset
+  form mới cùng part, append position, không mang IDs/correctness/explanation cũ.
+  Save fail không advance. Write thành công nhưng refetch fail: vẫn báo đã lưu,
+  khóa form với action tải thứ tự và tiếp tục, không bắt save lại.
+- Create network/5xx không rõ kết quả: giữ input và chặn gửi lại tự động. Action
+  kiểm tra detail liệt kê IDs mới so với trước request, mở tab mới để tự đối chiếu.
+  Không suy ra persisted bằng so text hoặc tự nhận một ID. Chỉ sau fresh read và
+  xác nhận rõ rủi ro trùng mới mở khóa nút Save; việc mở khóa chưa gửi request.
+  Backend chưa có idempotency key/version token; request cũ có thể vẫn hoàn tất.
+- Dirty editor: confirmation bằng AlertDialog cho Back/breadcrumb và same-tab links
+  (kể cả sidebar); beforeunload cho tab close/reload. Không patch history/router,
+  không cam kết chặn SPA browser Back/Forward, programmatic auth/logout hoặc session
+  expiration. Các trường hợp mất quyền ưu tiên access boundary và không persist dữ
+  liệu câu hỏi vào localStorage. Tab mới không làm mất form hiện tại.
+- Published/attempted/archived vẫn xem được question, mọi save/option mutation bị
+  chặn ở controls và handlers; 401/403 ưu tiên trạng thái từ chối truy cập.
+
+### Khác UI reference và bàn giao task 5
+
+- Giữ context/header → settings → prompt/context → answers → explanation, dùng app
+  shell hiện có; Save & Next vẫn hiện trên mobile. Context luôn mở để dễ xem nội
+  dung/validation; không giữ giới hạn mock 200 câu hoặc đúng bốn đáp án.
+- Bỏ question status, audio question, editable media URLs và preview. Exam status
+  chỉ đọc. Points/position/string bounds dùng DTO, không dùng mẫu HTML 0,5–10.
+- Task 5 tái sử dụng question target đủ bốn IDs (create ba IDs), current image summary,
+  question payload helper và atomic save baseline. Audio thuộc part; upload module/
+  validators task 1 đã có. Cần thiết kế rõ staged upload vs attach và explicit remove,
+  tránh null/omitted làm mất association khi lưu unrelated fields.
+- Chưa làm lifecycle/publish-validation UI, preview (task 6), hoặc media controls.
+
+## Xác minh task 4
+
+- `node --test tests/admin-jlpt-exams.test.mjs`: **16/16 pass**; thêm single-choice,
+  score/text/order bounds, không giới hạn option giả, identity/complete answer payload,
+  image preservation, ownership, next order và nested field paths.
+- Focused ESLint feature/routes/tests và TypeScript noEmit incremental=false: **pass**.
+- `pnpm build`: **pass**, hai route editor dynamic. `pnpm lint`: **fail** vì eqeqeq
+  có sẵn ở `components/common/card/CardItem.tsx:42`, cùng 6 warnings ngoài phạm vi.
+- Playwright script `tests/admin-jlpt-question.playwright.mjs` chạy callback với page,
+  origin và optional artifact directory. API/media đều intercept, exam 701 synthetic;
+  không sửa nội dung backend thật. **Pass**, 12 atomic requests; không page exception.
+  Gồm builder links, create→edit replace và PUT tiếp theo, double submit, correctness/
+  focus qua reorder/removal, retained/new/deleted IDs, image ID, nested 400, 500 +
+  failed detail và retry giữ input, reconnect refetch giữ dirty form, Save & Next
+  failed/success/last/create reset, write success + failed reconciliation (GET-only
+  retry), không GET detail trùng khi create + next, ambiguous create sau commit không
+  tự retry, dirty cancel/discard, beforeunload,
+  published/attempted/archived, invalid/mismatched IDs, 403/anonymous, 1440px/390px.
+- Đã xem ảnh editor desktop/mobile, không horizontal overflow, options và dialog dễ
+  đọc, controls wrap. Giữ nguyên hạn chế sidebar mobile của app shell. Đã xem console/
+  network: các 400/409/500/401 là error paths chủ động, không có exception từ editor;
+  shell còn prefetch `/admin/users` 404 và cảnh báo CSS preload khi qua builder.
+- Chạy lại Playwright builder task 3: **pass**, 16 structural requests mock, không
+  page exception; thêm regression collapse sau khi nhận hash context từ editor vẫn
+  được giữ qua structural refetch. Chrome/CDP `node tests/admin-jlpt-exams.browser.mjs`: **pass**.
+- Backend local 8080 và dev server 3000 vẫn chạy. Route editor thật trên origin 3000 chưa đăng nhập
+  chuyển về `/login?next=%2Fadmin%2Fexams%2F1%2Fsessions%2F1%2Fparts%2F1%2Fquestions%2Fnew`.
+  **Blocked live authenticated CRUD**: chưa có credential/session ADMIN được cung
+  cấp. Không tự tạo account hoặc sửa đề thi thật. Browser persistence ở trên là mock,
+  không phải xác nhận backend integration. Không thiếu endpoint cho phạm vi task 4.
+- Origin test production 3001 gọi backend thật bị chặn ở CSRF bởi CORS; đã kiểm tra
+  redirect thật bằng dev origin 3000 được phép. Không sửa CORS/auth để phục vụ test.
 
 ## Xác minh task 3
 

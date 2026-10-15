@@ -60,6 +60,77 @@ const {
   adminJlptContentLock,
   adminJlptMoveIds,
 } = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-structure'));
+const questionEditor = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-question'));
+
+test('single-choice editor validates text, scores, positions, correctness and duplicate identities', () => {
+  const values = questionEditor.adminJlptQuestionValues();
+  values.questionText = '彼は<u>日本語</u>を勉強します。\n一つ選んでください。';
+  values.answers = [{ answerText: '日本', isCorrect: true }, { answerText: '中国', isCorrect: false }];
+  assert.equal(questionEditor.adminJlptQuestionSchema.safeParse(values).success, true);
+  for (const patch of [
+    { points: 0 }, { points: 1000 }, { points: 0.001 }, { points: NaN },
+    { position: 0 }, { position: 1.2 }, { questionText: '<p>&nbsp;</p>' },
+    { questionText: '<script>alert(1)</script>' }, { questionText: 'x'.repeat(20001) },
+    { passageText: 'x'.repeat(50001) }, { explanation: 'x'.repeat(20001) },
+    { answers: [{ answerText: '日', isCorrect: true }] },
+    { answers: values.answers.map((a) => ({ ...a, isCorrect: true })) },
+    { answers: values.answers.map((a) => ({ ...a, isCorrect: false })) },
+    { answers: values.answers.map((a) => ({ ...a, answerId: 1 })) },
+    { answers: [{ answerText: '<br>', isCorrect: true }, values.answers[1]] },
+    { answers: [{ answerText: 'x'.repeat(501), isCorrect: true }, values.answers[1]] },
+  ]) assert.equal(questionEditor.adminJlptQuestionSchema.safeParse({ ...values, ...patch }).success, false);
+  assert.equal(questionEditor.adminJlptQuestionSchema.safeParse({ ...values, points: 999.99 }).success, true);
+  assert.equal(questionEditor.adminJlptQuestionSchema.safeParse({ ...values, answers: [...values.answers, ...Array.from({ length: 100 }, () => ({ answerText: '追加', isCorrect: false }))] }).success, true);
+});
+
+test('atomic payload preserves retained IDs and media, omits deleted/new IDs, and assigns contiguous order', () => {
+  const existing = { id: 31, questionText: '日本語', passageText: null, explanation: null, questionType: 'single_choice', points: 1, sortOrder: 2, image: { id: 43 }, answers: [
+    { id: 310, answerText: 'A', isCorrect: true, sortOrder: 0 },
+    { id: 311, answerText: 'B', isCorrect: false, sortOrder: 1 },
+    { id: 312, answerText: 'C', isCorrect: false, sortOrder: 2 },
+  ] };
+  const values = questionEditor.adminJlptQuestionValues(existing);
+  values.answers = [values.answers[2], values.answers[0], { answerText: '新規', isCorrect: false }];
+  const payload = questionEditor.adminJlptUpdateQuestionPayload(values, existing);
+  assert.equal(payload.imageMediaId, 43);
+  assert.equal(payload.sortOrder, 2);
+  assert.deepEqual(payload.answers, [
+    { id: 312, answerText: 'C', isCorrect: false, sortOrder: 0 },
+    { id: 310, answerText: 'A', isCorrect: true, sortOrder: 1 },
+    { answerText: '新規', isCorrect: false, sortOrder: 2 },
+  ]);
+  assert.throws(() => questionEditor.adminJlptCreateQuestionPayload(values));
+  assert.throws(() => questionEditor.adminJlptUpdateQuestionPayload({ ...values, answers: [values.answers[0], values.answers[0]] }, existing));
+  assert.throws(() => questionEditor.adminJlptUpdateQuestionPayload({ ...values, answers: [{ answerId: 999, answerText: '他', isCorrect: true }] }, existing));
+  const fresh = questionEditor.adminJlptQuestionValues(undefined, 3);
+  assert.equal(fresh.position, 4);
+  assert.equal(fresh.explanation, '');
+  assert.equal(fresh.answers.some((a) => a.isCorrect || a.answerId !== undefined), false);
+  const create = questionEditor.adminJlptCreateQuestionPayload(fresh);
+  assert.equal(create.imageMediaId, null);
+  assert.equal(create.answers.every((a) => !Object.hasOwn(a, 'id')), true);
+  values.answers.splice(1, 1); // Removing the correct answer requires a new selection.
+  assert.equal(questionEditor.adminJlptQuestionSchema.safeParse(values).success, false);
+});
+
+test('question routes verify every ancestor and Save & Next uses authoritative order', () => {
+  const questions = [{ id: 33, sortOrder: 2 }, { id: 31, sortOrder: 0 }, { id: 32, sortOrder: 1 }];
+  const exam = { id: 1, sessions: [{ id: 11, parts: [{ id: 21, questions }] }] };
+  const target = { examId: 1, sessionId: 11, partId: 21, questionId: 31 };
+  assert.equal(questionEditor.adminJlptQuestionContext(exam, target).question.id, 31);
+  for (const patch of [{ examId: 2 }, { sessionId: 12 }, { partId: 22 }, { questionId: 99 }])
+    assert.equal(questionEditor.adminJlptQuestionContext(exam, { ...target, ...patch }), null);
+  assert.equal(questionEditor.adminJlptNextQuestion({ questions }, 31).id, 32);
+  assert.equal(questionEditor.adminJlptNextQuestion({ questions }, 33), undefined);
+  assert.throws(() => questionEditor.adminJlptNextQuestion({ questions }, 99));
+  assert.equal(questionEditor.adminJlptQuestionUrl(target), '/admin/exams/1/sessions/11/parts/21/questions/31');
+  assert.equal(questionEditor.adminJlptQuestionUrl({ ...target, questionId: undefined }), '/admin/exams/1/sessions/11/parts/21/questions/new');
+  assert.equal(questionEditor.adminJlptBuilderUrl(target), '/admin/exams/1#part-21');
+  assert.equal(questionEditor.adminJlptQuestionErrorPath('answers[1].answerText', 3), 'answers.1.answerText');
+  assert.equal(questionEditor.adminJlptQuestionErrorPath('answers[1].isCorrect', 3), 'answers.1.isCorrect');
+  assert.equal(questionEditor.adminJlptQuestionErrorPath('answers[3].answerText', 3), null);
+  assert.equal(questionEditor.adminJlptQuestionErrorPath('sortOrder', 3), 'position');
+});
 
 test('builder forms follow session/part bounds and translate human positions at the payload boundary', () => {
   const session = {

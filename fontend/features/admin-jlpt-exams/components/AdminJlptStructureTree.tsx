@@ -1,22 +1,25 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { ArrowDown, ArrowUp, ChevronDown, Pencil, Plus, Trash2, Headphones } from 'lucide-react';
 import type {
   AdminJlptExamDetail,
   AdminJlptQuestion,
 } from '@/apis/admin-jlpt-exams/admin-jlpt-exams.type';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   adminJlptSessionLabels,
   type AdminJlptEditorTarget,
   type AdminJlptStructureTarget,
 } from '../admin-jlpt-structure';
 import { AdminJlptSafeText } from './AdminJlptSafeText';
+import { adminJlptQuestionUrl } from '../admin-jlpt-question';
 
 interface Props {
   exam: AdminJlptExamDetail;
   disabled: boolean;
+  questionNavigationDisabled?: boolean;
   onEdit: (target: AdminJlptEditorTarget) => void;
   onDelete: (target: AdminJlptStructureTarget) => void;
   onMove: (target: AdminJlptStructureTarget, direction: -1 | 1) => void;
@@ -61,8 +64,36 @@ function OrderControls({
   );
 }
 
-export function AdminJlptStructureTree({ exam, disabled, onEdit, onDelete, onMove }: Props) {
+export function AdminJlptStructureTree({
+  exam,
+  disabled,
+  questionNavigationDisabled = false,
+  onEdit,
+  onDelete,
+  onMove,
+}: Props) {
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
+  const revealedHash = useRef<string | null>(null);
+  useEffect(() => {
+    const revealContext = () => {
+      if (revealedHash.current === window.location.hash) return;
+      const partId = /^#part-(\d+)$/.exec(window.location.hash)?.[1];
+      const session = exam.sessions.find((s) => s.parts.some((p) => String(p.id) === partId));
+      if (!partId) revealedHash.current = window.location.hash;
+      if (!session || !partId) return;
+      revealedHash.current = window.location.hash;
+      setCollapsed((previous) => {
+        if (!previous.has(`session-${session.id}`) && !previous.has(`part-${partId}`)) return previous;
+        const next = new Set(previous);
+        next.delete(`session-${session.id}`);
+        next.delete(`part-${partId}`);
+        return next;
+      });
+    };
+    revealContext();
+    window.addEventListener('hashchange', revealContext);
+    return () => window.removeEventListener('hashchange', revealContext);
+  }, [exam.sessions]);
   const keys = exam.sessions.flatMap((s) => [
     `session-${s.id}`,
     ...s.parts.map((p) => `part-${p.id}`),
@@ -203,6 +234,7 @@ export function AdminJlptStructureTree({ exam, disabled, onEdit, onDelete, onMov
                 return (
                   <section
                     key={part.id}
+                    id={`part-${part.id}`}
                     data-part-id={part.id}
                     className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50/50 p-3 md:p-4"
                   >
@@ -240,6 +272,15 @@ export function AdminJlptStructureTree({ exam, disabled, onEdit, onDelete, onMov
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center justify-end gap-2">
+                        {!disabled && (
+                          <Link
+                            className={buttonVariants({ variant: 'outline' })}
+                            href={adminJlptQuestionUrl({ examId: exam.id, sessionId: session.id, partId: part.id })}
+                          >
+                            <Plus />
+                            Thêm câu hỏi
+                          </Link>
+                        )}
                         <OrderControls
                           label={partLabel}
                           index={partIndex}
@@ -270,6 +311,18 @@ export function AdminJlptStructureTree({ exam, disabled, onEdit, onDelete, onMov
                         const questionLabel = `câu hỏi #${question.id}`;
                         return (
                           <QuestionRow key={question.id} question={question}>
+                            <Link
+                              className={buttonVariants({ variant: 'outline' })}
+                              href={adminJlptQuestionUrl({ examId: exam.id, ...questionTarget })}
+                              aria-disabled={questionNavigationDisabled}
+                              tabIndex={questionNavigationDisabled ? -1 : undefined}
+                              onClick={(event) => {
+                                if (questionNavigationDisabled) event.preventDefault();
+                              }}
+                            >
+                              <Pencil />
+                              {disabled ? 'Xem câu hỏi' : 'Sửa câu hỏi'}
+                            </Link>
                             <OrderControls
                               label={questionLabel}
                               index={index}

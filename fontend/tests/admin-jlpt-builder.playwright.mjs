@@ -239,6 +239,9 @@ export default async function runAdminJlptBuilderSmoke(page, origin = 'http://lo
     check(writes().length === count, 'First item moved outside boundary');
 
     // Reorder all three hierarchy levels; focus stays on the moved resource.
+    // Returning from the question editor reveals a hash context once; later
+    // user collapse choices must still survive authoritative tree refetches.
+    await page.evaluate(() => { window.location.hash = 'part-22'; });
     await page.getByRole('button', { name: 'Thu gọn phần thi 部分 22', exact: true }).click();
     await page
       .getByRole('button', { name: 'Chuyển xuống phiên thi Session 11', exact: true })
