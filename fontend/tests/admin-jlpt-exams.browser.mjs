@@ -327,13 +327,22 @@ try {
   await screenshot('detail-mobile', 390);
   assert.equal(
     await evaluate(
-      '[...document.querySelectorAll("button")].some(b => /Save|Lưu đề|Xuất bản|Thêm phiên/.test(b.innerText))',
+      '[...document.querySelectorAll("button")].some(b => /Save Structure|Lưu đề|Xuất bản|Preview/.test(b.innerText))',
     ),
     false,
   );
+  await waitFor(
+    '[...document.querySelectorAll("button")].some(b => b.textContent.includes("Thêm phiên thi") && !b.disabled)',
+  );
   mode = 'archived';
   await navigate('/admin/exams/1');
-  await waitFor(hasText('giữ lại lịch sử làm bài'));
+  await waitFor(hasText('lịch sử làm bài'));
+  assert.equal(
+    await evaluate(
+      '[...document.querySelectorAll("button")].find(b => b.textContent.includes("Thêm phiên thi")).disabled',
+    ),
+    true,
+  );
   mode = 'empty-structure';
   await navigate('/admin/exams/1');
   await waitFor(hasText('Đề thi chưa có phiên thi.'));
@@ -359,7 +368,11 @@ try {
   for (const nextMode of ['stats-error', 'list-error']) {
     mode = nextMode;
     await navigate('/admin/exams');
-    await waitFor(hasText(nextMode === 'stats-error' ? 'Chưa thể tải thống kê.' : 'Chưa thể tải dữ liệu đề thi'));
+    await waitFor(
+      hasText(
+        nextMode === 'stats-error' ? 'Chưa thể tải thống kê.' : 'Chưa thể tải dữ liệu đề thi',
+      ),
+    );
     if (nextMode === 'stats-error') await waitFor(hasText(summary.title));
     mode = 'admin';
     await evaluate(

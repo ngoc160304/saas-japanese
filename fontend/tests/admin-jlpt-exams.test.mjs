@@ -52,6 +52,84 @@ const { validateAdminJlptMedia } = load(resolve(root, 'apis/admin-jlpt-exams/adm
 const { adminJlptMetadataSchema, adminJlptMetadataPayload, adminJlptMetadataLock } = load(
   resolve(root, 'features/admin-jlpt-exams/admin-jlpt-metadata'),
 );
+const {
+  adminJlptSessionSchema,
+  adminJlptPartSchema,
+  adminJlptSessionPayload,
+  adminJlptPartPayload,
+  adminJlptContentLock,
+  adminJlptMoveIds,
+} = load(resolve(root, 'features/admin-jlpt-exams/admin-jlpt-structure'));
+
+test('builder forms follow session/part bounds and translate human positions at the payload boundary', () => {
+  const session = {
+    kind: 'session',
+    name: ' 読解 ',
+    sessionType: 'reading',
+    timeLimitMinutes: 1,
+    position: 1,
+  };
+  assert.equal(adminJlptSessionSchema.safeParse(session).success, true);
+  for (const patch of [
+    { name: ' ' },
+    { name: 'x'.repeat(151) },
+    { sessionType: 'READING' },
+    { timeLimitMinutes: 0 },
+    { timeLimitMinutes: 181 },
+    { timeLimitMinutes: 1.5 },
+    { position: 0 },
+    { position: 1.5 },
+  ])
+    assert.equal(adminJlptSessionSchema.safeParse({ ...session, ...patch }).success, false);
+  assert.deepEqual(adminJlptSessionPayload(session), {
+    name: '読解',
+    sessionType: 'reading',
+    timeLimitMinutes: 1,
+    sortOrder: 0,
+  });
+  const part = {
+    kind: 'part',
+    name: ' Mondai ',
+    instructions: ' 読んでください。\n次の問題 ',
+    position: 3,
+  };
+  assert.equal(adminJlptPartSchema.safeParse(part).success, true);
+  assert.equal(
+    adminJlptPartSchema.safeParse({ ...part, instructions: 'x'.repeat(10001) }).success,
+    false,
+  );
+  assert.deepEqual(adminJlptPartPayload(part, { audio: { id: 42 } }), {
+    name: 'Mondai',
+    instructions: '読んでください。\n次の問題',
+    sortOrder: 2,
+    audioMediaId: 42,
+  });
+  assert.equal(adminJlptPartPayload({ ...part, instructions: ' ' }).instructions, null);
+  assert.equal(adminJlptPartPayload(part, { audio: null }).audioMediaId, null);
+});
+
+test('builder moves send every sibling exactly once, preserve input, and reject boundaries', () => {
+  const siblings = [{ id: 8 }, { id: 12 }, { id: 3 }];
+  assert.deepEqual(adminJlptMoveIds(siblings, 12, -1), [12, 8, 3]);
+  assert.deepEqual(adminJlptMoveIds(siblings, 12, 1), [8, 3, 12]);
+  assert.equal(adminJlptMoveIds(siblings, 8, -1), null);
+  assert.equal(adminJlptMoveIds(siblings, 3, 1), null);
+  assert.equal(adminJlptMoveIds(siblings, 99, -1), null);
+  assert.equal(adminJlptMoveIds([], 99, 1), null);
+  assert.deepEqual(siblings, [{ id: 8 }, { id: 12 }, { id: 3 }]);
+});
+
+test('builder respects explicit status and attempts even if contentLocked is inconsistent', () => {
+  const draft = { status: 'DRAFT', hasAttempts: false, contentLocked: false };
+  assert.equal(adminJlptContentLock(draft), null);
+  for (const patch of [
+    { status: 'PUBLISHED' },
+    { status: 'ARCHIVED' },
+    { hasAttempts: true },
+    { contentLocked: true },
+  ])
+    assert.equal(typeof adminJlptContentLock({ ...draft, ...patch }), 'string');
+});
 const response = (config, data, status = 200) => ({
   config,
   data,

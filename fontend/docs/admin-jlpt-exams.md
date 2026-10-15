@@ -1,4 +1,4 @@
-# Admin JLPT Exam Management — bàn giao frontend tasks 1–2
+# Admin JLPT Exam Management — bàn giao frontend tasks 1–3
 
 Đối chiếu implementation local trên nhánh `feature/course-client`, ngày 2026-10-15.
 Nguồn: `AdminJlptExamController`, `AdminJlptExamService`/implementation, DTO/query/enums,
@@ -207,15 +207,19 @@ ownership hoặc DB conflict/lock. Upload có thể 413, 415; unsupported method
 
 | Layer | File/component | Trách nhiệm |
 | --- | --- | --- |
-| app/admin/exams/layout.tsx | AdminJlptAccessBoundary | Chờ session và server ADMIN check trước khi mount con |
+| app/admin/exams/layout.tsx | AdminJlptAccessBoundary | Chờ session, ưu tiên 401/403 từ endpoints admin; reads chạy song song |
 | app/admin/exams/page.tsx | Suspense → AdminJlptExamListPage | Thin route; list/statistics orchestration và metadata dialog |
 | app/admin/exams/[id]/page.tsx | parseAdminJlptExamId → AdminJlptExamDetailPage | Await params theo Next.js cài local, validate ID, notFound |
 | app/admin/exams/loading/error/not-found.tsx | AdminJlptState | Route loading, recovery (Next 16.3 retry), invalid ID state |
-| features/admin-jlpt-exams/components | List/Detail/Status/AccessBoundary/State | Orchestration, error/access/empty states; builder còn chỉ đọc |
+| features/admin-jlpt-exams/components | List/Detail/Status/AccessBoundary/State | Orchestration, error/access/empty states; detail là builder task 3 |
 | features/admin-jlpt-exams/components | ExamFilters/ExamGrid/ExamStats | Toolbar, responsive cards, thống kê có loading/error/retry độc lập |
 | features/admin-jlpt-exams/components | MetadataDialog | Create/edit RHF + Zod, fresh detail, pending/dirty-close, field errors, conflict |
 | features/admin-jlpt-exams/hooks | useAdminJlptExamsUrlState | URL state, debounce, canonicalization, filter/reset/page |
 | features/admin-jlpt-exams/admin-jlpt-metadata.ts | schema/payload/lock helper | Bounds backend, writable payload và lý do read-only cho metadata |
+| features/admin-jlpt-exams/components | StructureTree/SafeText | Cây session → part → question, thu/mở theo ID, các action có accessible label, nội dung có định dạng an toàn |
+| features/admin-jlpt-exams/components | StructureDialog/StructureDeleteDialog | Form session/part, fresh detail, dirty confirmation, cascade confirmation, giữ input khi lỗi |
+| features/admin-jlpt-exams/hooks | useAdminJlptStructure | Kiểm tra lock/ownership, serialize mutation, batch reorder và phục hồi authoritative state |
+| features/admin-jlpt-exams/admin-jlpt-structure.ts | schema/payload/order/lock | Contract session/part, UI position → API order, complete sibling lists |
 | apis/admin-jlpt-exams | .api/.type/.keys + admin-jlpt-media | Contract, unwrap, ownership paths, read AbortSignal, media validation |
 | features/admin-jlpt-exams/hooks | useAdminJlptExams | Query/mutation lifecycle |
 
@@ -280,12 +284,121 @@ Default status cố ý ghi “Đang hoạt động (nháp và xuất bản)” v
 Không đưa status dropdown vào metadata hoặc editable duration/passingScore từ HTML.
 Không có nút publish/unpublish/archive/preview giả ở task 2.
 
-Task 3 có thể reuse API/nested path types/query keys, mutation invalidation, detail query
-(freshOnMount tùy chọn), lock explanations, URL/card/metadata flow vừa hoàn thiện.
-Các task 3–7 còn hierarchy editing/reorder, atomic question/answer editor, media UI,
+Task 3 đã hoàn thiện hierarchy editing/reorder (chi tiết bên dưới).
+Các task 4–7 còn atomic question/answer editor, media UI,
 validation/lifecycle controls và preview theo kế hoạch được giao riêng. Không có
 endpoint admin CRUD/reorder/lifecycle/upload nào bị thiếu; hạn chế cần phối hợp backend
-là role trong authenticated user model nêu đầu tài liệu. Task 2 chưa triển khai task 3.
+là role trong authenticated user model nêu đầu tài liệu.
+
+## Builder task 3 và bàn giao task 4
+
+Route giữ nguyên `/admin/exams/[id]`; page Server Component await/validate params như
+task 1, không thêm raw API logic vào app/. Builder dùng chung admin shell, breadcrumb
+về `/admin/exams`, overview title/level/status/description và năm metrics từ detail:
+sessionCount/partCount/questionCount/totalTimeMinutes/passingScore. Nút Sửa thông tin
+đề mở chính MetadataDialog task 2 khi contract cho phép.
+
+Cây dùng một detail query, không GET riêng từng row. Session/part thu/mở bằng button
+có aria-expanded/aria-controls; trạng thái theo resource ID giữ qua mutation/refetch.
+Có mở/thu tất cả và empty state ở từng cấp. Question row hiển thị thứ tự, ID, excerpt,
+số answers, points, ảnh đã gắn và answers đúng từ admin response. `SafeText` dựng React
+nodes theo allowlist, bỏ attributes/URLs/script/style; giữ xuống dòng, chữ Nhật, ruby,
+in đậm/nghiêng/gạch chân và định dạng cơ bản, không dùng dangerouslySetInnerHTML.
+
+Session form: name <=150 nonblank, sessionType bắt buộc (ba enum lowercase),
+timeLimitMinutes integer 1–180 và vị trí. Part form: name <=150 nonblank,
+instructions <=10000, vị trí. Không có session description, part type hoặc part
+default points trong DTO. Position trên UI bắt đầu 1, helper payload chuyển sang
+sortOrder zero based. Create chèn 0..N; edit di chuyển 0..N-1; form giới hạn theo
+sibling set mới nhất. Không hardcode giới hạn số sessions/parts từ HTML.
+
+Form mở sẽ refetch detail lấy initial values mới nhất; background snapshot cập nhật
+quyền/parent membership nhưng không reset dirty input. RHF/Zod map fieldErrors
+(sortOrder → position), lỗi chung và focus lỗi; guard đồng bộ chống double submit,
+pending chặn đóng, dirty close cần xác nhận. Nếu refresh sau lỗi mạng thất bại, có nút
+`Tải lại trạng thái, giữ biểu mẫu` ngay trong dialog. Loading dialog không restore
+focus đè lên form khi chuyển sang ready; đóng form trả focus về action mở nó.
+
+PUT part **gửi lại audioMediaId từ part hiện tại trong detail cache**, kể cả khi chỉ
+sửa name/instructions/order. Backend coi omitted hoặc null là detach, không có PATCH
+metadata-only. Task 3 chỉ hiển thị originalName/ID của audio, không thêm URL input,
+upload hoặc remove media. Với part mới không có media, payload gửi explicit null.
+Backend không có version token; concurrent edits từ tab khác vẫn do server quyết định.
+
+Deletion local đã đối chiếu service + cascade entity:
+
+| Mục | Hiệu ứng DELETE thành công |
+| --- | --- |
+| Session | Xóa vĩnh viễn session, parts, questions, answers; recalculate total duration |
+| Part | Xóa vĩnh viễn part, questions, answers |
+| Question | Xóa vĩnh viễn question và answers |
+
+Các delete đóng gap sortOrder ở sibling collection. Audio của part và image của
+question bị tháo liên kết; backend khóa media và tính lại isUsed theo references còn
+tồn tại, **không xóa tệp media**. Dialog nêu tên/ID, excerpt và số child/answers từ
+detail hiện tại, giữ mở khi reject. Đây khác DELETE exam (archive mềm), không mô tả
+delete cấu trúc là lưu trữ. Sau xóa focus về heading Cấu trúc đề thi.
+
+Move-up/down gọi đúng ba batch endpoints đã có, mỗi lần gửi toàn bộ current sibling
+IDs đúng một lần. Không dùng legacy sort-order hoặc cross-parent moves. Thứ tự chỉ
+đổi sau server response + detail refetch, giữ focus button được di chuyển và boundary
+aria-disabled vẫn focusable. Hook dùng gate đồng bộ cho cả exam để không chồng save,
+delete và reorder trong builder; buttons và handlers đều kiểm tra quyền/pending.
+Metadata dialog là modal và action bị khóa trong structural mutation.
+
+Success dùng mutation hooks task 1, await invalidate list/stats/detail/validation,
+không splice response con vào cây. Lỗi 400/404/409 được hooks cũ reconcile; lỗi auth,
+network/5xx và local guard rejection cũng yêu cầu refresh. Không retry writes tự động.
+401/403 ưu tiên access state; published/attempted/archived chỉ xem. Background detail
+5xx giữ cây cũ với cảnh báo và chặn sửa, cho retry; không trình bày cây cũ là dữ liệu
+vừa tải thành công. Chỉ toast success sau khi write đã được server chấp nhận.
+
+Khác HTML có chủ đích: dùng app shell; thêm sessionType bắt buộc; duration min1;
+bỏ unsupported fields, audio URL, status dropdown, max-score giả định và Save Structure.
+Không có nút thêm/sửa câu hỏi vì chưa có editor route làm việc. Không thêm preview,
+publish/unpublish/archive hoặc publish validation panel ở task 3.
+
+Task 4 tái sử dụng detail/cache admin và SafeText, lock guard, cấu trúc nesting hiện
+có. Mỗi question cần đủ `{examId, sessionId, partId, questionId}`; create cần đủ ba
+ancestor IDs. Builder hiện có `data-session-id`, `data-part-id`, `data-question-id`
+và stable React keys. Chưa ấn định/thêm URL editor mới; task 4 phải tạo route hoạt động
+rồi mới gắn action vào part/question. Atomic save dùng complete answers set và union
+new/existing answer IDs của task 1; không biến thành nhiều write lẻ. Answer reorder
+và question create/edit chưa triển khai.
+
+## Xác minh task 3
+
+- `node --test tests/admin-jlpt-exams.test.mjs`: **13/13 pass**, gồm thêm schema/bounds
+  session/part, chuyển position sang sortOrder, giữ audioMediaId, full sibling lists,
+  reorder boundaries và lock theo status/attempts kể cả flag không nhất quán.
+- Focused ESLint trên feature và ba scripts liên quan: **pass**; TypeScript
+  `pnpm exec tsc --noEmit --incremental false`: **pass**.
+- `pnpm build`: **pass**, route `/admin/exams/[id]` vẫn dynamic. `pnpm lint`: **fail**
+  bởi lỗi eqeqeq có sẵn `components/common/card/CardItem.tsx:42` và 6 warnings ngoài
+  phạm vi. Không sửa file đó hoặc thêm dependency để làm xanh kiểm tra.
+- `tests/admin-jlpt-builder.playwright.mjs` chạy bằng Playwright MCP trên production
+  build localhost:3001: **pass**, 16 intercepted write requests, không page exception.
+  Kiểm tra session/part create/edit; metadata form reuse; audio ID; zero-based order
+  và full sibling sets ở ba cấp; persistence sau reload; cascade confirmations/delete;
+  count/duration refresh; double submit; validation 400 giữ input; reorder reject;
+  409 đổi lock giữ input/chặn save; 500 + detail refetch failure và retry trong form;
+  readonly published/attempted/archived; 403/anonymous; Japanese markup/script safety;
+  collapse state qua refetch; focus move, initial focus, Escape và mobile/desktop.
+  Đã xem console/network: các API 400/409/500/403/401 là test error paths chủ động;
+  shell còn prefetch `/admin/users` trả 404 và cảnh báo CSS preload của Next. Không có
+  exception từ builder, không sửa route/sidebar ngoài phạm vi để che các log này.
+- Chrome/CDP regression `node tests/admin-jlpt-exams.browser.mjs`: **pass**. Cập nhật
+  assertion cũ cho builder DRAFT được chỉnh sửa, archived vẫn khóa. Bao gồm bootstrap,
+  401/403, invalid ID/404/empty, list/statistics/URL/retry và responsive.
+- Đã xem screenshots builder + dialog ở 1440px/390px; không horizontal overflow,
+  tên Nhật dài xuống dòng và controls/dialog có thể sử dụng. Xác minh focus quay về
+  nút mở dialog sau Escape. Sidebar mobile dùng nguyên shell hiện tại.
+- Backend local 8080 đang chạy. Route thật `/admin/exams/1` khi chưa có phiên ADMIN
+  chuyển đúng `/login?next=%2Fadmin%2Fexams%2F1`. **Live authenticated CRUD bị chặn**
+  vì chưa có credential/session ADMIN được cung cấp. Mọi write ở browser test đều
+  intercept, không sửa đề thi thật; không coi mock persistence là live integration.
+- Không sửa backend/UI/auth/dependencies. Hạn chế contract còn lại: user model chưa
+  có role, không có maximum score hoặc version token; không thiếu endpoint task 3.
 
 ## Xác minh task 2
 
