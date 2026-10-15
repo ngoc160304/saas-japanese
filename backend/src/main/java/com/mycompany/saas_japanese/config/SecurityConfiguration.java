@@ -97,7 +97,12 @@ public class SecurityConfiguration {
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/student/dashboard", "/api/v1/speaking/topics")
                                                 .authenticated()
+                                                .requestMatchers("/api/v1/admin/jlpt-exams",
+                                                                "/api/v1/admin/jlpt-exams/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers("/api/v1/admin/**").permitAll()
+                                                .requestMatchers("/api/v1/upload/audios", "/api/v1/upload/audios/**")
+                                                .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.POST, "/api/v1/lessons")
                                                 .hasAuthority("ROLE_ADMIN")
                                                 .requestMatchers(HttpMethod.PUT, "/api/v1/lessons/{id}")

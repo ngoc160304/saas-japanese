@@ -10,7 +10,7 @@ import { getApiError, getApiErrorMessage } from '@/lib/api-error';
 import { selectAuthInitialized, selectCurrentUser } from '@/store/authSlice';
 import { useAppSelector } from '@/store/hooks';
 import { JlptExamTaking } from './JlptExamTaking';
-import { attemptStorageKey, clearStoredAttempt, markAttemptStarting, readStoredAttempt, writeStoredAttempt, type StoredAttempt } from '../../taking/attempt-storage';
+import { attemptStorageKey, clearStoredAttempt, markAttemptStarting, readStoredAttempt, writeStoredAttempt, restoredAttemptExam, type StoredAttempt } from '../../taking/attempt-storage';
 
 type TakingMode = { examId: number; mode: 'full'; sessionId?: never } |
   { examId: number; mode: 'session'; sessionId: number };
@@ -54,10 +54,24 @@ export function JlptExamTakingPage(props: TakingMode) {
     mutationFn: (request: StartJlptAttemptRequest) => jlptExamsAPI.startJlptAttempt(examId, request),
     retry: false,
     onSuccess: (attempt) => {
-      if (storageKey) writeStoredAttempt(storageKey, { attempt, savedAnswers: {} });
+      if (storageKey) writeStoredAttempt(storageKey, {
+        attempt, savedAnswers: {}, ...(query.data?.id === examId ? { exam: query.data } : {}),
+      });
     },
   });
-  const exam = query.isSuccess && query.data?.id === examId ? query.data : null;
+  const active = mutation.isSuccess
+    ? { attempt: mutation.data, savedAnswers: {}, exam: query.data ?? undefined }
+    : restored && restored !== 'starting' ? restored : null;
+  const fallback = restoredAttemptExam(
+    examId, active, query.data, query.isError ? getApiError(query.error).status : null,
+  );
+  const exam = query.isSuccess && query.data?.id === examId ? query.data : fallback;
+  useEffect(() => {
+    // Upgrade legacy in-tab snapshots while the public exam is still readable.
+    if (storageKey && restored && restored !== 'starting' && !restored.exam &&
+        query.isSuccess && query.data?.id === examId)
+      writeStoredAttempt(storageKey, { ...restored, exam: query.data });
+  }, [storageKey, restored, query.isSuccess, query.data, examId]);
   const sessionId = mode === 'session' ? props.sessionId : null;
   const requestedSession = exam?.sessions.find((session) => session.id === sessionId);
   const durationMinutes = mode === 'full' ? exam?.totalTimeMinutes : requestedSession?.timeLimitMinutes;
@@ -112,7 +126,6 @@ export function JlptExamTakingPage(props: TakingMode) {
     );
   }
 
-  const active = mutation.isSuccess ? { attempt: mutation.data, savedAnswers: {} } : restored && restored !== 'starting' ? restored : null;
   if (active) {
     if (active.attempt.examId !== examId || active.attempt.mode !== mode) {
       return <main role="alert" className="min-h-dvh bg-[#f8fafc] p-8 text-center text-slate-700">The server returned an unexpected attempt. Please return to the exam details.</main>;

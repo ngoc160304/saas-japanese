@@ -1,8 +1,10 @@
-import type { StartedJlptAttempt } from '@/apis/jlpt-exams/jlpt-exams.type';
+import type { JlptExamStructure, StartedJlptAttempt } from '@/apis/jlpt-exams/jlpt-exams.type';
 
 export interface StoredAttempt {
   attempt: StartedJlptAttempt;
   savedAnswers: Record<number, number>;
+  /** Public metadata captured while starting; never an admin exam/solution object. */
+  exam?: JlptExamStructure;
 }
 
 export function attemptStorageKey(userId: number, examId: number, mode: string, sessionId: number | null) {
@@ -22,7 +24,24 @@ export function readStoredAttempt(key: string): StoredAttempt | 'starting' | nul
 }
 
 export function writeStoredAttempt(key: string, stored: StoredAttempt) {
-  try { sessionStorage.setItem(key, JSON.stringify(stored)); } catch { /* Storage may be disabled. */ }
+  try {
+    const previous = stored.exam ? null : readStoredAttempt(key);
+    const exam = stored.exam ?? (previous && previous !== 'starting' &&
+      previous.attempt.attemptId === stored.attempt.attemptId ? previous.exam : undefined);
+    sessionStorage.setItem(key, JSON.stringify({ ...stored, ...(exam ? { exam } : {}) }));
+  } catch { /* Storage may be disabled. */ }
+}
+
+/** A public catalog 404 must not hide a still-owned active attempt. 401/403 never fall back. */
+export function restoredAttemptExam(
+  examId: number,
+  active: StoredAttempt | null,
+  cached: JlptExamStructure | null | undefined,
+  status: number | null,
+) {
+  if (status !== 404 || active?.attempt.examId !== examId) return null;
+  const exam = active.exam ?? cached;
+  return exam?.id === examId && Array.isArray(exam.sessions) ? exam : null;
 }
 
 export function markAttemptStarting(key: string) {

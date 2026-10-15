@@ -9,6 +9,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,12 +24,25 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.mycompany.saas_japanese.domain.response.ErrorResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamPublishErrorResponse;
 
 @RestControllerAdvice
 public class GlobalException {
   private static final Logger LOGGER = LoggerFactory.getLogger(GlobalException.class);
+
+  @ExceptionHandler(JlptPublishValidationException.class)
+  public ResponseEntity<AdminJlptExamPublishErrorResponse> invalidPublication(
+      JlptPublishValidationException exception) {
+    Map<String, String> fields = new LinkedHashMap<>();
+    exception.getIssues().forEach(issue -> fields.merge(issue.path(), issue.message(),
+        (previous, message) -> previous + "; " + message));
+    return ResponseEntity.badRequest().body(new AdminJlptExamPublishErrorResponse(
+        400, exception.getMessage(), fields, Instant.now(), exception.getIssues()));
+  }
 
   @ExceptionHandler(BadRequestException.class)
   public ResponseEntity<ErrorResponse> badRequest(BadRequestException exception) {
@@ -56,8 +70,8 @@ public class GlobalException {
     return error(HttpStatus.CONFLICT, exception.getMessage());
   }
 
-  @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<ErrorResponse> dataConflict(DataIntegrityViolationException exception) {
+  @ExceptionHandler({DataIntegrityViolationException.class, PessimisticLockingFailureException.class})
+  public ResponseEntity<ErrorResponse> dataConflict(RuntimeException exception) {
     return error(HttpStatus.CONFLICT, "Resource already exists or conflicts with current data");
   }
 
@@ -71,7 +85,8 @@ public class GlobalException {
   }
 
   @ExceptionHandler({HttpMessageNotReadableException.class, ConstraintViolationException.class,
-      MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class})
+      MethodArgumentTypeMismatchException.class, MissingServletRequestParameterException.class,
+      MissingServletRequestPartException.class})
   public ResponseEntity<ErrorResponse> invalidRequest(Exception exception) {
     return error(HttpStatus.BAD_REQUEST, "Invalid request");
   }
@@ -84,6 +99,11 @@ public class GlobalException {
   @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
   public ResponseEntity<ErrorResponse> invalidMediaType(HttpMediaTypeNotSupportedException exception) {
     return error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "Unsupported media type");
+  }
+
+  @ExceptionHandler(MaxUploadSizeExceededException.class)
+  public ResponseEntity<ErrorResponse> uploadTooLarge(MaxUploadSizeExceededException exception) {
+    return error(HttpStatus.CONTENT_TOO_LARGE, "Upload exceeds the multipart size limit");
   }
 
   @ExceptionHandler(NoResourceFoundException.class)

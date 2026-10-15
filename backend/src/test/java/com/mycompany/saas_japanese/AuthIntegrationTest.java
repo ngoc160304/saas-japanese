@@ -97,6 +97,7 @@ class AuthIntegrationTest extends AuthTestSupport {
     user = new User();
     user.setEmail(EMAIL);
     user.setUsername("Learner");
+    user.setRole(UserRoleEnum.student);
     user.setPassword(passwords.encode(PASSWORD));
     user.setActive(true);
     user.setVerified(true);

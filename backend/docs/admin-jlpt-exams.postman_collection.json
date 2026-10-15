@@ -1,0 +1,2399 @@
+{
+  "info": {
+    "name": "Admin JLPT backend - authoring to attempt handoff",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Tasks 1-6 local API handoff. Generated and structurally validated; NOT executed in Postman.\nRead admin-jlpt-exams-api.md first. Use only a disposable local/test database: POST/PUT/PATCH/DELETE mutate it.\nSet baseUrl to the server origin WITHOUT /api/v1 or a trailing slash. Leave credentials out of this file.\nAuthenticate separately through the existing login/CSRF/cookie flow (or your existing client); paste valid access\ntokens into adminToken and studentToken. ADMIN must be a trusted provisioned account; do not infer role from\nregistration. Requests use Bearer access tokens; refresh manually if expired. The first learner profile request\ncaptures studentUserId. All generated IDs are collection variables. Empty values must be captured before use.\nSelect actual local PNG/JPEG/WebP/GIF and MP3/WAV files in BOTH upload requests before running the workflow.\nDo not manually set multipart Content-Type: Postman adds its boundary. Image .jpeg, .png, .webp, .gif only,\n10 MiB; audio .mp3 audio/mpeg or .wav audio/wav (also x-wav/wave), 20 MiB. Attachment uses returned IDs.\nRun folders 00-06 in order once per new exam. Full question arrays replace answers; retained IDs survive.\nThe second attempt belongs to the same learner and remains in progress across unpublish and archive.\nArchive is SOFT DELETE, with no restore endpoint. The temporary session DELETE physically removes draft content.\nOptional negative checks at the end are read-only; they deliberately expect 401/403/400.\nNo real credentials/tokens, production provider calls, or database secrets are included."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "examId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgeSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "temporarySessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgePartId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingPartId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningPartId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "imageMediaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "audioMediaId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgeQuestionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingQuestionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningQuestionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgeCorrectAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingCorrectAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningCorrectAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "retainedAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "removedAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "newWrongAnswerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attemptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "progressAttemptId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgeAttemptSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingAttemptSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningAttemptSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "knowledgeProgressSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "readingProgressSessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "listeningProgressSessionId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "00 - Authentication and manual media selection",
+      "item": [
+        {
+          "name": "Read ADMIN profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/auth/myProfile",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read learner profile and capture studentUserId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/auth/myProfile",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('studentUserId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "SELECT LOCAL FILE - upload images",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/upload/images",
+            "description": "MANUAL: select a valid local file in Body > form-data > file. Uses the configured remote upload provider; run only against a disposable test environment. Upload is separate from the database transaction that attaches media to an exam.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('imageMediaId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "SELECT LOCAL FILE - upload audios",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/upload/audios",
+            "description": "MANUAL: select a valid local file in Body > form-data > file. Uses the configured remote upload provider; run only against a disposable test environment. Upload is separate from the database transaction that attaches media to an exam.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('audioMediaId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "01 - Create draft and hierarchy (MUTATES DATA)",
+      "item": [
+        {
+          "name": "Create DRAFT exam",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"N3\",\n  \"title\": \"Postman JLPT handoff\",\n  \"description\": \"日本語\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('examId', String(data.id));",
+                  "pm.test('Draft', () => pm.expect(data.status).to.eql('DRAFT'));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read empty-exam validation issues",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/validation",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Incomplete draft', () => pm.expect(data.canPublish).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject incomplete publication (no state change)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/publish",
+            "description": "Changes disposable data."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(400));",
+                  "pm.test('Located issues', () => pm.expect(envelope.issues[0].path).to.eql('sessions'));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Update exam metadata",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"N3\",\n  \"title\": \"Postman JLPT handoff\",\n  \"description\": \"Frontend handoff 日本語\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create knowledge session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Knowledge\",\n  \"sessionType\": \"language_knowledge\",\n  \"timeLimitMinutes\": 10,\n  \"sortOrder\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('knowledgeSessionId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create knowledge part",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{knowledgeSessionId}}/parts",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Knowledge part\",\n  \"instructions\": \"Choose an answer\",\n  \"sortOrder\": 0,\n  \"audioMediaId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('knowledgePartId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Aggregate create knowledge question and answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{knowledgeSessionId}}/parts/{{knowledgePartId}}/questions/with-answers",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"<strong>問題 日本語</strong>\",\n  \"passageText\": \"文章\",\n  \"questionType\": \"single_choice\",\n  \"explanation\": \"Explanation 日本語\",\n  \"points\": 40,\n  \"sortOrder\": 0,\n  \"imageMediaId\": null,\n  \"answers\": [\n    {\n      \"answerText\": \"正解\",\n      \"isCorrect\": true\n    },\n    {\n      \"answerText\": \"不正解\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('knowledgeQuestionId', String(data.id));",
+                  "pm.collectionVariables.set('knowledgeCorrectAnswerId', String(data.answers.find(a => a.isCorrect).id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create reading session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Reading\",\n  \"sessionType\": \"reading\",\n  \"timeLimitMinutes\": 20,\n  \"sortOrder\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('readingSessionId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create reading part",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Reading part\",\n  \"instructions\": \"Choose an answer\",\n  \"sortOrder\": 0,\n  \"audioMediaId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('readingPartId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Aggregate create reading question and answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/with-answers",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"<strong>問題 日本語</strong>\",\n  \"passageText\": \"文章\",\n  \"questionType\": \"single_choice\",\n  \"explanation\": \"Explanation 日本語\",\n  \"points\": 40,\n  \"sortOrder\": 0,\n  \"imageMediaId\": {{imageMediaId}},\n  \"answers\": [\n    {\n      \"answerText\": \"正解\",\n      \"isCorrect\": true\n    },\n    {\n      \"answerText\": \"不正解\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('readingQuestionId', String(data.id));",
+                  "pm.collectionVariables.set('readingCorrectAnswerId', String(data.answers.find(a => a.isCorrect).id));",
+                  "pm.collectionVariables.set('retainedAnswerId', String(data.answers[0].id));",
+                  "pm.collectionVariables.set('removedAnswerId', String(data.answers[1].id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create listening session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Listening\",\n  \"sessionType\": \"listening\",\n  \"timeLimitMinutes\": 30,\n  \"sortOrder\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('listeningSessionId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create listening part with AUDIO",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{listeningSessionId}}/parts",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Listening part\",\n  \"instructions\": \"Choose an answer\",\n  \"sortOrder\": 0,\n  \"audioMediaId\": {{audioMediaId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('listeningPartId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Aggregate create listening question and answers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{listeningSessionId}}/parts/{{listeningPartId}}/questions/with-answers",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"<strong>問題 日本語</strong>\",\n  \"passageText\": \"文章\",\n  \"questionType\": \"single_choice\",\n  \"explanation\": \"Explanation 日本語\",\n  \"points\": 40,\n  \"sortOrder\": 0,\n  \"imageMediaId\": null,\n  \"answers\": [\n    {\n      \"answerText\": \"正解\",\n      \"isCorrect\": true\n    },\n    {\n      \"answerText\": \"不正解\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('listeningQuestionId', String(data.id));",
+                  "pm.collectionVariables.set('listeningCorrectAnswerId', String(data.answers.find(a => a.isCorrect).id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Create temporary empty session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Temporary\",\n  \"sessionType\": \"reading\",\n  \"timeLimitMinutes\": 5,\n  \"sortOrder\": 3\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(201));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('temporarySessionId', String(data.id));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[DELETE DRAFT CONTENT - DESTRUCTIVE] Remove temporary session",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{temporarySessionId}}",
+            "description": "Physically deletes this draft session and any descendants. Never use with unrelated IDs."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Aggregate replacement and ordering (MUTATES DATA)",
+      "item": [
+        {
+          "name": "Save Question - retain ID, delete omitted answer, add two",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/{{readingQuestionId}}/with-answers",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"<strong>問題 日本語</strong>\",\n  \"passageText\": \"文章\",\n  \"questionType\": \"single_choice\",\n  \"explanation\": \"Explanation 日本語\",\n  \"points\": 40,\n  \"sortOrder\": 0,\n  \"imageMediaId\": {{imageMediaId}},\n  \"answers\": [\n    {\n      \"id\": {{retainedAnswerId}},\n      \"answerText\": \"Retained 日本語\",\n      \"isCorrect\": false\n    },\n    {\n      \"answerText\": \"New correct\",\n      \"isCorrect\": true\n    },\n    {\n      \"answerText\": \"New wrong\",\n      \"isCorrect\": false\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('readingCorrectAnswerId', String(data.answers[1].id));",
+                  "pm.collectionVariables.set('newWrongAnswerId', String(data.answers[2].id));",
+                  "pm.test('Retained ID', () => pm.expect(String(data.answers[0].id)).to.eql(pm.collectionVariables.get('retainedAnswerId')));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reorder all answers (array index is sortOrder)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/{{readingQuestionId}}/answers/reorder",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {{newWrongAnswerId}},\n    {{readingCorrectAnswerId}},\n    {{retainedAnswerId}}\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reorder all sessions",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/reorder",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {{listeningSessionId}},\n    {{readingSessionId}},\n    {{knowledgeSessionId}}\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reorder single part (idempotent)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/reorder",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {{readingPartId}}\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reorder single question (idempotent)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/reorder",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {{readingQuestionId}}\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Legacy single-question sort-order remains compatible",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/{{readingQuestionId}}/sort-order",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sortOrder\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Reject incomplete sibling list",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/reorder",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ids\": [\n    {{readingSessionId}}\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(400));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read retained question with ordered answers and image",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}/parts/{{readingPartId}}/questions/{{readingQuestionId}}",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Verify and publish (PUBLISH MUTATES STATE)",
+      "item": [
+        {
+          "name": "List - pagination, search, level, status, deterministic sort",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams?search=Postman%20JLPT%20handoff&level=N3&status=DRAFT&page=0&size=12&sortKey=title&sortType=ASC",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Stats - ignores selected status and pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/stats?search=Postman%20JLPT%20handoff&level=N3&status=ARCHIVED&page=99&size=1",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Buckets partition total', () => pm.expect(data.totalExams).to.eql(data.draftExams + data.publishedExams + data.archivedExams));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Detail - hierarchy counts, duration, passing score",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Derived fields', () => { pm.expect(data.sessionCount).to.eql(3); pm.expect(data.partCount).to.eql(3); pm.expect(data.questionCount).to.eql(3); pm.expect(data.totalTimeMinutes).to.eql(60); pm.expect(data.passingScore).to.eql(95); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Readiness - ready without mutation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/validation",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Ready', () => { pm.expect(data.canPublish).to.eql(true); pm.expect(data.issues).to.eql([]); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Publish latest persisted structure",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/publish",
+            "description": "Changes disposable data."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Published', () => pm.expect(data.status).to.eql('PUBLISHED'));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Learner completed attempt (MUTATES LEARNER DATA)",
+      "item": [
+        {
+          "name": "Learner published catalog",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams?search=Postman%20JLPT%20handoff&page=0&size=12",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Learner detail - no correctness or explanations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/detail",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Learner session",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/sessions/{{readingSessionId}}",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Start full attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/attempts",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{studentUserId}},\n  \"mode\": \"full\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('attemptId', String(data.attemptId));",
+                  "pm.collectionVariables.set('knowledgeAttemptSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('knowledgeSessionId')).attemptSessionId));",
+                  "pm.collectionVariables.set('readingAttemptSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('readingSessionId')).attemptSessionId));",
+                  "pm.collectionVariables.set('listeningAttemptSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('listeningSessionId')).attemptSessionId));",
+                  "pm.test('No solutions in start', () => pm.expect(JSON.stringify(data)).not.to.match(/isCorrect|correctAnswerId|explanation/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Review before completion is rejected",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/review",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(400));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save knowledge answer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/sessions/{{knowledgeAttemptSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{knowledgeQuestionId}},\n  \"answerId\": {{knowledgeCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save reading answer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/sessions/{{readingAttemptSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{readingQuestionId}},\n  \"answerId\": {{readingCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save listening answer",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/sessions/{{listeningAttemptSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{listeningQuestionId}},\n  \"answerId\": {{listeningCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Submit full attempt",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/submit",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Unchanged point scoring', () => pm.expect(data.totalScore).to.eql(120));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Completed result",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/result",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Existing N3 thresholds', () => { pm.expect(data.overallPassScore).to.eql(95); pm.expect(data.isPassed).to.eql(true); });"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Completed owner review",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/review",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Start separate in-progress full attempt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/attempts",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{studentUserId}},\n  \"mode\": \"full\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.collectionVariables.set('progressAttemptId', String(data.attemptId));",
+                  "pm.collectionVariables.set('knowledgeProgressSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('knowledgeSessionId')).attemptSessionId));",
+                  "pm.collectionVariables.set('readingProgressSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('readingSessionId')).attemptSessionId));",
+                  "pm.collectionVariables.set('listeningProgressSessionId', String(data.sessions.find(s => String(s.sessionId) === pm.collectionVariables.get('listeningSessionId')).attemptSessionId));",
+                  "pm.test('No solutions in start', () => pm.expect(JSON.stringify(data)).not.to.match(/isCorrect|correctAnswerId|explanation/));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Unpublish, lock content, SOFT ARCHIVE (MUTATES STATE)",
+      "item": [
+        {
+          "name": "Unpublish - attempts are preserved",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/unpublish",
+            "description": "Changes disposable data."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Attempted exam remains content locked",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}",
+            "description": "Changes disposable data.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"level\": \"N3\",\n  \"title\": \"Must not be saved\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 409', () => pm.response.to.have.status(409));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(409));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "New attempt blocked after unpublish",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/attempts",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{studentUserId}},\n  \"mode\": \"full\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 404', () => pm.response.to.have.status(404));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(404));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save knowledge for in-progress attempt",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{progressAttemptId}}/sessions/{{knowledgeProgressSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{knowledgeQuestionId}},\n  \"answerId\": {{knowledgeCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save reading for in-progress attempt",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{progressAttemptId}}/sessions/{{readingProgressSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{readingQuestionId}},\n  \"answerId\": {{readingCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "[SOFT ARCHIVE - MUTATES DATA, NO RESTORE] Archive exam",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}",
+            "description": "Sets deletedAt/isDeleted and unpublishes. Preserves hierarchy, referenced media and attempts. No API restore; run only against the newly generated disposable examId."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 204', () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "New attempt blocked after archive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/{{examId}}/attempts",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{studentUserId}},\n  \"mode\": \"full\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 404', () => pm.response.to.have.status(404));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(404));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Save listening for in-progress attempt",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{progressAttemptId}}/sessions/{{listeningProgressSessionId}}/answers",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionId\": {{listeningQuestionId}},\n  \"answerId\": {{listeningCorrectAnswerId}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Submit existing in-progress attempt after archive",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{progressAttemptId}}/submit",
+            "description": "Changes disposable data.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read archived admin detail",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Read archived list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams?status=ARCHIVED&search=Postman%20JLPT%20handoff",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Historical access and read-only negative checks",
+      "item": [
+        {
+          "name": "Historical result after archive",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/result",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Historical review after archive",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/{{attemptId}}/review",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Learner history after archive",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/jlpt-exams/attempts/history?page=0&size=12",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Admin archived readiness - lifecycle issue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/{{examId}}/validation",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing success wrapper', () => pm.expect(envelope.statusCode).to.eql(200));",
+                  "const data = envelope.data;",
+                  "pm.test('Archived cannot publish', () => pm.expect(data.canPublish).to.eql(false));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Anonymous admin stats is 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/stats",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401', () => pm.response.to.have.status(401));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(401));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Learner admin stats is 403",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams/stats",
+            "description": "Read-only request.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{studentToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 403', () => pm.response.to.have.status(403));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(403));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Invalid admin pagination is 400",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/admin/jlpt-exams?size=0",
+            "description": "Read-only request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+                  "const envelope = pm.response.json();",
+                  "pm.test('Existing error wrapper', () => pm.expect(envelope.status).to.eql(400));"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}

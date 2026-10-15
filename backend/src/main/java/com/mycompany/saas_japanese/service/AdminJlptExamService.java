@@ -1,20 +1,30 @@
 package com.mycompany.saas_japanese.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import com.mycompany.saas_japanese.domain.query.AdminJlptExamQuery;
+import com.mycompany.saas_japanese.domain.query.AdminJlptExamStatsQuery;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptAnswer;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptExam;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptPart;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptQuestion;
+import com.mycompany.saas_japanese.domain.request.ReqSaveAdminJlptQuestion;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptSession;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamDetailResponse;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamSummaryResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamStatsResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamValidationResponse;
 
 public interface AdminJlptExamService {
   Page<AdminJlptExamSummaryResponse> findAll(AdminJlptExamQuery query);
 
+  AdminJlptExamStatsResponse statistics(AdminJlptExamStatsQuery query);
+
   AdminJlptExamDetailResponse findById(Long examId);
+
+  AdminJlptExamValidationResponse validate(Long examId);
 
   AdminJlptExamDetailResponse create(ReqAdminJlptExam request);
 
@@ -57,6 +67,12 @@ public interface AdminJlptExamService {
   AdminJlptExamDetailResponse.QuestionResponse createQuestion(
       Long examId, Long sessionId, Long partId, ReqAdminJlptQuestion request);
 
+  AdminJlptExamDetailResponse.QuestionResponse createQuestionWithAnswers(
+      Long examId, Long sessionId, Long partId, ReqSaveAdminJlptQuestion request);
+
+  AdminJlptExamDetailResponse.QuestionResponse updateQuestionWithAnswers(
+      Long examId, Long sessionId, Long partId, Long questionId, ReqSaveAdminJlptQuestion request);
+
   AdminJlptExamDetailResponse.QuestionResponse updateQuestion(
       Long examId, Long sessionId, Long partId, Long questionId, ReqAdminJlptQuestion request);
 
@@ -80,4 +96,14 @@ public interface AdminJlptExamService {
       Integer sortOrder);
 
   void deleteAnswer(Long examId, Long sessionId, Long partId, Long questionId, Long answerId);
+
+  List<AdminJlptExamDetailResponse.SessionResponse> reorderSessions(Long examId, List<Long> ids);
+
+  List<AdminJlptExamDetailResponse.PartResponse> reorderParts(Long examId, Long sessionId, List<Long> ids);
+
+  List<AdminJlptExamDetailResponse.QuestionResponse> reorderQuestions(
+      Long examId, Long sessionId, Long partId, List<Long> ids);
+
+  List<AdminJlptExamDetailResponse.AnswerResponse> reorderAnswers(
+      Long examId, Long sessionId, Long partId, Long questionId, List<Long> ids);
 }

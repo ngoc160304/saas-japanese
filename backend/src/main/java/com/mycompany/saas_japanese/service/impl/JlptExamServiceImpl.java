@@ -204,23 +204,24 @@ public class JlptExamServiceImpl implements JlptExamService {
                 String mode = request.getMode();
 
                 if (!"full".equals(mode) && !"session".equals(mode)) {
-                        throw new IllegalArgumentException(
+                        throw new BadRequestException(
                                         "Mode must be 'full' or 'session'");
                 }
 
                 if ("session".equals(mode)
                                 && request.getSessionId() == null) {
-                        throw new IllegalArgumentException(
+                        throw new BadRequestException(
                                         "sessionId is required when mode = session");
                 }
 
                 if ("full".equals(mode)
                                 && request.getSessionId() != null) {
-                        throw new IllegalArgumentException(
+                        throw new BadRequestException(
                                         "sessionId must be null when mode = full");
                 }
 
-                JlptExam exam = jlptExamRepository.findByIdAndIsDeletedFalse(examId)
+                // Serialize attempt creation with admin lifecycle/content writes on the same exam.
+                JlptExam exam = jlptExamRepository.findActiveForUpdate(examId)
                                 .orElseThrow(() -> new NotFoundException("JLPT exam not found"));
                 requirePublished(exam);
 
@@ -240,11 +241,11 @@ public class JlptExamServiceImpl implements JlptExamService {
 
                         JlptExamSession session = jlptExamSessionRepository
                                         .findById(request.getSessionId())
-                                        .orElseThrow(() -> new RuntimeException(
+                                        .orElseThrow(() -> new NotFoundException(
                                                         "JLPT exam session not found"));
 
                         if (!session.getJlptExam().getId().equals(examId)) {
-                                throw new IllegalArgumentException(
+                                throw new BadRequestException(
                                                 "Session does not belong to this exam");
                         }
 
@@ -252,7 +253,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                 }
 
                 if (sessions.isEmpty()) {
-                        throw new RuntimeException(
+                        throw new BadRequestException(
                                         "This exam has no sessions");
                 }
 
@@ -572,6 +573,10 @@ public class JlptExamServiceImpl implements JlptExamService {
                 }
 
                 attempt.setTotalScore(attemptScore);
+                JlptScoringRule scoringRule = JlptScoringRule.forLevel(attempt.getJlptExam().getJlptLevel());
+                attempt.setIsPassed(FULL_ATTEMPT_MODE.equals(determineAttemptMode(attemptSessions))
+                                && passesFullExam(attemptScore, scoringRule, scoringRule.getScoringSections().stream()
+                                                .map(rule -> toScoringSectionResult(rule, attemptSessions)).toList()));
                 attempt.setStatus(JlptAttemptStatusEnum.COMPLETED);
                 attempt.setFinishedAt(finishedAt);
                 attempt.setDurationSeconds(calculateDurationSeconds(attempt.getStartedAt(), finishedAt));
@@ -645,10 +650,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .sum();
                 Boolean isPassed = null;
                 if (isFullAttempt) {
-                        isPassed = attempt.getTotalScore().compareTo(scoringRule.getOverallPassScore()) >= 0
-                                        && scoringSectionResults.stream()
-                                                        .allMatch(section -> Boolean.TRUE.equals(
-                                                                        section.getIsPassed()));
+                        isPassed = passesFullExam(attempt.getTotalScore(), scoringRule, scoringSectionResults);
                 }
 
                 return JlptAttemptResultResponse.builder()
@@ -851,6 +853,12 @@ public class JlptExamServiceImpl implements JlptExamService {
                 UserJlptAttemptSession practicedSession = SESSION_ATTEMPT_MODE.equals(mode)
                                 ? attemptSessions.get(0)
                                 : null;
+                Boolean isPassed = null;
+                if (isFullAttempt && attempt.getStatus() == JlptAttemptStatusEnum.COMPLETED) {
+                        JlptScoringRule rule = JlptScoringRule.forLevel(attempt.getJlptExam().getJlptLevel());
+                        isPassed = passesFullExam(attempt.getTotalScore(), rule, rule.getScoringSections().stream()
+                                        .map(section -> toScoringSectionResult(section, attemptSessions)).toList());
+                }
                 BigDecimal maxScore = attemptSessions.stream()
                                 .map(UserJlptAttemptSession::getMaxScore)
                                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -872,10 +880,7 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .maxScore(maxScore)
                                 .correctCount(correctCount)
                                 .totalQuestions(totalQuestions)
-                                .isPassed(isFullAttempt
-                                                && attempt.getStatus() == JlptAttemptStatusEnum.COMPLETED
-                                                                ? attempt.getIsPassed()
-                                                                : null)
+                                .isPassed(isPassed)
                                 .startedAt(attempt.getStartedAt())
                                 .finishedAt(attempt.getFinishedAt())
                                 .durationSeconds(attempt.getDurationSeconds())
@@ -947,6 +952,12 @@ public class JlptExamServiceImpl implements JlptExamService {
                                 .durationSeconds(attemptSession.getDurationSeconds())
                                 .parts(parts)
                                 .build();
+        }
+
+        private boolean passesFullExam(BigDecimal score, JlptScoringRule rule,
+                        List<JlptAttemptResultResponse.ScoringSectionResult> sections) {
+                return score.compareTo(rule.getOverallPassScore()) >= 0
+                                && sections.stream().allMatch(section -> Boolean.TRUE.equals(section.getIsPassed()));
         }
 
         private JlptAttemptResultResponse.ScoringSectionResult toScoringSectionResult(

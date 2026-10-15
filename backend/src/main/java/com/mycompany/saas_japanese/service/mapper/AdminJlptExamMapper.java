@@ -13,18 +13,26 @@ import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamDetailResponse;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamSummaryResponse;
 import com.mycompany.saas_japanese.util.constant.AdminJlptExamStatus;
+import com.mycompany.saas_japanese.util.constant.JlptScoringRule;
 
 @Component
 public class AdminJlptExamMapper {
-  public AdminJlptExamSummaryResponse toSummary(JlptExam exam, boolean hasAttempts) {
+  public AdminJlptExamSummaryResponse toSummary(
+      JlptExam exam, boolean hasAttempts, long sessionCount, long partCount,
+      long questionCount, int totalTimeMinutes) {
     return AdminJlptExamSummaryResponse.builder()
         .id(exam.getId())
         .level(exam.getJlptLevel())
         .title(exam.getTitle())
         .description(exam.getDescription())
-        .totalTimeMinutes(exam.getTotalTimeMinutes())
+        .totalTimeMinutes(totalTimeMinutes)
         .status(statusOf(exam))
         .hasAttempts(hasAttempts)
+        .contentLocked(contentLocked(exam, hasAttempts))
+        .sessionCount(sessionCount)
+        .partCount(partCount)
+        .questionCount(questionCount)
+        .passingScore(JlptScoringRule.forLevel(exam.getJlptLevel()).getOverallPassScore())
         .createdAt(exam.getCreatedAt())
         .updatedAt(exam.getUpdatedAt())
         .build();
@@ -39,11 +47,16 @@ public class AdminJlptExamMapper {
         .level(exam.getJlptLevel())
         .title(exam.getTitle())
         .description(exam.getDescription())
-        .totalTimeMinutes(exam.getTotalTimeMinutes())
+        .totalTimeMinutes(sessions.stream().mapToInt(
+            AdminJlptExamDetailResponse.SessionResponse::getTimeLimitMinutes).sum())
         .status(statusOf(exam))
         .hasAttempts(hasAttempts)
-        .contentLocked(hasAttempts || Boolean.TRUE.equals(exam.getIsPublished())
-            || Boolean.TRUE.equals(exam.getIsDeleted()))
+        .contentLocked(contentLocked(exam, hasAttempts))
+        .sessionCount(sessions.size())
+        .partCount(sessions.stream().mapToLong(session -> session.getParts().size()).sum())
+        .questionCount(sessions.stream().flatMap(session -> session.getParts().stream())
+            .mapToLong(part -> part.getQuestions().size()).sum())
+        .passingScore(JlptScoringRule.forLevel(exam.getJlptLevel()).getOverallPassScore())
         .createdAt(exam.getCreatedAt())
         .updatedAt(exam.getUpdatedAt())
         .sessions(sessions)
@@ -113,6 +126,11 @@ public class AdminJlptExamMapper {
         .secureUrl(media.getSecureUrl())
         .fileType(media.getFileType())
         .build();
+  }
+
+  private boolean contentLocked(JlptExam exam, boolean hasAttempts) {
+    return hasAttempts || Boolean.TRUE.equals(exam.getIsPublished())
+        || Boolean.TRUE.equals(exam.getIsDeleted());
   }
 
   private AdminJlptExamStatus statusOf(JlptExam exam) {

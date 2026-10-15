@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.response.MediaResponse;
 import com.mycompany.saas_japanese.service.UploadService;
+import com.mycompany.saas_japanese.util.anotation.ApiMessage;
 
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,18 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/upload")
 public class UploadController {
   private final UploadService uploadService;
+
+  @PostMapping(value = "/audios", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @ApiMessage("Upload audio")
+  public ResponseEntity<MediaResponse> uploadAudio(@RequestParam("file") MultipartFile file) {
+    Media result = uploadService.uploadAudio(file);
+    MediaResponse response = new MediaResponse();
+    response.setId(result.getId());
+    response.setOriginalName(result.getOriginalName());
+    response.setPublicId(result.getPublicId());
+    response.setSecureUrl(result.getSecureUrl());
+    return ResponseEntity.ok(response);
+  }
 
   @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<?> uploadImage(

@@ -39,5 +39,6 @@ out/
 /src/main/resources/certs
 .env
 **/**.md
+!docs/admin-jlpt-exams-api.md
 
 AUTHENTICAtiON.txt

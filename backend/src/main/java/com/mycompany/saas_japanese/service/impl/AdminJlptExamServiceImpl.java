@@ -1,6 +1,7 @@
 package com.mycompany.saas_japanese.service.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Isolation;
 
 import com.mycompany.saas_japanese.domain.JlptExam;
 import com.mycompany.saas_japanese.domain.JlptExamAnswer;
@@ -26,30 +28,43 @@ import com.mycompany.saas_japanese.domain.JlptExamQuestion;
 import com.mycompany.saas_japanese.domain.JlptExamSession;
 import com.mycompany.saas_japanese.domain.Media;
 import com.mycompany.saas_japanese.domain.query.AdminJlptExamQuery;
+import com.mycompany.saas_japanese.domain.query.AdminJlptExamStatsQuery;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptAnswer;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptExam;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptPart;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptQuestion;
+import com.mycompany.saas_japanese.domain.request.ReqSaveAdminJlptQuestion;
+import com.mycompany.saas_japanese.domain.request.ReqSaveAdminJlptQuestion.AnswerInput;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptSession;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamDetailResponse;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamSummaryResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamStatsResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamValidationResponse;
 import com.mycompany.saas_japanese.repository.JlptExamAnswerRepository;
 import com.mycompany.saas_japanese.repository.JlptExamPartRepository;
 import com.mycompany.saas_japanese.repository.JlptExamQuestionRepository;
 import com.mycompany.saas_japanese.repository.JlptExamRepository;
 import com.mycompany.saas_japanese.repository.JlptExamSessionRepository;
+import com.mycompany.saas_japanese.repository.JlptExamSessionStatistics;
+import com.mycompany.saas_japanese.repository.JlptExamContentCounts;
 import com.mycompany.saas_japanese.repository.MediaRepository;
+import com.mycompany.saas_japanese.repository.CourseRepository;
+import com.mycompany.saas_japanese.repository.CourseCategoryRepository;
+import com.mycompany.saas_japanese.repository.LessonRepository;
 import com.mycompany.saas_japanese.repository.UserJlptAttemptRepository;
 import com.mycompany.saas_japanese.service.AdminJlptExamService;
 import com.mycompany.saas_japanese.service.mapper.AdminJlptExamMapper;
 import com.mycompany.saas_japanese.specification.JlptExamSpecs;
 import com.mycompany.saas_japanese.util.constant.FileTypeEnum;
+import com.mycompany.saas_japanese.util.GrammarHtmlSanitizer;
 import com.mycompany.saas_japanese.util.constant.JlptQuestionEnum;
 import com.mycompany.saas_japanese.util.error.BadRequestException;
 import com.mycompany.saas_japanese.util.error.ConflictException;
 import com.mycompany.saas_japanese.util.error.NotFoundException;
+import com.mycompany.saas_japanese.util.error.JlptPublishValidationException;
 
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
 
 @Service
 @RequiredArgsConstructor
@@ -62,6 +77,11 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   private final UserJlptAttemptRepository attemptRepository;
   private final MediaRepository mediaRepository;
   private final AdminJlptExamMapper mapper;
+  private final CourseRepository courseRepository;
+  private final CourseCategoryRepository categoryRepository;
+  private final LessonRepository lessonRepository;
+  private final GrammarHtmlSanitizer htmlSanitizer;
+  private final JlptExamPublishValidator publishValidator;
 
   @Override
   @Transactional(readOnly = true)
@@ -77,7 +97,27 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     Set<Long> attemptedExamIds = examIds.isEmpty()
         ? Collections.emptySet()
         : attemptRepository.findAttemptedExamIds(examIds);
-    return exams.map(exam -> mapper.toSummary(exam, attemptedExamIds.contains(exam.getId())));
+    Map<Long, JlptExamSessionStatistics> sessionStatistics = examIds.isEmpty() ? Map.of()
+        : sessionRepository.summarizeByExamIds(examIds).stream()
+            .collect(Collectors.toMap(JlptExamSessionStatistics::getExamId, Function.identity()));
+    Map<Long, JlptExamContentCounts> contentCounts = examIds.isEmpty() ? Map.of()
+        : partRepository.countContentByExamIds(examIds).stream()
+            .collect(Collectors.toMap(JlptExamContentCounts::getExamId, Function.identity()));
+    return exams.map(exam -> {
+      JlptExamSessionStatistics session = sessionStatistics.get(exam.getId());
+      JlptExamContentCounts content = contentCounts.get(exam.getId());
+      return mapper.toSummary(exam, attemptedExamIds.contains(exam.getId()),
+          session == null ? 0 : session.getSessionCount(),
+          content == null ? 0 : content.getPartCount(),
+          content == null ? 0 : content.getQuestionCount(),
+          session == null ? 0 : Math.toIntExact(session.getTotalTimeMinutes()));
+    });
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public AdminJlptExamStatsResponse statistics(AdminJlptExamStatsQuery query) {
+    return examRepository.summarizeAdminExams(trimToNull(query.getSearch()), query.getLevel());
   }
 
   @Override
@@ -88,7 +128,13 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+  public AdminJlptExamValidationResponse validate(Long examId) {
+    return publishValidator.validate(requireExam(examId));
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse create(ReqAdminJlptExam request) {
     JlptExam exam = JlptExam.builder()
         .jlptLevel(request.getLevel())
@@ -102,7 +148,7 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse update(Long examId, ReqAdminJlptExam request) {
     JlptExam exam = requireEditableExam(examId);
     exam.setJlptLevel(request.getLevel());
@@ -112,16 +158,20 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse publish(Long examId) {
     JlptExam exam = requireActiveExam(examId);
-    validatePublishable(exam);
+    AdminJlptExamValidationResponse validation = publishValidator.validate(exam);
+    if (!validation.canPublish()) {
+      throw new JlptPublishValidationException(validation.issues());
+    }
+    exam.setTotalTimeMinutes(Math.toIntExact(validation.totalTimeMinutes()));
     exam.setIsPublished(true);
     return mapDetail(examRepository.save(exam));
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse unpublish(Long examId) {
     JlptExam exam = requireActiveExam(examId);
     exam.setIsPublished(false);
@@ -129,7 +179,7 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void delete(Long examId) {
     JlptExam exam = requireActiveExam(examId);
     exam.setIsPublished(false);
@@ -146,10 +196,11 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.SessionResponse createSession(
       Long examId, ReqAdminJlptSession request) {
     JlptExam exam = requireEditableExam(examId);
+    List<JlptExamSession> siblings = sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(examId);
     JlptExamSession session = JlptExamSession.builder()
         .jlptExam(exam)
         .name(request.getName().trim())
@@ -157,13 +208,14 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
         .timeLimitMinutes(request.getTimeLimitMinutes())
         .sortOrder(request.getSortOrder())
         .build();
+    JlptSiblingOrder.insert(siblings, session, request.getSortOrder(), JlptExamSession::setSortOrder);
     session = sessionRepository.save(session);
     recalculateTotalTime(exam);
     return findSession(examId, session.getId());
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.SessionResponse updateSession(
       Long examId, Long sessionId, ReqAdminJlptSession request) {
     JlptExam exam = requireEditableExam(examId);
@@ -171,31 +223,40 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     session.setName(request.getName().trim());
     session.setSessionType(request.getSessionType());
     session.setTimeLimitMinutes(request.getTimeLimitMinutes());
-    session.setSortOrder(request.getSortOrder());
+    JlptSiblingOrder.move(sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(examId),
+        session, request.getSortOrder(), JlptExamSession::setSortOrder);
     sessionRepository.save(session);
     recalculateTotalTime(exam);
     return findSession(examId, sessionId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.SessionResponse updateSessionSortOrder(
       Long examId, Long sessionId, Integer sortOrder) {
     requireEditableExam(examId);
     JlptExamSession session = requireSession(examId, sessionId);
-    session.setSortOrder(sortOrder);
+    JlptSiblingOrder.move(sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(examId),
+        session, sortOrder, JlptExamSession::setSortOrder);
     sessionRepository.save(session);
     return findSession(examId, sessionId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void deleteSession(Long examId, Long sessionId) {
     JlptExam exam = requireEditableExam(examId);
     JlptExamSession session = requireSession(examId, sessionId);
-    releaseMediaForSession(sessionId);
+    List<JlptExamPart> parts = partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId);
+    List<JlptExamQuestion> questions = questionsForParts(parts);
+    Set<Long> mediaIds = referencedMedia(parts, questions);
+    lockMedia(mediaIds);
+    deleteAnswers(questions);
     sessionRepository.delete(session);
     sessionRepository.flush();
+    releaseMedia(mediaIds);
+    JlptSiblingOrder.assign(sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(examId),
+        JlptExamSession::setSortOrder);
     recalculateTotalTime(exam);
   }
 
@@ -208,11 +269,12 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.PartResponse createPart(
       Long examId, Long sessionId, ReqAdminJlptPart request) {
     requireEditableExam(examId);
     JlptExamSession session = requireSession(examId, sessionId);
+    List<JlptExamPart> siblings = partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId);
     Long audioMediaId = replaceMedia(null, request.getAudioMediaId(), FileTypeEnum.AUDIO);
     JlptExamPart part = JlptExamPart.builder()
         .jlptExamSession(session)
@@ -221,43 +283,55 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
         .sortOrder(request.getSortOrder())
         .audioMediaId(audioMediaId)
         .build();
+    JlptSiblingOrder.insert(siblings, part, request.getSortOrder(), JlptExamPart::setSortOrder);
     part = partRepository.save(part);
     return findPart(examId, sessionId, part.getId());
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.PartResponse updatePart(
       Long examId, Long sessionId, Long partId, ReqAdminJlptPart request) {
     requireEditableExam(examId);
     JlptExamPart part = requirePart(examId, sessionId, partId);
     part.setName(request.getName().trim());
     part.setInstructions(trimToNull(request.getInstructions()));
-    part.setSortOrder(request.getSortOrder());
+    JlptSiblingOrder.move(partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId),
+        part, request.getSortOrder(), JlptExamPart::setSortOrder);
+    Long oldMediaId = part.getAudioMediaId();
     part.setAudioMediaId(replaceMedia(
         part.getAudioMediaId(), request.getAudioMediaId(), FileTypeEnum.AUDIO));
-    partRepository.save(part);
+    partRepository.saveAndFlush(part);
+    releaseMedia(oldMediaId);
     return findPart(examId, sessionId, partId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.PartResponse updatePartSortOrder(
       Long examId, Long sessionId, Long partId, Integer sortOrder) {
     requireEditableExam(examId);
     JlptExamPart part = requirePart(examId, sessionId, partId);
-    part.setSortOrder(sortOrder);
+    JlptSiblingOrder.move(partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId),
+        part, sortOrder, JlptExamPart::setSortOrder);
     partRepository.save(part);
     return findPart(examId, sessionId, partId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void deletePart(Long examId, Long sessionId, Long partId) {
     requireEditableExam(examId);
     JlptExamPart part = requirePart(examId, sessionId, partId);
-    releaseMediaForPart(part);
+    List<JlptExamQuestion> questions = questionsForParts(List.of(part));
+    Set<Long> mediaIds = referencedMedia(List.of(part), questions);
+    lockMedia(mediaIds);
+    deleteAnswers(questions);
     partRepository.delete(part);
+    partRepository.flush();
+    releaseMedia(mediaIds);
+    JlptSiblingOrder.assign(partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId),
+        JlptExamPart::setSortOrder);
   }
 
   @Override
@@ -269,11 +343,12 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.QuestionResponse createQuestion(
       Long examId, Long sessionId, Long partId, ReqAdminJlptQuestion request) {
     requireEditableExam(examId);
     JlptExamPart part = requirePart(examId, sessionId, partId);
+    List<JlptExamQuestion> siblings = questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId);
     Long imageMediaId = replaceMedia(null, request.getImageMediaId(), FileTypeEnum.IMAGE);
     JlptExamQuestion question = JlptExamQuestion.builder()
         .jlptExamPart(part)
@@ -285,12 +360,13 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
         .sortOrder(request.getSortOrder())
         .imageMediaId(imageMediaId)
         .build();
+    JlptSiblingOrder.insert(siblings, question, request.getSortOrder(), JlptExamQuestion::setSortOrder);
     question = questionRepository.save(question);
     return findQuestion(examId, sessionId, partId, question.getId());
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.QuestionResponse updateQuestion(
       Long examId, Long sessionId, Long partId, Long questionId,
       ReqAdminJlptQuestion request) {
@@ -301,34 +377,40 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     question.setQuestionType(request.getQuestionType());
     question.setExplanation(trimToNull(request.getExplanation()));
     question.setPoints(request.getPoints());
-    question.setSortOrder(request.getSortOrder());
+    JlptSiblingOrder.move(questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId),
+        question, request.getSortOrder(), JlptExamQuestion::setSortOrder);
+    Long oldMediaId = question.getImageMediaId();
     question.setImageMediaId(replaceMedia(
         question.getImageMediaId(), request.getImageMediaId(), FileTypeEnum.IMAGE));
-    questionRepository.save(question);
+    questionRepository.saveAndFlush(question);
+    releaseMedia(oldMediaId);
     return findQuestion(examId, sessionId, partId, questionId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.QuestionResponse updateQuestionSortOrder(
       Long examId, Long sessionId, Long partId, Long questionId, Integer sortOrder) {
     requireEditableExam(examId);
     JlptExamQuestion question = requireQuestion(examId, sessionId, partId, questionId);
-    question.setSortOrder(sortOrder);
+    JlptSiblingOrder.move(questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId),
+        question, sortOrder, JlptExamQuestion::setSortOrder);
     questionRepository.save(question);
     return findQuestion(examId, sessionId, partId, questionId);
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void deleteQuestion(Long examId, Long sessionId, Long partId, Long questionId) {
     requireEditableExam(examId);
     JlptExamQuestion question = requireQuestion(examId, sessionId, partId, questionId);
-    releaseMedia(question.getImageMediaId());
-    answerRepository.deleteAll(
-        answerRepository.findByJlptExamQuestionIdOrderBySortOrderAsc(questionId));
-    answerRepository.flush();
+    lockMedia(referencedMedia(List.of(), List.of(question)));
+    deleteAnswers(List.of(question));
     questionRepository.delete(question);
+    questionRepository.flush();
+    releaseMedia(question.getImageMediaId());
+    JlptSiblingOrder.assign(questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId),
+        JlptExamQuestion::setSortOrder);
   }
 
   @Override
@@ -340,23 +422,25 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.AnswerResponse createAnswer(
       Long examId, Long sessionId, Long partId, Long questionId,
       ReqAdminJlptAnswer request) {
     requireEditableExam(examId);
     JlptExamQuestion question = requireQuestion(examId, sessionId, partId, questionId);
+    List<JlptExamAnswer> siblings = answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId);
     JlptExamAnswer answer = JlptExamAnswer.builder()
         .jlptExamQuestion(question)
         .answerText(request.getAnswerText().trim())
         .isCorrect(request.getIsCorrect())
         .sortOrder(request.getSortOrder())
         .build();
+    JlptSiblingOrder.insert(siblings, answer, request.getSortOrder(), JlptExamAnswer::setSortOrder);
     return mapper.toAnswer(answerRepository.save(answer));
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.AnswerResponse updateAnswer(
       Long examId, Long sessionId, Long partId, Long questionId, Long answerId,
       ReqAdminJlptAnswer request) {
@@ -364,31 +448,184 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     JlptExamAnswer answer = requireAnswer(examId, sessionId, partId, questionId, answerId);
     answer.setAnswerText(request.getAnswerText().trim());
     answer.setIsCorrect(request.getIsCorrect());
-    answer.setSortOrder(request.getSortOrder());
+    JlptSiblingOrder.move(answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId),
+        answer, request.getSortOrder(), JlptExamAnswer::setSortOrder);
     return mapper.toAnswer(answerRepository.save(answer));
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public AdminJlptExamDetailResponse.AnswerResponse updateAnswerSortOrder(
       Long examId, Long sessionId, Long partId, Long questionId, Long answerId,
       Integer sortOrder) {
     requireEditableExam(examId);
     JlptExamAnswer answer = requireAnswer(examId, sessionId, partId, questionId, answerId);
-    answer.setSortOrder(sortOrder);
+    JlptSiblingOrder.move(answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId),
+        answer, sortOrder, JlptExamAnswer::setSortOrder);
     return mapper.toAnswer(answerRepository.save(answer));
   }
 
   @Override
-  @Transactional
+  @Transactional(isolation = Isolation.READ_COMMITTED)
   public void deleteAnswer(
       Long examId, Long sessionId, Long partId, Long questionId, Long answerId) {
     requireEditableExam(examId);
     answerRepository.delete(requireAnswer(examId, sessionId, partId, questionId, answerId));
+    answerRepository.flush();
+    JlptSiblingOrder.assign(answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId),
+        JlptExamAnswer::setSortOrder);
   }
 
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public List<AdminJlptExamDetailResponse.SessionResponse> reorderSessions(Long examId, List<Long> ids) {
+    JlptExam exam = requireEditableExam(examId);
+    JlptSiblingOrder.reorder(sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(examId), ids,
+        JlptExamSession::getId, JlptExamSession::setSortOrder);
+    sessionRepository.flush();
+    return mapDetail(exam).getSessions();
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public List<AdminJlptExamDetailResponse.PartResponse> reorderParts(Long examId, Long sessionId, List<Long> ids) {
+    JlptExam exam = requireEditableExam(examId);
+    requireSession(examId, sessionId);
+    JlptSiblingOrder.reorder(partRepository.findByJlptExamSessionIdOrderBySortOrderAscIdAsc(sessionId), ids,
+        JlptExamPart::getId, JlptExamPart::setSortOrder);
+    partRepository.flush();
+    return sessionFromDetail(mapDetail(exam), sessionId).getParts();
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public List<AdminJlptExamDetailResponse.QuestionResponse> reorderQuestions(
+      Long examId, Long sessionId, Long partId, List<Long> ids) {
+    JlptExam exam = requireEditableExam(examId);
+    requirePart(examId, sessionId, partId);
+    JlptSiblingOrder.reorder(questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId), ids,
+        JlptExamQuestion::getId, JlptExamQuestion::setSortOrder);
+    questionRepository.flush();
+    return partFromDetail(mapDetail(exam), sessionId, partId).getQuestions();
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public List<AdminJlptExamDetailResponse.AnswerResponse> reorderAnswers(
+      Long examId, Long sessionId, Long partId, Long questionId, List<Long> ids) {
+    requireEditableExam(examId);
+    requireQuestion(examId, sessionId, partId, questionId);
+    JlptSiblingOrder.reorder(answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId), ids,
+        JlptExamAnswer::getId, JlptExamAnswer::setSortOrder);
+    answerRepository.flush();
+    return answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId).stream()
+        .map(mapper::toAnswer).toList();
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public AdminJlptExamDetailResponse.QuestionResponse createQuestionWithAnswers(
+      Long examId, Long sessionId, Long partId, ReqSaveAdminJlptQuestion request) {
+    return saveCompleteQuestion(examId, sessionId, partId, null, request);
+  }
+
+  @Override
+  @Transactional(isolation = Isolation.READ_COMMITTED)
+  public AdminJlptExamDetailResponse.QuestionResponse updateQuestionWithAnswers(
+      Long examId, Long sessionId, Long partId, Long questionId, ReqSaveAdminJlptQuestion request) {
+    return saveCompleteQuestion(examId, sessionId, partId, questionId, request);
+  }
+
+  private AdminJlptExamDetailResponse.QuestionResponse saveCompleteQuestion(
+      Long examId, Long sessionId, Long partId, Long questionId, ReqSaveAdminJlptQuestion request) {
+    requireEditableExam(examId);
+    JlptExamPart part = requirePart(examId, sessionId, partId);
+    JlptExamQuestion question = questionId == null ? JlptExamQuestion.builder().jlptExamPart(part).build()
+        : requireQuestion(examId, sessionId, partId, questionId);
+    List<JlptExamQuestion> siblings = questionRepository.findByJlptExamPartIdOrderBySortOrderAscIdAsc(partId);
+    List<JlptExamAnswer> current = questionId == null ? List.of()
+        : answerRepository.findByJlptExamQuestionIdOrderBySortOrderAscIdAsc(questionId);
+    Map<Long, JlptExamAnswer> byId = current.stream()
+        .collect(Collectors.toMap(JlptExamAnswer::getId, Function.identity()));
+    QuestionContent content = validateCompleteQuestion(request, byId);
+    JlptSiblingOrder.requirePosition(request.getSortOrder(), siblings.size() - (questionId == null ? 0 : 1));
+
+    // All body/ownership/membership/position checks precede media or entity mutations.
+    Long oldMediaId = question.getImageMediaId();
+    Long newMediaId = replaceMedia(oldMediaId, request.getImageMediaId(), FileTypeEnum.IMAGE);
+    question.setQuestionText(content.questionText());
+    question.setPassageText(content.passageText());
+    question.setExplanation(content.explanation());
+    question.setQuestionType(request.getQuestionType());
+    question.setPoints(request.getPoints());
+    question.setImageMediaId(newMediaId);
+    if (questionId == null) {
+      JlptSiblingOrder.insert(siblings, question, request.getSortOrder(), JlptExamQuestion::setSortOrder);
+    } else {
+      JlptSiblingOrder.move(siblings, question, request.getSortOrder(), JlptExamQuestion::setSortOrder);
+    }
+    questionRepository.save(question);
+
+    Set<Long> retained = content.answers().stream().map(AnswerInput::id).filter(Objects::nonNull)
+        .collect(Collectors.toSet());
+    answerRepository.deleteAll(current.stream().filter(answer -> !retained.contains(answer.getId())).toList());
+    List<JlptExamAnswer> saved = new ArrayList<>();
+    for (AnswerInput input : content.answers()) {
+      JlptExamAnswer answer = input.id() == null
+          ? JlptExamAnswer.builder().jlptExamQuestion(question).build() : byId.get(input.id());
+      answer.setAnswerText(input.answerText());
+      answer.setIsCorrect(input.isCorrect());
+      saved.add(answer);
+    }
+    JlptSiblingOrder.assign(saved, JlptExamAnswer::setSortOrder);
+    answerRepository.saveAll(saved);
+    answerRepository.flush();
+    releaseMedia(oldMediaId);
+    return findQuestion(examId, sessionId, partId, question.getId());
+  }
+
+  private QuestionContent validateCompleteQuestion(
+      ReqSaveAdminJlptQuestion request, Map<Long, JlptExamAnswer> current) {
+    List<AnswerInput> inputs = request.getAnswers();
+    if (request.getQuestionType() != JlptQuestionEnum.single_choice || inputs == null || inputs.size() < 2
+        || inputs.stream().anyMatch(Objects::isNull)
+        || inputs.stream().filter(answer -> Boolean.TRUE.equals(answer.isCorrect())).count() != 1) {
+      throw new BadRequestException(
+          "A single-choice question needs at least two answers and exactly one correct answer");
+    }
+    Set<Long> seen = new HashSet<>();
+    List<AnswerInput> normalized = new ArrayList<>();
+    for (int index = 0; index < inputs.size(); index++) {
+      AnswerInput input = inputs.get(index);
+      if (input.id() != null && (!seen.add(input.id()) || !current.containsKey(input.id()))) {
+        throw new BadRequestException("Answer IDs must be unique existing answers belonging to this question");
+      }
+      if (input.sortOrder() != null && input.sortOrder() != index) {
+        throw new BadRequestException("Answer sort order must match its zero-based array position");
+      }
+      normalized.add(new AnswerInput(input.id(), safeText(input.answerText(), 500, true), input.isCorrect(), index));
+    }
+    return new QuestionContent(safeText(request.getQuestionText(), 20000, true),
+        safeText(request.getPassageText(), 50000, false), safeText(request.getExplanation(), 20000, false),
+        normalized);
+  }
+
+  private String safeText(String value, int maximum, boolean required) {
+    String cleaned = htmlSanitizer.sanitize(value);
+    if (required && (cleaned == null || Jsoup.parse(cleaned).text().replace('\u00a0', ' ').isBlank())) {
+      throw new BadRequestException("Required question/answer text must contain visible text");
+    }
+    if (cleaned != null && cleaned.length() > maximum) {
+      throw new BadRequestException("Sanitized text must not exceed " + maximum + " characters");
+    }
+    return cleaned;
+  }
+
+  private record QuestionContent(
+      String questionText, String passageText, String explanation, List<AnswerInput> answers) { }
+
   private AdminJlptExamDetailResponse mapDetail(JlptExam exam) {
-    List<JlptExamSession> sessions = sessionRepository.findByJlptExam_IdOrderBySortOrderAsc(exam.getId());
+    List<JlptExamSession> sessions = sessionRepository.findByJlptExamIdOrderBySortOrderAscIdAsc(exam.getId());
     List<Long> sessionIds = sessions.stream().map(JlptExamSession::getId).toList();
     List<JlptExamPart> parts = sessionIds.isEmpty()
         ? List.of()
@@ -406,21 +643,22 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
         .collect(Collectors.groupingBy(answer -> answer.getJlptExamQuestion().getId()));
     Map<Long, Media> mediaById = loadMedia(parts, questions);
 
-    Map<Long, List<AdminJlptExamDetailResponse.QuestionResponse>> questionsByPart = questions.stream()
-        .map(question -> mapper.toQuestion(
-            question,
-            mediaById.get(question.getImageMediaId()),
-            answersByQuestion.getOrDefault(question.getId(), List.of()).stream()
-                .map(mapper::toAnswer)
-                .toList()))
-        .collect(Collectors.groupingBy(response -> requireQuestionPartId(questions, response.getId())));
+    Map<Long, List<AdminJlptExamDetailResponse.QuestionResponse>> questionsByPart = new HashMap<>();
+    for (JlptExamQuestion question : questions) {
+      questionsByPart.computeIfAbsent(question.getJlptExamPart().getId(), ignored -> new ArrayList<>())
+          .add(mapper.toQuestion(question,
+              question.getImageMediaId() == null ? null : mediaById.get(question.getImageMediaId()),
+              answersByQuestion.getOrDefault(question.getId(), List.of()).stream()
+                  .map(mapper::toAnswer).toList()));
+    }
 
-    Map<Long, List<AdminJlptExamDetailResponse.PartResponse>> partsBySession = parts.stream()
-        .map(part -> mapper.toPart(
-            part,
-            mediaById.get(part.getAudioMediaId()),
-            questionsByPart.getOrDefault(part.getId(), List.of())))
-        .collect(Collectors.groupingBy(response -> requirePartSessionId(parts, response.getId())));
+    Map<Long, List<AdminJlptExamDetailResponse.PartResponse>> partsBySession = new HashMap<>();
+    for (JlptExamPart part : parts) {
+      partsBySession.computeIfAbsent(part.getJlptExamSession().getId(), ignored -> new ArrayList<>())
+          .add(mapper.toPart(part,
+              part.getAudioMediaId() == null ? null : mediaById.get(part.getAudioMediaId()),
+              questionsByPart.getOrDefault(part.getId(), List.of())));
+    }
 
     List<AdminJlptExamDetailResponse.SessionResponse> sessionResponses = sessions.stream()
         .map(session -> mapper.toSession(
@@ -444,87 +682,15 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
         .collect(Collectors.toMap(Media::getId, Function.identity()));
   }
 
-  private Long requireQuestionPartId(List<JlptExamQuestion> questions, Long questionId) {
-    return questions.stream()
-        .filter(question -> Objects.equals(question.getId(), questionId))
-        .findFirst()
-        .orElseThrow()
-        .getJlptExamPart()
-        .getId();
-  }
-
-  private Long requirePartSessionId(List<JlptExamPart> parts, Long partId) {
-    return parts.stream()
-        .filter(part -> Objects.equals(part.getId(), partId))
-        .findFirst()
-        .orElseThrow()
-        .getJlptExamSession()
-        .getId();
-  }
-
-  private void validatePublishable(JlptExam exam) {
-    AdminJlptExamDetailResponse detail = mapDetail(exam);
-    if (detail.getSessions().isEmpty()) {
-      throw new BadRequestException("A published exam must contain at least one session");
-    }
-    requireUniqueSortOrders(detail.getSessions().stream()
-        .map(AdminJlptExamDetailResponse.SessionResponse::getSortOrder).toList(), "sessions");
-    for (AdminJlptExamDetailResponse.SessionResponse session : detail.getSessions()) {
-      if (session.getTimeLimitMinutes() == null || session.getTimeLimitMinutes() <= 0) {
-        throw new BadRequestException("Every session must have a positive time limit");
-      }
-      if (session.getParts().isEmpty()) {
-        throw new BadRequestException("Every session must contain at least one part");
-      }
-      requireUniqueSortOrders(session.getParts().stream()
-          .map(AdminJlptExamDetailResponse.PartResponse::getSortOrder).toList(), "parts");
-      for (AdminJlptExamDetailResponse.PartResponse part : session.getParts()) {
-        if (part.getQuestions().isEmpty()) {
-          throw new BadRequestException("Every part must contain at least one question");
-        }
-        requireUniqueSortOrders(part.getQuestions().stream()
-            .map(AdminJlptExamDetailResponse.QuestionResponse::getSortOrder).toList(), "questions");
-        for (AdminJlptExamDetailResponse.QuestionResponse question : part.getQuestions()) {
-          validateQuestionForPublish(question);
-        }
-      }
-    }
-  }
-
-  private void validateQuestionForPublish(AdminJlptExamDetailResponse.QuestionResponse question) {
-    if (question.getQuestionType() != JlptQuestionEnum.single_choice) {
-      throw new BadRequestException("Unsupported JLPT question type");
-    }
-    if (question.getAnswers().size() < 2) {
-      throw new BadRequestException("Each single-choice question must have at least two answers");
-    }
-    long correctAnswers = question.getAnswers().stream()
-        .filter(answer -> Boolean.TRUE.equals(answer.getIsCorrect()))
-        .count();
-    if (correctAnswers != 1) {
-      throw new BadRequestException("Each single-choice question must have exactly one correct answer");
-    }
-    requireUniqueSortOrders(question.getAnswers().stream()
-        .map(AdminJlptExamDetailResponse.AnswerResponse::getSortOrder).toList(), "answers");
-  }
-
-  private void requireUniqueSortOrders(List<Integer> sortOrders, String resource) {
-    if (new HashSet<>(sortOrders).size() != sortOrders.size()) {
-      throw new BadRequestException("Duplicate sort order in " + resource);
-    }
-  }
-
   private JlptExam requireExam(Long examId) {
     return examRepository.findById(examId)
         .orElseThrow(() -> new NotFoundException("JLPT exam not found"));
   }
 
   private JlptExam requireActiveExam(Long examId) {
-    JlptExam exam = requireExam(examId);
-    if (Boolean.TRUE.equals(exam.getIsDeleted())) {
-      throw new NotFoundException("JLPT exam not found");
-    }
-    return exam;
+    // Every hierarchy/lifecycle writer takes this root lock before reading membership.
+    return examRepository.findActiveForUpdate(examId)
+        .orElseThrow(() -> new NotFoundException("JLPT exam not found"));
   }
 
   private JlptExam requireEditableExam(Long examId) {
@@ -580,21 +746,22 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
   }
 
   private Long replaceMedia(Long oldMediaId, Long newMediaId, FileTypeEnum expectedType) {
-    if (Objects.equals(oldMediaId, newMediaId)) {
-      return oldMediaId;
-    }
     Media replacement = null;
+    List<Long> ids = java.util.stream.Stream.of(oldMediaId, newMediaId).filter(Objects::nonNull).toList();
+    Map<Long, Media> locked = lockMedia(ids);
     if (newMediaId != null) {
-      replacement = mediaRepository.findByIdAndIsDeletedFalse(newMediaId)
-          .orElseThrow(() -> new NotFoundException("Media not found"));
+      replacement = locked.get(newMediaId);
+      if (replacement == null) {
+        throw new NotFoundException("Media not found");
+      }
       if (replacement.getFileType() != expectedType) {
         throw new BadRequestException("Media has an invalid file type");
       }
-      if (Boolean.TRUE.equals(replacement.getIsUsed())) {
+      if (!Objects.equals(oldMediaId, newMediaId)
+          && (Boolean.TRUE.equals(replacement.getIsUsed()) || isMediaReferenced(newMediaId))) {
         throw new ConflictException("Media is already in use");
       }
     }
-    releaseMedia(oldMediaId);
     if (replacement != null) {
       replacement.setIsUsed(true);
     }
@@ -603,23 +770,46 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
 
   private void releaseMedia(Long mediaId) {
     if (mediaId != null) {
-      mediaRepository.findById(mediaId).ifPresent(media -> media.setIsUsed(false));
+      mediaRepository.findActiveForUpdate(mediaId)
+          .ifPresent(media -> media.setIsUsed(isMediaReferenced(mediaId)));
     }
   }
 
-  private void releaseMediaForSession(Long sessionId) {
-    partRepository.findByJlptExamSession_IdOrderBySortOrderAsc(sessionId)
-        .forEach(this::releaseMediaForPart);
+  private void releaseMedia(Collection<Long> mediaIds) {
+    mediaIds.stream().sorted().forEach(this::releaseMedia);
   }
 
-  private void releaseMediaForPart(JlptExamPart part) {
-    releaseMedia(part.getAudioMediaId());
-    questionRepository.findByJlptExamPartIdOrderBySortOrderAsc(part.getId())
-        .forEach(question -> {
-          releaseMedia(question.getImageMediaId());
-          answerRepository.deleteAll(
-              answerRepository.findByJlptExamQuestionIdOrderBySortOrderAsc(question.getId()));
-        });
+  private boolean isMediaReferenced(Long id) {
+    return partRepository.existsByAudioMediaId(id) || questionRepository.existsByImageMediaId(id)
+        || courseRepository.existsByThumbnailMediaIdAndIsDeletedFalse(id)
+        || categoryRepository.existsByMediaIdAndIsDeletedFalse(id)
+        || lessonRepository.existsByVideoMediaIdAndIsDeletedFalse(id);
+  }
+
+  private Map<Long, Media> lockMedia(Collection<Long> ids) {
+    Map<Long, Media> locked = new HashMap<>();
+    ids.stream().distinct().sorted().forEach(id -> mediaRepository.findActiveForUpdate(id)
+        .ifPresent(media -> locked.put(id, media)));
+    return locked;
+  }
+
+  private Set<Long> referencedMedia(List<JlptExamPart> parts, List<JlptExamQuestion> questions) {
+    Set<Long> ids = new HashSet<>();
+    parts.stream().map(JlptExamPart::getAudioMediaId).filter(Objects::nonNull).forEach(ids::add);
+    questions.stream().map(JlptExamQuestion::getImageMediaId).filter(Objects::nonNull).forEach(ids::add);
+    return ids;
+  }
+
+  private List<JlptExamQuestion> questionsForParts(List<JlptExamPart> parts) {
+    return parts.isEmpty() ? List.of() : questionRepository.findAdminQuestionsByPartIds(
+        parts.stream().map(JlptExamPart::getId).toList());
+  }
+
+  private void deleteAnswers(List<JlptExamQuestion> questions) {
+    if (!questions.isEmpty()) {
+      answerRepository.deleteAll(answerRepository.findAdminAnswersByQuestionIds(
+          questions.stream().map(JlptExamQuestion::getId).toList()));
+    }
     answerRepository.flush();
   }
 
@@ -673,7 +863,8 @@ public class AdminJlptExamServiceImpl implements AdminJlptExamService {
     } catch (IllegalArgumentException exception) {
       direction = Sort.Direction.DESC;
     }
-    return Sort.by(direction, field);
+    Sort sort = Sort.by(direction, field);
+    return field.equals("id") ? sort : sort.and(Sort.by(direction, "id"));
   }
 
   private String trimToNull(String value) {

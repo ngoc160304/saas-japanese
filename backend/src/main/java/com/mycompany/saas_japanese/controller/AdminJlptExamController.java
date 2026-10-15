@@ -1,5 +1,7 @@
 package com.mycompany.saas_japanese.controller;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,14 +17,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.saas_japanese.domain.query.AdminJlptExamQuery;
+import com.mycompany.saas_japanese.domain.query.AdminJlptExamStatsQuery;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptAnswer;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptExam;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptPart;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptQuestion;
+import com.mycompany.saas_japanese.domain.request.ReqSaveAdminJlptQuestion;
 import com.mycompany.saas_japanese.domain.request.ReqAdminJlptSession;
 import com.mycompany.saas_japanese.domain.request.ReqJlptSortOrder;
+import com.mycompany.saas_japanese.domain.request.ReqJlptReorder;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamDetailResponse;
 import com.mycompany.saas_japanese.domain.response.AdminJlptExamSummaryResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamStatsResponse;
+import com.mycompany.saas_japanese.domain.response.AdminJlptExamValidationResponse;
 import com.mycompany.saas_japanese.service.AdminJlptExamService;
 import com.mycompany.saas_japanese.util.anotation.ApiMessage;
 
@@ -37,11 +44,73 @@ import lombok.RequiredArgsConstructor;
 public class AdminJlptExamController {
   private final AdminJlptExamService service;
 
+  @GetMapping("/{examId}/validation")
+  @ApiMessage("Validate JLPT exam readiness")
+  public ResponseEntity<AdminJlptExamValidationResponse> validate(@Positive @PathVariable Long examId) {
+    return ResponseEntity.ok(service.validate(examId));
+  }
+
+  @PostMapping("/{examId}/sessions/{sessionId}/parts/{partId}/questions/with-answers")
+  @ApiMessage("Create JLPT question with answers")
+  public ResponseEntity<AdminJlptExamDetailResponse.QuestionResponse> createQuestionWithAnswers(
+      @Positive @PathVariable Long examId, @Positive @PathVariable Long sessionId,
+      @Positive @PathVariable Long partId, @Valid @RequestBody ReqSaveAdminJlptQuestion request) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(
+        service.createQuestionWithAnswers(examId, sessionId, partId, request));
+  }
+
+  @PutMapping("/{examId}/sessions/{sessionId}/parts/{partId}/questions/{questionId}/with-answers")
+  @ApiMessage("Update JLPT question with answers")
+  public ResponseEntity<AdminJlptExamDetailResponse.QuestionResponse> updateQuestionWithAnswers(
+      @Positive @PathVariable Long examId, @Positive @PathVariable Long sessionId,
+      @Positive @PathVariable Long partId, @Positive @PathVariable Long questionId,
+      @Valid @RequestBody ReqSaveAdminJlptQuestion request) {
+    return ResponseEntity.ok(service.updateQuestionWithAnswers(examId, sessionId, partId, questionId, request));
+  }
+
+  @PatchMapping("/{examId}/sessions/reorder")
+  @ApiMessage("Reorder JLPT exam sessions")
+  public ResponseEntity<List<AdminJlptExamDetailResponse.SessionResponse>> reorderSessions(
+      @Positive @PathVariable Long examId, @Valid @RequestBody ReqJlptReorder request) {
+    return ResponseEntity.ok(service.reorderSessions(examId, request.getIds()));
+  }
+
+  @PatchMapping("/{examId}/sessions/{sessionId}/parts/reorder")
+  @ApiMessage("Reorder JLPT exam parts")
+  public ResponseEntity<List<AdminJlptExamDetailResponse.PartResponse>> reorderParts(
+      @Positive @PathVariable Long examId, @Positive @PathVariable Long sessionId,
+      @Valid @RequestBody ReqJlptReorder request) {
+    return ResponseEntity.ok(service.reorderParts(examId, sessionId, request.getIds()));
+  }
+
+  @PatchMapping("/{examId}/sessions/{sessionId}/parts/{partId}/questions/reorder")
+  @ApiMessage("Reorder JLPT exam questions")
+  public ResponseEntity<List<AdminJlptExamDetailResponse.QuestionResponse>> reorderQuestions(
+      @Positive @PathVariable Long examId, @Positive @PathVariable Long sessionId,
+      @Positive @PathVariable Long partId, @Valid @RequestBody ReqJlptReorder request) {
+    return ResponseEntity.ok(service.reorderQuestions(examId, sessionId, partId, request.getIds()));
+  }
+
+  @PatchMapping("/{examId}/sessions/{sessionId}/parts/{partId}/questions/{questionId}/answers/reorder")
+  @ApiMessage("Reorder JLPT exam answers")
+  public ResponseEntity<List<AdminJlptExamDetailResponse.AnswerResponse>> reorderAnswers(
+      @Positive @PathVariable Long examId, @Positive @PathVariable Long sessionId,
+      @Positive @PathVariable Long partId, @Positive @PathVariable Long questionId,
+      @Valid @RequestBody ReqJlptReorder request) {
+    return ResponseEntity.ok(service.reorderAnswers(examId, sessionId, partId, questionId, request.getIds()));
+  }
+
   @GetMapping
   @ApiMessage("Fetch admin JLPT exams")
   public ResponseEntity<Page<AdminJlptExamSummaryResponse>> findAll(
       @Valid AdminJlptExamQuery query) {
     return ResponseEntity.ok(service.findAll(query));
+  }
+
+  @GetMapping("/stats")
+  @ApiMessage("Fetch admin JLPT exam statistics")
+  public ResponseEntity<AdminJlptExamStatsResponse> statistics(@Valid AdminJlptExamStatsQuery query) {
+    return ResponseEntity.ok(service.statistics(query));
   }
 
   @GetMapping("/{examId}")
