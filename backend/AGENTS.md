@@ -43,7 +43,7 @@ Vai trò:
 - domain/response/: output DTO.
 - domain/query/: pagination, filter và sort input.
 - service/mapper/: mapping entity/DTO.
-- Specification/: dynamic JPA filtering; giữ nguyên cách viết hoa tên thư mục hiện tại.
+- specification/: dynamic JPA filtering; tên package và thư mục đều viết thường.
 - provider/: external integration.
 - util/error/: domain exception và centralized error handling.
 - util/: utility dùng chung như SecurityUtil và SlugUtil.
@@ -127,7 +127,7 @@ Khi sửa login/register/OTP/password/profile:
 - Response DTO chỉ chứa dữ liệu API cần.
 - Request create và update được tách khi validation/semantics khác nhau.
 - Giữ naming hiện tại trừ khi task yêu cầu refactor.
-- Không đổi CourseQuerry hoặc package Specification chỉ như cleanup ngoài phạm vi.
+- Không đổi CourseQuerry hoặc package specification chỉ như cleanup ngoài phạm vi.
 - Không thêm MapStruct hoặc mapping framework mới nếu chưa được chấp thuận.
 - Xóa unused import, debug log và commented-out implementation.
 
